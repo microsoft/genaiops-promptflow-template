@@ -1,0 +1,32 @@
+{
+    "datasets":[
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "pr",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "pr_data",
+            "DATA_PATH":"flows/named_entity_recognition/data/data.jsonl",
+            "DATASET_NAME":"temp_dataset",
+            "DATASET_DESC":"this dataset is for pr validation only"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "test_data",
+            "DATA_PATH":"flows/named_entity_recognition/data/eval_data.jsonl",
+            "DATASET_NAME":"named_entity_recognition_test",
+            "RELATED_EXP_DATASET": "named_entity_recognition_train",
+            "DATASET_DESC":"this dataset is for evaluating flows"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "training_data",
+            "DATA_PATH":"flows/named_entity_recognition/data/data.jsonl",
+            "DATASET_NAME":"named_entity_recognition_train",
+            "DATASET_DESC":"this dataset is for prompt experiments"
+        }
+    ]
+}

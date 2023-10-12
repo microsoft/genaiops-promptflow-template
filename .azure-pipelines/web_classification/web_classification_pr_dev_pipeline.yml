@@ -1,0 +1,35 @@
+trigger: none
+pr:
+  branches:
+   include:
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - mlops/common/*
+      - flows/web_classification/*
+      - model/web_classification/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: mlops_platform_dev_vg
+
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "pr"
+ - name: model_type
+   displayName: "model type"
+   default: "web_classification"
+
+stages:
+  - template: ../templates/variables_template.yml
+    parameters:
+      env_name: ${{parameters.env_name}}
+      model_type: ${{parameters.model_type}}
+  - template: ../platform_pr_dev_pipeline.yml
+    parameters:
+      exec_environment: ${{ parameters.env_name }}
+      model_type: ${{ parameters.model_type }}

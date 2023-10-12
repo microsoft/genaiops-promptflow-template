@@ -1,0 +1,51 @@
+{
+    "datasets":[
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
+            "ENV_NAME": "pr",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "pr_data",
+            "DATA_PATH":"flows/web_classification/data/data.jsonl",
+            "DATASET_NAME":"web_classification_pr",
+            "DATASET_DESC":"this dataset is for pr validation only"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "test_data",
+            "DATA_PATH":"flows/web_classification/data/eval_data.jsonl",
+            "DATASET_NAME":"web_classification_train_eval",
+            "RELATED_EXP_DATASET": "web_classification_train",
+            "DATASET_DESC":"this dataset is for evaluating flows"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "test_data",
+            "DATA_PATH":"flows/web_classification/data/eval_data_new.jsonl",
+            "DATASET_NAME":"web_classification_train_new_eval",
+            "RELATED_EXP_DATASET": "web_classification_train_new",
+            "DATASET_DESC":"this dataset is for evaluating flows"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "training_data",
+            "DATA_PATH":"flows/web_classification/data/data.jsonl",
+            "DATASET_NAME":"web_classification_train",
+            "DATASET_DESC":"this dataset is for prompt experiments"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
+            "ENV_NAME": "dev",
+            "AZURE_RM_SVC_CONNECTION": "azure_connection",
+            "DATA_PURPOSE": "training_data",
+            "DATA_PATH":"flows/web_classification/data/data_new.jsonl",
+            "DATASET_NAME":"web_classification_train_new",
+            "DATASET_DESC":"this dataset is for prompt experiments"
+        }
+    ]
+}
