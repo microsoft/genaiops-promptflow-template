@@ -1,0 +1,94 @@
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+ - name: model_type
+   displayName: "type of model to execute"
+
+stages:
+- stage: variable_generation
+  jobs:
+  - job: load_config_variables
+    steps:
+    - powershell: |
+        $json = Get-Content -Raw -Path '$(System.DefaultWorkingDirectory)/config/model_config.json' | ConvertFrom-Json
+        $firstElement = $json.flows | Where-Object {($_.PROMPT_FLOW_CONFIG_NAME -eq "${{ parameters.model_type }}") -and ($_.ENV_NAME -eq "${{ parameters.env_name }}")} | Select-Object -First 1
+        
+        Write-Output $firstElement.KEYVAULT_NAME
+        
+        foreach ($property in $firstElement.PSObject.Properties) {
+          $pname = $property.Name
+          $pvalue = $property.Value -replace '\s\s+', ","
+          $pvalue = $pvalue.replace(" ", "")
+          Write-Output "##vso[task.setvariable variable=$pname;isoutput=true]$pvalue"
+          }
+        
+        $EXPERIMENT_NAME =  "${{ parameters.model_type }}" + "_" + "$($firstElement.EXPERIMENT_BASE_NAME)" + "_" + "${{parameters.env_name}}"
+        Write-Output "##vso[task.setvariable variable=EXPERIMENT_NAME;isoutput=true]$EXPERIMENT_NAME"
+        
+        $DISPLAY_NAME =  "${{ parameters.model_type }}" + "_" + "$($firstElement.DISPLAY_BASE_NAME)" + "_" + "${{parameters.env_name}}" + "_" + "$(Build.BuildID)"
+        Write-Output "##vso[task.setvariable variable=DISPLAY_NAME;isoutput=true]$DISPLAY_NAME"
+        Write-Output $DISPLAY_NAME
+        $MODEL_NAME =  "${{ parameters.model_type }}" + "_" + "$($firstElement.MODEL_BASE_NAME)" + "_" + "${{parameters.env_name}}" + "_" + "$(Build.SourceBranchName)"
+        Write-Output "##vso[task.setvariable variable=MODEL_NAME;isoutput=true]$MODEL_NAME"  
+      name: loading_model_config
+
+  - job: validate_assign_variables
+    dependsOn: load_config_variables
+    variables:
+    - name:  PROMPT_FLOW_CONFIG_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.PROMPT_FLOW_CONFIG_NAME'] ]
+    - name:  KEYVAULT_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.KEYVAULT_NAME'] ]       
+    - name:  RUNTIME_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.RUNTIME_NAME'] ]
+    - name:  AZURE_RM_SVC_CONNECTION
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.AZURE_RM_SVC_CONNECTION'] ] 
+    - name:  MODEL_BASE_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.MODEL_BASE_NAME'] ]
+    - name:  RESOURCE_GROUP_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.RESOURCE_GROUP_NAME'] ]
+    - name:  WORKSPACE_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.WORKSPACE_NAME'] ]
+    - name: EXPERIMENT_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.EXPERIMENT_NAME'] ]
+    - name: MODEL_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.MODEL_NAME'] ]  
+    - name: CONNECTION_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.CONNECTION_NAME'] ] 
+    - name: DEPLOYMENT_NAME
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.DEPLOYMENT_NAME'] ]
+    - name: STANDARD_FLOW_PATH
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.STANDARD_FLOW_PATH'] ] 
+    - name: EVALUATION_FLOW_PATH
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.EVALUATION_FLOW_PATH'] ]  
+    - name: DATA_CONFIG_PATH
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.DATA_CONFIG_PATH'] ]
+    - name: REALTIME_DEPLOYMENT_CONFIG
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.REALTIME_DEPLOYMENT_CONFIG'] ]
+    - name: DEPLOY_FLOW_PATH
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.DEPLOY_FLOW_PATH'] ]
+    - name: DATA_MAPPING_CONFIG
+      value: $[ dependencies.load_config_variables.outputs['loading_model_config.DATA_MAPPING_CONFIG'] ]
+ 
+ 
+    steps:
+    - script: |
+        if [ -z "$(PROMPT_FLOW_CONFIG_NAME)" ]
+        then
+          echo "variables are not available. Check parameter values or config json file for valid values.."
+          exit 1
+        else
+          echo "variables were loaded from config file.."
+          printenv
+        fi
+      name: validate_variable_load
+    - task: AzureKeyVault@2
+      continueOnError: false
+      inputs:
+        azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+        KeyVaultName: $(KEYVAULT_NAME)
+        SecretsFilter: '*'
+        RunAsPreJob: false
+      name: load_keyvault_secrets
+
+          

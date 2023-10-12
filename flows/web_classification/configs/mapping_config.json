@@ -1,0 +1,16 @@
+{
+    "experiment": {
+        "url": "${data.url}"
+    },
+    "evaluation": {
+        "evaluation": {
+            "groundtruth": "${data.answer}",
+            "prediction": "${run.outputs.category}"
+        },
+        "evaluation_adv": {
+            "groundtruth": "${data.answer}",
+            "prediction": "${run.outputs.category}"
+        }
+    }
+
+}

@@ -1,0 +1,42 @@
+pr: none
+trigger:
+  branches:
+   include:
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - mlops/common/*
+      - flows/web_classification/*
+      - model/web_classification/*
+      - src/shared/*
+
+pool:
+  vmImage: ubuntu-latest
+
+
+variables:
+- group: mlops_platform_dev_vg
+
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "dev"
+ - name: model_type
+   displayName: "model type"
+   default: "web_classification"
+ - name: IS_KUBERNETES_DEPLOYMENT
+   displayName: "determine managed or kubernetes deployment"
+   default: "True"
+
+
+stages:
+  - template: ../templates/variables_template.yml
+    parameters:
+      env_name: ${{parameters.env_name}}
+      model_type: ${{parameters.model_type}}
+  - template: ../platform_ci_dev_pipeline.yml
+    parameters:
+      exec_environment: ${{ parameters.env_name }}
+      model_type: ${{ parameters.model_type }}
+      IS_KUBERNETES_DEPLOYMENT: ${{ parameters.IS_KUBERNETES_DEPLOYMENT }}

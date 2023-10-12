@@ -1,0 +1,96 @@
+parameters:
+- name: SUBSCRIPTION_ID
+  type: string
+- name: RESOURCE_GROUP_NAME
+  type: string
+- name: WORKSPACE_NAME
+  type: string
+- name: MODEL_TYPE
+  type: string
+- name: MODEL_NAME
+  type: string
+- name: MODEL_VERSION
+  type: string
+- name: DEPLOY_ENVIRONMENT
+  type: string
+- name: DATA_CONFIG_PATH
+  type: string
+- name: REALTIME_DEPLOYMENT_CONFIG
+  type: string
+- name: KEY_VAULT_NAME
+  type: string
+
+steps:
+- template: execute_python_code.yml
+  parameters:
+    step_name: "provision kubernetes endpoint"
+    script_parameter: |
+      python -m mlops.common.deployment.kubernetes_endpoint \
+        --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} \
+        --build_id $(Build.Buildid) \
+        --output_file "endpoint_principal.txt" \
+        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} 
+
+
+- task: AzureCLI@2
+  displayName: Read endpoint principal
+  name: read_endpoint_principal
+  inputs:
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    scriptLocation: inlineScript
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    inlineScript: |
+      readarray arr <"endpoint_principal.txt"
+      endpoint_principal=${arr[0]}
+      echo $endpoint_principal
+      echo "##vso[task.setvariable variable=ENDPOINT_PRINCIPAL;isOutput=true;]$endpoint_principal"
+  
+- task: AzureCLI@2
+  displayName: Assign permission deployment
+  continueOnError: false
+  env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
+  inputs: 
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    scriptLocation: inlineScript
+    inlineScript: |
+      az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/${{ parameters.RESOURCE_GROUP_NAME }}/providers/Microsoft.MachineLearningServices/workspaces/${{ parameters.WORKSPACE_NAME }}"
+      az keyvault set-policy --name ${{ parameters.KEY_VAULT_NAME }} --resource-group ${{ parameters.RESOURCE_GROUP_NAME }} --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
+
+- template: execute_python_code.yml
+  parameters:
+    step_name: "provision kubernetes deployment"
+    script_parameter: |
+      python -m mlops.common.deployment.kubernetes_deployment \
+        --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+        --model_name ${{ parameters.MODEL_NAME }} \
+        --model_version ${{ parameters.MODEL_VERSION }} \
+        --build_id $(Build.Buildid) \
+        --env_type ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} 
+
+- template: execute_python_code.yml
+  parameters:
+    step_name: "test kubernetes endpoint"
+    script_parameter: |
+      python -m mlops.common.deployment.test_model_on_kubernetes \
+        --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} \
+        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }}
+
+
+
+
+
+
+
+
