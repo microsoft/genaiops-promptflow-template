@@ -1,0 +1,81 @@
+name: aml_real_deployment
+
+description: execute an online endpoint for real time inference
+
+inputs:
+  SUBSCRIPTION_ID:
+    description: "subscription id needed for deployment"
+    required: true
+  MODEL_TYPE:
+    description: "the flow to be registered and deployed"
+    required: true
+  MODEL_VERSION:
+    description: "flow version in registry to be deployed"
+    required: true
+  DEPLOY_ENVIRONMENT:
+    description: "env stage e.g. dev, test, prod"
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Provision Kubernetes Online Endpoint
+      uses: ./.github/actions/execute_script
+      with:
+        step_name: "Provision Kubernetes Online Endpoint"
+        script_parameter: |
+          python -m mlops.common.deployment.kubernetes_endpoint \
+            --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
+            --build_id ${{ github.run_id }} \
+            --output_file "endpoint_principal.txt" \
+            --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --model_type ${{ inputs.MODEL_TYPE }}
+
+    - name: Read system managed id information
+      shell: bash
+      run: |
+        readarray arr <"endpoint_principal.txt"
+        endpoint_principal=${arr[0]}
+        echo $endpoint_principal
+        echo "ENDPOINT_PRINCIPAL=${endpoint_principal}"  >> "$GITHUB_ENV"
+
+    - name: Assign Azure resource permissions
+      shell: bash
+      run: |
+        file_path="./${{ inputs.MODEL_TYPE }}/config.json"
+        desired_type=${{ inputs.DEPLOY_ENVIRONMENT }}
+        selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+
+        if [[ -n "$selected_object" ]]; then
+          echo "$selected_object"
+          KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
+          RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
+          WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
+        else
+          echo "Object not found"
+        fi
+        az role assignment create --assignee $ENDPOINT_PRINCIPAL --role "AzureML Data Scientist" --scope "/subscriptions/${{ inputs.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
+        az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $ENDPOINT_PRINCIPAL --secret-permissions get list
+
+    - name: Provision Kubernetes Online Deployment
+      uses: ./.github/actions/execute_script
+      with:
+        step_name: "Provision Kubernetes Online Deployment"
+        script_parameter: |
+          python -m mlops.common.deployment.kubernetes_deployment \
+            --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
+            --model_version ${{ inputs.MODEL_VERSION }} \
+            --build_id ${{ github.run_id }} \
+            --env_type ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --model_type ${{ inputs.MODEL_TYPE }}
+
+    - name: Test Kubernetes Deployment
+      uses: ./.github/actions/execute_script
+      with:
+        step_name: "Test Kubernetes Deployment"
+        script_parameter: |
+          python -m mlops.common.deployment.test_model_on_kubernetes \
+            --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
+            --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --model_type ${{ inputs.MODEL_TYPE }}

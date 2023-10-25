@@ -28,8 +28,8 @@ steps:
       echo "$result"
       python -m pip install --upgrade pip
       python -m pip install -r .azure-pipelines/requirements/execute_job_requirements.txt
-      pip_install_command="python -m pip install promptflow==0.0.105361075 promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] $result"
-      #pip_install_command="python -m pip install promptflow==0.0.102010695 promptflow-tools==0.1.0b3 promptflow-sdk==0.0.101948879 jinja2 promptflow[azure] openai promptflow-sdk[builtins] $result"
+      #pip_install_command="python -m pip install promptflow==0.0.105361075 promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] $result"
+      pip_install_command="python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] $result"
       eval "$pip_install_command"
       az version
 

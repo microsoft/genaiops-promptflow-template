@@ -1,0 +1,26 @@
+{
+    "envs":[ 
+            {
+                "ENV_NAME": "pr",
+                "RUNTIME_NAME": "newruntime70",
+                "KEYVAULT_NAME": "researchmlops5963078644",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "researchmlops",
+                "CONNECTION_NAME": "aoai",
+                "DEPLOYMENT_NAME": "gpt-35-turbo",
+                "STANDARD_FLOW_PATH": "flows/standard",
+                "EVALUATION_FLOW_PATH": "flows/evaluation"
+            },
+            {
+                "ENV_NAME": "dev",
+                "RUNTIME_NAME": "newruntime70",
+                "KEYVAULT_NAME": "researchmlops5963078644",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "researchmlops",
+                "CONNECTION_NAME": "aoai",
+                "DEPLOYMENT_NAME": "gpt-35-turbo",
+                "STANDARD_FLOW_PATH": "flows/standard",
+                "EVALUATION_FLOW_PATH": "flows/evaluation"
+            }
+    ]
+}

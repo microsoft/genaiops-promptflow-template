@@ -49,7 +49,8 @@ LLMOps with Prompt Flow provides capabilities for both simple as well as complex
 
 # Documentation
 
-Full documentation can be found [here](./docs/how_to_setup.md)
+Full documentation can using this repo using Azure DevOps be found [here](./docs/Azure_devops_how_to_setup.md)
+Full documentation can using this repo using Github Workflows be found [here](./docs/github_workflows_how_to_setup.md)
 
 # Deployment
 

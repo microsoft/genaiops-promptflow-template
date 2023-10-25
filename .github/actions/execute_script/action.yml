@@ -1,0 +1,19 @@
+name: execute_script
+
+description: execute a bash script
+
+inputs:
+  step_name:
+    description: "used for naming the step execution"
+    required: true
+  script_parameter:
+    description: "command line instruction for executing a script"
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: ${{inputs.step_name}}
+      shell: bash
+      run: |
+        ${{inputs.script_parameter}}

@@ -10,45 +10,32 @@ parameters:
 
 stages:
     - stage: execute_prompt_experiment
-      displayName: execute_prompt_experiment
-      dependsOn: 
-      - variable_generation
-      variables:
-      - template: templates/experiment_variables.yml
       jobs:
       - job: Execute_ml_Job_Pipeline
         steps:
-        - template: templates/get_connection_details.yml
         - template: templates/configure_azureml_agent.yml
+        - template: templates/get_connection_details.yml
         - template: templates/register_data_asset.yml
           parameters:
             step_name: "register training data"
             script_parameter: |
               python -m mlops.common.register_data_asset \
-                --subscription_id $(SUBSCRIPTION_ID) \
-                --resource_group_name  $(RESOURCE_GROUP_NAME) \
-                --workspace_name $(WORKSPACE_NAME) \
+                --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
-                --data_config_path "$(DATA_CONFIG_PATH)" \
+                --model_type ${{ parameters.model_type }} \
                 --environment_name ${{ parameters.exec_environment }}
+
         - template: templates/execute_mlops_pipeline.yml
           parameters:
             script_parameter: |
               python -m mlops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --resource_group_name $(RESOURCE_GROUP_NAME) \
-                --workspace_name $(WORKSPACE_NAME) \
-                --runtime_name $(RUNTIME_NAME) \
-                --connection_name $(CONNECTION_NAME) \
-                --deployment_name $(DEPLOYMENT_NAME) \
                 --build_id $(BUILD.BUILDID) \
                 --stage ${{parameters.exec_environment}} \
-                --experiment_name $(EXPERIMENT_NAME) \
-                --standard_flow_path $(STANDARD_FLOW_PATH) \
-                --data_config_path "$(DATA_CONFIG_PATH)" \
+                --model_type ${{ parameters.model_type }} \
                 --data_purpose "training_data" \
-                --data_mapping $(DATA_MAPPING_CONFIG) \
                 --output_file run_id.txt
+
         - task: AzureCLI@2
           displayName: Read prompt runs
           name: read_run_id
@@ -62,34 +49,28 @@ stages:
               run_name=${arr[0]}
               echo $run_name
               echo "##vso[task.setvariable variable=RUN_NAME;isOutput=true;]$run_name"
+
         - template: templates/register_data_asset.yml
           parameters:
             step_name: "register test data"
             script_parameter: |
               python -m mlops.common.register_data_asset \
-                --subscription_id $(SUBSCRIPTION_ID) \
-                --resource_group_name  $(RESOURCE_GROUP_NAME) \
-                --workspace_name $(WORKSPACE_NAME) \
+                --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "test_data" \
-                --data_config_path "$(DATA_CONFIG_PATH)" \
+                --model_type ${{ parameters.model_type }} \
                 --environment_name ${{ parameters.exec_environment }}
+
         - template: templates/execute_mlops_pipeline.yml
           parameters:
             script_parameter: |
               python -m mlops.common.prompt_eval \
                 --subscription_id $(SUBSCRIPTION_ID) \
-                --resource_group_name $(RESOURCE_GROUP_NAME) \
-                --workspace_name $(WORKSPACE_NAME) \
-                --runtime_name $(RUNTIME_NAME) \
                 --build_id $(BUILD.BUILDID) \
                 --stage "${{parameters.exec_environment}}" \
-                --experiment_name $(EXPERIMENT_NAME) \
-                --standard_flow_path $(STANDARD_FLOW_PATH) \
-                --eval_flow_path $(EVALUATION_FLOW_PATH) \
-                --data_config_path "$(DATA_CONFIG_PATH)" \
+                --model_type ${{ parameters.model_type }} \
                 --data_purpose "test_data" \
-                --data_mapping $(DATA_MAPPING_CONFIG) \
                 --run_id "$(read_run_id.RUN_NAME)"
+
         - task: PublishPipelineArtifact@1
           inputs:
             targetPath: '$(System.DefaultWorkingDirectory)/reports'
@@ -99,10 +80,8 @@ stages:
     - stage: deploy_prompts
       displayName: deploy_prompts
       dependsOn: 
-      - variable_generation
       - execute_prompt_experiment
       variables:
-      - template: templates/experiment_variables.yml
       - name: run_id_from_submit_job
         value: $[ stageDependencies.execute_prompt_experiment.Execute_ml_Job_Pipeline.outputs['read_run_id.RUN_NAME'] ]
       jobs:
@@ -130,11 +109,6 @@ stages:
             script_parameter: |
               python -m mlops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
-                --resource_group_name $(RESOURCE_GROUP_NAME) \
-                --workspace_name $(WORKSPACE_NAME) \
-                --model_name $(MODEL_NAME) \
-                --model_path $(STANDARD_FLOW_PATH) \
-                --deploy_flow_path $(DEPLOY_FLOW_PATH) \
                 --model_type ${{ parameters.model_type }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
@@ -156,13 +130,8 @@ stages:
           - template: templates/kubernetes_deployment.yml  # Template reference
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)
-              WORKSPACE_NAME: $(WORKSPACE_NAME)
               MODEL_TYPE: ${{ parameters.model_type }}
-              MODEL_NAME: $(MODEL_NAME)
               DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
-              DATA_CONFIG_PATH:  $(DATA_CONFIG_PATH)
-              REALTIME_DEPLOYMENT_CONFIG: $(REALTIME_DEPLOYMENT_CONFIG)
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
@@ -170,12 +139,7 @@ stages:
           - template: templates/aml_real_deployment.yml  # Template reference
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              RESOURCE_GROUP_NAME: $(RESOURCE_GROUP_NAME)
-              WORKSPACE_NAME: $(WORKSPACE_NAME)
               MODEL_TYPE: ${{ parameters.model_type }}
-              MODEL_NAME: $(MODEL_NAME)
               DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
-              DATA_CONFIG_PATH:  $(DATA_CONFIG_PATH)
-              REALTIME_DEPLOYMENT_CONFIG: $(REALTIME_DEPLOYMENT_CONFIG)
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
