@@ -1,0 +1,106 @@
+name: web_classification_cd_dev_pipeline
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow use-case to execute"
+        required: true
+        default: "web_classification"
+      is_kubernetes_deployment:
+        type: string
+        description: "Determine managed(False) or kubernetes(True) deployment"
+        required: true
+    secrets:
+      azure_credentials:
+        description: "service principal auth to Azure"
+        required: true
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow use-case to execute"
+        required: true
+      is_kubernetes_deployment:
+        type: string
+        description: "Determine managed(False) or kubernetes(True) deployment"
+        required: true
+
+jobs:
+  flow-deployment:
+    name: prompt flow deployment job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure_credentials }}
+      - name: Configure Azure ML Agent
+        uses: ./.github/actions/configure_azureml_agent
+      - name: load the current Azure subscription details
+        id: subscription_details
+        shell: bash
+        run: |
+          export subscriptionId=$(az account show --query id -o tsv)
+          echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
+
+      - name: Register flow as model in AzureML
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register flow as model in AzureML"
+          script_parameter: |
+            python -m mlops.common.deployment.register_model \
+            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+            --model_type ${{ inputs.flow_type }} \
+            --output_file "model_version.txt" \
+            --build_id ${{ github.run_id }} \
+            --env_type ${{ inputs.env_name }} \
+
+      - name: Read registered flow latest version
+        shell: bash
+        run: |
+          readarray arr <"model_version.txt"
+          model_version=${arr[0]}
+          echo $model_version
+          echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
+
+      - name: Deploy to AML real-time online endpoint
+        if: ${{ inputs.is_kubernetes_deployment == 'False'  }} 
+        uses: ./.github/actions/aml_real_deployment
+        with:
+          SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
+          MODEL_TYPE: ${{ inputs.flow_type }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          MODEL_VERSION: $MODEL_VERSION
+
+      - name: Deploy to kubernetes real-time online endpoint
+        if: ${{ inputs.is_kubernetes_deployment == 'True'  }}  
+        uses: ./.github/actions/kubernetes_deployment
+        with:
+          SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
+          MODEL_TYPE: ${{ inputs.flow_type }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          MODEL_VERSION: $MODEL_VERSION
+
+
+        
+            
+
+
+
+
+
+            

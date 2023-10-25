@@ -17,7 +17,7 @@ jobs:
 
 
   - script: |
-      pytest test/${{ parameters.model_type }}  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+      pytest ${{ parameters.model_type }}/tests  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
     displayName: 'Run Unit Tests'
     condition: succeededOrFailed()
 

@@ -20,27 +20,35 @@ from azure.ai.ml.entities._deployment.container_resource_settings import (
 
 parser = argparse.ArgumentParser("provision_deployment")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--resource_group_name", type=str, help="Azure Machine learning resource group", required=True)
-parser.add_argument("--workspace_name", type=str, help="Azure Machine learning Workspace name", required=True)
-parser.add_argument("--model_name", type=str, help="registered model name to be deployed", required=True)
 parser.add_argument("--model_version", type=str, help="registered model version to be deployed", required=True)
 parser.add_argument("--build_id", type=str, help="Azure DevOps build id for deployment", required=True)
 parser.add_argument("--env_type", type=str, help="env name (dev, test, prod) for deployment", required=True)
-parser.add_argument("--realtime_deployment_config", type=str, help="file path of realtime config")
+parser.add_argument("--model_type", type=str, help="name of the flow", required=True)
 
 
 args = parser.parse_args()
 
-model_name = args.model_name
 model_version = args.model_version
 build_id = args.build_id
-real_config = args.realtime_deployment_config
-env_type = args.env_type
+stage = args.env_type
+model_type = args.model_type
+model_name = f"{model_type}_{stage}"
+main_config = open(f"{model_type}/config.json")
+model_config = json.load(main_config)
+
+for obj in model_config["envs"]:
+    if obj.get("ENV_NAME") == stage:
+        config = obj
+        break
+
+resource_group_name = config["RESOURCE_GROUP_NAME"]
+workspace_name = config["WORKSPACE_NAME"]
+real_config = f"{model_type}/configs/deployment_config.json"
 
 print(f"Model name: {model_name}")
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, args.resource_group_name, args.workspace_name
+    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
 )
 
 model = ml_client.models.get(model_name, model_version)
@@ -49,7 +57,7 @@ config_file = open(real_config)
 endpoint_config = json.load(config_file)
 for elem in endpoint_config['kubernetes_endpoint']:
     if 'ENDPOINT_NAME' in elem and 'ENV_NAME' in elem:
-        if env_type == elem['ENV_NAME']:
+        if stage == elem['ENV_NAME']:
             endpoint_name = elem["ENDPOINT_NAME"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
             deployment_conda_path = elem["DEPLOYMENT_CONDA_PATH"]
@@ -64,7 +72,7 @@ for elem in endpoint_config['kubernetes_endpoint']:
             deployment_desc = elem["DEPLOYMENT_DESC"]
             environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
             environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
-            environment_variables["PRT_CONFIG_OVERRIDE"] = f"deployment.subscription_id={args.subscription_id},deployment.resource_group={args.resource_group_name},deployment.workspace_name={args.workspace_name},deployment.endpoint_name={endpoint_name},deployment.deployment_name={deployment_name}"
+            environment_variables["PRT_CONFIG_OVERRIDE"] = f"deployment.subscription_id={args.subscription_id},deployment.resource_group={resource_group_name},deployment.workspace_name={workspace_name},deployment.endpoint_name={endpoint_name},deployment.deployment_name={deployment_name}"
 
             environment = Environment(
                 image=deployment_base_image,

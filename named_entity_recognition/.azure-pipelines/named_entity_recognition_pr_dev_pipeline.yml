@@ -1,0 +1,31 @@
+trigger: none
+pr:
+  branches:
+   include:
+     - main
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - mlops/*
+      - named_entity_recognition/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: mlops_platform_dev_vg
+
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "pr"
+ - name: model_type
+   displayName: "model type"
+   default: "named_entity_recognition"
+
+stages:
+  - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
+    parameters:
+      exec_environment: ${{ parameters.env_name }}
+      model_type: ${{ parameters.model_type }}

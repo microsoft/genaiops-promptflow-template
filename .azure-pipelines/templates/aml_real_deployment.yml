@@ -1,21 +1,11 @@
 parameters:
 - name: SUBSCRIPTION_ID
   type: string
-- name: RESOURCE_GROUP_NAME
-  type: string
-- name: WORKSPACE_NAME
-  type: string
 - name: MODEL_TYPE
-  type: string
-- name: MODEL_NAME
   type: string
 - name: MODEL_VERSION
   type: string
 - name: DEPLOY_ENVIRONMENT
-  type: string
-- name: DATA_CONFIG_PATH
-  type: string
-- name: REALTIME_DEPLOYMENT_CONFIG
   type: string
 - name: KEY_VAULT_NAME
   type: string
@@ -27,12 +17,10 @@ steps:
     script_parameter: |
       python -m mlops.common.deployment.provision_endpoint \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
-        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
-        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
-        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} \
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} 
+        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --model_type ${{ parameters.MODEL_TYPE }}
 
 
 - task: AzureCLI@2
@@ -59,8 +47,20 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/${{ parameters.RESOURCE_GROUP_NAME }}/providers/Microsoft.MachineLearningServices/workspaces/${{ parameters.WORKSPACE_NAME }}"
-      az keyvault set-policy --name ${{ parameters.KEY_VAULT_NAME }} --resource-group ${{ parameters.RESOURCE_GROUP_NAME }} --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
+      file_path="./${{ parameters.MODEL_TYPE }}/config.json"
+      desired_type=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+
+      if [[ -n "$selected_object" ]]; then
+        echo "$selected_object"
+        KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
+        RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
+        WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
+      else
+        echo "Object not found"
+      fi
+      az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
+      az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
 
 - template: execute_python_code.yml
   parameters:
@@ -68,13 +68,10 @@ steps:
     script_parameter: |
       python -m mlops.common.deployment.provision_deployment \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
-        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
-        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
-        --model_name ${{ parameters.MODEL_NAME }} \
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
         --env_type ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} 
+        --model_type ${{ parameters.MODEL_TYPE }}
 
 - template: execute_python_code.yml
   parameters:
@@ -82,10 +79,8 @@ steps:
     script_parameter: |
       python -m mlops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
-        --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
-        --workspace_name ${{ parameters.WORKSPACE_NAME }} \
-        --realtime_deployment_config ${{ parameters.REALTIME_DEPLOYMENT_CONFIG }} \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }}
+        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --model_type ${{ parameters.MODEL_TYPE }}
 
 
 

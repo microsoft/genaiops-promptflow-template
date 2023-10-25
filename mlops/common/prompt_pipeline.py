@@ -1,6 +1,7 @@
 import json
 import yaml
 import datetime
+import time
 from promptflow.entities import Run
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
@@ -20,26 +21,36 @@ def are_dictionaries_similar(dict1, old_runs):
 
 def prepare_and_execute(
         subscription_id,
-        resource_group_name,
-        workspace_name,
-        runtime,
-        connection_name,
-        deployment_name,
         build_id,
-        standard_flow_path,
+        model_type,
         stage,
-        experiment_name,
         output_file,
-        data_config_path,
         data_purpose,
-        data_mapping_config
     ):
+
+    main_config = open(f"{model_type}/config.json")
+    model_config = json.load(main_config)
+
+    for obj in model_config["envs"]:
+        if obj.get("ENV_NAME") == stage:
+            config = obj
+            break
+
+    resource_group_name = config["RESOURCE_GROUP_NAME"]
+    workspace_name = config["WORKSPACE_NAME"]
+    data_mapping_config= f"{model_type}/configs/mapping_config.json"
+    standard_flow_path= config["STANDARD_FLOW_PATH"]
+    data_config_path= f"{model_type}/configs/data_config.json"
+    connection_name= config["CONNECTION_NAME"]
+    deployment_name= config["DEPLOYMENT_NAME"]
+    runtime= config["RUNTIME_NAME"]
+    experiment_name = f"{model_type}_{stage}"
 
     ml_client = MLClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
 
     pf = PFClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
     print(data_mapping_config)
-    flow = standard_flow_path
+    flow = f"{model_type}/{standard_flow_path}" 
     dataset_name = []
     config_file = open(data_config_path)
     data_config = json.load(config_file)
@@ -108,6 +119,7 @@ def prepare_and_execute(
                             flow=flow,
                             data=data_id,
                             runtime=runtime,
+                            #resources={'instance_type': "Standard_E4ds_v4"},
                             variant=variant_string,
                             name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
                             display_name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
@@ -123,7 +135,7 @@ def prepare_and_execute(
                         run_ids.append(pipeline_job.name)
 
                         df_result = None
-                        
+                        time.sleep(15)
                         if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
                             print("job completed")
                             df_result = pf.get_details(pipeline_job)
@@ -138,6 +150,7 @@ def prepare_and_execute(
                 flow=flow,
                 data=data_id,
                 runtime=runtime,
+                #resources={'instance_type': "Standard_E4ds_v4"},
                 name=f"{experiment_name}_{timestamp}_{data_ref}",
                 display_name=f"{experiment_name}_{timestamp}_{data_ref}",
                 environment_variables={
@@ -152,7 +165,7 @@ def prepare_and_execute(
             run_ids.append(pipeline_job.name)
 
             df_result = None
-            
+            time.sleep(15)
             if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
                 print("job completed")
                 df_result = pf.get_details(pipeline_job)
@@ -171,21 +184,6 @@ def main():
     parser = argparse.ArgumentParser("prompt_exprimentation")
     parser.add_argument("--subscription_id", type=str, help="Azure subscription id")
     parser.add_argument(
-        "--resource_group_name", type=str, help="Azure Machine learning resource group"
-    )
-    parser.add_argument(
-        "--workspace_name", type=str, help="Azure Machine learning Workspace name"
-    )
-    parser.add_argument(
-        "--runtime_name", type=str, help="prompt flow runtime time"
-    )
-    parser.add_argument(
-        "--connection_name", type=str, help="connection name to LLM"
-    )
-    parser.add_argument(
-        "--deployment_name", type=str, help="LLM Model deployment name"
-    )
-    parser.add_argument(
         "--build_id",
         type=str,
         help="Unique identifier for Azure DevOps pipeline run",
@@ -196,39 +194,21 @@ def main():
         help="execution and deployment environment. e.g. dev, prod, test",
     )
     parser.add_argument(
-        "--experiment_name", type=str, help="Job execution experiment name"
-    )
-    parser.add_argument(
-        "--standard_flow_path", type=str, help="Job execution experiment name"
-    )
-
-    parser.add_argument(
         "--data_purpose", type=str, help="data to be registered identified by purpose"
     )
-
     parser.add_argument(
         "--output_file", type=str, required=False, help="A file to save run ids"
     )
-    parser.add_argument("--data_config_path", type=str, required=True, help="data config path")
-    parser.add_argument("--data_mapping_config", type=str, required=True, help="data mapping config")
-
+    parser.add_argument("--model_type", type=str, help="data config file path", required=True)
     args = parser.parse_args()
 
     prepare_and_execute(
         args.subscription_id,
-        args.resource_group_name,
-        args.workspace_name,
-        args.runtime_name,
-        args.connection_name,
-        args.deployment_name,
         args.build_id,
-        args.standard_flow_path,
+        args.model_type,
         args.stage,
-        args.experiment_name,
         args.output_file,
-        args.data_config_path,
         args.data_purpose,
-        args.data_mapping_config
     )
 
 

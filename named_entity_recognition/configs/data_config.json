@@ -1,0 +1,29 @@
+{
+    "datasets":[
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "pr",
+            "DATA_PURPOSE": "pr_data",
+            "DATA_PATH":"data/data.jsonl",
+            "DATASET_NAME":"temp_dataset",
+            "DATASET_DESC":"this dataset is for pr validation only"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "dev",
+            "DATA_PURPOSE": "test_data",
+            "DATA_PATH":"data/eval_data.jsonl",
+            "DATASET_NAME":"named_entity_recognition_test",
+            "RELATED_EXP_DATASET": "named_entity_recognition_train",
+            "DATASET_DESC":"this dataset is for evaluating flows"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
+            "ENV_NAME": "dev",
+            "DATA_PURPOSE": "training_data",
+            "DATA_PATH":"data/data.jsonl",
+            "DATASET_NAME":"named_entity_recognition_train",
+            "DATASET_DESC":"this dataset is for prompt experiments"
+        }
+    ]
+}
