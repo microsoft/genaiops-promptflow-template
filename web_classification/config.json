@@ -26,7 +26,7 @@
                     "CONNECTION_NAME": "aoai",
                     "DEPLOYMENT_NAME": "gpt-35-turbo",
                     "STANDARD_FLOW_PATH": "flows/experiment",
-                    "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
+                    "EVALUATION_FLOW_PATH": "flows/evaluation"
                 }
             ]
         }
