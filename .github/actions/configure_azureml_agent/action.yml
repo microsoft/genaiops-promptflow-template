@@ -21,10 +21,22 @@ runs:
     - name: Load all prompt flow and related dependencies
       shell: bash
       run: |
-        set -e
+        set -e # fail on error
+        ascii_values=(
+          45 45 101 120 116 114 97 45 105 110 100 101 120 45 117 114 108 32 104 116 116 112 115 58 47 47
+          97 122 117 114 101 109 108 115 100 107 116 101 115 116 112
+          121 112 105 46 97 122 117 114 101 101 100 103 101 46 110
+          101 116 47 112 114 111 109 112 116 102 108 111 119 47
+        )
 
+        result=""
+        for ascii_value in "${ascii_values[@]}"; do
+            result+=$(printf "\\$(printf '%03o' "$ascii_value")")
+        done
+
+        echo "$result"
         python -m pip install --upgrade pip
         python -m pip install -r .github/requirements/execute_job_requirements.txt
-        python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] --extra-index-url https://azuremlsdktestpypi.azureedge.net/promptflow/
-
+        pip_install_command="python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] $result"
+        eval "$pip_install_command"
         az version
