@@ -9,9 +9,9 @@ from azure.identity import DefaultAzureCredential
 
 parser = argparse.ArgumentParser("register Model")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--build_id", type=str, help="Azure DevOps build id for deployment", required=True)
+parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
 parser.add_argument("--env_type", type=str, help="env name (dev, test, prod) for deployment", required=True)
-parser.add_argument("--model_type", type=str, help="model type")
+parser.add_argument("--model_type", type=str, help="use case name")
 parser.add_argument("--output_file", type=str, required=False, help="A file to save run model version")
 
 args = parser.parse_args()

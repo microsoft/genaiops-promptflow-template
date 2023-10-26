@@ -11,7 +11,7 @@ from azure.identity import DefaultAzureCredential
 parser = argparse.ArgumentParser("provision_endpoints")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--output_file", type=str, help="outfile file needed for endpoint principal", required=True)
-parser.add_argument("--build_id", type=str, help="Azure DevOps build id for deployment", required=True)
+parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
 parser.add_argument("--environment_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
 parser.add_argument("--model_type", type=str, help="name of the flow", required=True)
 args = parser.parse_args()

@@ -181,12 +181,12 @@ def prepare_and_execute(
     print(str(run_ids))
 
 def main():
-    parser = argparse.ArgumentParser("prompt_exprimentation")
+    parser = argparse.ArgumentParser("prompt_bulk_run")
     parser.add_argument("--subscription_id", type=str, help="Azure subscription id")
     parser.add_argument(
         "--build_id",
         type=str,
-        help="Unique identifier for Azure DevOps pipeline run",
+        help="Unique identifier for build execution",
     )
     parser.add_argument(
         "--stage",
@@ -194,12 +194,12 @@ def main():
         help="execution and deployment environment. e.g. dev, prod, test",
     )
     parser.add_argument(
-        "--data_purpose", type=str, help="data to be registered identified by purpose"
+        "--data_purpose", type=str, help="data identified by purpose"
     )
     parser.add_argument(
         "--output_file", type=str, required=False, help="A file to save run ids"
     )
-    parser.add_argument("--model_type", type=str, help="data config file path", required=True)
+    parser.add_argument("--model_type", type=str, help="use case name", required=True)
     args = parser.parse_args()
 
     prepare_and_execute(

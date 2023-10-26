@@ -18,10 +18,10 @@ from azure.ai.ml.entities._deployment.container_resource_settings import (
 
 
 
-parser = argparse.ArgumentParser("provision_deployment")
+parser = argparse.ArgumentParser("provision_kubernetes_deployment")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--model_version", type=str, help="registered model version to be deployed", required=True)
-parser.add_argument("--build_id", type=str, help="Azure DevOps build id for deployment", required=True)
+parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
 parser.add_argument("--env_type", type=str, help="env name (dev, test, prod) for deployment", required=True)
 parser.add_argument("--model_type", type=str, help="name of the flow", required=True)
 

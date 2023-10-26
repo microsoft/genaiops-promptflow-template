@@ -35,6 +35,28 @@
       },
       "source": "summarize_text_content__variant_1.jinja2"
     },
+    "summarize_text_content1.jinja2": {
+      "type": "llm",
+      "inputs": {
+        "text": {
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "source": "summarize_text_content.jinja2"
+    },
+    "summarize_text_content1__variant_1.jinja2": {
+      "type": "llm",
+      "inputs": {
+        "text": {
+          "type": [
+            "string"
+          ]
+        }
+      },
+      "source": "summarize_text_content__variant_1.jinja2"
+    },
     "prepare_examples.py": {
       "type": "python",
       "source": "prepare_examples.py",
