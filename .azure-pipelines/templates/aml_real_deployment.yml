@@ -38,7 +38,8 @@ steps:
       echo "##vso[task.setvariable variable=ENDPOINT_PRINCIPAL;isOutput=true;]$endpoint_principal"
   
 - task: AzureCLI@2
-  displayName: Assign permission deployment
+  displayName: Assign permission to endpoint principal
+  name: read_endpoint_principal
   continueOnError: false
   env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
   inputs: 
@@ -47,9 +48,9 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      file_path="./${{ parameters.MODEL_TYPE }}/config.json"
-      desired_type=${{ parameters.DEPLOY_ENVIRONMENT }}
-      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+      config_path="./${{ parameters.MODEL_TYPE }}/config.json"
+      env_type=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_type\")" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
         echo "$selected_object"
@@ -57,11 +58,15 @@ steps:
         RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
         WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
       else
-        echo "Object not found"
+        echo "Object in config file not found"
       fi
-      az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
-      az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
 
+      echo "assigning permissions to Principal to AzureML workspace.."
+      az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
+      
+      echo "assigning permissions to Principal to Key vault.."
+      az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
+      
 - template: execute_python_code.yml
   parameters:
     step_name: "provision deployment"

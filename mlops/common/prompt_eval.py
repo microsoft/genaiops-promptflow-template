@@ -197,21 +197,21 @@ def column_widths(column):
     return f'width: {max_length}em;'
 
 def main():
-    parser = argparse.ArgumentParser("prompt_exprimentation")
+    parser = argparse.ArgumentParser("prompt_evaluation")
     parser.add_argument("--subscription_id", type=str, help="Azure subscription id")
     parser.add_argument(
         "--build_id",
         type=str,
-        help="Unique identifier for Azure DevOps pipeline run",
+        help="Unique identifier for build execution",
     )
     parser.add_argument(
         "--stage",
         type=str,
         help="execution and deployment environment. e.g. dev, prod, test",
     )
-    parser.add_argument("--data_purpose", type=str, help="data to be registered identified by purpose", required=True)
-    parser.add_argument("--run_id", type=str, required=True, help="run ids")
-    parser.add_argument("--model_type", type=str, help="data config file path", required=True)
+    parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
+    parser.add_argument("--run_id", type=str, required=True, help="bulk execution run ids")
+    parser.add_argument("--model_type", type=str, help="use case name", required=True)
 
     args = parser.parse_args()
 
@@ -223,7 +223,6 @@ def main():
         args.data_purpose,
         args.model_type
     )
-
 
 if __name__ ==  '__main__':
       main()

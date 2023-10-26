@@ -33,6 +33,10 @@ on:
         type: string
         description: "Determine managed(False) or kubernetes(True) deployment"
         required: true
+  pull_request:
+    branches:
+      - main
+      - development
 
 
 
@@ -40,8 +44,8 @@ jobs:
   execute-platform-flow-ci:
     uses: ./.github/workflows/platform_ci_dev_workflow.yml
     with:
-      env_name: ${{ inputs.env_name }}
-      flow_type: ${{ inputs.flow_type }}
-      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment }}
+      env_name: ${{ inputs.env_name || 'dev'}}
+      flow_type: ${{ inputs.flow_type || 'web_classification' }}
+      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment || 'False' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

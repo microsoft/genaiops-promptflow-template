@@ -1,19 +1,17 @@
 {
     "azure_managed_endpoint":[
         {
-            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "web-classification",
-            "ENDPOINT_DESC": "An online endpoint serving an MLflow model for classification",
+            "ENDPOINT_DESC": "An AML compute based endpoint serving a flow for web classification",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "white",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "CURRENT_DEPLOYMENT_NAME": "orange",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "25",
             "DEPLOYMENT_VM_SIZE": "Standard_E16s_v3",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231011.v2",
+            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231018.v1",
             "DEPLOYMENT_CONDA_PATH": "model/web_classification/environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
@@ -23,12 +21,10 @@
     ],
     "kubernetes_endpoint":[
         {
-            "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "webclassification",
-            "ENDPOINT_DESC": "An online endpoint serving an MLflow model for online taxi",
+            "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for web classification",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
@@ -36,7 +32,7 @@
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": 100,
             "COMPUTE_NAME": "k8s-compute",
             "DEPLOYMENT_VM_SIZE": "promptinstancetype",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231011.v2",
+            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231018.v1",
             "DEPLOYMENT_CONDA_PATH": "environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "CPU_ALLOCATION": "100m",

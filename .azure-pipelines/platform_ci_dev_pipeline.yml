@@ -1,4 +1,3 @@
-
 parameters:
  - name: exec_environment
    displayName: "Execution Environment"
@@ -14,7 +13,9 @@ stages:
       - job: Execute_ml_Job_Pipeline
         steps:
         - template: templates/configure_azureml_agent.yml
+
         - template: templates/get_connection_details.yml
+        
         - template: templates/register_data_asset.yml
           parameters:
             step_name: "register training data"
@@ -97,15 +98,18 @@ stages:
               rimod@microsoft.com
             instructions: "$(run_id_from_submit_job)"
             onTimeout: 'reject'
+      
       - job: deploy_flow
         dependsOn: 
         - ApproveDeployment
         steps:
         - template: templates/get_connection_details.yml
+      
         - template: templates/configure_azureml_agent.yml
+      
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register flow" # work here
+            step_name: "register flow" 
             script_parameter: |
               python -m mlops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
@@ -113,6 +117,7 @@ stages:
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
                 --env_type ${{parameters.exec_environment}}
+      
         - task: AzureCLI@2
           displayName: Read model version
           name: read_model_version
@@ -126,8 +131,9 @@ stages:
               model_version=${arr[0]}
               echo $model_version
               echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version" 
+              
         - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'True') }}:
-          - template: templates/kubernetes_deployment.yml  # Template reference
+          - template: templates/kubernetes_deployment.yml  
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               MODEL_TYPE: ${{ parameters.model_type }}
@@ -136,7 +142,7 @@ stages:
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'False') }}:
-          - template: templates/aml_real_deployment.yml  # Template reference
+          - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               MODEL_TYPE: ${{ parameters.model_type }}
