@@ -39,7 +39,7 @@ steps:
   
 - task: AzureCLI@2
   displayName: Assign permission to endpoint principal
-  name: read_endpoint_principal
+  name: assign_endpoint_principal
   continueOnError: false
   env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
   inputs: 
