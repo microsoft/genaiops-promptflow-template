@@ -49,6 +49,6 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
-      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment }}
+      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment|| 'False' }}
     secrets:
-      azure_credentials: ${{ secrets.AZURE_CREDENTIALS || 'False'}}
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
