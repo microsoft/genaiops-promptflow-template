@@ -37,6 +37,10 @@ on:
     branches:
       - main
       - development
+    paths:
+      - '.github/**'
+      - 'mlops/**'
+      - 'web_classification/**'
 
 
 

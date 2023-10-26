@@ -37,6 +37,10 @@ on:
     branches:
       - main
       - development
+    paths:
+      - '.github/**'
+      - 'mlops/**'
+      - 'named_entity_recognition/**'
 
 
 jobs:
