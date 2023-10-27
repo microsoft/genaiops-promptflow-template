@@ -27,7 +27,6 @@ More details about how to create a policy can be found [here](https://learn.micr
 - ENV_NAME:  This represents the environment name, referring to a development and other environments for the tests and deployment of the Prompt Flow flows.
 - RUNTIME_NAME:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows.
 - KEYVAULT_NAME:  This points to the name of an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
-
 - RESOURCE_GROUP_NAME:  This is the name of the Azure resource group where various Azure resources are organized.
 - WORKSPACE_NAME:  This represent the name of a workspace, which is a container for machine learning assets and resources.
 - CONNECTION_NAME:  This is name for a specific Prompt Flow connection, which is used to link different LLM's like Azure Open AI.

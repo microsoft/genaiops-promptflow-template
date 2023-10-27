@@ -84,38 +84,5 @@ node_variants:
           api: chat
           module: promptflow.tools.aoai
     default_variant_id: variant_0
-  summarize_text_content1:
-    variants:
-      variant_0:
-        node:
-          type: llm
-          source:
-            type: code
-            path: summarize_text_content.jinja2
-          inputs:
-            deployment_name: gpt-35-turbo
-            max_tokens: 128
-            temperature: 0.2
-            text: ${fetch_text_content_from_url.output}
-          provider: AzureOpenAI
-          connection: aoai1
-          api: chat
-          module: promptflow.tools.aoai
-      variant_1:
-        node:
-          type: llm
-          source:
-            type: code
-            path: summarize_text_content__variant_1.jinja2
-          inputs:
-            deployment_name: gpt-35-turbo
-            max_tokens: 256
-            temperature: 0.3
-            text: ${fetch_text_content_from_url.output}
-          provider: AzureOpenAI
-          connection: aoai2
-          api: chat
-          module: promptflow.tools.aoai
-    default_variant_id: variant_0
 environment:
     python_requirements_txt: requirements.txt
