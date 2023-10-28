@@ -7,6 +7,10 @@ on:
         type: string
         description: "The flow use-case to validate"
         required: true
+    secrets:
+      azure_credentials:
+        description: "service principal auth to Azure"
+        required: true
 
 jobs:
   validate-code:
@@ -15,8 +19,16 @@ jobs:
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
-      - name: Configure Azure ML Agent
-        uses: ./.github/actions/configure_azureml_agent
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Load all prompt flow and related dependencies
+        shell: bash
+        run: |
+          set -e # fail on error
+          python -m pip install --upgrade pip
+          python -m pip install -r .github/requirements/build_validation_requirements.txt
+          az version
       - name: Azure login
         uses: azure/login@v1
         with:

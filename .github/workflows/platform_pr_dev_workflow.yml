@@ -19,10 +19,10 @@ on:
 
 jobs:
   pr_code_validation:
-    name: valiate pull requests
+    name: Build Validation
     uses: ./.github/workflows/build_validation_workflow.yml
     with:
-      flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+      azure_credentials: ${{ secrets.azure_credentials }}
   pr_run_validation:
     runs-on: ubuntu-latest
     needs: pr_code_validation
