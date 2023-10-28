@@ -7,17 +7,25 @@ on:
         type: string
         description: "Execution Environment"
         required: true
-        default: "dev"
       flow_type:
         type: string
         description: "The flow use-case to execute"
         required: true
-        default: "web_classification"
     secrets:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+      flow_type:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        
 jobs:
   pr_code_validation:
     name: valiate pull requests

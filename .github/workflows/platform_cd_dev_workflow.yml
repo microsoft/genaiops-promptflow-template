@@ -7,12 +7,10 @@ on:
         type: string
         description: "Execution Environment"
         required: true
-        default: "dev"
       flow_type:
         type: string
         description: "The flow use-case to execute"
         required: true
-        default: "web_classification"
       is_kubernetes_deployment:
         type: string
         description: "Determine managed(False) or kubernetes(True) deployment"
