@@ -3,7 +3,7 @@
                 {
                     "ENV_NAME": "pr",
                     "AZURE_RM_SVC_CONNECTION": "azure_connection",
-                    "RUNTIME_NAME": "newruntime90",
+                    "RUNTIME_NAME": "newruntime95",
                     "EXPERIMENT_BASE_NAME": "mlops",
                     "KEYVAULT_NAME": "researchmlops5963078644",
                     "MODEL_BASE_NAME": "codegen",
@@ -17,7 +17,7 @@
                 {
                     "ENV_NAME": "dev",
                     "AZURE_RM_SVC_CONNECTION": "azure_connection",
-                    "RUNTIME_NAME": "newruntime90",
+                    "RUNTIME_NAME": "newruntime95",
                     "EXPERIMENT_BASE_NAME": "mlops",
                     "KEYVAULT_NAME": "researchmlops5963078644",
                     "MODEL_BASE_NAME": "codegen",
