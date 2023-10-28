@@ -65,7 +65,7 @@ jobs:
             --build_id ${{ github.run_id }} \
             --model_type ${{ inputs.flow_type }} \
             --stage ${{ inputs.env_name }} \
-            --data_purpose "training_data" \
+            --data_purpose "pr_data" \
             --output_file run_id.txt
             
 
