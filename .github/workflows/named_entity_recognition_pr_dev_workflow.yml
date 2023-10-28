@@ -1,0 +1,45 @@
+name: named_entity_recognition_pr_dev_pipeline
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "named_entity_recognition"
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "named_entity_recognition"
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'mlops/**'
+      - 'named_entity_recognition/**'
+
+
+jobs:
+  execute-platform-pr-workflow:
+    uses: ./.github/workflows/platform_pr_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name || 'dev'}}
+      flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

@@ -20,8 +20,6 @@ nodes:
     url: ${inputs.url}
 - name: summarize_text_content
   use_variants: true
-- name: summarize_text_content1
-  use_variants: true
 - name: prepare_examples
   type: python
   source:

@@ -1,0 +1,73 @@
+name: platform_pr_dev_workflow
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+      flow_type:
+        type: string
+        description: "The flow use-case to execute"
+        required: true
+    secrets:
+      azure_credentials:
+        description: "service principal auth to Azure"
+        required: true
+
+
+jobs:
+  pr_code_validation:
+    name: Build Validation
+    uses: ./.github/workflows/build_validation_workflow.yml
+    with:
+      flow_type: ${{ inputs.flow_type }}
+    secrets:
+      azure_credentials: ${{ secrets.azure_credentials }}
+  pr_flow_validation:
+    runs-on: ubuntu-latest
+    needs: pr_code_validation
+    steps:
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.azure_credentials }}
+      - name: Configure Azure ML Agent
+        uses: ./.github/actions/configure_azureml_agent
+      - name: load the current Azure subscription details
+        id: subscription_details
+        shell: bash
+        run: |
+          export subscriptionId=$(az account show --query id -o tsv)
+          echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
+
+      - name: Register experiment data asset
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register experiment data asset"
+          script_parameter: |
+            python -m mlops.common.register_data_asset \
+            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+            --data_purpose "training_data" \
+            --model_type ${{ inputs.flow_type }} \
+            --environment_name ${{ inputs.env_name }}
+          
+      - name: Execute prompt flow bulk run
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Execute prompt flow bulk run"
+          script_parameter: |
+            python -m mlops.common.prompt_pipeline \
+            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+            --build_id ${{ github.run_id }} \
+            --model_type ${{ inputs.flow_type }} \
+            --stage ${{ inputs.env_name }} \
+            --data_purpose "training_data" \
+            --output_file run_id.txt
+            
+
+
+

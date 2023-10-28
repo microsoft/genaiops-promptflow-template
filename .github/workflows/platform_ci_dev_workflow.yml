@@ -100,10 +100,11 @@ jobs:
             --run_id "$RUN_NAME"
 
       - name: Archive CSV
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: evaluation-reports
           path: ./reports
+
   deploy-flow:
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     needs: flow-experiment-and_evaluation
