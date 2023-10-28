@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.9"
-      - name: Load all prompt flow and related dependencies
+      - name: Load all build validation related dependencies
         shell: bash
         run: |
           set -e # fail on error
