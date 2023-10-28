@@ -1,4 +1,4 @@
-name: pr_dev_pipeline
+name: platform_pr_dev_workflow
 
 on:
   workflow_call:
@@ -15,17 +15,8 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-  workflow_dispatch:
-    inputs:
-      env_name:
-        type: string
-        description: "Execution Environment"
-        required: true
-      flow_type:
-        type: string
-        description: "The flow usecase to execute"
-        required: true
-        
+
+
 jobs:
   pr_code_validation:
     name: valiate pull requests
