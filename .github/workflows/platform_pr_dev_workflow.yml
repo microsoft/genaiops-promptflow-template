@@ -22,6 +22,8 @@ jobs:
     name: Build Validation
     uses: ./.github/workflows/build_validation_workflow.yml
     with:
+      flow_type: ${{ inputs.flow_type }}
+    secrets:
       azure_credentials: ${{ secrets.azure_credentials }}
   pr_run_validation:
     runs-on: ubuntu-latest
