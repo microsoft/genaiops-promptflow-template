@@ -51,7 +51,7 @@ jobs:
           script_parameter: |
             python -m mlops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --data_purpose "training_data" \
+            --data_purpose "pr_data" \
             --model_type ${{ inputs.flow_type }} \
             --environment_name ${{ inputs.env_name }}
           
@@ -65,7 +65,7 @@ jobs:
             --build_id ${{ github.run_id }} \
             --model_type ${{ inputs.flow_type }} \
             --stage ${{ inputs.env_name }} \
-            --data_purpose "training_data" \
+            --data_purpose "pr_data" \
             --output_file run_id.txt
             
 
