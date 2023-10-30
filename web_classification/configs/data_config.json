@@ -4,7 +4,7 @@
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "pr",
             "AZURE_RM_SVC_CONNECTION": "azure_connection",
-            "DATA_PURPOSE": "pr_data",
+            "DATA_PURPOSE": "pr",
             "DATA_PATH":"data/data.jsonl",
             "DATASET_NAME":"web_classification_pr",
             "DATASET_DESC":"this dataset is for pr validation only"
