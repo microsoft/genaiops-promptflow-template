@@ -33,10 +33,11 @@ jobs:
           --flow named_entity_recognition/flows/post-production-evaluation/ \
           --data named_entity_recognition/data/production_log.jsonl \
           --name eval_run_${{ github.run_number }}_${{ github.run_attempt }} \
+          --column-mapping text='${data.text}' entity_type='${data.entity_type}' llm_result='${data.llm_result}' \
           --stream
-      # - name: PromptFlow Evaluation Results Metrics
-      #   run: |
-      #     pf run show-metrics -n eval_run_${{ github.run_number }}_${{ github.run_attempt }}
+      - name: PromptFlow Evaluation Results Metrics
+        run: |
+          pf run show-metrics -n eval_run_${{ github.run_number }}_${{ github.run_attempt }}
       - name: PromptFlow Evaluation Results Generation
         id: evaluation_report_generation
         run: |
