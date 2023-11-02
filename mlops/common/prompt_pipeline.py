@@ -124,7 +124,7 @@ def prepare_and_execute(
 
                         pipeline_job = pf.runs.create_or_update(run,stream=True)
                         run_ids.append(pipeline_job.name)
-
+                        time.sleep(15)
                         df_result = None
                         time.sleep(15)
                         if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
@@ -153,7 +153,7 @@ def prepare_and_execute(
             run._experiment_name = experiment_name
             pipeline_job = pf.runs.create_or_update(run, stream=True)
             run_ids.append(pipeline_job.name)
-
+            time.sleep(15)
             df_result = None
             if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
                 print("job completed")
