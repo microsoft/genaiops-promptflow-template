@@ -4,7 +4,7 @@ This template supports Azure ML as a platform for ML, and Azure DevOps as a plat
 
 In order to setup the repository, you need to complete few steps.
 
-**Step 1.** Create a service connection in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection.
+**Step 1.** Create a service connection in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection. A Service Principal should pre-exist before executing this step. 
 
 **Step 2.** Create a new variable group (mlops_platform_dev_vg) with the following variables:
 
