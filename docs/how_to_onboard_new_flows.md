@@ -33,7 +33,7 @@ paths in trigger and pr section with values related to new flows and the default
 
 **Bring Data**  The data folder contains data that would be uploaded to AzureML data assets. You can copy the data in this folder.
 
-**Update Environment dependencies** The environment folder contains requirements.txt file needed by the flow related to any python package dependencies. 
+**Update Environment dependencies** The environment folder containsconda.yml file needed by the flow related to any python package dependencies as part of endpoint deployment.
 
 **update local execution file**  You can start by copying one of an existing local_execution folder modify the python files to refer to new flows and related data.
 

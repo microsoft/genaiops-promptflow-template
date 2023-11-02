@@ -72,8 +72,9 @@ Additionally, there is a config.json file that refers important infrastructure a
 
 # Documentation
 
-- Full documentation can using this repo using Azure DevOps be found [here](./docs/Azure_devops_how_to_setup.md)
-- Full documentation can using this repo using Github Workflows be found [here](./docs/github_workflows_how_to_setup.md)
+- Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
+- Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
+- documentation can adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
 
 # Deployment
 
