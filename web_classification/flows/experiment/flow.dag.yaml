@@ -63,7 +63,7 @@ node_variants:
             temperature: 0.2
             text: ${fetch_text_content_from_url.output}
           provider: AzureOpenAI
-          connection: aoai1
+          connection: aoai
           api: chat
           module: promptflow.tools.aoai
       variant_1:
@@ -78,7 +78,7 @@ node_variants:
             temperature: 0.3
             text: ${fetch_text_content_from_url.output}
           provider: AzureOpenAI
-          connection: aoai2
+          connection: aoai
           api: chat
           module: promptflow.tools.aoai
     default_variant_id: variant_0

@@ -6,16 +6,16 @@ from azure.identity import DefaultAzureCredential
 
 parser = argparse.ArgumentParser("test_model")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--model_type", type=str, help="name of the flow", required=True)
+parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
 parser.add_argument("--environment_name",type=str,help="env name (dev, test, prod) for deployment", required=True)
 
 args = parser.parse_args()
 
 
 stage = args.environment_name
-model_type = args.model_type
+flow_to_execute = args.flow_to_execute
 
-main_config = open(f"{model_type}/config.json")
+main_config = open(f"{flow_to_execute}/config.json")
 model_config = json.load(main_config)
 
 for obj in model_config["envs"]:
@@ -25,7 +25,7 @@ for obj in model_config["envs"]:
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
-real_config = f"{model_type}/configs/deployment_config.json"
+real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 ml_client = MLClient(
     DefaultAzureCredential(), args.subscription_id,  resource_group_name,  workspace_name
@@ -46,7 +46,7 @@ for elem in endpoint_config['azure_managed_endpoint']:
             request_result = ml_client.online_endpoints.invoke(
                 endpoint_name=endpoint_name,
                 deployment_name=deployment_name,
-                request_file=f"{model_type}/{test_model_file}",
+                request_file=f"{flow_to_execute}/{test_model_file}",
             )
 
             print(request_result)

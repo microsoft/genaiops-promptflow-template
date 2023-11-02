@@ -21,8 +21,8 @@ parameters:
  - name: env_name
    displayName: "Execution Environment"
    default: "dev"
- - name: model_type
-   displayName: "model type"
+ - name: flow_to_execute
+   displayName: "flow to execute"
    default: "named_entity_recognition"
  - name: IS_KUBERNETES_DEPLOYMENT
    displayName: "determine managed or kubernetes deployment"
@@ -33,5 +33,5 @@ stages:
   - template: ../../.azure-pipelines/platform_ci_dev_pipeline.yml
     parameters:
       exec_environment: ${{ parameters.env_name }}
-      model_type: ${{ parameters.model_type }}
+      flow_to_execute: ${{ parameters.flow_to_execute }}
       IS_KUBERNETES_DEPLOYMENT: ${{ parameters.IS_KUBERNETES_DEPLOYMENT }}

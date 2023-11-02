@@ -1,5 +1,5 @@
 parameters:
- - name: model_type
+ - name: flow_to_execute
    displayName: "type of model to execute"
 
 jobs:
@@ -15,9 +15,8 @@ jobs:
       pip install -r .azure-pipelines/requirements/build_validation_requirements.txt
     displayName: "Load Python Dependencies"
 
-
   - script: |
-      pytest ${{ parameters.model_type }}/tests  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+      pytest ${{ parameters.flow_to_execute }}/tests  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
     displayName: 'Run Unit Tests'
     condition: succeededOrFailed()
 

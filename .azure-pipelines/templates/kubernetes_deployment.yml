@@ -1,7 +1,7 @@
 parameters:
 - name: SUBSCRIPTION_ID
   type: string
-- name: MODEL_TYPE
+- name: flow_to_execute
   type: string
 - name: MODEL_VERSION
   type: string
@@ -20,7 +20,7 @@ steps:
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
         --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --model_type ${{ parameters.MODEL_TYPE }}
+        --flow_to_execute ${{ parameters.flow_to_execute }}
 
 
 - task: AzureCLI@2
@@ -47,7 +47,7 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      config_path="./${{ parameters.MODEL_TYPE }}/config.json"
+      config_path="./${{ parameters.flow_to_execute }}/config.json"
       env_type=${{ parameters.DEPLOY_ENVIRONMENT }}
       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_type\")" "$config_path")
 
@@ -74,7 +74,7 @@ steps:
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
         --env_type ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --model_type ${{ parameters.MODEL_TYPE }}
+        --flow_to_execute ${{ parameters.flow_to_execute }}
 
 - template: execute_python_code.yml
   parameters:
@@ -83,7 +83,7 @@ steps:
       python -m mlops.common.deployment.test_model_on_kubernetes \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --model_type ${{ parameters.MODEL_TYPE }}
+        --flow_to_execute ${{ parameters.flow_to_execute }}
 
 
 

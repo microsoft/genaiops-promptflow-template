@@ -8,13 +8,13 @@ import json
 parser = argparse.ArgumentParser("register data assets")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--data_purpose", type=str, help="data to be registered identified by purpose", required=True)
-parser.add_argument("--model_type", type=str, help="data config file path", required=True)
+parser.add_argument("--flow_to_execute", type=str, help="data config file path", required=True)
 parser.add_argument("--environment_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
  
 args = parser.parse_args()
 
 environment_name = args.environment_name
-main_config = open(f"{args.model_type}/config.json")
+main_config = open(f"{args.flow_to_execute}/config.json")
 config = json.load(main_config)
 
 for obj in config["envs"]:
@@ -22,7 +22,7 @@ for obj in config["envs"]:
         model_config = obj
         break
 
-data_config_path = f"{args.model_type}/configs/data_config.json"
+data_config_path = f"{args.flow_to_execute}/configs/data_config.json"
 resource_group_name = model_config["RESOURCE_GROUP_NAME"]
 workspace_name= model_config["WORKSPACE_NAME"]
 data_purpose = args.data_purpose
@@ -38,7 +38,7 @@ data_config = json.load(config_file)
 for elem in data_config['datasets']:
     if 'DATA_PURPOSE' in elem and 'ENV_NAME' in elem:
         if data_purpose == elem["DATA_PURPOSE"] and environment_name == elem['ENV_NAME']:
-            data_path = f"{args.model_type}/{elem['DATA_PATH']}"
+            data_path = f"{args.flow_to_execute}/{elem['DATA_PATH']}"
             dataset_desc = elem["DATASET_DESC"]
             dataset_name = elem["DATASET_NAME"]
 

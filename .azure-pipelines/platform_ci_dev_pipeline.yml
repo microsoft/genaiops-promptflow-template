@@ -2,7 +2,7 @@ parameters:
  - name: exec_environment
    displayName: "Execution Environment"
    default: "dev"
- - name: model_type
+ - name: flow_to_execute
    displayName: "type of model to execute"
  - name: IS_KUBERNETES_DEPLOYMENT
    displayName: "determine managed or kubernetes deployment"
@@ -23,7 +23,7 @@ stages:
               python -m mlops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --environment_name ${{ parameters.exec_environment }}
 
         - template: templates/execute_mlops_pipeline.yml
@@ -33,7 +33,7 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
                 --stage ${{parameters.exec_environment}} \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "training_data" \
                 --output_file run_id.txt
 
@@ -58,7 +58,7 @@ stages:
               python -m mlops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "test_data" \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --environment_name ${{ parameters.exec_environment }}
 
         - template: templates/execute_mlops_pipeline.yml
@@ -68,7 +68,7 @@ stages:
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --build_id $(BUILD.BUILDID) \
                 --stage "${{parameters.exec_environment}}" \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "test_data" \
                 --run_id "$(read_run_id.RUN_NAME)"
 
@@ -113,7 +113,7 @@ stages:
             script_parameter: |
               python -m mlops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
                 --env_type ${{parameters.exec_environment}}
@@ -136,7 +136,7 @@ stages:
           - template: templates/kubernetes_deployment.yml  
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              MODEL_TYPE: ${{ parameters.model_type }}
+              flow_to_execute: ${{ parameters.flow_to_execute }}
               DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
@@ -145,7 +145,7 @@ stages:
           - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              MODEL_TYPE: ${{ parameters.model_type }}
+              flow_to_execute: ${{ parameters.flow_to_execute }}
               DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)

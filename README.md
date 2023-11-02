@@ -47,6 +47,29 @@ That's where **LLMOps with Prompt Flow** comes in. LLMOps with Prompt Flow is a 
 
 LLMOps with Prompt Flow provides capabilities for both simple as well as complex LLM-infused apps. It is completely customizable to the needs of the application.
 
+# Folder structure
+
+Each use case (set of Prompt Flow standard and evaluation flows) should follow the folder structure as shown here:
+
+- .azure-pipelines : It contains the CI and PR related pipeline for Azure DevOps and specific to a use-case
+- configs          : It contains data, deployment and prompt flow data mapping related configuration files.
+- data             : This folder contains data files related to Prompt Flow standard and eevaluation flow
+- environment      : It contains python package dependencies needed in runtime for execution. 
+- flows            : It should contain minimally two folder - one for standard Prompt Flow related files and other for Evaluation flow related file. There can be multiple evaluation flow related folders.
+- local_execution  : Contains python script for executing both the standard and evaluation flow locally
+- tests            : contains unit tests for the flows
+
+Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containg test data for testing endpoints after deployment. 
+
+- The '.azure-pipelines' folder contains the Azure DevOps pipelines for the platform and any changes will impact exeuction of all the flows.
+
+- The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github Workflows should be within this single folder for execution.
+
+- The 'docs' folder contains documentation for step by step guide for both Azure DevOps and Github Workflow related configuration.
+
+- The 'mlops' folder contains all the code related to flow execution, evaluation and deployment.
+
+
 # Documentation
 
 - Full documentation can using this repo using Azure DevOps be found [here](./docs/Azure_devops_how_to_setup.md)

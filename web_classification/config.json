@@ -9,8 +9,6 @@
                     "MODEL_BASE_NAME": "codegen",
                     "RESOURCE_GROUP_NAME": "mlops",
                     "WORKSPACE_NAME": "researchmlops",
-                    "CONNECTION_NAME": "aoai",
-                    "DEPLOYMENT_NAME": "gpt-35-turbo",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation"
                 },
@@ -23,8 +21,6 @@
                     "MODEL_BASE_NAME": "codegen",
                     "RESOURCE_GROUP_NAME": "mlops",
                     "WORKSPACE_NAME": "researchmlops",
-                    "CONNECTION_NAME": "aoai",
-                    "DEPLOYMENT_NAME": "gpt-35-turbo",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
