@@ -22,13 +22,13 @@ def are_dictionaries_similar(dict1, old_runs):
 def prepare_and_execute(
         subscription_id,
         build_id,
-        model_type,
+        flow_to_execute,
         stage,
         output_file,
         data_purpose,
     ):
 
-    main_config = open(f"{model_type}/config.json")
+    main_config = open(f"{flow_to_execute}/config.json")
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:
@@ -38,19 +38,17 @@ def prepare_and_execute(
 
     resource_group_name = config["RESOURCE_GROUP_NAME"]
     workspace_name = config["WORKSPACE_NAME"]
-    data_mapping_config= f"{model_type}/configs/mapping_config.json"
+    data_mapping_config= f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path= config["STANDARD_FLOW_PATH"]
-    data_config_path= f"{model_type}/configs/data_config.json"
-    connection_name= config["CONNECTION_NAME"]
-    deployment_name= config["DEPLOYMENT_NAME"]
+    data_config_path= f"{flow_to_execute}/configs/data_config.json"
     runtime= config["RUNTIME_NAME"]
-    experiment_name = f"{model_type}_{stage}"
+    experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
 
     pf = PFClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
     print(data_mapping_config)
-    flow = f"{model_type}/{standard_flow_path}" 
+    flow = f"{flow_to_execute}/{standard_flow_path}" 
     dataset_name = []
     config_file = open(data_config_path)
     data_config = json.load(config_file)
@@ -84,12 +82,6 @@ def prepare_and_execute(
         if nodes.get("type",{}) == 'llm':
             all_llm_nodes.add(nodes['name'])
 
-    connections = {}
-    for node in all_llm_nodes:
-        connections[node] = {
-            "connection": connection_name,
-            "deployment_name": deployment_name
-        }
 
     mapping_file = open(data_mapping_config)
     mapping_config = json.load(mapping_file)
@@ -127,13 +119,12 @@ def prepare_and_execute(
                                 "key1": "value1"
                             },
                             column_mapping=exp_config_node,
-                            # connections=connections,
                             tags={"build_id": build_id},
                         )
 
                         pipeline_job = pf.runs.create_or_update(run,stream=True)
                         run_ids.append(pipeline_job.name)
-
+                        time.sleep(15)
                         df_result = None
                         time.sleep(15)
                         if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
@@ -158,14 +149,12 @@ def prepare_and_execute(
                 },
                 column_mapping=exp_config_node,
                 tags={"build_id": build_id},
-                #connections=connections
             )
             run._experiment_name = experiment_name
             pipeline_job = pf.runs.create_or_update(run, stream=True)
             run_ids.append(pipeline_job.name)
-
-            df_result = None
             time.sleep(15)
+            df_result = None
             if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
                 print("job completed")
                 df_result = pf.get_details(pipeline_job)
@@ -199,13 +188,13 @@ def main():
     parser.add_argument(
         "--output_file", type=str, required=False, help="A file to save run ids"
     )
-    parser.add_argument("--model_type", type=str, help="use case name", required=True)
+    parser.add_argument("--flow_to_execute", type=str, help="flow use case name", required=True)
     args = parser.parse_args()
 
     prepare_and_execute(
         args.subscription_id,
         args.build_id,
-        args.model_type,
+        args.flow_to_execute,
         args.stage,
         args.output_file,
         args.data_purpose,

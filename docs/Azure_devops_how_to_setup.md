@@ -4,7 +4,7 @@ This template supports Azure ML as a platform for ML, and Azure DevOps as a plat
 
 In order to setup the repository, you need to complete few steps.
 
-**Step 1.** Create a service connection in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection.
+**Step 1.** Create a service connection in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection. A Service Principal should pre-exist before executing this step. 
 
 **Step 2.** Create a new variable group (mlops_platform_dev_vg) with the following variables:
 
@@ -12,7 +12,7 @@ In order to setup the repository, you need to complete few steps.
 
 Information about variable groups in Azure DevOps can be found in [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=classic).
 
-**Step 3.** Create a *development* branch and make it as default one to make sure that all PRs should go towards to it. This template assumes that the team works at a *development* branch as a primary source for coding and improving the model quality. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
+**Step 3.** Create a *development* branch and make it as default one to make sure that all PRs should go towards to it. This template assumes that the team works at a *development* branch as a primary source for coding. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
 
 **Step 4.** Create two Azure Pipelines for each use case (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files. The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) that should be executed automatically once new PR has been merged into the *development* branch. The main idea of this pipeline is to execute training on the full dataset to generate a prompt variant and flow that can be a candidate for production. This Azure Pipeline should be extended based on the project's requirements. 
 
@@ -29,8 +29,6 @@ More details about how to create a policy can be found [here](https://learn.micr
 - KEYVAULT_NAME:  This points to the name of an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
 - RESOURCE_GROUP_NAME:  This is the name of the Azure resource group where various Azure resources are organized.
 - WORKSPACE_NAME:  This represent the name of a workspace, which is a container for machine learning assets and resources.
-- CONNECTION_NAME:  This is name for a specific Prompt Flow connection, which is used to link different LLM's like Azure Open AI.
-- DEPLOYMENT_NAME:  This is the name of a LLM deployment like GPT-3.5-Turbo model.
 - STANDARD_FLOW_PATH:  This specify a standard flow path associated with an prompt experiment.
 - EVALUATION_FLOW_PATH:  This is an string value referring to evaluation flow paths. e.g. "eval1,eval2"
 
@@ -52,7 +50,7 @@ More details about how to create a policy can be found [here](https://learn.micr
 **Step 9.** Modify the configuration values in deployment_config.json file based on the environment.  These are required for deploying prompt flows in Azure ML.
 
 - ENV_NAME: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- TEST_FILE_PATH: This parameter  represents the file path to a sample input request for testing the deployed model. 
+- TEST_FILE_PATH: This parameter  represents the file path to a sample input request for testing the deployed flow. 
 - ENDPOINT_NAME: This parameter is the name or identifier of the deployed endpoint for the prompt flow.
 - ENDPOINT_DESC: This parameter provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
 - DEPLOYMENT_DESC: This parameter provides a description of the deployment itself.

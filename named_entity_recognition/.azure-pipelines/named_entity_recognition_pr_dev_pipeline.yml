@@ -20,12 +20,12 @@ parameters:
  - name: env_name
    displayName: "Execution Environment"
    default: "pr"
- - name: model_type
-   displayName: "model type"
+ - name: flow_to_execute
+   displayName: "flow to execute"
    default: "named_entity_recognition"
 
 stages:
   - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
     parameters:
       exec_environment: ${{ parameters.env_name }}
-      model_type: ${{ parameters.model_type }}
+      flow_to_execute: ${{ parameters.flow_to_execute }}

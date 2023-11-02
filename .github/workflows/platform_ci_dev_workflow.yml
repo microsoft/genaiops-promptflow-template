@@ -50,7 +50,7 @@ jobs:
             python -m mlops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --data_purpose "training_data" \
-            --model_type ${{ inputs.flow_type }} \
+            --flow_to_execute ${{ inputs.flow_type }} \
             --environment_name ${{ inputs.env_name }}
           
       - name: Execute prompt flow bulk run
@@ -61,7 +61,7 @@ jobs:
             python -m mlops.common.prompt_pipeline \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
-            --model_type ${{ inputs.flow_type }} \
+            --flow_to_execute ${{ inputs.flow_type }} \
             --stage ${{ inputs.env_name }} \
             --data_purpose "training_data" \
             --output_file run_id.txt
@@ -83,7 +83,7 @@ jobs:
             python -m mlops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --data_purpose "test_data" \
-            --model_type ${{ inputs.flow_type }} \
+            --flow_to_execute ${{ inputs.flow_type }} \
             --environment_name ${{ inputs.env_name }}
             
       - name: Execute bulk run evaluations
@@ -94,7 +94,7 @@ jobs:
             python -m mlops.common.prompt_eval \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
-            --model_type ${{ inputs.flow_type }} \
+            --flow_to_execute ${{ inputs.flow_type }} \
             --stage ${{ inputs.env_name }} \
             --data_purpose "test_data" \
             --run_id "$RUN_NAME"

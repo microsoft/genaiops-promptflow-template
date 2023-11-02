@@ -11,7 +11,7 @@ parser = argparse.ArgumentParser("register Model")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
 parser.add_argument("--env_type", type=str, help="env name (dev, test, prod) for deployment", required=True)
-parser.add_argument("--model_type", type=str, help="use case name")
+parser.add_argument("--flow_to_execute", type=str, help="use case name")
 parser.add_argument("--output_file", type=str, required=False, help="A file to save run model version")
 
 args = parser.parse_args()
@@ -19,12 +19,12 @@ args = parser.parse_args()
 
 
 stage = args.env_type
-model_type = args.model_type
-model_name = f"{model_type}_{stage}"
+flow_to_execute = args.flow_to_execute
+model_name = f"{flow_to_execute}_{stage}"
 build_id = args.build_id
 output_file = args.output_file
 
-main_config = open(f"{model_type}/config.json")
+main_config = open(f"{flow_to_execute}/config.json")
 model_config = json.load(main_config)
 
 for obj in model_config["envs"]:
@@ -40,9 +40,9 @@ print(f"Model name: {model_name}")
 
 
 
-if os.path.exists(f"{model_type}/flow.dag.yaml"): 
+if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"): 
     file_to_replace = "flow.dag.yaml"
-    source_path = os.path.join(os.getcwd(), f"{model_type}/flow.dag.yaml")
+    source_path = os.path.join(os.getcwd(), f"{flow_to_execute}/flow.dag.yaml")
     destination_path = os.path.join(os.getcwd(), model_path, file_to_replace)
     shutil.copy(source_path, destination_path)
 
@@ -52,11 +52,11 @@ ml_client = MLClient(
 
 model = Model(
     name = model_name,
-    path = f"{model_type}/{model_path}",
+    path = f"{flow_to_execute}/{model_path}",
     stage = "Production",
-    description = f"{model_type} model registered for prompt flow deployment",
+    description = f"{flow_to_execute} model registered for prompt flow deployment",
     properties={
-        "azureml.promptflow.source_flow_id": model_type
+        "azureml.promptflow.source_flow_id": flow_to_execute
     },
     tags={"build_id": build_id}
 

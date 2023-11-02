@@ -16,10 +16,10 @@ def prepare_and_execute(subscription_id,
         stage,
         run_id,
         data_purpose,
-        model_type
+        flow_to_execute
     ):
 
-    main_config = open(f"{model_type}/config.json")
+    main_config = open(f"{flow_to_execute}/config.json")
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:
@@ -28,19 +28,19 @@ def prepare_and_execute(subscription_id,
             break
     resource_group_name = config["RESOURCE_GROUP_NAME"]
     workspace_name = config["WORKSPACE_NAME"]
-    data_mapping_config= f"{model_type}/configs/mapping_config.json"
+    data_mapping_config= f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path= config["STANDARD_FLOW_PATH"]
-    data_config_path= f"{model_type}/configs/data_config.json"
+    data_config_path= f"{flow_to_execute}/configs/data_config.json"
     runtime= config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
-    experiment_name = f"{model_type}_{stage}"
+    experiment_name = f"{flow_to_execute}_{stage}"
 
 
     eval_flows = eval_flow_path.split(",")
 
     pf = PFClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
 
-    standard_flow = f"{model_type}/{standard_flow_path}" 
+    standard_flow = f"{flow_to_execute}/{standard_flow_path}" 
     dataset_name = []
     config_file = open(data_config_path)
     data_config = json.load(config_file)
@@ -79,7 +79,7 @@ def prepare_and_execute(subscription_id,
     run_ids = ast.literal_eval(run_id)
      
     for flow in eval_flows:
-        flow = f"{model_type}/{flow.strip()}"
+        flow = f"{flow_to_execute}/{flow.strip()}"
         dataframes = []
         metrics = []
 
@@ -211,7 +211,7 @@ def main():
     )
     parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
     parser.add_argument("--run_id", type=str, required=True, help="bulk execution run ids")
-    parser.add_argument("--model_type", type=str, help="use case name", required=True)
+    parser.add_argument("--flow_to_execute", type=str, help="flow use case name", required=True)
 
     args = parser.parse_args()
 
@@ -221,7 +221,7 @@ def main():
         args.stage,
         args.run_id,
         args.data_purpose,
-        args.model_type
+        args.flow_to_execute
     )
 
 if __name__ ==  '__main__':

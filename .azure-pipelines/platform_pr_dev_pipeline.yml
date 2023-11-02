@@ -3,7 +3,7 @@ parameters:
  - name: exec_environment
    displayName: "Execution Environment"
    default: "dev"
- - name: model_type
+ - name: flow_to_execute
    displayName: "type of model to execute"
 
 stages:
@@ -12,7 +12,7 @@ stages:
       jobs:
         - template: build_validation_pipeline.yml
           parameters:
-            model_type: ${{ parameters.model_type }}
+            flow_to_execute: ${{ parameters.flow_to_execute }}
 
     - stage: execute_training_job
       displayName: execute_training_job
@@ -32,7 +32,7 @@ stages:
               python -m mlops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --environment_name ${{ parameters.exec_environment }}
 
         - template: templates/execute_mlops_pipeline.yml
@@ -42,6 +42,6 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
                 --stage ${{parameters.exec_environment}} \
-                --model_type ${{ parameters.model_type }} \
+                --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "training_data" \
                 --output_file run_id.txt

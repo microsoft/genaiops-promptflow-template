@@ -62,7 +62,7 @@ jobs:
           script_parameter: |
             python -m mlops.common.deployment.register_model \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --model_type ${{ inputs.flow_type }} \
+            --flow_to_execute ${{ inputs.flow_type }} \
             --output_file "model_version.txt" \
             --build_id ${{ github.run_id }} \
             --env_type ${{ inputs.env_name }} \
@@ -80,7 +80,7 @@ jobs:
         uses: ./.github/actions/aml_real_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
-          MODEL_TYPE: ${{ inputs.flow_type }}
+          flow_to_execute: ${{ inputs.flow_type }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
           MODEL_VERSION: $MODEL_VERSION
 
@@ -89,7 +89,7 @@ jobs:
         uses: ./.github/actions/kubernetes_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
-          MODEL_TYPE: ${{ inputs.flow_type }}
+          flow_to_execute: ${{ inputs.flow_type }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
           MODEL_VERSION: $MODEL_VERSION
 

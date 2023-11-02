@@ -3,28 +3,24 @@
                 {
                     "ENV_NAME": "pr",
                     "AZURE_RM_SVC_CONNECTION": "azure_connection",
-                    "RUNTIME_NAME": "newruntime95",
+                    "RUNTIME_NAME": "newruntime150",
                     "EXPERIMENT_BASE_NAME": "mlops",
                     "KEYVAULT_NAME": "researchmlops5963078644",
                     "MODEL_BASE_NAME": "codegen",
                     "RESOURCE_GROUP_NAME": "mlops",
                     "WORKSPACE_NAME": "researchmlops",
-                    "CONNECTION_NAME": "aoai",
-                    "DEPLOYMENT_NAME": "gpt-35-turbo",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation"
                 },
                 {
                     "ENV_NAME": "dev",
                     "AZURE_RM_SVC_CONNECTION": "azure_connection",
-                    "RUNTIME_NAME": "newruntime95",
+                    "RUNTIME_NAME": "newruntime150",
                     "EXPERIMENT_BASE_NAME": "mlops",
                     "KEYVAULT_NAME": "researchmlops5963078644",
                     "MODEL_BASE_NAME": "codegen",
                     "RESOURCE_GROUP_NAME": "mlops",
                     "WORKSPACE_NAME": "researchmlops",
-                    "CONNECTION_NAME": "aoai",
-                    "DEPLOYMENT_NAME": "gpt-35-turbo",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
