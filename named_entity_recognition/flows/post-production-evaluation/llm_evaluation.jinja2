@@ -1,0 +1,35 @@
+system:
+You are an evaluator who can evaluate if the given entity was extracted correctly for a given text.
+You will be given a text, an entity and the entity value.
+
+You need to score the entity extraction on a scale of 0 to 1. 1 being the best score and 0 being the worst.
+ONLY NUMERIC RESULTS ARE ACCEPTED.
+
+user:
+Text: The phone number (321) 654-0987 is no longer in service.
+Entity: phone number
+Value: (321) 654-0987
+assistant:
+1.0
+user:
+Text: The Eiffel Tower is an iconic landmark in Paris.
+Entity: people's full name
+Value: Eiffel Tower
+assistant:
+0.0
+user:
+Text: John Doe has been appointed as the new CEO of the company.
+Entity: people's full name
+Value: John Doe CEO
+assistant:
+0.5
+user:
+Text: The project manager and the data analyst are collaborating to interpret the project data.
+Entity: job title
+Value: project manager
+assistant:
+0.5
+user:
+Text: {{text}}
+Entity: {{entity}}
+Value: {{value}}

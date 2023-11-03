@@ -1,0 +1,52 @@
+name: named_entity_recognition_post_production_evaluation
+
+on:
+  workflow_call:
+    secrets:
+      azure_openai_endpoint:
+        description: "Azure OpenAI Endpoint URL"
+        required: true
+      azure_openai_key:
+        description: "Azure OpenAI Key"
+        required: true
+
+jobs:
+  evaluation:
+    runs-on: u
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+      - name: Configure Azure ML Agent
+        uses: ./.github/actions/configure_azureml_agent
+      - name: PromptFlow create connection
+        run: |
+          pf connection create -f named_entity_recognition/flows/post-production-evaluation/azure_openai.yml \
+            --set api_key="${{ secrets.azure_openai_key }}" \
+            --set api_base="${{ secrets.azure_openai_endpoint }}"
+      - name: PromptFlow Post Production Evaluation Run
+        run: |
+          pf run create \
+          --flow named_entity_recognition/flows/post-production-evaluation/ \
+          --data named_entity_recognition/data/production_log.jsonl \
+          --name eval_run_${{ github.run_number }}_${{ github.run_attempt }} \
+          --column-mapping text='${data.text}' entity_type='${data.entity_type}' llm_result='${data.llm_result}' \
+          --stream
+      - name: PromptFlow Evaluation Results Metrics
+        run: |
+          pf run show-metrics -n eval_run_${{ github.run_number }}_${{ github.run_attempt }}
+      - name: PromptFlow Evaluation Results Generation
+        id: evaluation_report_generation
+        run: |
+          REPORT_FILE_NAME=$(pf run visualize -n "eval_base_run_${{ github.run_number }}_${{ github.run_attempt }},eval_run_${{ github.run_number }}_${{ github.run_attempt }}" | grep 'The HTML file is generated at' | cut -d "'" -f 2)
+          echo "Generated report file: $REPORT_FILE_NAME"
+          echo "report_file_name=$REPORT_FILE_NAME" >> $GITHUB_OUTPUT
+          echo "Registered outout variable: ${{ steps.evaluation_report_generation.outputs.report_file_name }}"
+      - name: PromptFlow Evaluation Results Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: evaluation_report
+          path: ${{ steps.evaluation_report_generation.outputs.report_file_name }}

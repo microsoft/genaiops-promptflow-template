@@ -1,0 +1,46 @@
+id: template_eval_flow
+name: Template Evaluation Flow
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  text:
+    type: string
+    default: The software engineer is working on a new update for the application.
+  entity_type:
+    type: string
+    default: job title
+  llm_result:
+    type: string
+    default: software engineer
+outputs:
+  score:
+    type: string
+    reference: ${concat_scores.output}
+nodes:
+- name: llm_evaluation
+  type: llm
+  source:
+    type: code
+    path: llm_evaluation.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo
+    entity: ${inputs.entity_type}
+    text: ${inputs.text}
+    value: ${inputs.llm_result}
+  connection: open_ai_connection
+  api: chat
+- name: concat_scores
+  type: python
+  source:
+    type: code
+    path: concat_scores.py
+  inputs:
+    llm_score: ${llm_evaluation.output}
+- name: aggregate
+  type: python
+  source:
+    type: code
+    path: aggregate.py
+  inputs:
+    concatenated_result: ${concat_scores.output}
+  aggregation: true
