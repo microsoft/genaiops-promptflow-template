@@ -1,4 +1,4 @@
-name: named_entity_recognition_pr_dev_pipeline
+name: math_coding_ci_dev_workflow
 
 on:
   workflow_call:
@@ -13,6 +13,10 @@ on:
         description: "The flow usecase to execute"
         required: true
         default: "named_entity_recognition"
+      is_kubernetes_deployment:
+        type: string
+        description: "Determine managed(False) or kubernetes(True) deployment"
+        required: true
   workflow_dispatch:
     inputs:
       env_name:
@@ -25,6 +29,10 @@ on:
         description: "The flow usecase to execute"
         required: true
         default: "named_entity_recognition"
+      is_kubernetes_deployment:
+        type: string
+        description: "Determine managed(False) or kubernetes(True) deployment"
+        required: true
   pull_request:
     branches:
       - main
@@ -33,20 +41,14 @@ on:
       - '.github/**'
       - 'mlops/**'
       - 'named_entity_recognition/**'
-  push:
-    branches:
-      - main
-      - development
-    paths:
-      - '.github/**'
-      - 'mlops/**'
-      - 'named_entity_recognition/**'
+
 
 jobs:
-  execute-platform-pr-workflow:
-    uses: ./.github/workflows/platform_pr_dev_workflow.yml
+  execute-platform-flow-ci:
+    uses: ./.github/workflows/platform_ci_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment|| 'False' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
