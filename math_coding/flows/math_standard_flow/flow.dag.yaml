@@ -45,5 +45,6 @@ nodes:
     model: gpt-3.5-turbo
     question: ${inputs.math_question}
     examples: ${math_example.output}
-  connection: open_ai_connection
+  provider: AzureOpenAI
+  connection: aoai
   api: chat

@@ -32,15 +32,7 @@ on:
     paths:
       - '.github/**'
       - 'mlops/**'
-      - 'named_entity_recognition/**'
-  push:
-    branches:
-      - main
-      - development
-    paths:
-      - '.github/**'
-      - 'mlops/**'
-      - 'named_entity_recognition/**'
+      - 'math_coding/**'
 
 jobs:
   execute-platform-pr-workflow:
