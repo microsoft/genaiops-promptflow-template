@@ -1,4 +1,4 @@
-name: named_entity_recognition_ci_dev_pipeline
+name: math_coding_ci_dev_workflow
 
 on:
   workflow_call:
