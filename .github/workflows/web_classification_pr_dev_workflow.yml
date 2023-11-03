@@ -33,14 +33,6 @@ on:
       - '.github/**'
       - 'mlops/**'
       - 'web_classification/**'
-  push:
-    branches:
-      - main
-      - development
-    paths:
-      - '.github/**'
-      - 'mlops/**'
-      - 'web_classification/**'
 
 
 jobs:

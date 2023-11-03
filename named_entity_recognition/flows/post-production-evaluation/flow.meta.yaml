@@ -1,0 +1,10 @@
+$schema: https://azuremlschemas.azureedge.net/latest/flow.schema.json
+name: post_production_evaluation
+display_name: Post Production Evaluation
+type: evaluate
+path: ./flow.dag.yaml
+description: Post Production Evaluation
+properties:
+  promptflow.stage: prod
+  promptflow.section: template
+  promptflow.batch_inputs: samples.json

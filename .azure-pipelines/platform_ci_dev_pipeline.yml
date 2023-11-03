@@ -95,7 +95,7 @@ stages:
           timeoutInMinutes: 60 # task times out in 60 minutes
           inputs:
             notifyUsers: |
-              rimod@microsoft.com
+              replace@youremail.com
             instructions: "$(run_id_from_submit_job)"
             onTimeout: 'reject'
       

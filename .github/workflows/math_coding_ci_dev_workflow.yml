@@ -40,7 +40,7 @@ on:
     paths:
       - '.github/**'
       - 'mlops/**'
-      - 'named_entity_recognition/**'
+      - 'math_coding/**'
 
 
 jobs:

@@ -50,7 +50,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
+.DS_Store
 # Translations
 *.mo
 *.pot
@@ -136,3 +136,6 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Prompt flow files
+**/.promptflow
