@@ -19,7 +19,6 @@ def line_process(groundtruth: str, prediction: str) -> int:
 
     if round(prediction, 2) == round(groundtruth, 2):
         processed_result = 1
-
     return processed_result
 
 
