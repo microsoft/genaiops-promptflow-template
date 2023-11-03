@@ -1,0 +1,22 @@
+{
+    "envs":[ 
+            {
+                "ENV_NAME": "pr",
+                "RUNTIME_NAME": "newruntime150",
+                "KEYVAULT_NAME": "researchmlops5963078644",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "researchmlops",
+                "STANDARD_FLOW_PATH": "flows/math_standard_flow",
+                "EVALUATION_FLOW_PATH": "flows/math_evaluation_flow"
+            },
+            {
+                "ENV_NAME": "dev",
+                "RUNTIME_NAME": "newruntime150",
+                "KEYVAULT_NAME": "researchmlops5963078644",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "researchmlops",
+                "STANDARD_FLOW_PATH": "flows/standard",
+                "EVALUATION_FLOW_PATH": "flows/evaluation"
+            }
+    ]
+}
