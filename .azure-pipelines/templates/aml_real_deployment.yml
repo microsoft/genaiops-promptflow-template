@@ -15,7 +15,7 @@ steps:
   parameters:
     step_name: "provision azureml endpoint"
     script_parameter: |
-      python -m mlops.common.deployment.provision_endpoint \
+      python -m llmops.common.deployment.provision_endpoint \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
@@ -71,7 +71,7 @@ steps:
   parameters:
     step_name: "provision deployment"
     script_parameter: |
-      python -m mlops.common.deployment.provision_deployment \
+      python -m llmops.common.deployment.provision_deployment \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
@@ -82,7 +82,7 @@ steps:
   parameters:
     step_name: "test endpoint"
     script_parameter: |
-      python -m mlops.common.deployment.test_model_on_aml \
+      python -m llmops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}

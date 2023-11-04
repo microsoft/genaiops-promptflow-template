@@ -7,7 +7,7 @@ pr:
   paths:
     include:
       - .azure-pipelines/*
-      - mlops/*
+      - llmops/*
       - named_entity_recognition/*
 
 pool:

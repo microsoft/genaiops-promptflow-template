@@ -2,7 +2,7 @@
     "envs":[ 
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "newruntime150",
+                "RUNTIME_NAME": "replace the value which using dedicated runtime and compute",
                 "KEYVAULT_NAME": "researchmlops5963078644",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "researchmlops",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "newruntime150",
+                "RUNTIME_NAME": "replace the value which using dedicated runtime and compute",
                 "KEYVAULT_NAME": "researchmlops5963078644",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "researchmlops",

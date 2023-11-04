@@ -7,7 +7,7 @@ pr:
   paths:
     include:
       - .azure-pipelines/*
-      - mlops/*
+      - llmops/*
       - web_classification/*
 
 pool:

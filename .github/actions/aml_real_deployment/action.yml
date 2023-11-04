@@ -25,7 +25,7 @@ runs:
       with:
         step_name: "Provision AML Online Endpoint"
         script_parameter: |
-          python -m mlops.common.deployment.provision_endpoint \
+          python -m llmops.common.deployment.provision_endpoint \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
             --output_file "endpoint_principal.txt" \
@@ -63,7 +63,7 @@ runs:
       with:
         step_name: "Provision AML Online Deployment"
         script_parameter: |
-          python -m mlops.common.deployment.provision_deployment \
+          python -m llmops.common.deployment.provision_deployment \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --model_version ${{ inputs.MODEL_VERSION }} \
             --build_id ${{ github.run_id }} \
@@ -75,7 +75,7 @@ runs:
       with:
         step_name: "Test AML Deployment"
         script_parameter: |
-          python -m mlops.common.deployment.test_model_on_aml \
+          python -m llmops.common.deployment.test_model_on_aml \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }}

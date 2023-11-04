@@ -54,14 +54,13 @@ Each use case (set of Prompt Flow standard and evaluation flows) should follow t
 - .azure-pipelines : It contains the CI and PR related pipeline for Azure DevOps and specific to a use-case
 - configs          : It contains data, deployment and prompt flow data mapping related configuration files.
 - data             : This folder contains data files related to Prompt Flow standard and eevaluation flow
-- environment      : It contains python package dependencies needed in runtime for execution. 
+- environment      : It contains Conda file for python package dependencies needed for deployment environment. 
 - flows            : It should contain minimally two folder - one for standard Prompt Flow related files and other for Evaluation flow related file. There can be multiple evaluation flow related folders.
-- local_execution  : Contains python script for executing both the standard and evaluation flow locally
 - tests            : contains unit tests for the flows
 
-Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containg test data for testing endpoints after deployment. 
+Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containing test ata for testing endpoints after deployment. 
 
-- The '.azure-pipelines' folder contains the Azure DevOps pipelines for the platform and any changes will impact exeuction of all the flows.
+- The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact exeuction of all the flows.
 
 - The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github Workflows should be within this single folder for execution.
 
@@ -69,6 +68,7 @@ Additionally, there is a config.json file that refers important infrastructure a
 
 - The 'mlops' folder contains all the code related to flow execution, evaluation and deployment.
 
+- The 'local_execution' folder contains python script for executing both the standard and evaluation flow locally.
 
 # Documentation
 
@@ -113,24 +113,15 @@ git clone https://github.com/microsoft/llmops-promptflow-template.git
 
 ```bash
 
-subscription_id=
-resource_group_name=
-workspace_name=
-runtime_name=
 experiment_name=
-<<connection name>>={ 
-    "api_key": "",
-    "api_base": "",
-    "api_type": "azure",
-    "api_version": "2023-03-15-preview"
-}
-
+connection_name_1={ "api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}
+connection_name_2={ "api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}
 ```
 3. Prepare the local conda or virtual environment to install the dependencies.
 
 ```bash
 
-python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
+python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] dotenv
 
 ```
 

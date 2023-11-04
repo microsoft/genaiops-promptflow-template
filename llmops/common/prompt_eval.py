@@ -8,7 +8,6 @@ from promptflow.entities import Run
 from azure.identity import DefaultAzureCredential
 from promptflow.azure import PFClient
 import argparse
-from promptflow.entities import AzureOpenAIConnection
 import pandas as pd
 
 def prepare_and_execute(subscription_id,
@@ -26,15 +25,17 @@ def prepare_and_execute(subscription_id,
         if obj.get("ENV_NAME") == stage:
             config = obj
             break
+
     resource_group_name = config["RESOURCE_GROUP_NAME"]
     workspace_name = config["WORKSPACE_NAME"]
     data_mapping_config= f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path= config["STANDARD_FLOW_PATH"]
     data_config_path= f"{flow_to_execute}/configs/data_config.json"
-    runtime= config["RUNTIME_NAME"]
+
+    # un-comment the code here COMPUTE_RUNTIME
+    # runtime= config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
     experiment_name = f"{flow_to_execute}_{stage}"
-
 
     eval_flows = eval_flow_path.split(",")
 
@@ -50,13 +51,13 @@ def prepare_and_execute(subscription_id,
                 data_name = elem["DATASET_NAME"]
                 related_data = elem["RELATED_EXP_DATASET"]
                 data = pf.ml_client.data.get(name=data_name,label='latest')
-                data_id = f"azureml:{data.name}:{data.version}" # added
+                data_id = f"azureml:{data.name}:{data.version}"
                 dataset_name.append({
                     "data_id": data_id,
                     "ref_data":  related_data
                 })
 
-    print(dataset_name) # added
+    print(dataset_name) 
     standard_flow_file = f"{standard_flow}/flow.dag.yaml"
 
     with open(standard_flow_file, "r") as yaml_file:
@@ -96,7 +97,6 @@ def prepare_and_execute(subscription_id,
                     data_id = data_n
                     break
 
-
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             print(flow)
 
@@ -105,7 +105,7 @@ def prepare_and_execute(subscription_id,
                 data=data_id, 
                 run=my_run, 
                 column_mapping=mapping_node, 
-                #runtime=runtime,
+                #runtime=runtime,  # un-comment the code here comment the line related to resources parameter. COMPUTE_RUNTIME 
                 resources={'instance_type': "Standard_E4ds_v4"},
                 name=f"{experiment_name}_eval_{timestamp}",
                 display_name=f"{experiment_name}_eval_{timestamp}",
@@ -114,8 +114,10 @@ def prepare_and_execute(subscription_id,
             eval_run._experiment_name = experiment_name
             eval_job = pf.runs.create_or_update(eval_run, stream=True)
             df_result = None
+
             time.sleep(15)
-            if eval_job.status == "Completed" or eval_job.status == "Finished": # 4
+            
+            if eval_job.status == "Completed" or eval_job.status == "Finished":
                 print(eval_job.status)
                 df_result = pf.get_details(eval_job)
                 metric_variant = pf.get_metrics(eval_job)
@@ -164,12 +166,12 @@ def prepare_and_execute(subscription_id,
             
         styled_df = combined_results_df.to_html(index=False)
 
-        with open(f'reports/{run_data_id}_result.html', 'w') as f:
-            f.write(styled_df)
+        with open(f'reports/{run_data_id}_result.html', 'w') as combined_results:
+            combined_results.write(styled_df)
             
         html_table_metrics = combined_metrics_df.to_html(index=False)
-        with open(f'reports/{run_data_id}_metrics.html', 'w') as f:
-            f.write(html_table_metrics)
+        with open(f'reports/{run_data_id}_metrics.html', 'w') as combined_metrics:
+            combined_metrics.write(html_table_metrics)
 
         all_eval_df.append(combined_results_df) 
         all_eval_metrics.append(combined_metrics_df)
@@ -184,12 +186,12 @@ def prepare_and_execute(subscription_id,
     final_metrics_df.to_csv(f"./reports/{experiment_name}_metrics.csv")
             
     styled_df = final_results_df.to_html(index=False)
-    with open(f'reports/{experiment_name}_result.html', 'w') as f:
-        f.write(styled_df)
+    with open(f'reports/{experiment_name}_result.html', 'w') as final_results:
+        final_results.write(styled_df)
             
     html_table_metrics = final_metrics_df.to_html(index=False)
-    with open(f'reports/{experiment_name}_metrics.html', 'w') as f:
-        f.write(html_table_metrics)
+    with open(f'reports/{experiment_name}_metrics.html', 'w') as final_metrics:
+        final_metrics.write(html_table_metrics)
 
 
 def column_widths(column):
@@ -210,7 +212,7 @@ def main():
         help="execution and deployment environment. e.g. dev, prod, test",
     )
     parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
-    parser.add_argument("--run_id", type=str, required=True, help="bulk execution run ids")
+    parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
     parser.add_argument("--flow_to_execute", type=str, help="flow use case name", required=True)
 
     args = parser.parse_args()

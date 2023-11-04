@@ -49,7 +49,7 @@ jobs:
         with:
           step_name: "Register experiment data asset"
           script_parameter: |
-            python -m mlops.common.register_data_asset \
+            python -m llmops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --data_purpose "pr_data" \
             --flow_to_execute ${{ inputs.flow_type }} \
@@ -60,7 +60,7 @@ jobs:
         with:
           step_name: "Execute prompt flow bulk run"
           script_parameter: |
-            python -m mlops.common.prompt_pipeline \
+            python -m llmops.common.prompt_pipeline \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
             --flow_to_execute ${{ inputs.flow_type }} \

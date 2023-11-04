@@ -39,7 +39,7 @@ on:
       - development
     paths:
       - '.github/**'
-      - 'mlops/**'
+      - 'llmops/**'
       - 'named_entity_recognition/**'
 
 

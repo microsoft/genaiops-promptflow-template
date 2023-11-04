@@ -62,7 +62,7 @@ More details about how to create a policy can be found [here](https://learn.micr
 - DEPLOYMENT_INSTANCE_COUNT":This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
 - ENVIRONMENT_VARIABLES": This parameter represents a set of environment variables that can be passed to the deployment.
 
-**Step 10.** Add your data into data folder under use case folder. It supports, jsonl files. 
+**Step 10.** Add your data into data folder under use case folder. It supports jsonl files. 
 
 **Step 11.** Copy the standard and evaluation flow folders developed using Prompt Flow into the "flows" folder available for each use case.
 
