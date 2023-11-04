@@ -39,6 +39,6 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
-      flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+      flow_type: ${{ inputs.flow_type || 'math_coding' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

@@ -15,7 +15,7 @@ pool:
 
 
 variables:
-- group: mlops_platform_dev_vg
+- group: llmops_platform_dev_vg
 
 parameters:
  - name: env_name
