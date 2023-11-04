@@ -25,7 +25,7 @@ runs:
       with:
         step_name: "Provision Kubernetes Online Endpoint"
         script_parameter: |
-          python -m mlops.common.deployment.kubernetes_endpoint \
+          python -m llmops.common.deployment.kubernetes_endpoint \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
             --output_file "endpoint_principal.txt" \
@@ -63,7 +63,7 @@ runs:
       with:
         step_name: "Provision Kubernetes Online Deployment"
         script_parameter: |
-          python -m mlops.common.deployment.kubernetes_deployment \
+          python -m llmops.common.deployment.kubernetes_deployment \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --model_version ${{ inputs.MODEL_VERSION }} \
             --build_id ${{ github.run_id }} \
@@ -75,7 +75,7 @@ runs:
       with:
         step_name: "Test Kubernetes Deployment"
         script_parameter: |
-          python -m mlops.common.deployment.test_model_on_kubernetes \
+          python -m llmops.common.deployment.test_model_on_kubernetes \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }}

@@ -31,7 +31,7 @@ on:
       - development
     paths:
       - '.github/**'
-      - 'mlops/**'
+      - 'llmops/**'
       - 'web_classification/**'
 
 

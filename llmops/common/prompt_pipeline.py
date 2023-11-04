@@ -41,7 +41,9 @@ def prepare_and_execute(
     data_mapping_config= f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path= config["STANDARD_FLOW_PATH"]
     data_config_path= f"{flow_to_execute}/configs/data_config.json"
-    runtime= config["RUNTIME_NAME"]
+
+    # un-comment the code here COMPUTE_RUNTIME
+    # runtime= config["RUNTIME_NAME"] 
     experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
@@ -110,7 +112,7 @@ def prepare_and_execute(
                         run = Run( 
                             flow=flow,
                             data=data_id,
-                            #runtime=runtime,
+                            #runtime=runtime, # un-comment the code here comment the line related to resources parameter. COMPUTE_RUNTIME 
                             resources={'instance_type': "Standard_E4ds_v4"},
                             variant=variant_string,
                             name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
@@ -140,7 +142,7 @@ def prepare_and_execute(
             run = Run( 
                 flow=flow,
                 data=data_id,
-                #runtime=runtime,
+                #runtime=runtime,  # un-comment the code here comment the line related to resources parameter. COMPUTE_RUNTIME 
                 resources={'instance_type': "Standard_E4ds_v4"},
                 name=f"{experiment_name}_{timestamp}_{data_ref}",
                 display_name=f"{experiment_name}_{timestamp}_{data_ref}",
