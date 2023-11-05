@@ -81,13 +81,15 @@ There are multiple configuration files for enabling Prompt Flow run and evaluati
 
 Modify the configuration values in config.json file available for each example based on description.
 
-- `ENV_NAME`:  This represents the environment name, referring to a development and other environments for the tests and deployment of the Prompt Flow flows. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute
-- `KEYVAULT_NAME`:  This points to the name of an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
-- `RESOURCE_GROUP_NAME`:  This is the name of the Azure resource group where various Azure resources are organized.
-- `WORKSPACE_NAME`:  This represent the name of a workspace, which is a container for machine learning assets and resources.
-- `STANDARD_FLOW_PATH`:  This specify a standard flow path associated with an prompt experiment. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
+- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute. The template uses automatic runtime be default.
+- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
+- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
+- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
+- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
+- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+
+The template uses 'pr' and 'dev' to refer to environment types. The template can be extended by implementing additional environment types.
 
 ### Update mapping_config.json in config folder
 
@@ -107,6 +109,7 @@ Modify the configuration values in data_config.json file based on the environmen
 - `DATASET_NAME`: This is the name used for created Data Asset on Azure ML.
 - `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for bulk run of standard flows.
 - `DATASET_DESC`: This provides a description for the dataset.
+
 
 ### Update deployment_config.json in config folder
 
@@ -147,6 +150,10 @@ The Environment folder contains conda.yml file and any additional dependencies n
 
 The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be update to reflect test data needed for testing.
 
+### Update email Id for notification
+
+Manual approval is enabled by default. The template uses a dummy `replace@youremail.com` email Id. Replace this with valid email address in code.
+
 ## Example Prompt Run, Evaluation and Deployment Scenario
 
 There are three examples in this template. While named_entity_recognition and math_coding has same functionality, web_classification has multiple evaluation flows and datasets for dev environment. This is a flow in general across all examples.
@@ -165,12 +172,15 @@ This Azure DevOps CI pipelines contains the following steps:
 - Execution of multiple evaluation flows for a single bulk run (only for web_classification)
 - Evaluation of the bulk run result using single evaluation flow (for others)
 
+**Manual Approval**
+- approval required before deployment 
+
 **Register Prompt Flow LLM App**
 - Check in logic, Customer defined logic (accuracy rate, if >=90% you can deploy)
 
 **Deploy and Test LLM App**
 - Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
-- Assign RBAC permissions to the newly deployed endpoint to Key Vault and Azure ML workspace
+- Assign RBAC permissions to the newly deployed endpoint related to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
 
 
@@ -188,6 +198,6 @@ This Azure DevOps CI pipelines contains the following steps:
 
 ## Moving to production
 
-The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt Flow model, and deployment in Testing, additional pipelines similar to `dev`` pipelines can be replicated and deployed in the Production environment.
+The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt Flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
 
 The sample Prompt flow run & evaluation and Azure DevOps pipelines can be used as a starting point to adapt your own prompt engineering code and data.
