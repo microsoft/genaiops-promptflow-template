@@ -58,13 +58,13 @@ There are multiple configuration files for enabling Prompt Flow run and evaluati
 
 Modify the configuration values in config.json file available for each example based on description.
 
-- `ENV_NAME`:  This represents the environment name, referring to a development and other environments for the tests and deployment of the Prompt Flow flows. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute
-- `KEYVAULT_NAME`:  This points to the name of an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
-- `RESOURCE_GROUP_NAME`:  This is the name of the Azure resource group where various Azure resources are organized.
-- `WORKSPACE_NAME`:  This represent the name of a workspace, which is a container for machine learning assets and resources.
-- `STANDARD_FLOW_PATH`:  This specify a standard flow path associated with an prompt experiment. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
+- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute. The template uses automatic runtime be default.
+- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
+- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
+- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
+- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
+- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
 
 ### Update mapping_config.json in config folder
 
@@ -165,6 +165,6 @@ This Github CI workflow contains the following steps:
 
 ## Moving to production
 
-The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt Flow model, and deployment in Testing, additional pipelines similar to `dev`` pipelines can be replicated and deployed in the Production environment.
+The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt Flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
 
 The sample Prompt flow run & evaluation and GitHub workflows can be used as a starting point to adapt your own prompt engineering code and data.

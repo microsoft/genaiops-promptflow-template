@@ -66,7 +66,7 @@ Additionally, there is a config.json file that refers important infrastructure a
 
 - The 'docs' folder contains documentation for step by step guide for both Azure DevOps and Github Workflow related configuration.
 
-- The 'mlops' folder contains all the code related to flow execution, evaluation and deployment.
+- The 'llmops' folder contains all the code related to flow execution, evaluation and deployment.
 
 - The 'local_execution' folder contains python script for executing both the standard and evaluation flow locally.
 
