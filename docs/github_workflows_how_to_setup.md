@@ -94,14 +94,13 @@ Eventually, the default branch in github repo should show `development` as the d
 
 ![make development branch as default branch](images/default-branch.png)
 
-
 The template comes with few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenerio has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough. 
 
 The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
 
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
 
-Another important step in this section is to enable workflows in the new repository just created after forking.
+- Another important step in this section is to enable workflows in the new repository just created after forking.
 
 ![enable githhub workflows](images/enable-workflows.png)
 
@@ -145,7 +144,7 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the config.json file for each example as described in next section and push the code changes in your feature branch to the newly forked repo.
+Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization) as described in next section (mainlu update the keyvault name, resource group name and Azure Machine Learning workspace name) and push the new feature branch to the newly forked repo.
 
 ``` bash
 
@@ -169,7 +168,6 @@ After the execution is complete, the code can be merged to the `development` bra
 
 Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
 
-
 ## Update configurations for Prompt flow and GitHub Actions 
 
 There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Github workflows
@@ -192,7 +190,6 @@ Modify the configuration values in mapping_config.json file based on both the st
 
 - `experiment`: This section define inputs for standard flow. The values comes from a dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
-
 
 ### Update data_config.json in config folder
 
@@ -273,7 +270,7 @@ This Github CI workflow contains the following steps:
 
 ### Online Endpoint  
       
-1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to a 
+1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a kubernetes compute type
 
