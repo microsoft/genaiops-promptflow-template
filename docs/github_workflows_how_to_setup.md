@@ -20,7 +20,7 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - A Machine Learning workspace.
 - Git running on your local machine.
 - GitHub as the source control repository
-- Azure OpenAI with Model with chat capability.
+- Azure OpenAI with Model deployed model (gpt-35-turbo)
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
@@ -44,7 +44,7 @@ Create one Azure service principal for the purpose of understanding this reposit
     
     echo "Please ensure that the information created here is properly save for future use."
 
-1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
 1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
 

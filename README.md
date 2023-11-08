@@ -125,9 +125,9 @@ python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptfl
 
 ```
 
-4. Bring or write your flows into the template based on documentation [here](./docs/how_to_setup.md).
+4. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
 
-5. Write lpython scripts in notebooks folder similar to provided examples there.
+5. Write python scripts similar to provided examples in local_execution folder.
 
 
 ## Contributing
