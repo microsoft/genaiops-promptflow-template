@@ -3,7 +3,7 @@
         "math_question": "${data.question}"
     },
     "evaluation": {
-        "evaluation": {
+        "math_evaluation_flow": {
             "groundtruth": "${data.groundtruth}",
             "prediction": "${run.outputs.answer}"
         }

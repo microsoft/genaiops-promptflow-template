@@ -20,10 +20,53 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - A Machine Learning workspace.
 - Git running on your local machine.
 - Azure DevOps project as the source control repository
-- Azure Service Principal
-- Azure OpenAI
+- Azure OpenAI with Model with chat capability.
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
+
+## Create service principal
+
+Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.
+
+1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+
+    ``` bash
+    spname="<your sp name>"
+    roleName="Contributor"
+    subscriptionId="<subscription Id>"
+    servicePrincipalName="Azure-ARM-${spname}"
+
+    # Verify the ID of the active subscription
+    echo "Using subscription ID $subscriptionID"
+    echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
+    
+    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth 
+    
+    echo "Please ensure that the information created here is properly save for future use."
+
+1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
+
+    ```json
+
+      {
+      "clientId": "<service principal client id>",  
+      "clientSecret": "<service principal client secret>",
+      "subscriptionId": "<Azure subscription id>",  
+      "tenantId": "<Azure tenant id>",
+      "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+      "resourceManagerEndpointUrl": "https://management.azure.com/", 
+      "activeDirectoryGraphResourceId": "https://graph.windows.net/", 
+      "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+      "galleryEndpointUrl": "https://gallery.azure.com/",
+      "managementEndpointUrl": "https://management.core.windows.net/" 
+      }
+    ```
+
+1. Copy all of this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+
+1. Close the Cloud Shell once the service principals are created. 
 
 ## Set up authentication with Azure and Azure DevOps
 
@@ -68,10 +111,15 @@ More details about how to create a policy can be found [here](https://learn.micr
 
 Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
 
-This repository has 3 examples and we will use example `web-classification` which uses connection `aoai` inside, we need to set up the connection if we haven’t added it before.
+This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
 
 Please go to workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
+![aoai connection in Prompt Flow](images/connection.png)
+
+The configuration for connection used while authoring the repo:
+
+![connection details](images/connection-details.png)
 
 ## Update configurations for Prompt flow and Azure DevOps pipeline
 
@@ -106,7 +154,7 @@ Modify the configuration values in data_config.json file based on the environmen
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
 - `DATA_PURPOSE`: This denotes the purpose of the data usage. These includes data for pull-request(pr_data), experimentation(training_data) or evaluation(test_data). These 3 types are supported by the template.
 - `DATA_PATH`: This points to the file path e.g. "flows/web_classification/data/data.jsonl".
-- `DATASET_NAME`: This is the name used for created Data Asset on Azure ML.
+- `DATASET_NAME`: This is the name used for created Data Asset on Azure ML. Special characters are not allowed for naming of dataset. Special characters are not allowed for naming of dataset.
 - `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for bulk run of standard flows.
 - `DATASET_DESC`: This provides a description for the dataset.
 

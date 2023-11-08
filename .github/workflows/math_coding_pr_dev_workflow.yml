@@ -12,7 +12,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "named_entity_recognition"
+        default: "math_coding"
   workflow_dispatch:
     inputs:
       env_name:
@@ -24,7 +24,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "named_entity_recognition"
+        default: "math_coding"
   pull_request:
     branches:
       - main
