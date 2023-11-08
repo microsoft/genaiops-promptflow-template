@@ -3,7 +3,6 @@
         {
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "pr",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "DATA_PURPOSE": "pr_data",
             "DATA_PATH":"data/data.jsonl",
             "DATASET_NAME":"web_classification_pr",
@@ -12,7 +11,6 @@
         {
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "DATA_PURPOSE": "test_data",
             "DATA_PATH":"data/eval_data.jsonl",
             "DATASET_NAME":"web_classification_train_eval",
@@ -22,7 +20,6 @@
         {
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "DATA_PURPOSE": "test_data",
             "DATA_PATH":"data/eval_data_new.jsonl",
             "DATASET_NAME":"web_classification_train_new_eval",
@@ -32,7 +29,6 @@
         {
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "DATA_PURPOSE": "training_data",
             "DATA_PATH":"data/data.jsonl",
             "DATASET_NAME":"web_classification_train",
@@ -41,7 +37,6 @@
         {
             "PROMPT_FLOW_CONFIG_NAME": "web_classification",
             "ENV_NAME": "dev",
-            "AZURE_RM_SVC_CONNECTION": "azure_connection",
             "DATA_PURPOSE": "training_data",
             "DATA_PATH":"data/data_new.jsonl",
             "DATASET_NAME":"web_classification_train_new",

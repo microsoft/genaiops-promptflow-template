@@ -12,7 +12,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "named_entity_recognition"
+        default: "math_coding"
       is_kubernetes_deployment:
         type: string
         description: "Determine managed(False) or kubernetes(True) deployment"
@@ -28,7 +28,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "named_entity_recognition"
+        default: "math_coding"
       is_kubernetes_deployment:
         type: string
         description: "Determine managed(False) or kubernetes(True) deployment"
@@ -48,7 +48,7 @@ jobs:
     uses: ./.github/workflows/platform_ci_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
-      flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+      flow_type: ${{ inputs.flow_type || 'math_coding' }}
       is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment|| 'False' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

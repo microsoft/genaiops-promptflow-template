@@ -20,35 +20,153 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - A Machine Learning workspace.
 - Git running on your local machine.
 - GitHub as the source control repository
-- Azure Service Principal
-- Azure OpenAI
+- Azure OpenAI with Model with chat capability.
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
-## Set up authentication with Azure and GitHub
+## Create service principal
 
-From your GitHub project, select **Settings** -> **Secrets and  variables**,  **Actions** and **New repository secret**. Create a Github repository secret named 'AZURE_CREDENTIALS' with information related to Azure Service Principal. You can use [this document](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-a-service-principal-secret) as a reference.
+Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.
 
-![Screenshot of GitHub Secrets.](media/github-secrets.png)
+1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+
+    ``` bash
+    spname="<your sp name>"
+    roleName="Contributor"
+    subscriptionId="<subscription Id>"
+    servicePrincipalName="Azure-ARM-${spname}"
+    
+    # Verify the ID of the active subscription
+    echo "Using subscription ID $subscriptionID"
+    echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
+    
+    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth 
+    
+    echo "Please ensure that the information created here is properly save for future use."
+
+1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
+
+1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
+
+    ```json
+
+      {
+      "clientId": "<service principal client id>",  
+      "clientSecret": "<service principal client secret>",
+      "subscriptionId": "<Azure subscription id>",  
+      "tenantId": "<Azure tenant id>",
+      "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+      "resourceManagerEndpointUrl": "https://management.azure.com/", 
+      "activeDirectoryGraphResourceId": "https://graph.windows.net/", 
+      "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+      "galleryEndpointUrl": "https://gallery.azure.com/",
+      "managementEndpointUrl": "https://management.core.windows.net/" 
+      }
+    ```
+
+1. Copy all of this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+
+1. Close the Cloud Shell once the service principals are created. 
 
 ## Set up Github Repo
 
-Fork and then clone this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) in your GitHub organization. This repo has reusable LLMOps code that can be used across multiple projects. 
+Fork this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) in your GitHub organization. This repo has reusable LLMOps code that can be used across multiple projects. 
+
+![fork the repository](images/fork.png)
 
 Create a *development* branch from *main* branch and also make it as default one to make sure that all PRs should go towards it. This template assumes that the team works at a *development* branch as a primary source for coding and improving the prompt quality. Later, you can implement Github workflows that move code from the *development* branch into qa/main or execute a release process right away. Release management is not in part of this template.
 
-The template comes with few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenerio has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough. The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
+![create a new development branch](images/new-branch.png)
+
+At this time, `main` is the default branch.
+
+![main as default branch](images/main-default.png)
+
+From settings page, switch the default branch from `main` to `development`
+
+![change development as default branch](images/change-default-branch.png)
+
+It might ask for confirmation.
+
+![default branch confirmation](images/confirmation.png)
+
+Eventually, the default branch in github repo should show `development` as the default branch.
+
+![make development branch as default branch](images/default-branch.png)
+
+The template comes with few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenerio has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough. 
+
+The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
 
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
+
+- Another important step in this section is to enable workflows in the new repository just created after forking.
+
+![enable githhub workflows](images/enable-workflows.png)
+
+## Set up authentication with Azure and GitHub
+
+From your GitHub project, select **Settings** -> **Secrets and  variables**,  **Actions** and **New repository secret**. Create a Github repository secret named 'AZURE_CREDENTIALS' with information related to Azure Service Principal. You can paste the service principal output as the content of the secret and use [this document](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-a-service-principal-secret) as a reference.
+
+![Screenshot of GitHub Secrets.](images/github-secrets.png)
 
 ## Setup connections for Prompt flow 
 
 Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
 
-This repository has 3 examples and we will use example `web-classification` which uses connection `aoai` inside, we need to set up the connection if we haven’t added it before.
+This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
 
 Please go to workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
+![aoai connection in Prompt Flow](images/connection.png)
+
+The configuration for connection used while authoring the repo:
+
+![connection details](images/connection-details.png)
+
+## Cloning the repo
+
+ Now, we can clone the forked repo on local machine using command shown here. Replace the repo url with your url.
+
+``` bash
+git clone https://github.com/ritesh-modi/llmops-promptflow-template.git
+
+cd llmops-promptflow-template
+
+git branch
+
+```
+
+create a new feature branch using command shown here. Replace the branch name with your preferred name.
+``` bash 
+
+git checkout -b featurebranch
+
+```
+
+Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization) as described in next section (mainlu update the keyvault name, resource group name and Azure Machine Learning workspace name) and push the new feature branch to the newly forked repo.
+
+``` bash
+
+git add .
+git commit -m "changed code"
+git push -u origin fearurebranch
+
+
+```
+
+Raise a new PR to merge code from `feature branch` to the `development` branch.
+
+![raise a new PR](images/pr.png)
+
+This should start the process of executing the Math_coding PR pipeline.
+
+![PR pipeline execution](images/pr-workflow-execution.png)
+
+
+After the execution is complete, the code can be merged to the `development` branch.
+
+Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
 
 ## Update configurations for Prompt flow and GitHub Actions 
 
@@ -73,7 +191,6 @@ Modify the configuration values in mapping_config.json file based on both the st
 - `experiment`: This section define inputs for standard flow. The values comes from a dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
 
-
 ### Update data_config.json in config folder
 
 Modify the configuration values in data_config.json file based on the environment. These are required in creating data assets in Azure ML and also consume them in pipelines.
@@ -81,8 +198,8 @@ Modify the configuration values in data_config.json file based on the environmen
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
 - `DATA_PURPOSE`: This denotes the purpose of the data usage. These includes data for pull-request(pr_data), experimentation(training_data) or evaluation(test_data). These 3 types are supported by the template.
 - `DATA_PATH`: This points to the file path e.g. "flows/web_classification/data/data.jsonl".
-- `DATASET_NAME`: This is the name used for created Data Asset on Azure ML.
-- `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for bulk run of standard flows.
+- `DATASET_NAME`: This is the name used for created Data Asset on Azure ML. Special characters are not allowed for naming of dataset. Special characters are not allowed for naming of dataset.
+- `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for standard flow.
 - `DATASET_DESC`: This provides a description for the dataset.
 
 ### Update deployment_config.json in config folder
@@ -153,7 +270,7 @@ This Github CI workflow contains the following steps:
 
 ### Online Endpoint  
       
-1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to a 
+1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a kubernetes compute type
 
