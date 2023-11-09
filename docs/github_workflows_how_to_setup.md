@@ -20,7 +20,7 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - A Machine Learning workspace.
 - Git running on your local machine.
 - GitHub as the source control repository
-- Azure OpenAI with Model deployed model (gpt-35-turbo)
+- Azure OpenAI with Model deployed with name (gpt-35-turbo)
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
@@ -32,7 +32,7 @@ Create one Azure service principal for the purpose of understanding this reposit
 
     ``` bash
     spname="<your sp name>"
-    roleName="Contributor"
+    roleName="Owner"
     subscriptionId="<subscription Id>"
     servicePrincipalName="Azure-ARM-${spname}"
     
@@ -114,9 +114,11 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
 
-This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
+This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before. 
 
-Please go to workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
+This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
+
+Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
 ![aoai connection in Prompt Flow](images/connection.png)
 
@@ -150,7 +152,7 @@ Update code so that we can create a pull request. Update the config.json file fo
 
 git add .
 git commit -m "changed code"
-git push -u origin fearurebranch
+git push -u origin featurebranch
 
 
 ```
