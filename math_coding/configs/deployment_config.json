@@ -3,7 +3,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "math-coding-me",
+            "ENDPOINT_NAME": "math-coding-me-mb",
             "ENDPOINT_DESC": "An online endpoint serving a flow for math coding",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
@@ -23,7 +23,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "math-coding-kube",
+            "ENDPOINT_NAME": "math-coding-kube-mb",
             "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for math coding",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
