@@ -13,13 +13,13 @@ parameters:
 steps:
 - template: execute_python_code.yml
   parameters:
-    step_name: "provision kubernetes endpoint"
+    step_name: "Provision Kubernetes Endpoint"
     script_parameter: |
       python -m llmops.common.deployment.kubernetes_endpoint \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 
@@ -38,7 +38,7 @@ steps:
       echo "##vso[task.setvariable variable=ENDPOINT_PRINCIPAL;isOutput=true;]$endpoint_principal"
   
 - task: AzureCLI@2
-  displayName: Assign permission deployment
+  displayName: Assign Permission Deployment
   continueOnError: false
   env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
   inputs: 
@@ -48,8 +48,8 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
       config_path="./${{ parameters.flow_to_execute }}/config.json"
-      env_type=${{ parameters.DEPLOY_ENVIRONMENT }}
-      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_type\")" "$config_path")
+      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
         echo "$selected_object"
@@ -67,22 +67,22 @@ steps:
 
 - template: execute_python_code.yml
   parameters:
-    step_name: "provision kubernetes based deployment"
+    step_name: "Provision Kubernetes Based Deployment"
     script_parameter: |
       python -m llmops.common.deployment.kubernetes_deployment \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
-        --env_type ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 - template: execute_python_code.yml
   parameters:
-    step_name: "test kubernetes endpoint"
+    step_name: "Test Kubernetes Endpoint"
     script_parameter: |
       python -m llmops.common.deployment.test_model_on_kubernetes \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 

@@ -207,9 +207,9 @@ def main():
         help="Unique identifier for build execution",
     )
     parser.add_argument(
-        "--stage",
+        "--env_name",
         type=str,
-        help="execution and deployment environment. e.g. dev, prod, test",
+        help="environment name (dev, test, prod) for execution and deployment",
     )
     parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
     parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
@@ -220,7 +220,7 @@ def main():
     prepare_and_execute(
         args.subscription_id,
         args.build_id,
-        args.stage,
+        args.env_name,
         args.run_id,
         args.data_purpose,
         args.flow_to_execute

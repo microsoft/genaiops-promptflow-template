@@ -18,13 +18,13 @@ parser = argparse.ArgumentParser("provision_kubernetes_endpoints")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--output_file", type=str, help="outfile file needed for endpoint principal", required=True)
 parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
-parser.add_argument("--environment_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
+parser.add_argument("--env_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
 parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
 args = parser.parse_args()
 
 build_id = args.build_id
 output_file = args.output_file
-stage = args.environment_name
+stage = args.env_name
 flow_to_execute = args.flow_to_execute
 main_config = open(f"{flow_to_execute}/config.json")
 model_config = json.load(main_config)

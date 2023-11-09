@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser("provision_deployment")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--model_version", type=str, help="registered model version to be deployed", required=True)
 parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
-parser.add_argument("--env_type", type=str, help="env name (dev, test, prod) for deployment", required=True)
+parser.add_argument("--env_name", type=str, help="environment name (dev, test, prod) for deployment", required=True)
 parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
 
 
@@ -24,7 +24,7 @@ args = parser.parse_args()
 
 model_version = args.model_version
 build_id = args.build_id
-stage = args.env_type
+stage = args.env_name
 flow_to_execute = args.flow_to_execute
 model_name = f"{flow_to_execute}_{stage}"
 main_config = open(f"{flow_to_execute}/config.json")

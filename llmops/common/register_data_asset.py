@@ -9,11 +9,11 @@ parser = argparse.ArgumentParser("register data assets")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--data_purpose", type=str, help="data to be registered identified by purpose", required=True)
 parser.add_argument("--flow_to_execute", type=str, help="data config file path", required=True)
-parser.add_argument("--environment_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
+parser.add_argument("--env_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
  
 args = parser.parse_args()
 
-environment_name = args.environment_name
+environment_name = args.env_name
 main_config = open(f"{args.flow_to_execute}/config.json")
 config = json.load(main_config)
 

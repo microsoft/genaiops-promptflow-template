@@ -16,29 +16,30 @@ stages:
 
         - template: templates/get_connection_details.yml
         
-        - template: templates/register_data_asset.yml
+        - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register training data"
+            step_name: "Register Training Data"
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --environment_name ${{ parameters.exec_environment }}
+                --env_name ${{ parameters.exec_environment }}
 
-        - template: templates/execute_llmops_pipeline.yml
+        - template: templates/execute_python_code.yml
           parameters:
+            step_name: "Execute Standard Flow"
             script_parameter: |
               python -m llmops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
-                --stage ${{parameters.exec_environment}} \
+                --env_name ${{ parameters.exec_environment }} \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "training_data" \
                 --output_file run_id.txt
 
         - task: AzureCLI@2
-          displayName: Read prompt runs
+          displayName: Read Standard Flow run_id
           name: read_run_id
           inputs:
             azureSubscription: $(AZURE_RM_SVC_CONNECTION)
@@ -51,23 +52,24 @@ stages:
               echo $run_name
               echo "##vso[task.setvariable variable=RUN_NAME;isOutput=true;]$run_name"
 
-        - template: templates/register_data_asset.yml
+        - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register test data"
+            step_name: "Register Test Data"
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "test_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --environment_name ${{ parameters.exec_environment }}
+                --env_name ${{ parameters.exec_environment }}
 
-        - template: templates/execute_llmops_pipeline.yml
+        - template: templates/execute_python_code.yml
           parameters:
+            step_name: "Execute Evaluation Flow"
             script_parameter: |
               python -m llmops.common.prompt_eval \
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --build_id $(BUILD.BUILDID) \
-                --stage "${{parameters.exec_environment}}" \
+                --env_name "${{ parameters.exec_environment }}" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "test_data" \
                 --run_id "$(read_run_id.RUN_NAME)"
@@ -109,17 +111,17 @@ stages:
       
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register flow" 
+            step_name: "Register Standard Flow"
             script_parameter: |
               python -m llmops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
-                --env_type ${{parameters.exec_environment}}
+                --env_name ${{ parameters.exec_environment }}
       
         - task: AzureCLI@2
-          displayName: Read model version
+          displayName: Read Model Version
           name: read_model_version
           inputs:
             azureSubscription: $(AZURE_RM_SVC_CONNECTION)
@@ -137,7 +139,7 @@ stages:
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               flow_to_execute: ${{ parameters.flow_to_execute }}
-              DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
@@ -146,6 +148,6 @@ stages:
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               flow_to_execute: ${{ parameters.flow_to_execute }}
-              DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)

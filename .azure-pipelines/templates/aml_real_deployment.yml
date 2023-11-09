@@ -13,18 +13,18 @@ parameters:
 steps:
 - template: execute_python_code.yml
   parameters:
-    step_name: "provision azureml endpoint"
+    step_name: "Provision AzureML Endpoint"
     script_parameter: |
       python -m llmops.common.deployment.provision_endpoint \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 
 - task: AzureCLI@2
-  displayName: Read endpoint principal
+  displayName: Read Endpoint Principal
   name: read_endpoint_principal
   inputs:
     azureSubscription: $(AZURE_RM_SVC_CONNECTION)
@@ -38,7 +38,7 @@ steps:
       echo "##vso[task.setvariable variable=ENDPOINT_PRINCIPAL;isOutput=true;]$endpoint_principal"
   
 - task: AzureCLI@2
-  displayName: Assign permission to endpoint principal
+  displayName: Assign Permission to Endpoint Principal
   name: assign_endpoint_principal
   continueOnError: false
   env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
@@ -49,8 +49,8 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
       config_path="./${{ parameters.flow_to_execute }}/config.json"
-      env_type=${{ parameters.DEPLOY_ENVIRONMENT }}
-      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_type\")" "$config_path")
+      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
         echo "$selected_object"
@@ -69,22 +69,22 @@ steps:
       
 - template: execute_python_code.yml
   parameters:
-    step_name: "provision deployment"
+    step_name: "Provision Deployment"
     script_parameter: |
       python -m llmops.common.deployment.provision_deployment \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
-        --env_type ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 - template: execute_python_code.yml
   parameters:
-    step_name: "test endpoint"
+    step_name: "Test Endpoint"
     script_parameter: |
       python -m llmops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
-        --environment_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }}
 
 
