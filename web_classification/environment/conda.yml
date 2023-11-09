@@ -1,4 +1,4 @@
-name: named-entity-env
+name: web-classify-env
 channels:
   - conda-forge
 dependencies:

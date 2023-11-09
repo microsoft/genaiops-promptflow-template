@@ -1,4 +1,4 @@
-name: named-entity-env
+name: math-coding-env
 channels:
   - conda-forge
 dependencies:
