@@ -23,7 +23,7 @@ def prepare_and_execute(
         subscription_id,
         build_id,
         flow_to_execute,
-        env_name,
+        stage,
         output_file,
         data_purpose,
     ):
@@ -32,7 +32,7 @@ def prepare_and_execute(
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == env_name:
+        if obj.get("ENV_NAME") == stage:
             config = obj
             break
 
@@ -44,7 +44,7 @@ def prepare_and_execute(
 
     # un-comment the code here COMPUTE_RUNTIME
     # runtime= config["RUNTIME_NAME"] 
-    experiment_name = f"{flow_to_execute}_{env_name}"
+    experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(DefaultAzureCredential(),subscription_id,resource_group_name,workspace_name)
 
@@ -56,7 +56,7 @@ def prepare_and_execute(
     data_config = json.load(config_file)
     for elem in data_config['datasets']:
         if 'DATA_PURPOSE' in elem and 'ENV_NAME' in elem:
-            if env_name == elem['ENV_NAME'] and data_purpose == elem['DATA_PURPOSE']:
+            if stage == elem['ENV_NAME'] and data_purpose == elem['DATA_PURPOSE']:
                 data_name = elem["DATASET_NAME"]
                 data = ml_client.data.get(name=data_name,label='latest')
                 data_id = f"azureml:{data.name}:{data.version}" 
