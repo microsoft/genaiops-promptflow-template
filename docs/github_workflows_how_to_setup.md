@@ -193,7 +193,7 @@ git push -u origin featurebranch
 
 ```
 
-Raise a new PR to merge code from `feature branch` to the `development` branch.
+Raise a new PR to merge code from `feature branch` to the `development` branch. Ensure that the PR from feature branch to development branch happens within your repository and organization.
 
 ![raise a new PR](images/pr.png)
 
