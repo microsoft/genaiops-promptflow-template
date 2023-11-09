@@ -132,7 +132,7 @@ There are multiple configuration files for enabling Prompt Flow run and evaluati
 Modify the configuration values in config.json file available for each example based on description.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute. The template uses automatic runtime be default.
+- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
 - `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
 - `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.

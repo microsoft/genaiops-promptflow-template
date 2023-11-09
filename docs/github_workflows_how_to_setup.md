@@ -1,6 +1,6 @@
 # How to setup the repo with Github Workflows
 
-This template supports Azure Machine Learning(ML) as a platform for LLMOps, and Github workflows as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
+This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Github workflows as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
 
 * Running Prompt flow after a Pull Request
 * Running multiple Prompt flow evaluation to ensure results are high quality 
@@ -8,7 +8,7 @@ This template supports Azure Machine Learning(ML) as a platform for LLMOps, and 
 * Deployment of prompt flow models
 * Deployment to Kubernetes and/or Azure ML compute
 * A/B deployments
-* Role based access control(RBAC) permissions to deployment system managed id to keyvault and Azure ML workspace
+* Role based access control (RBAC) permissions to deployment system managed id to key vault and Azure ML workspace
 * Endpoint testing
 * Report generation
 
@@ -64,7 +64,7 @@ Create one Azure service principal for the purpose of understanding this reposit
       }
     ```
 
-1. Copy all of this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+1. Copy all this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created. 
 
@@ -114,7 +114,7 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
 
-This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before. 
+This repository has 3 examples, and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before. 
 
 This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
 
@@ -146,7 +146,45 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization) as described in next section (mainlu update the keyvault name, resource group name and Azure Machine Learning workspace name) and push the new feature branch to the newly forked repo.
+Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
+Update the Endpoint name and deployment name in deployment_config.json file.
+
+### Update config.json
+
+Modify the configuration values in config.json file available for each example based on description.
+
+- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
+- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
+- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
+- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
+- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
+- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
+- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+
+### Update deployment_config.json in config folder
+
+Modify the configuration values in deployment_config.json file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
+
+- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
+- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
+- `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
+- `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
+- `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
+- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment. 
+- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment. 
+- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment. 
+- `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
+- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment.
+- `DEPLOYMENT_TRAFFIC_ALLOCATION`: This parameter represents the percentage allocation of traffic to this deployment. A value of 100 indicates that all traffic is directed to this deployment.
+- `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
+- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt Flow runtime.
+-  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
+- `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
+- `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
+
+Kubernetes deployments have additional properties - `COMPUTE_NAME`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements.
+
+Now, push the new feature branch to the newly forked repo.
 
 ``` bash
 
@@ -174,23 +212,11 @@ Now a new PR can be opened from `development` branch to the `main` branch. This 
 
 There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Github workflows
 
-### Update config.json
-
-Modify the configuration values in config.json file available for each example based on description.
-
-- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Use this only when using dedicated runtime and compute. The template uses automatic runtime be default.
-- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
-- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
-- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
-- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
-
 ### Update mapping_config.json in config folder
 
 Modify the configuration values in mapping_config.json file based on both the standard and evaluation flows for an example. These are used in both experiment and evaluation flow execution.
 
-- `experiment`: This section define inputs for standard flow. The values comes from a dataset.
+- `experiment`: This section defines inputs for standard flow. The values comes from corresponding experiment dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
 
 ### Update data_config.json in config folder
@@ -203,29 +229,6 @@ Modify the configuration values in data_config.json file based on the environmen
 - `DATASET_NAME`: This is the name used for created Data Asset on Azure ML. Special characters are not allowed for naming of dataset. Special characters are not allowed for naming of dataset.
 - `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for standard flow.
 - `DATASET_DESC`: This provides a description for the dataset.
-
-### Update deployment_config.json in config folder
-
-**Step 8.** Modify the configuration values in deployment_config.json filefor each environment. These are required for deploying Prompt flows in Azure ML.
-
-- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
-- `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
-- `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
-- `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
-- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment. 
-- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment. 
-- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment. 
-- `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
-- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment.
-- `DEPLOYMENT_TRAFFIC_ALLOCATION`: This parameter represent the percentage allocation of traffic to this deployment. A value of 100 indicates that all traffic is directed to this deployment.
-- `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
-- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represent the name of the base image used for creating the Prompt Flow runtime.
--  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
-- `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
-- `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
-
-Kubernetes deployments have addtional properties - `COMPUTE_NAME`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements.
 
 ### Update data folder with data files
 
@@ -241,7 +244,7 @@ The Environment folder contains conda.yml file and any additional dependencies n
 
 ### Update test data
 
-The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be update to reflect test data needed for testing.
+The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be updated to reflect test data needed for testing.
 
 ## Example Prompt Run, Evaluation and Deployment Scenario
 
@@ -274,7 +277,7 @@ This Github CI workflow contains the following steps:
       
 1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
 
-     ![Managed online endpoint](./images/online-endpoint.png) or to a kubernetes compute type
+     ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
      ![Managed online endpoint](./images/kubernetes.png) 
    
