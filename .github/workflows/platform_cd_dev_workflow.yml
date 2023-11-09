@@ -1,4 +1,4 @@
-name: web_classification_cd_dev_pipeline
+name: platform_cd_dev_workflow
 
 on:
   workflow_call:

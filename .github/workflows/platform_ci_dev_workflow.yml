@@ -1,4 +1,4 @@
-name: web_classification_ci_dev_pipeline
+name: platform_ci_dev_workflow
 
 on:
   workflow_call:

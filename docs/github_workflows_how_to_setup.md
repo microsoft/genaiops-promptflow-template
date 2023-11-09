@@ -159,7 +159,7 @@ Modify the configuration values in config.json file available for each example b
 - `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
 - `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g. "flows/standard"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow folders. It can have one or more comma seperated values - one for each evaluation flow. e.g. "flows/eval_flow_1,flows/eval_flow_2"
 
 ### Update deployment_config.json in config folder
 
@@ -193,7 +193,7 @@ git push -u origin featurebranch
 
 ```
 
-Raise a new PR to merge code from `feature branch` to the `development` branch.
+Raise a new PR to merge code from `feature branch` to the `development` branch. Ensure that the PR from feature branch to development branch happens within your repository and organization.
 
 ![raise a new PR](images/pr.png)
 
@@ -230,7 +230,7 @@ Modify the configuration values in data_config.json file based on the environmen
 
 ### Update data folder with data files
 
-Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows. Refer to data_
+Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows.
 
 ### Update Standard and evaluation flows
 
