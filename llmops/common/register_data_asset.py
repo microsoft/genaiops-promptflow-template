@@ -13,12 +13,12 @@ parser.add_argument("--env_name",type=str,help="environment name (e.g. dev, test
  
 args = parser.parse_args()
 
-stage = args.env_name
+environment_name = args.env_name
 main_config = open(f"{args.flow_to_execute}/config.json")
 config = json.load(main_config)
 
 for obj in config["envs"]:
-    if obj.get("ENV_NAME") == stage:
+    if obj.get("ENV_NAME") == environment_name:
         model_config = obj
         break
 
@@ -37,7 +37,7 @@ data_config = json.load(config_file)
 #csv_file_path = 'output.csv'
 for elem in data_config['datasets']:
     if 'DATA_PURPOSE' in elem and 'ENV_NAME' in elem:
-        if data_purpose == elem["DATA_PURPOSE"] and stage == elem['ENV_NAME']:
+        if data_purpose == elem["DATA_PURPOSE"] and environment_name == elem['ENV_NAME']:
             data_path = f"{args.flow_to_execute}/{elem['DATA_PATH']}"
             dataset_desc = elem["DATASET_DESC"]
             dataset_name = elem["DATASET_NAME"]
