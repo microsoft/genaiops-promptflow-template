@@ -18,7 +18,7 @@ stages:
         
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register training data"
+            step_name: "Register Training Data"
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
@@ -28,7 +28,7 @@ stages:
 
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "Execute prompt job"
+            step_name: "Execute Standard Flow"
             script_parameter: |
               python -m llmops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
@@ -39,7 +39,7 @@ stages:
                 --output_file run_id.txt
 
         - task: AzureCLI@2
-          displayName: Read prompt runs
+          displayName: Read Standard Flow run_id
           name: read_run_id
           inputs:
             azureSubscription: $(AZURE_RM_SVC_CONNECTION)
@@ -54,7 +54,7 @@ stages:
 
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register test data"
+            step_name: "Register Test Data"
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
@@ -64,7 +64,7 @@ stages:
 
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "Execute prompt job"
+            step_name: "Execute Evaluation Flow"
             script_parameter: |
               python -m llmops.common.prompt_eval \
                 --subscription_id $(SUBSCRIPTION_ID) \
@@ -111,7 +111,7 @@ stages:
       
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register flow" 
+            step_name: "Register Standard Flow"
             script_parameter: |
               python -m llmops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
@@ -121,7 +121,7 @@ stages:
                 --env_name ${{ parameters.exec_environment }}
       
         - task: AzureCLI@2
-          displayName: Read model version
+          displayName: Read Model Version
           name: read_model_version
           inputs:
             azureSubscription: $(AZURE_RM_SVC_CONNECTION)

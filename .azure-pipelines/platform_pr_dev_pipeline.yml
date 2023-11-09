@@ -27,7 +27,7 @@ stages:
         
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "register training data"
+            step_name: "Register Training Data"
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
@@ -37,7 +37,7 @@ stages:
 
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "Execute prompt job"
+            step_name: "Execute Standard Flow"
             script_parameter: |
               python -m llmops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
