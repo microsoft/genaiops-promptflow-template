@@ -25,7 +25,7 @@ stages:
 
         - template: templates/configure_azureml_agent.yml
         
-        - template: templates/register_data_asset.yml
+        - template: templates/execute_python_code.yml
           parameters:
             step_name: "register training data"
             script_parameter: |
@@ -33,15 +33,16 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --environment_name ${{ parameters.exec_environment }}
+                --env_name ${{ parameters.exec_environment }}
 
-        - template: templates/execute_llmops_pipeline.yml
+        - template: templates/execute_python_code.yml
           parameters:
+            step_name: "Execute prompt job"
             script_parameter: |
               python -m llmops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
-                --stage ${{parameters.exec_environment}} \
+                --env_name ${{ parameters.exec_environment }} \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "training_data" \
                 --output_file run_id.txt

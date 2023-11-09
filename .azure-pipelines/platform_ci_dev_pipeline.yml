@@ -16,7 +16,7 @@ stages:
 
         - template: templates/get_connection_details.yml
         
-        - template: templates/register_data_asset.yml
+        - template: templates/execute_python_code.yml
           parameters:
             step_name: "register training data"
             script_parameter: |
@@ -24,15 +24,16 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "training_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --environment_name ${{ parameters.exec_environment }}
+                --env_name ${{ parameters.exec_environment }}
 
-        - template: templates/execute_llmops_pipeline.yml
+        - template: templates/execute_python_code.yml
           parameters:
+            step_name: "Execute prompt job"
             script_parameter: |
               python -m llmops.common.prompt_pipeline \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
-                --stage ${{parameters.exec_environment}} \
+                --env_name ${{ parameters.exec_environment }} \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "training_data" \
                 --output_file run_id.txt
@@ -51,7 +52,7 @@ stages:
               echo $run_name
               echo "##vso[task.setvariable variable=RUN_NAME;isOutput=true;]$run_name"
 
-        - template: templates/register_data_asset.yml
+        - template: templates/execute_python_code.yml
           parameters:
             step_name: "register test data"
             script_parameter: |
@@ -59,15 +60,16 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --data_purpose "test_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --environment_name ${{ parameters.exec_environment }}
+                --env_name ${{ parameters.exec_environment }}
 
-        - template: templates/execute_llmops_pipeline.yml
+        - template: templates/execute_python_code.yml
           parameters:
+            step_name: "Execute prompt job"
             script_parameter: |
               python -m llmops.common.prompt_eval \
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --build_id $(BUILD.BUILDID) \
-                --stage "${{parameters.exec_environment}}" \
+                --env_name "${{ parameters.exec_environment }}" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --data_purpose "test_data" \
                 --run_id "$(read_run_id.RUN_NAME)"
@@ -116,7 +118,7 @@ stages:
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
-                --env_type ${{parameters.exec_environment}}
+                --env_name ${{ parameters.exec_environment }}
       
         - task: AzureCLI@2
           displayName: Read model version
@@ -137,7 +139,7 @@ stages:
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               flow_to_execute: ${{ parameters.flow_to_execute }}
-              DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
@@ -146,6 +148,6 @@ stages:
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
               flow_to_execute: ${{ parameters.flow_to_execute }}
-              DEPLOY_ENVIRONMENT: ${{parameters.exec_environment}} 
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)

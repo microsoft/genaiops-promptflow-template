@@ -12,7 +12,7 @@ import pandas as pd
 
 def prepare_and_execute(subscription_id,
         build_id,
-        stage,
+        env_name,
         run_id,
         data_purpose,
         flow_to_execute
@@ -22,7 +22,7 @@ def prepare_and_execute(subscription_id,
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
+        if obj.get("ENV_NAME") == env_name:
             config = obj
             break
 
@@ -35,7 +35,7 @@ def prepare_and_execute(subscription_id,
     # un-comment the code here COMPUTE_RUNTIME
     # runtime= config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
-    experiment_name = f"{flow_to_execute}_{stage}"
+    experiment_name = f"{flow_to_execute}_{env_name}"
 
     eval_flows = eval_flow_path.split(",")
 
@@ -47,7 +47,7 @@ def prepare_and_execute(subscription_id,
     data_config = json.load(config_file)
     for elem in data_config['datasets']:
         if 'DATA_PURPOSE' in elem and 'ENV_NAME' in elem:
-            if stage == elem['ENV_NAME'] and data_purpose == elem['DATA_PURPOSE']:
+            if env_name == elem['ENV_NAME'] and data_purpose == elem['DATA_PURPOSE']:
                 data_name = elem["DATASET_NAME"]
                 related_data = elem["RELATED_EXP_DATASET"]
                 data = pf.ml_client.data.get(name=data_name,label='latest')
@@ -178,7 +178,7 @@ def prepare_and_execute(subscription_id,
         
     final_results_df = pd.concat(all_eval_df, ignore_index=True)
     final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
-    final_results_df["stage"] = stage
+    final_results_df["stage"] = env_name
     final_results_df["experiment_name"] = experiment_name
     final_results_df["build"] = build_id
 
@@ -207,9 +207,9 @@ def main():
         help="Unique identifier for build execution",
     )
     parser.add_argument(
-        "--stage",
+        "--env_name",
         type=str,
-        help="execution and deployment environment. e.g. dev, prod, test",
+        help="environment name (dev, test, prod) for execution and deployment",
     )
     parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
     parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
@@ -220,7 +220,7 @@ def main():
     prepare_and_execute(
         args.subscription_id,
         args.build_id,
-        args.stage,
+        args.env_name,
         args.run_id,
         args.data_purpose,
         args.flow_to_execute

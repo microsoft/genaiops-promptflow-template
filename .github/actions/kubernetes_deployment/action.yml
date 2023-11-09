@@ -29,7 +29,7 @@ runs:
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
             --output_file "endpoint_principal.txt" \
-            --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }}
 
     - name: Read system managed id information
@@ -67,7 +67,7 @@ runs:
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --model_version ${{ inputs.MODEL_VERSION }} \
             --build_id ${{ github.run_id }} \
-            --env_type ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }}
 
     - name: Test Kubernetes Deployment
@@ -77,5 +77,5 @@ runs:
         script_parameter: |
           python -m llmops.common.deployment.test_model_on_kubernetes \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
-            --environment_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
+            --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }}

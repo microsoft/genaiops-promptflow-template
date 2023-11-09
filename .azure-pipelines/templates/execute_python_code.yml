@@ -6,7 +6,7 @@ parameters:
 
 steps:
   - task: AzureCLI@2
-    displayName: ${{parameters.step_name}}
+    displayName: ${{ parameters.step_name }}
     continueOnError: false
     env: {APPLICATIONINSIGHTS_CONNECTION_STRING: "$(APPLICATIONINSIGHTS-CONNECTION-STRING)"}
     inputs: 
@@ -15,4 +15,4 @@ steps:
       workingDirectory: $(System.DefaultWorkingDirectory)
       scriptLocation: inlineScript
       inlineScript: |
-        ${{parameters.script_parameter}}
+        ${{ parameters.script_parameter }}

@@ -7,12 +7,12 @@ from azure.identity import DefaultAzureCredential
 parser = argparse.ArgumentParser("test_model")
 parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
 parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
-parser.add_argument("--environment_name",type=str,help="env name (dev, test, prod) for deployment", required=True)
+parser.add_argument("--env_name",type=str,help="environment name (dev, test, prod) for deployment", required=True)
 
 args = parser.parse_args()
 
 
-stage = args.environment_name
+stage = args.env_name
 flow_to_execute = args.flow_to_execute
 
 main_config = open(f"{flow_to_execute}/config.json")
