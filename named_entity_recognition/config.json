@@ -2,19 +2,19 @@
     "envs":[ 
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "replace the value which using dedicated runtime and compute",
-                "KEYVAULT_NAME": "researchmlops5963078644",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "researchmlops",
+                "RUNTIME_NAME": "replace the value if you're using dedicated runtime and compute",
+                "KEYVAULT_NAME": "amlcpp0891591029",
+                "RESOURCE_GROUP_NAME": "rg-chatcpp",
+                "WORKSPACE_NAME": "aml-cpp",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
                 "RUNTIME_NAME": "replace the value which using dedicated runtime and compute",
-                "KEYVAULT_NAME": "researchmlops5963078644",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "researchmlops",
+                "KEYVAULT_NAME": "amlcpp0891591029",
+                "RESOURCE_GROUP_NAME": "rg-chatcpp",
+                "WORKSPACE_NAME": "aml-cpp",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             }
