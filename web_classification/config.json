@@ -3,7 +3,7 @@
                 {
                     "ENV_NAME": "pr",
                     "RUNTIME_NAME": "caquigg1",
-                    "KEYVAULT_NAME": "researchmlops5963078644",
+                    "KEYVAULT_NAME": "caquiggamldev1308495785",
                     "RESOURCE_GROUP_NAME": "caquigg-devwork",
                     "WORKSPACE_NAME": "caquigg-aml-dev",
                     "STANDARD_FLOW_PATH": "flows/experiment",
@@ -12,7 +12,7 @@
                 {
                     "ENV_NAME": "dev",
                     "RUNTIME_NAME": "caquigg1",
-                    "KEYVAULT_NAME": "researchmlops5963078644",
+                    "KEYVAULT_NAME": "caquiggamldev1308495785",
                     "RESOURCE_GROUP_NAME": "caquigg-devwork",
                     "WORKSPACE_NAME": "caquigg-aml-dev",
                     "STANDARD_FLOW_PATH": "flows/experiment",
