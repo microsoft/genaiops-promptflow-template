@@ -18,7 +18,7 @@ nodes:
     type: code
     path: NER_LLM.jinja2
   inputs:
-    deployment_name: gpt-35-turbo
+    deployment_name: chat
     max_tokens: 64
     text: ${inputs.text}
     entity_type: ${inputs.entity_type}
