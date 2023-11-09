@@ -1,5 +1,5 @@
 # LLMOps with Prompt Flow (preview)
-Large Language Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
+Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
 
@@ -16,9 +16,9 @@ As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingl
 - It involves handling multiple flows, their unique lifecycles, experimentation with various configurations, and ensuring smooth deployments.
 
 # Context
-- LLM-infused application are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that needs engineering cadence and rigour.
-- Prompt flow is a powerful feature that simplifies and streamlines the Prompt Engineering process for LLM-infused applications. It enables users to create, evaluate, and deploy high-quality flows with ease and efficiency. 
-- How do we best augment LLM-infused application with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt Flow and LLMOps.
+- LLM-infused applications are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that needs engineering cadence and rigour.
+- Prompt flow is a powerful feature that simplifies and streamlines the Prompt Engineering process for LLM-infused applications. It enables users to create, evaluate, and deploy high-quality flows with ease and efficiency.
+- How do we best augment LLM-infused applications with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt Flow and LLMOps.
 
 # Solution
 
@@ -53,18 +53,18 @@ Each use case (set of Prompt Flow standard and evaluation flows) should follow t
 
 - .azure-pipelines : It contains the CI and PR related pipeline for Azure DevOps and specific to a use-case
 - configs          : It contains data, deployment and prompt flow data mapping related configuration files.
-- data             : This folder contains data files related to Prompt Flow standard and eevaluation flow
-- environment      : It contains Conda file for python package dependencies needed for deployment environment. 
-- flows            : It should contain minimally two folder - one for standard Prompt Flow related files and other for Evaluation flow related file. There can be multiple evaluation flow related folders.
+- data             : This folder contains data files related to Prompt Flow standard and evaluation flow
+- environment      : It contains Conda file for python package dependencies needed for deployment environment.
+- flows            : It should contain minimally two folders - one for standard Prompt Flow related files and other for Evaluation flow related files. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
-Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containing test ata for testing endpoints after deployment. 
+Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
 
-- The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact exeuction of all the flows.
+- The '.azure-pipelines' folder contains the common Azure DevOps Pipelines for the platform and any changes to them will impact exeuction of all the flows.
 
-- The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github Workflows should be within this single folder for execution.
+- The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github workflows should be within this single folder for execution.
 
-- The 'docs' folder contains documentation for step by step guide for both Azure DevOps and Github Workflow related configuration.
+- The 'docs' folder contains documentation for step-by-step guide for both Azure DevOps and Github workflow related configuration.
 
 - The 'llmops' folder contains all the code related to flow execution, evaluation and deployment.
 
@@ -73,8 +73,8 @@ Additionally, there is a config.json file that refers important infrastructure a
 # Documentation
 
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
-- Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
-- documentation can adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
+- Full documentation on using this repo using Github workflows can be found [here](./docs/github_workflows_how_to_setup.md)
+- Documentation on adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
 
 # Deployment
 
