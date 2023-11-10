@@ -21,8 +21,11 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - Git running on your local machine.
 - Azure DevOps organization
 - Azure OpenAI with Model deployed with name (gpt-35-turbo)
+- In case of Kubernetes based deployment, Kubernetes resources and associating it with Azure Machine Learning workspace would be required. More details about using Kubernetes as compute in AzureML is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-attach-kubernetes-anywhere?view=azureml-api-2)
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
+
+The template deploys real-time online endpoints for flows. These endpoints have Managed ID assigned to them and in many cases they need access to Azure Machine learning workspace and its associated key vault. The template by default 
 
 ## Setup connections for Prompt flow 
 
@@ -41,7 +44,7 @@ The configuration for connection used while authoring the repo:
   ![connection details](images/connection-details.png)
 
 
-## Create service principal
+## Create Azure service principal
 
 Create a Azure service principal for the purpose of working with this repository. You can add more depending on number of environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, PowerShell or from Azure UI. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
 
