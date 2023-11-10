@@ -121,7 +121,7 @@ connection_name_2={ "api_key": "","api_base": "","api_type": "azure","api_versio
 
 ```bash
 
-python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] dotenv
+python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] python-dotenv
 
 ```
 
