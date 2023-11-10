@@ -24,6 +24,23 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
+## Setup connections for Prompt flow 
+
+Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
+
+This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
+
+This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
+
+Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
+
+  ![aoai connection in Prompt Flow](images/connection.png)
+
+The configuration for connection used while authoring the repo:
+
+  ![connection details](images/connection-details.png)
+
+
 ## Create service principal
 
 Create a Azure service principal for the purpose of working with this repository. You can add more depending on number of environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, PowerShell or from Azure UI. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
@@ -70,39 +87,39 @@ Create a Azure service principal for the purpose of working with this repository
 
 ## Create new Azure DevOps project
 
-1. Create a new Azure DevOps project. 
+1. Create an Azure DevOps project to establish a repository for source code and CI/CD execution for Prompt flows. Information about creating a new project in Azure DevOps can be found [here](https://learn.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops&tabs=browser) .
 
   ![creating a new project](images/devops-project.png)
 
-Do not initialize the repository. The repo should like the image shown next.
+Do not initialize the repository. If you created an empty repo with no README or .gitignore files, you'll see instructions on how to clone the repo to your computer. You'll also see instructions on how to push code in an existing repo into the newly created one. The repo should like the image shown here. 
 
   ![un-initialized](images/repo-init.png)
 
-2. Get the url of the repo and note it down for usage in next steps.
+2. Get the url of the repo and note it somewhere for its usage in next steps.
 
   ![repo-url](images/repo-url.png)
 
 ## Set up authentication with Azure and Azure DevOps
 
-Create a service connection in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection. 
+Create a service connection named `azure_connection` in Azure DevOps. You can use [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml) as a reference. Use Azure Resource Manager as a type of the service connection. 
 
-From your Azure DevOps project, select `**Project Settings** -> **Service connections** -> **New Service connection** -> **Azure Resource Manager** and **Service Principal(manual)**`. Fill the form with relevant data related to Service Principal, test and save the connection.
+From your Azure DevOps project, select `**Project Settings** -> **Service connections** -> **New Service connection** -> **Azure Resource Manager** and **Service Principal(manual)**`. Fill the form with relevant data related to Service Principal, test and save the connection. A Service connection with the name `azure_connection` is used in the pipelines in this repo.
 
 ![Service connection.](./images/service-connection.png)
 
 ## Create a Azure DevOps Variable Group
 
-Create a new variable group (llmops_platform_dev_vg) with the following variables:
+Create a new variable group (llmops_platform_dev_vg) with the following variable:
 
-- AZURE_RM_SVC_CONNECTION: the service connection name from the previous step.
+- AZURE_RM_SVC_CONNECTION: the name of service connection created in previous step.
 
 ![Variable group](./images/variable-group.png)
 
 Information about variable groups in Azure DevOps can be found in [this document](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=classic).
 
-## Set up Azure DevOps Repo
+## Configure Azure DevOps local and remote repository
 
-Clone this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) locally on your workstation. This repo has reusable LLMOps code that can be used across multiple projects. 
+Clone this Github repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) locally on your workstation. This repo has reusable LLMOps code that can be used across multiple projects. 
 
 ``` bash
 git clone --branch main https://github.com/microsoft/llmops-promptflow-template.git
@@ -119,9 +136,10 @@ git branch
 
 ```
 
-4. Update the url pointed by git origin to the Azure DevOps repo url copied in previous step. Replace the url with your url and push both main and development branches to Azure DevOps repo
+4. By default, the cloned repo will point to github remote repo. This should be changed and start pointing to Azure DevOps repository. Update the url pointed by git origin to the Azure DevOps repo url copied from previous step using the following commands. Replace the url with your url and push both main and development branches to Azure DevOps repo.
 
 ``` bash
+
 git remote set-url origin https://rimod1310@dev.azure.com/rimod1310/test-llmops-template/_git/test-llmops-template
 
 git push --all
@@ -132,19 +150,18 @@ As a result the code for LLMOps Prompt Flow template will now be available in Az
 
   ![repo-status](images/devops-branch.png)
 
-`Development` branch should be the default branch in Azure DevOps. If not set it as default branch. This template assumes that the team works at a *development* branch as a primary source for coding. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
-
+5. `Development` branch should be the default branch in Azure DevOps. If not already set as default branch, it should be configured to be the default branch. This template assumes that the team works at a *development* branch as a primary source for coding. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
 
   ![devops-default-branch](images/devops-default-branch.png)
 
 
-Create two Azure Pipelines for each use case (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files. The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
+6. Create two Azure Pipelines for each scenario (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files. The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
 
 The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
 
 More details about how to create a basic Azure Pipeline can be found [here](https://learn.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs).
 
-These following steps needs to be executed twice - once for PR pipeline and again for CI pipeline.
+These following steps should be executed twice - once for PR pipeline and again for CI pipeline.
   
   ![create-pipeline](images/create-pipeline.png)
   
@@ -160,7 +177,6 @@ Select `Existing Azure Pipeline YAML file` from resultant page.
 
   ![configure-pipeline](images/configur-pipeline.png)
   
-
 select the CI yaml file `named_entity_recognition_ci_dev_pipeline.yml` for named_entity_recognition scenario from the `development` branch.
   
   ![select-yaml](images/select-yaml.png)
@@ -173,12 +189,12 @@ Rename the saved pipeline as `named-entity-ci`.
 
   ![rename-pipeline](images/rename-pipeline.png)
   
-Perform the same steps as before for PR pipeline. By the end of this step both the CI and PR pipeline for named_entity_recognition should be available in the Azure DevOps repository.
+Perform the same steps as before for PR pipeline and name is `named-entity-pr`. By the end of this step both the CI and PR pipeline for named_entity_recognition should be available in the Azure DevOps repository.
   
 
-Setup a policy for the *development* branch. At this stage we have an Azure Pipeline that should be executed on every PR to the *development* branch. At the same time successful completion of the build is not a requirement. So, it's important to add our PR build as a policy. Pay special attention that [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml) has various paths in place. We are using these paths to limit number of runs if the current PR doesn't affect ML component (for example, PR modifies a documentation file). Therefore, setting up the policy you need to make sure that you are using the same set of paths in the *Path filter* field.
+7. Setup a policy for the *development* branch. At this stage we have an Azure Pipeline that should be executed on every PR to the *development* branch. At the same time successful completion of the build is not a requirement. So, it's important to add our PR build as a policy. Pay special attention that [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml) has various paths in place. We are using these paths to limit number of runs if the current PR doesn't affect ML component (for example, PR modifies a documentation file). Therefore, setting up the policy you need to make sure that you are using the same set of paths in the *Path filter* field.
 
-From your Azure DevOps project, select `**Repos** -> **Branches** ->  **more options button against a branch ** -> **Branch policies** -> **Build validation**` and fill the form using the appropriate PR pipeline.
+From your Azure DevOps project, select `**Repos** -> **Branches** -> **more options button against development branch ** -> **Branch policies** -> **Build validation**` and fill the form using the appropriate PR pipeline.
 
   ![start-policy](images/start-policy.png)
   
@@ -197,7 +213,7 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognition). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
+Update configuration so that we can create a pull request for a scenario (e.g. named_entity_recognition). Update the config.json file for any one of the examples. Update the keyvault name, resource group name and Azure Machine Learning workspace name.
 Update the Endpoint name and deployment name in deployment_config.json file.
 
 ### Update config.json
@@ -243,10 +259,10 @@ git add .
 git commit -m "changed code"
 git push -u origin featurebranch
 
-
 ```
+### Execute pipelines
 
-Raise a new PR to merge code from `feature branch` to the `development` branch. 
+1. Raise a new PR to merge code from `feature branch` to the `development` branch. 
 
 ![feature-to-dev](images/feature-to-dev.png)
 
@@ -254,33 +270,13 @@ This should start the process of executing the Math_coding PR pipeline.
 
 ![pr-execution](images/pr-execution.png)
 
-
-After the execution is complete, the code can be merged to the `development` branch.
+2. After the execution is complete, the code can be merged to the `development` branch.
 
 Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
 
-
-
-## Setup connections for Prompt flow 
-
-Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
-
-This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
-
-This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
-
-Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
-
-![aoai connection in Prompt Flow](images/connection.png)
-
-The configuration for connection used while authoring the repo:
-
-![connection details](images/connection-details.png)
-
-## Update configurations for Prompt flow and Azure DevOps pipeline
+## Update more configurations for Prompt flow and Azure DevOps pipeline
 
 There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Azure DevOps pipelines.
-
 
 ### Update mapping_config.json in config folder
 
@@ -288,7 +284,6 @@ Modify the configuration values in mapping_config.json file based on both the st
 
 - `experiment`: This section define inputs for standard flow. The values comes from a dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
-
 
 ### Update data_config.json in config folder
 
@@ -300,8 +295,6 @@ Modify the configuration values in data_config.json file based on the environmen
 - `DATASET_NAME`: This is the name used for created Data Asset on Azure ML. Special characters are not allowed for naming of dataset. Special characters are not allowed for naming of dataset.
 - `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for bulk run of standard flows.
 - `DATASET_DESC`: This provides a description for the dataset.
-
-
 
 ### Update data folder with data files
 
@@ -351,7 +344,6 @@ This Azure DevOps CI pipelines contains the following steps:
 - Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
 - Assign RBAC permissions to the newly deployed endpoint related to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
-
 
 ### Online Endpoint  
       
