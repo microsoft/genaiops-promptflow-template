@@ -139,3 +139,5 @@ cython_debug/
 
 # Prompt flow files
 **/.promptflow
+
+.idea/
