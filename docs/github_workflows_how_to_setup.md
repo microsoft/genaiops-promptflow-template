@@ -3,7 +3,7 @@
 This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Github workflows as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
 
 * Running Prompt flow after a Pull Request
-* Running multiple Prompt flow evaluation to ensure results are high quality 
+* Running multiple Prompt flow evaluations to ensure results are high quality
 * Registering of prompt flow models
 * Deployment of prompt flow models
 * Deployment to Kubernetes and/or Azure ML compute
@@ -26,7 +26,7 @@ Prompt Flow runtimes are optional by default for this template. The template use
 
 ## Create service principal
 
-Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
+Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
 1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
@@ -66,11 +66,11 @@ Create one Azure service principal for the purpose of understanding this reposit
 
 1. Copy all this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
-1. Close the Cloud Shell once the service principals are created. 
+1. Close the Cloud Shell once the service principals are created.
 
 ## Set up Github Repo
 
-Fork this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) in your GitHub organization. This repo has reusable LLMOps code that can be used across multiple projects. 
+Fork this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) in your GitHub organization. This repo has reusable LLMOps code that can be used across multiple projects.
 
 ![fork the repository](images/fork.png)
 
@@ -82,7 +82,7 @@ At this time, `main` is the default branch.
 
 ![main as default branch](images/main-default.png)
 
-From settings page, switch the default branch from `main` to `development`
+From the settings page, switch the default branch from `main` to `development`
 
 ![change development as default branch](images/change-default-branch.png)
 
@@ -94,9 +94,9 @@ Eventually, the default branch in github repo should show `development` as the d
 
 ![make development branch as default branch](images/default-branch.png)
 
-The template comes with few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenerio has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough. 
+The template comes with a few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough.
 
-The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
+The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
 
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
 
@@ -110,15 +110,15 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 ![Screenshot of GitHub Secrets.](images/github-secrets.png)
 
-## Setup connections for Prompt flow 
+## Setup connections for Prompt flow
 
-Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
+Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools, for example Azure OpenAI.
 
-This repository has 3 examples, and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before. 
+This repository has 3 examples, and all the examples use a connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
 
-This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
+This repository has all the examples use Azure OpenAI model `gpt-35-turbo` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before.
 
-Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
+Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instructions to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples use a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
 ![aoai connection in Prompt Flow](images/connection.png)
 
@@ -128,7 +128,7 @@ The configuration for connection used while authoring the repo:
 
 ## Cloning the repo
 
- Now, we can clone the forked repo on local machine using command shown here. Replace the repo url with your url.
+ Now, we can clone the forked repo on your local machine using command shown here. Replace the repo url with your url.
 
 ``` bash
 git clone https://github.com/ritesh-modi/llmops-promptflow-template.git
@@ -139,40 +139,41 @@ git branch
 
 ```
 
-create a new feature branch using command shown here. Replace the branch name with your preferred name.
-``` bash 
+Create a new feature branch using the command shown here. Replace the branch name with your preferred name.
+
+``` bash
 
 git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
-Update the Endpoint name and deployment name in deployment_config.json file.
+Update code so that we can create a pull request. Update the `config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
+Update the Endpoint name and deployment name in the `deployment_config.json` file.
 
 ### Update config.json
 
-Modify the configuration values in config.json file available for each example based on description.
+Modify the configuration values in the `config.json` file available for each example based on description.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
-- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
+- `RUNTIME_NAME`:  This is the name of a Prompt Flow runtime environment, used for executing the prompt flows. Add values to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
+- `KEYVAULT_NAME`:  This points to an Azure Key Vault related to the Azure ML service, a service for securely storing and managing secrets, keys, and certificates.
 - `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
-- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+- `STANDARD_FLOW_PATH`:  This is the relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
+- `EVALUATION_FLOW_PATH`:  This is a string value referring to relative evaluation flow paths. It can have multiple comma separated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
 
 ### Update deployment_config.json in config folder
 
-Modify the configuration values in deployment_config.json file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
+Modify the configuration values in the `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
 
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
+- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model.
 - `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
 - `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
 - `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
-- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment. 
-- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment. 
-- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment. 
+- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment.
+- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment.
+- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment.
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
 - `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment.
 - `DEPLOYMENT_TRAFFIC_ALLOCATION`: This parameter represents the percentage allocation of traffic to this deployment. A value of 100 indicates that all traffic is directed to this deployment.
@@ -203,61 +204,60 @@ This should start the process of executing the Math_coding PR pipeline.
 
 ![PR pipeline execution](images/pr-workflow-execution.png)
 
-
 After the execution is complete, the code can be merged to the `development` branch.
 
 Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
 
-## Update configurations for Prompt flow and GitHub Actions 
+## Update configurations for Prompt flow and GitHub Actions
 
 There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Github workflows
 
 ### Update mapping_config.json in config folder
 
-Modify the configuration values in mapping_config.json file based on both the standard and evaluation flows for an example. These are used in both experiment and evaluation flow execution.
+Modify the configuration values in the `mapping_config.json` file based on both the standard and evaluation flows for an example. These are used in both experiment and evaluation flow execution.
 
 - `experiment`: This section defines inputs for standard flow. The values comes from corresponding experiment dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
 
 ### Update data_config.json in config folder
 
-Modify the configuration values in data_config.json file based on the environment. These are required in creating data assets in Azure ML and also consume them in pipelines.
+Modify the configuration values in the `data_config.json` file based on the environment. These are required in creating data assets in Azure ML and also consume them in pipelines.
 
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- `DATA_PURPOSE`: This denotes the purpose of the data usage. These includes data for pull-request(pr_data), experimentation(training_data) or evaluation(test_data). These 3 types are supported by the template.
+- `DATA_PURPOSE`: This denotes the purpose of the data usage. This includes data for pull-request(pr_data), experimentation(training_data) or evaluation(test_data). These 3 types are supported by the template.
 - `DATA_PATH`: This points to the file path e.g. "flows/web_classification/data/data.jsonl".
-- `DATASET_NAME`: This is the name used for created Data Asset on Azure ML. Special characters are not allowed for naming of dataset. Special characters are not allowed for naming of dataset.
+- `DATASET_NAME`: This is the name used for the created Data Asset on Azure ML. Special characters are not allowed for naming the dataset.
 - `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for standard flow.
 - `DATASET_DESC`: This provides a description for the dataset.
 
 ### Update data folder with data files
 
-Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows. Refer to data_
+Add your data into the `data` folder under the use case folder. It supports `jsonl` files and the examples already contains data files for both running and evaluating Prompt Flows.
 
 ### Update Standard and evaluation flows
 
-The flows folder contains one folder for each standard and evaluation flow. Each example in the repository already has these flows. 
+The `flows` folder contains one folder for each standard and evaluation flow. Each example in the repository already has these flows.
 
 ### Update Environment related dependencies
 
-The Environment folder contains conda.yml file and any additional dependencies needed by the flow should be added to it. This file is used during deployment process.
+The `environment` folder contains a `conda.yml` file and any additional dependencies needed by the flow should be added to it. This file is used during deployment process.
 
 ### Update test data
 
-The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be updated to reflect test data needed for testing.
+The `sample-request.json` file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own `sample-request.json` file and for custom flows, it should be updated to reflect test data needed for testing.
 
 ## Example Prompt Run, Evaluation and Deployment Scenario
 
-There are three examples in this template. While named_entity_recognition and math_coding has same functionality, web_classification has multiple evaluation flows and datasets for dev environment. This is a flow in general across all examples.
+There are three examples in this template. While `named_entity_recognition` and `math_coding` have the same functionality, `web_classification` has multiple evaluation flows and datasets for the dev environment. This is a flow in general across all examples.
 
-![Githib workflow execution](./images/github-execution.png) 
+![Githib workflow execution](./images/github-execution.png)
 
 This Github CI workflow contains the following steps:
 
 **Run Prompts in Flow**
 - Upload bulk run dataset
-- Bulk run prompt flow based on dataset.
-- Bulk run each prompt variant 
+- Bulk run prompt flow based on dataset
+- Bulk run each prompt variant
 
 **Evaluate Results**
 - Upload ground test dataset
@@ -268,10 +268,9 @@ This Github CI workflow contains the following steps:
 - Check in logic, Customer defined logic (accuracy rate, if >=90% you can deploy)
 
 **Deploy and Test LLM App**
-- Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
+- Deploy the Flow as a model to the development environment either as Kubernetes or Azure ML Compute endpoint
 - Assign RBAC permissions to the newly deployed endpoint to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
-
 
 ### Online Endpoint  
       
@@ -279,9 +278,9 @@ This Github CI workflow contains the following steps:
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
-     ![Managed online endpoint](./images/kubernetes.png) 
+     ![Managed online endpoint](./images/kubernetes.png)
    
-2. Once pipeline execution completes, it would have successfully completed the test using data from sample-request.json file as well. 
+2. Once pipeline execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
 
      ![online endpoint test in pipeline](./images/pipeline-test.png)
 
