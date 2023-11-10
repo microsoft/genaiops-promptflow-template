@@ -89,13 +89,13 @@ def prepare_and_execute(
     mapping_config = json.load(mapping_file)
     exp_config_node = mapping_config['experiment']
 
-
     run_ids = []
     past_runs = []
 
     for data_id in dataset_name:
         data_ref = data_id.replace("azureml:", "")
         data_ref = data_ref.split(":")[0]
+
         if len(all_variants) != 0:
             for variant in all_variants:
                 for variant_id, node_id in variant.items():
@@ -106,6 +106,7 @@ def prepare_and_execute(
                     get_current_defaults[node_id] = variant_id
                     get_current_defaults['dataset'] = data_ref
                     print(get_current_defaults)
+
                     if len(past_runs) == 0 or are_dictionaries_similar(get_current_defaults, past_runs) == False: 
                         past_runs.append(get_current_defaults)
                         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -126,10 +127,9 @@ def prepare_and_execute(
 
                         pipeline_job = pf.runs.create_or_update(run,stream=True)
                         run_ids.append(pipeline_job.name)
-                        time.sleep(15)
                         df_result = None
                         time.sleep(15)
-                        if pipeline_job.status == "Completed" or pipeline_job.status == "Finished": # 4
+                        if pipeline_job.status == "Completed" or pipeline_job.status == "Finished":
                             print("job completed")
                             df_result = pf.get_details(pipeline_job)
                             run_details = pf.runs.get_metrics(pipeline_job.name)
@@ -162,7 +162,6 @@ def prepare_and_execute(
                 df_result = pf.get_details(pipeline_job)
                 run_details = pf.runs.get_metrics(pipeline_job.name)
                 print(df_result.head(10))
-                print("done")
             else:
                 raise Exception("Sorry, exiting job with failure..")
 
@@ -173,22 +172,24 @@ def prepare_and_execute(
 
 def main():
     parser = argparse.ArgumentParser("prompt_bulk_run")
-    parser.add_argument("--subscription_id", type=str, help="Azure subscription id")
+    parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True,)
     parser.add_argument(
         "--build_id",
         type=str,
         help="Unique identifier for build execution",
+        required=True,
     )
     parser.add_argument(
         "--env_name",
         type=str,
         help="environment name (dev, test, prod) for execution and deployment",
+        required=True,
     )
     parser.add_argument(
-        "--data_purpose", type=str, help="data identified by purpose"
+        "--data_purpose", type=str, help="data identified by purpose", required=True
     )
     parser.add_argument(
-        "--output_file", type=str, required=False, help="A file to save run ids"
+        "--output_file", type=str, required=True, help="A file to save run ids"
     )
     parser.add_argument("--flow_to_execute", type=str, help="flow use case name", required=True)
     args = parser.parse_args()

@@ -7,16 +7,17 @@ As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingl
 
 # Challenges in LLMOps
 
-- Managing Large Language based flows, from local experimentation to production deployment, has been far from straightforward and isn't a one-size-fits-all task. 
+- Managing Large Language based flows, from local experimentation to production deployment, has been far from straightforward and isn't a one-size-fits-all task.
 
-- Each flow has its unique lifecycle, from initial experimentation to deployment, and each stage presents its set of challenges.
+- Each flow has its unique lifecycle, from initial experimentation to deployment, and each stage presents its own set of challenges.
 
 - Organizations often deal with multiple flows concurrently, each with its objectives, requirements, and complexities. This can quickly become overwhelming without proper management tools.
 
 - It involves handling multiple flows, their unique lifecycles, experimentation with various configurations, and ensuring smooth deployments.
 
 # Context
-- LLM-infused applications are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that needs engineering cadence and rigour.
+
+- LLM-infused applications are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that need engineering cadence and rigour.
 - Prompt flow is a powerful feature that simplifies and streamlines the Prompt Engineering process for LLM-infused applications. It enables users to create, evaluate, and deploy high-quality flows with ease and efficiency.
 - How do we best augment LLM-infused applications with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt Flow and LLMOps.
 
@@ -24,19 +25,19 @@ As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingl
 
 That's where **LLMOps with Prompt Flow** comes in. LLMOps with Prompt Flow is a "LLMOps template and guidance" to help you build LLM-infused apps using Prompt Flow. It provides the following features:
 
-- **Centralized Code Hosting:** This repo supports hosting code for multiple flows based on prompt flow, providing a single repository for all your flows.   Think of this platform as a single repository where all your prompt flow code resides. It's like a library for your flows, making it easy to find, access, and collaborate on different projects.
+- **Centralized Code Hosting:** This repo supports hosting code for multiple flows based on prompt flow, providing a single repository for all your flows. Think of this platform as a single repository where all your prompt flow code resides. It's like a library for your flows, making it easy to find, access, and collaborate on different projects.
 
 - **Lifecycle Management:** Each flow enjoys its own lifecycle, allowing for smooth transitions from local experimentation to production deployment.
 
 - **Variant and Hyperparameter Experimentation:** Experiment with multiple variants and hyperparameters, evaluating flow variants with ease. Variants and hyperparameters are like ingredients in a recipe. This platform allows you to experiment with different combinations of variants across multiple nodes in a flow.
 
-- **A/B Deployment:** Seamlessly implement A/B deployments, enabling you to compare different flow versions effortlessly. Just as in traditional A/B testing for websites, this platform facilitates A/B deployment for prompt flow flows. This means you can effortlessly compare different versions of a flows in a real-world setting to determine which performs best.
+- **A/B Deployment:** Seamlessly implement A/B deployments, enabling you to compare different flow versions effortlessly. Just as in traditional A/B testing for websites, this platform facilitates A/B deployment for prompt flow flows. This means you can effortlessly compare different versions of a flow in a real-world setting to determine which performs best.
 
 - **Many-to-many dataset/flow relationships:** Accommodate multiple datasets for each standard and evaluation flow, ensuring versatility in flow test and evaluation. The platform is designed to accommodate multiple datasets for each flow.
 
-- **Multiple Deployment Targets:** The repo supports deployment of flows to Kubernetes, Azure Managed computes driven through configuration ensuring that your flows can scale as needed.
+- **Multiple Deployment Targets:** The repo supports deployment of flows to Kubernetes and Azure Managed computes driven through configuration ensuring that your flows can scale as needed.
 
-- **Comprehensive Reporting:** Generate detailed reports for each variant configuration, allowing you to make informed decisions. Provides detailed Metric collection, experiment and variant bulk runs for all runs and experiments, enabling data-driven decisions in csv as well as HTML files.
+- **Comprehensive Reporting:** Generate detailed reports for each variant configuration, allowing you to make informed decisions. Provides detailed metric collection for all variant bulk runs and experiments, enabling data-driven decisions in csv as well as HTML files.
 
 - Offers BYOF (bring-your-own-flows). A **complete platform** for developing multiple use-cases related to LLM-infused applications.
 - Offers **configuration** based development. No need to write extensive boiler-plate code.
@@ -51,30 +52,30 @@ LLMOps with Prompt Flow provides capabilities for both simple as well as complex
 
 Each use case (set of Prompt Flow standard and evaluation flows) should follow the folder structure as shown here:
 
-- .azure-pipelines : It contains the CI and PR related pipeline for Azure DevOps and specific to a use-case
-- configs          : It contains data, deployment and prompt flow data mapping related configuration files.
+- .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
+- configs          : It contains data, deployment, and prompt flow data mapping related configuration files.
 - data             : This folder contains data files related to Prompt Flow standard and evaluation flow
-- environment      : It contains Conda file for python package dependencies needed for deployment environment.
-- flows            : It should contain minimally two folders - one for standard Prompt Flow related files and other for Evaluation flow related files. There can be multiple evaluation flow related folders.
+- environment      : It contains a Conda file for python package dependencies needed for deployment environment.
+- flows            : It should contain minimally two folder - one for standard Prompt Flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
-Additionally, there is a config.json file that refers important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
+Additionally, there is a config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
 
-- The '.azure-pipelines' folder contains the common Azure DevOps Pipelines for the platform and any changes to them will impact exeuction of all the flows.
+- The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact execution of all the flows.
 
 - The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github workflows should be within this single folder for execution.
 
-- The 'docs' folder contains documentation for step-by-step guide for both Azure DevOps and Github workflow related configuration.
+- The 'docs' folder contains documentation for step-by-step guides for both Azure DevOps and Github Workflow related configuration.
 
 - The 'llmops' folder contains all the code related to flow execution, evaluation and deployment.
 
-- The 'local_execution' folder contains python script for executing both the standard and evaluation flow locally.
+- The 'local_execution' folder contains python scripts for executing both the standard and evaluation flow locally.
 
 # Documentation
 
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
-- Full documentation on using this repo using Github workflows can be found [here](./docs/github_workflows_how_to_setup.md)
-- Documentation on adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
+- Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
+- Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
 
 # Deployment
 
@@ -103,13 +104,13 @@ The repo generates multiple reports (experiments-runs and metrics examples are s
 
 To harness the capabilities of the **local execution**, follow these installation steps:
 
-1. **Clone the Repository**: Begin by cloning the templates's repository from its [GitHub repository](https://github.com/microsoft/llmops-promptflow-template.git).
+1. **Clone the Repository**: Begin by cloning the template's repository from its [GitHub repository](https://github.com/microsoft/llmops-promptflow-template.git).
 
 ```bash
 git clone https://github.com/microsoft/llmops-promptflow-template.git
 ```
 
-2. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed:
+2. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed. All the flow examples in this repo uses AzureOpenAI connection named `aoai`. Add a line `aoai={"api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}` with updated values for api_key and api_base. If additional connections with different names are used in your flows, they should be added accordingly. Currently, flow with AzureOpenAI as provider as supported. 
 
 ```bash
 
@@ -121,14 +122,13 @@ connection_name_2={ "api_key": "","api_base": "","api_type": "azure","api_versio
 
 ```bash
 
-python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] dotenv
+python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] python-dotenv
 
 ```
 
 4. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
 
-5. Write python scripts similar to provided examples in local_execution folder.
-
+5. Write python scripts similar to the provided examples in local_execution folder.
 
 ## Contributing
 
