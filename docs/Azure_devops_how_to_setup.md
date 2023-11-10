@@ -1,6 +1,6 @@
 # How to setup the repo with Azure DevOps
 
-This template supports Azure Machine Learning(ML) as a platform for LLMOps, and Azure DevOps pipelines as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
+This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Azure DevOps pipelines as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
 
 * Running Prompt flow after a Pull Request
 * Running multiple Prompt flow evaluation to ensure results are high quality 
@@ -8,7 +8,7 @@ This template supports Azure Machine Learning(ML) as a platform for LLMOps, and 
 * Deployment of prompt flow models
 * Deployment to Kubernetes and/or Azure ML compute
 * A/B deployments
-* Role based access control(RBAC) permissions to deployment system managed id to keyvault and Azure ML workspace
+* Role based access control (RBAC) permissions to deployment system managed id to key vault and Azure ML workspace
 * Endpoint testing
 * Report generation
 
@@ -19,16 +19,16 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - An Azure subscription. If you don't have an Azure subscription, create a free account before you begin. Try the [free or paid version of Machine Learning](https://azure.microsoft.com/free/).
 - A Machine Learning workspace.
 - Git running on your local machine.
-- Azure DevOps project as the source control repository
+- Azure DevOps organization
 - Azure OpenAI with Model deployed with name (gpt-35-turbo)
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
 ## Create service principal
 
-Create one Azure service principal for the purpose of understanding this repository. You can add more depending on number of environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
+Create a Azure service principal for the purpose of working with this repository. You can add more depending on number of environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, PowerShell or from Azure UI. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
 
-1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
     ``` bash
     spname="<your sp name>"
@@ -64,9 +64,23 @@ Create one Azure service principal for the purpose of understanding this reposit
       }
     ```
 
-1. Copy all of this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+1. Copy the output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created. 
+
+## Create new Azure DevOps project
+
+1. Create a new Azure DevOps project. 
+
+  ![creating a new project](images/devops-project.png)
+
+Do not initialize the repository. The repo should like the image shown next.
+
+  ![un-initialized](images/repo-init.png)
+
+2. Get the url of the repo and note it down for usage in next steps.
+
+  ![repo-url](images/repo-url.png)
 
 ## Set up authentication with Azure and Azure DevOps
 
@@ -90,22 +104,162 @@ Information about variable groups in Azure DevOps can be found in [this document
 
 Clone this repository [LLMOps Prompt Flow Template Repo](https://github.com/microsoft/llmops-promptflow-template) locally on your workstation. This repo has reusable LLMOps code that can be used across multiple projects. 
 
-Clone your Azure DevOps repo as well and copy the code from Github repo just cloned into the Azure DevOps related git repo. Ensure the .git folder is not copied.
+``` bash
+git clone --branch main https://github.com/microsoft/llmops-promptflow-template.git
 
-Create a *development* branch and make it as default one to make sure that all PRs should go towards to it. This template assumes that the team works at a *development* branch as a primary source for coding. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
+cd llmops-promptflow-template
 
-Create two Azure Pipelines for each use case (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files. The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
+git branch
+
+git fetch origin development:development
+
+git checkout development
+
+git branch
+
+```
+
+4. Update the url pointed by git origin to the Azure DevOps repo url copied in previous step. Replace the url with your url and push both main and development branches to Azure DevOps repo
+
+``` bash
+git remote set-url origin https://rimod1310@dev.azure.com/rimod1310/test-llmops-template/_git/test-llmops-template
+
+git push --all
+
+```
+
+As a result the code for LLMOps Prompt Flow template will now be available in Azure DevOps repository. 
+
+  ![repo-status](images/devops-branch.png)
+
+`Development` branch should be the default branch in Azure DevOps. If not set it as default branch. This template assumes that the team works at a *development* branch as a primary source for coding. Later, you can implement Azure Pipeline that mode code from the *development* branch into qa/main or execute a release process right away. Release management is not in scope of this template.
+
+
+  ![devops-default-branch](images/devops-default-branch.png)
+
+
+Create two Azure Pipelines for each use case (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files. The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
+
+The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
 
 More details about how to create a basic Azure Pipeline can be found [here](https://learn.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs).
+
+These following steps needs to be executed twice - once for PR pipeline and again for CI pipeline.
+  
+  ![create-pipeline](images/create-pipeline.png)
+  
+In resultant page, select the location of the code - select `Azure Repos Git`
+  
+  ![code-location](images/code-location.png)
+  
+In next page, select the repository. There should be only visible repository.   
+  
+  ![select-repo](images/select-repo.png)
+
+Select `Existing Azure Pipeline YAML file` from resultant page.
+
+  ![configure-pipeline](images/configur-pipeline.png)
+  
+
+select the CI yaml file `named_entity_recognition_ci_dev_pipeline.yml` for named_entity_recognition scenario from the `development` branch.
+  
+  ![select-yaml](images/select-yaml.png)
+
+Save the new pipeline.
+  
+  ![save-pipeline](images/save-pipeline.png)
+  
+Rename the saved pipeline as `named-entity-ci`.
+
+  ![rename-pipeline](images/rename-pipeline.png)
+  
+Perform the same steps as before for PR pipeline. By the end of this step both the CI and PR pipeline for named_entity_recognition should be available in the Azure DevOps repository.
+  
 
 Setup a policy for the *development* branch. At this stage we have an Azure Pipeline that should be executed on every PR to the *development* branch. At the same time successful completion of the build is not a requirement. So, it's important to add our PR build as a policy. Pay special attention that [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml) has various paths in place. We are using these paths to limit number of runs if the current PR doesn't affect ML component (for example, PR modifies a documentation file). Therefore, setting up the policy you need to make sure that you are using the same set of paths in the *Path filter* field.
 
 From your Azure DevOps project, select `**Repos** -> **Branches** ->  **more options button against a branch ** -> **Branch policies** -> **Build validation**` and fill the form using the appropriate PR pipeline.
 
-![Build Validation](./images/build-validation.png)
-
+  ![start-policy](images/start-policy.png)
+  
+  
+  ![named-entity-policy](images/named-entity-policy.png)
 
 More details about how to create a policy can be found [here](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies?view=azure-devops&tabs=browser).
+
+## Test the pipelines
+
+From local machine, create a new git branch `featurebranch` from `development` branch.
+
+``` bash
+
+git checkout -b featurebranch
+
+```
+
+Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognition). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
+Update the Endpoint name and deployment name in deployment_config.json file.
+
+### Update config.json
+
+Modify the configuration values in config.json file available for each example based on description.
+
+- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
+- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
+- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
+- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
+- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
+- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g. "flows/standard"
+- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow folders. It can have one or more comma seperated values - one for each evaluation flow. e.g. "flows/eval_flow_1,flows/eval_flow_2"
+
+The template uses 'pr' and 'dev' to refer to environment types. The template can be extended by implementing additional environment types.
+
+### Update deployment_config.json in config folder
+
+Modify the configuration values in deployment_config.json file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
+
+- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
+- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
+- `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
+- `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
+- `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
+- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment. 
+- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment. 
+- `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
+- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment. A value of 100 indicates that all traffic is directed to this deployment.
+- `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
+- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt Flow runtime.
+-  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
+- `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
+- `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
+
+Kubernetes deployments have additional properties - `COMPUTE_NAME`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements.
+
+Now, push the new feature branch to the newly forked repo.
+
+``` bash
+
+git add .
+git commit -m "changed code"
+git push -u origin featurebranch
+
+
+```
+
+Raise a new PR to merge code from `feature branch` to the `development` branch. 
+
+![feature-to-dev](images/feature-to-dev.png)
+
+This should start the process of executing the Math_coding PR pipeline.
+
+![pr-execution](images/pr-execution.png)
+
+
+After the execution is complete, the code can be merged to the `development` branch.
+
+Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
+
+
 
 ## Setup connections for Prompt flow 
 
@@ -127,19 +281,6 @@ The configuration for connection used while authoring the repo:
 
 There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Azure DevOps pipelines.
 
-### Update config.json
-
-Modify the configuration values in config.json file available for each example based on description.
-
-- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
-- `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
-- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
-- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
-- `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is an string value referring to evaluation flow paths. It can have multiple comma seperated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
-
-The template uses 'pr' and 'dev' to refer to environment types. The template can be extended by implementing additional environment types.
 
 ### Update mapping_config.json in config folder
 
@@ -161,32 +302,10 @@ Modify the configuration values in data_config.json file based on the environmen
 - `DATASET_DESC`: This provides a description for the dataset.
 
 
-### Update deployment_config.json in config folder
-
-**Step 8.** Modify the configuration values in deployment_config.json filefor each environment. These are required for deploying Prompt flows in Azure ML.
-
-- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
-- `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
-- `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
-- `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
-- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment. 
-- `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment. 
-- `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment. 
-- `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
-- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment.
-- `DEPLOYMENT_TRAFFIC_ALLOCATION`: This parameter represent the percentage allocation of traffic to this deployment. A value of 100 indicates that all traffic is directed to this deployment.
-- `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
-- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represent the name of the base image used for creating the Prompt Flow runtime.
--  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
-- `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
-- `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
-
-Kubernetes deployments have addtional properties - `COMPUTE_NAME`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements.
 
 ### Update data folder with data files
 
-Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows. Refer to data_
+Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows.
 
 ### Update Standard and evaluation flows
 
@@ -198,7 +317,7 @@ The Environment folder contains conda.yml file and any additional dependencies n
 
 ### Update test data
 
-The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be update to reflect test data needed for testing.
+The sample-request.json file contains a single test record used for testing the online endpoint after deployment from the pipeline. Each example has its own sample-request.json file and for custom flows, it should be updated to reflect test data needed for the scenario.
 
 ### Update email Id for notification
 
@@ -226,7 +345,7 @@ This Azure DevOps CI pipelines contains the following steps:
 - approval required before deployment 
 
 **Register Prompt Flow LLM App**
-- Check in logic, Customer defined logic (accuracy rate, if >=90% you can deploy)
+- Register Prompt Flow as a Model in Azure Machine Learning Model Registry
 
 **Deploy and Test LLM App**
 - Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
@@ -238,13 +357,13 @@ This Azure DevOps CI pipelines contains the following steps:
       
 1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to 
 
-     ![Managed online endpoint](./images/online-endpoint.png) or to a kubernetes compute type
+     ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
      ![Kubernetes compute type](./images/kubernetes.png) 
    
-2. Once pipeline execution completes, it would have successfully completed the test using data from sample-request file as well. 
+2. Once pipeline execution completes, it would have successfully completed the test using data from sample-request.json file as well. 
 
-     ![online endpoint test in pipeline](./images/pipeline-test.png)
+     ![online endpoint test in pipeline](./images/test-devops-endpoint.png)
 
 ## Moving to production
 

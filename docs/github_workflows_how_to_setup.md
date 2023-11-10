@@ -26,9 +26,9 @@ Prompt Flow runtimes are optional by default for this template. The template use
 
 ## Create service principal
 
-Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
+Create a Azure service principal for the purpose of working with this repository. You can add more depending on number of environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, PowerShell or from Azure UI. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants. 
 
-1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
     ``` bash
     spname="<your sp name>"
@@ -37,7 +37,7 @@ Create one Azure service principal for the purpose of understanding this reposit
     servicePrincipalName="Azure-ARM-${spname}"
     
     # Verify the ID of the active subscription
-    echo "Using subscription ID $subscriptionId"
+    echo "Using subscription ID $subscriptionID"
     echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
     
     az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth 
@@ -64,7 +64,7 @@ Create one Azure service principal for the purpose of understanding this reposit
       }
     ```
 
-1. Copy all this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+1. Copy the output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created. 
 
@@ -146,7 +146,7 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognization). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
+Update code so that we can create a pull request. Update the config.json file for any one of the examples (e.g. named_entity_recognition). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
 Update the Endpoint name and deployment name in deployment_config.json file.
 
 ### Update config.json
@@ -242,7 +242,7 @@ The Environment folder contains conda.yml file and any additional dependencies n
 
 ### Update test data
 
-The sample-request.json file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own sample-request.json file and for custom flows, it should be updated to reflect test data needed for testing.
+The sample-request.json file contains a single test record used for testing the online endpoint after deployment from the pipeline. Each example has its own sample-request.json file and for custom flows, it should be updated to reflect test data needed for the scenario.
 
 ## Example Prompt Run, Evaluation and Deployment Scenario
 
@@ -263,11 +263,11 @@ This Github CI workflow contains the following steps:
 - Evaluation of the bulk run result using single evaluation flow (for others)
 
 **Register Prompt Flow LLM App**
-- Check in logic, Customer defined logic (accuracy rate, if >=90% you can deploy)
+- Register Prompt Flow as a Model in Azure Machine Learning Model Registry
 
 **Deploy and Test LLM App**
 - Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
-- Assign RBAC permissions to the newly deployed endpoint to Key Vault and Azure ML workspace
+- Assign RBAC permissions to the newly deployed endpoint related to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
 
 
