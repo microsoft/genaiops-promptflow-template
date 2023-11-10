@@ -1,5 +1,5 @@
 # LLMOps with Prompt Flow (preview)
-Large Language Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
+Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
 
@@ -63,7 +63,7 @@ Additionally, there is a config.json file that refers to important infrastructur
 
 - The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact execution of all the flows.
 
-- The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github Workflows should be within this single folder for execution.
+- The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github workflows should be within this single folder for execution.
 
 - The 'docs' folder contains documentation for step-by-step guides for both Azure DevOps and Github Workflow related configuration.
 
@@ -110,7 +110,7 @@ To harness the capabilities of the **local execution**, follow these installatio
 git clone https://github.com/microsoft/llmops-promptflow-template.git
 ```
 
-2. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed:
+2. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed. All the flow examples in this repo uses AzureOpenAI connection named `aoai`. Add a line `aoai={"api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}` with updated values for api_key and api_base. If additional connections with different names are used in your flows, they should be added accordingly. Currently, flow with AzureOpenAI as provider as supported. 
 
 ```bash
 
@@ -122,7 +122,7 @@ connection_name_2={ "api_key": "","api_base": "","api_type": "azure","api_versio
 
 ```bash
 
-python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] dotenv
+python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] python-dotenv
 
 ```
 

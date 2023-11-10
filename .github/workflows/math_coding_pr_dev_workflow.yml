@@ -13,18 +13,6 @@ on:
         description: "The flow usecase to execute"
         required: true
         default: "math_coding"
-  workflow_dispatch:
-    inputs:
-      env_name:
-        type: string
-        description: "Execution Environment"
-        required: true
-        default: "dev"
-      flow_type:
-        type: string
-        description: "The flow usecase to execute"
-        required: true
-        default: "math_coding"
   pull_request:
     branches:
       - main

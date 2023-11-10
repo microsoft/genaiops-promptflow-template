@@ -21,14 +21,15 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - Git running on your local machine.
 - GitHub as the source control repository
 - Azure OpenAI with Model deployed with name (gpt-35-turbo)
+- In case of Kubernetes based deployment, Kubernetes resources and associating it with Azure Machine Learning workspace would be required. More details about using Kubernetes as compute in AzureML is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-attach-kubernetes-anywhere?view=azureml-api-2)
 
 Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
 
-## Create service principal
+## Create Azure service principal
 
 Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
-1. Copy the following bash commands to your computer and update the **spname** and  **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
     ``` bash
     spname="<your sp name>"
@@ -64,7 +65,7 @@ Create one Azure service principal for the purpose of understanding this reposit
       }
     ```
 
-1. Copy all this output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+1. Copy the output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created.
 
@@ -175,8 +176,7 @@ Modify the configuration values in the `deployment_config.json` file for each en
 - `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment.
 - `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment.
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
-- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment.
-- `DEPLOYMENT_TRAFFIC_ALLOCATION`: This parameter represents the percentage allocation of traffic to this deployment. A value of 100 indicates that all traffic is directed to this deployment.
+- `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment. A value of 100 indicates that all traffic is directed to this deployment.
 - `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
 - `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt Flow runtime.
 -  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
@@ -193,10 +193,9 @@ git add .
 git commit -m "changed code"
 git push -u origin featurebranch
 
-
 ```
 
-Raise a new PR to merge code from `feature branch` to the `development` branch.
+Raise a new PR to merge code from `feature branch` to the `development` branch. Ensure that the PR from feature branch to development branch happens within your repository and organization.
 
 ![raise a new PR](images/pr.png)
 
@@ -265,7 +264,7 @@ This Github CI workflow contains the following steps:
 - Evaluation of the bulk run result using single evaluation flow (for others)
 
 **Register Prompt Flow LLM App**
-- Check in logic, Customer defined logic (accuracy rate, if >=90% you can deploy)
+- Register Prompt Flow as a Model in Azure Machine Learning Model Registry
 
 **Deploy and Test LLM App**
 - Deploy the Flow as a model to the development environment either as Kubernetes or Azure ML Compute endpoint
