@@ -193,23 +193,20 @@ def prepare_and_execute(subscription_id,
     with open(f'reports/{experiment_name}_metrics.html', 'w') as final_metrics:
         final_metrics.write(html_table_metrics)
 
-
-def column_widths(column):
-    max_length = max(column.astype(str).apply(len))
-    return f'width: {max_length}em;'
-
 def main():
     parser = argparse.ArgumentParser("prompt_evaluation")
-    parser.add_argument("--subscription_id", type=str, help="Azure subscription id")
+    parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True,)
     parser.add_argument(
         "--build_id",
         type=str,
         help="Unique identifier for build execution",
+        required=True,
     )
     parser.add_argument(
         "--env_name",
         type=str,
         help="environment name (dev, test, prod) for execution and deployment",
+        required=True,
     )
     parser.add_argument("--data_purpose", type=str, help="data identified by purpose", required=True)
     parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
