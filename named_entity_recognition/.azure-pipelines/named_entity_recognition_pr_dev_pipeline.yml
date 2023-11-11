@@ -24,6 +24,9 @@ parameters:
    displayName: "flow to execute"
    default: "named_entity_recognition"
 
+#=====================================
+# Execute platform_pr_dev_pipeline pipeline for experiment, evaluation and deployment of flows
+#=====================================
 stages:
   - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
     parameters:

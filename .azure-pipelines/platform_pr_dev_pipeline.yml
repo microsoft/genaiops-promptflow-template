@@ -25,6 +25,10 @@ stages:
 
         - template: templates/configure_azureml_agent.yml
         
+        #=====================================
+        # Registers experiment dataset in Azure ML as Data Asset
+        # Reads appropriate field values from data_config.json based on environment and data purpose
+        #=====================================           
         - template: templates/execute_python_code.yml
           parameters:
             step_name: "Register Training Data"
@@ -35,6 +39,15 @@ stages:
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --env_name ${{ parameters.exec_environment }}
 
+        #=====================================
+        # Executes Standard flow for a scenario
+        # Generates Reports for each RUN as well as consolidated one
+        # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
+        # Loads appropriate experiment data from Azure ML data asset
+        # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+        # Prompt Flow connections should pre-exist 
+        # used automatic (serverless) runtime by default
+        #=====================================
         - template: templates/execute_python_code.yml
           parameters:
             step_name: "Execute Standard Flow"
