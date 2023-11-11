@@ -33,7 +33,7 @@ Prompt Flow Connections helps securely store and manage secret keys or other sen
 
 This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
 
-This repository has all the examples using Azure OpenAI model `gpt-35-turbo`` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
+This repository has all the examples using Azure OpenAI model `gpt-35-turbo` deployed with the same name `gpt-35-turbo`, we need to set up this deployment if we haven’t created it before. 
 
 Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
@@ -48,7 +48,7 @@ The configuration for connection used while authoring the repo:
 
 Create an Azure service principal for the purpose of working with this repository. You can add more depending on number of environments you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, PowerShell or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. 
 
-1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** (of your choice) and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
     ``` bash
     spname="<your sp name>"
@@ -205,11 +205,11 @@ From local machine, create a new git branch `featurebranch` from `development` b
 git checkout -b featurebranch
 ```
 
-Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `config.json` file. Update the keyvault name, resource group name and Azure Machine Learning workspace name. Update the Endpoint name and deployment name in `configs/deployment_config.json` file.
+Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `config.json` and `configs/deployment_config.json` files. 
 
 ### Update config.json
 
-Modify the configuration values in `config.json` file available for each example based on description.
+Modify the configuration values in `config.json` file available for each example based on description. Update the `KEYVAULT_NAME`, `RESOURCE_GROUP_NAME` and Azure Machine Learning `WORKSPACE_NAME`.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
 - `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
@@ -223,7 +223,7 @@ The template uses 'pr' and 'dev' to refer to environment types. The template can
 
 ### Update config/deployment_config.json
 
-Modify the configuration values in `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
+Modify the configuration values in `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Update the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` before pushing the changes to remote repository.
 
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
 - `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model. 
@@ -253,7 +253,7 @@ git push -u origin featurebranch
 ```
 ### Execute pipelines
 
-1. Raise a new PR to merge code from `feature branch` to the `development` branch. 
+1. Raise a new PR to merge code from `featurebranch` to the `development` branch. 
 
 ![feature-to-dev](images/feature-to-dev.png)
 
@@ -273,7 +273,7 @@ There are multiple configuration files for enabling Prompt Flow run and evaluati
 
 Modify the configuration values in mapping_config.json file based on both the standard and evaluation flows for an example. These are used in both experiment and evaluation flow execution.
 
-- `experiment`: This section define inputs for standard flow. The values comes from a dataset.
+- `experiment`: This section define inputs for standard flow. The values come from a dataset.
 - `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
 
 ### Update data_config.json in config folder
