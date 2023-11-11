@@ -1,13 +1,14 @@
-import json
-import yaml
+
+import argparse
 import datetime
+import json
 import time
-from promptflow.entities import Run
+import yaml
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
+from promptflow.entities import Run
 from promptflow.azure import PFClient
-import argparse
-from promptflow.entities import AzureOpenAIConnection
+
 
 
 def are_dictionaries_similar(dict1, old_runs):
