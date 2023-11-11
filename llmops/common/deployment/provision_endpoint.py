@@ -1,19 +1,32 @@
-
 import json
 import argparse
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import (
-    ManagedOnlineEndpoint
-)
+from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.identity import DefaultAzureCredential
 
 
 parser = argparse.ArgumentParser("provision_endpoints")
-parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--output_file", type=str, help="outfile file needed for endpoint principal", required=True)
-parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
-parser.add_argument("--env_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
-parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
+parser.add_argument(
+    "--subscription_id", type=str, help="Azure subscription id", required=True
+)
+parser.add_argument(
+    "--output_file",
+    type=str,
+    help="outfile file needed for endpoint principal",
+    required=True,
+)
+parser.add_argument(
+    "--build_id", type=str, help="build id for deployment", required=True
+)
+parser.add_argument(
+    "--env_name",
+    type=str,
+    help="environment name (e.g. dev, test, prod)",
+    required=True,
+)
+parser.add_argument(
+    "--flow_to_execute", type=str, help="name of the flow", required=True
+)
 args = parser.parse_args()
 
 
@@ -41,9 +54,9 @@ ml_client = MLClient(
 
 config_file = open(real_config)
 endpoint_config = json.load(config_file)
-for elem in endpoint_config['azure_managed_endpoint']:
-    if 'ENDPOINT_NAME' in elem and 'ENV_NAME' in elem:
-        if stage == elem['ENV_NAME']:
+for elem in endpoint_config["azure_managed_endpoint"]:
+    if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
+        if stage == elem["ENV_NAME"]:
             endpoint_name = elem["ENDPOINT_NAME"]
             endpoint_desc = elem["ENDPOINT_DESC"]
             endpoint = ManagedOnlineEndpoint(
@@ -53,9 +66,13 @@ for elem in endpoint_config['azure_managed_endpoint']:
                 tags={"build_id": build_id},
             )
 
-            ml_client.online_endpoints.begin_create_or_update(endpoint=endpoint).result()
+            ml_client.online_endpoints.begin_create_or_update(
+                endpoint=endpoint
+            ).result()
 
-            principal_id = ml_client.online_endpoints.get(endpoint_name).identity.principal_id
+            principal_id = ml_client.online_endpoints.get(
+                endpoint_name
+            ).identity.principal_id
             if output_file is not None:
                 with open(output_file, "w") as out_file:
                     out_file.write(str(principal_id))

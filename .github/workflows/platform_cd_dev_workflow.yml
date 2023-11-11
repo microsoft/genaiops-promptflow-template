@@ -55,6 +55,11 @@ jobs:
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
+      #=====================================
+      # Registers the flow in Azure ML registry
+      # Writes latest model version to model_version.txt file.
+      # model_version.txt file is read in next step
+      #=====================================   
       - name: Register flow as model in AzureML
         uses: ./.github/actions/execute_script
         with:
@@ -67,6 +72,10 @@ jobs:
             --build_id ${{ github.run_id }} \
             --env_name ${{ inputs.env_name }} \
 
+      #=====================================
+      # Reads model_version.txt file. Assigns it to variable MODEL_VERSION
+      # MODEL_VERSION Used in next step for deployment
+      #=====================================   
       - name: Read registered flow latest version
         shell: bash
         run: |
@@ -75,6 +84,10 @@ jobs:
           echo $model_version
           echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
 
+      #=====================================
+      # Executed Kubernetes deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'True'
+      # Reads 'kubernetes_endpoint' field values from deployment_config.json
+      #=====================================             
       - name: Deploy to AML real-time online endpoint
         if: ${{ inputs.is_kubernetes_deployment == 'False'  }} 
         uses: ./.github/actions/aml_real_deployment
@@ -84,6 +97,10 @@ jobs:
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
           MODEL_VERSION: $MODEL_VERSION
 
+      #=====================================
+      # Executed AML Compute deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'False'
+      # Reads 'azure_managed_endpoint' field values from deployment_config.json
+      #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
         if: ${{ inputs.is_kubernetes_deployment == 'True'  }}  
         uses: ./.github/actions/kubernetes_deployment
