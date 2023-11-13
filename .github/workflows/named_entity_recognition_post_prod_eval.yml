@@ -47,8 +47,8 @@ jobs:
             python -m llmops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --data_purpose "post_production_eval_data" \
-            --flow_to_execute ${{ inputs.flow_type }} \
-            --env_name ${{ inputs.env_name }}
+            --flow_to_execute "named_entity_recognition" \
+            --env_name "postprodeval"
 
       - name: Execute prompt flow bulk evaluation
         uses: ./.github/actions/execute_script
@@ -58,7 +58,7 @@ jobs:
             python -m llmops.common.prompt_pipeline \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
-            --flow_to_execute ${{ inputs.flow_type }} \
-            --env_name ${{ inputs.env_name }} \
+            --flow_to_execute "named_entity_recognition" \
+            --env_name "postprodeval" \
             --data_purpose "post_production_eval_data" \
             --output_file run_id.txt
