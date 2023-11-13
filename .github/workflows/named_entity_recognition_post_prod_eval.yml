@@ -38,7 +38,7 @@ jobs:
           script_parameter: |
             python -m llmops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --data_purpose "pr_data" \
+            --data_purpose "post_production_eval_data" \
             --flow_to_execute ${{ inputs.flow_type }} \
             --env_name ${{ inputs.env_name }}
 
@@ -52,6 +52,6 @@ jobs:
             --build_id ${{ github.run_id }} \
             --flow_to_execute ${{ inputs.flow_type }} \
             --env_name ${{ inputs.env_name }} \
-            --data_purpose "pr_data" \
+            --data_purpose "post_production_eval_data" \
             --output_file run_id.txt
 
