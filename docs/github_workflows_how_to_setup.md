@@ -150,8 +150,7 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the `config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update the keyvault name, resource group name and Azure Machine Learning workspace name.
-Update the Endpoint name and deployment name in the `deployment_config.json` file.
+Update code so that we can create a pull request. Update the `config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `config.json` file. Update the keyvault name, resource group name and Azure Machine Learning workspace name. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file.
 
 ### Update config.json
 
@@ -184,7 +183,7 @@ Modify the configuration values in the `deployment_config.json` file for each en
 - `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
 - `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
 
-Kubernetes deployments have additional properties - `COMPUTE_NAME`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements.
+Kubernetes deployments have additional properties - `COMPUTE_NAME`, `DEPLOYMENT_VM_SIZE`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements. These should also be updates with your values before executing Kubernetes based deployments.
 
 Now, push the new feature branch to the newly forked repo.
 
