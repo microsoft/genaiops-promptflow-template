@@ -29,20 +29,20 @@ Prompt Flow runtimes are optional by default for this template. The template use
 
 Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
-1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
 
     ``` bash
     spname="<your sp name>"
     roleName="Owner"
     subscriptionId="<subscription Id>"
     servicePrincipalName="Azure-ARM-${spname}"
-    
+
     # Verify the ID of the active subscription
     echo "Using subscription ID $subscriptionID"
     echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
-    
-    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth 
-    
+
+    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth
+
     echo "Please ensure that the information created here is properly save for future use."
 
 1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -52,16 +52,16 @@ Create one Azure service principal for the purpose of understanding this reposit
     ```json
 
       {
-      "clientId": "<service principal client id>",  
+      "clientId": "<service principal client id>",
       "clientSecret": "<service principal client secret>",
-      "subscriptionId": "<Azure subscription id>",  
+      "subscriptionId": "<Azure subscription id>",
       "tenantId": "<Azure tenant id>",
       "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-      "resourceManagerEndpointUrl": "https://management.azure.com/", 
-      "activeDirectoryGraphResourceId": "https://graph.windows.net/", 
+      "resourceManagerEndpointUrl": "https://management.azure.com/",
+      "activeDirectoryGraphResourceId": "https://graph.windows.net/",
       "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
       "galleryEndpointUrl": "https://gallery.azure.com/",
-      "managementEndpointUrl": "https://management.core.windows.net/" 
+      "managementEndpointUrl": "https://management.core.windows.net/"
       }
     ```
 
@@ -271,14 +271,19 @@ This Github CI workflow contains the following steps:
 - Assign RBAC permissions to the newly deployed endpoint to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
 
-### Online Endpoint  
-      
+**Run post production deployment evaluation**
+- Upload the sampled production log dataset
+- Execute the evaluation flow on the production log dataset
+- Generate the evaluation report
+
+### Online Endpoint
+
 1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
      ![Managed online endpoint](./images/kubernetes.png)
-   
+
 2. Once pipeline execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
 
      ![online endpoint test in pipeline](./images/pipeline-test.png)
