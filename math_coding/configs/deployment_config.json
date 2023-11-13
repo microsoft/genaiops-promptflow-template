@@ -4,7 +4,7 @@
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "math-coding-me1",
-            "ENDPOINT_DESC": "An online endpoint serving a flow for math coding",
+            "ENDPOINT_DESC": "An online endpoint serving a flow for math coding flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
