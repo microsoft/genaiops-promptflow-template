@@ -1,5 +1,5 @@
 {
-    "envs":[ 
+    "envs":[
             {
                 "ENV_NAME": "pr",
                 "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
@@ -17,6 +17,14 @@
                 "WORKSPACE_NAME": "researchmlops",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
+            },
+            {
+                "ENV_NAME": "postprodeval",
+                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "KEYVAULT_NAME": "researchmlops5963078644",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "researchmlops",
+                "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
 }
