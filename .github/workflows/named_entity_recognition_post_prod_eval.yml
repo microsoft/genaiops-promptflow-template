@@ -11,6 +11,14 @@ on:
         description: "Environment name"
         required: true
         default: "postprodeval"
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'named_entity_recognition/**'
 
 jobs:
   evaluation:
@@ -54,4 +62,3 @@ jobs:
             --env_name ${{ inputs.env_name }} \
             --data_purpose "post_production_eval_data" \
             --output_file run_id.txt
-
