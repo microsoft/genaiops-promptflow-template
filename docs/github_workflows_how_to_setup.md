@@ -167,14 +167,13 @@ Modify the configuration values in the `config.json` file available for each exa
 
 ### Update deployment_config.json in config folder
 
-Modify the configuration values in the `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
+Modify the configuration values in the `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
 
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
 - `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model.
 - `ENDPOINT_NAME`: The value represents the name or identifier of the deployed endpoint for the prompt flow.
 - `ENDPOINT_DESC`: It provides a description of the endpoint. It describes the purpose of the endpoint, which is to serve a prompt flow online.
 - `DEPLOYMENT_DESC`: It provides a description of the deployment itself.
-- `DEPLOYMENT_NAME`: The value represents the name or identifier of the deployment.
 - `PRIOR_DEPLOYMENT_NAME`: The name of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_NAME property for the first deployment.
 - `PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION`:  The traffic allocation of prior deployment. Used during A/B deployment. The value is "" if there is only a single deployment. Refer to CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION property for the first deployment.
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
