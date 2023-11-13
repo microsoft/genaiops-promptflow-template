@@ -11,7 +11,7 @@
             "CURRENT_DEPLOYMENT_NAME": "pink",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231018.v1",
+            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest",
             "DEPLOYMENT_CONDA_PATH": "environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
@@ -32,7 +32,7 @@
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": 100,
             "COMPUTE_NAME": "k8s-compute",
             "DEPLOYMENT_VM_SIZE": "promptinstancetype",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20231018.v1",
+            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest",
             "DEPLOYMENT_CONDA_PATH": "environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "CPU_ALLOCATION": "100m",
