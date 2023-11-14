@@ -23,8 +23,6 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - Azure OpenAI with Model deployed with name `gpt-35-turbo`.
 - In case of Kubernetes based deployment, Kubernetes resources and associating it with Azure Machine Learning workspace would be required. More details about using Kubernetes as compute in AzureML is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-attach-kubernetes-anywhere?view=azureml-api-2).
 
-Prompt Flow runtimes are optional by default for this template. The template uses the concept of 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime. The template supports using dedicated compute instances and runtimes and they can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes)
-
 The template deploys real-time online endpoints for flows. These endpoints have Managed ID assigned to them and in many cases they need access to Azure Machine learning workspace and its associated key vault. The template by default provides access to both the key vault and Azure Machine Learning workspace based on this [document](https://learn.microsoft.com/en-ca/azure/machine-learning/prompt-flow/how-to-deploy-for-real-time-inference?view=azureml-api-2#grant-permissions-to-the-endpoint)
 
 ## Setup connections for Prompt flow 
@@ -87,6 +85,131 @@ Create an Azure service principal for the purpose of working with this repositor
 1. Copy the output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created. 
+
+## Setup runtime for Prompt flow 
+
+Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal. 
+
+Compute Instances and Prompt Flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
+
+### Steps:
+
+1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. 
+
+```bash
+subscriptionId=<your azure subscription id>
+rgname=<your resource group name>                                                                      
+workspace_name=<your Azure machine learning workspace name> 
+userAssignedId=<enter user assigned managed identifier name>
+keyvault=<your Azure machine learning workspace associate key vault name>
+compute_name=<enter compute name>
+location=<your Azure machine learning workspace region>
+runtimeName=<enter runtime name>
+sp_id=<your azure service principal or client id>
+sp_password=<your service principal password>
+tenant_id=<your azure tenant id>
+```
+
+2. This next 2 commands should not be performed from Cloud shell. It should be performed from local shells. It helps with interactive azure login and selects a subscription.
+
+```bash
+az login
+az account set -s $subscriptionId
+```
+
+3. Create a user-assigned managed identity 
+
+```bash
+az identity create -g $rgname -n $userAssignedId --query "id"
+```
+
+4. Get id, principalId of user-assigned managed identity
+
+```bash
+um_details=$(az identity show -g $rgname -n $userAssignedId --query "[id, clientId, principalId]")
+```
+
+5. Get id of user-assigned managed identity
+
+```bash
+user_managed_id="$(echo $um_details | jq -r '.[0]')"
+```
+
+6. Get principal Id of user-assigned managed identity
+
+```bash
+principalId="$(echo $um_details | jq -r '.[2]')"
+```
+
+7. Grant the user managed identity permission to access the workspace (AzureML Data Scientist)
+
+```bash
+az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
+```
+
+8. Grant the user managed identity permission to access the workspace keyvault (get and list)
+
+```bash
+az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list         
+```
+
+9. login with Service Principal
+
+```bash
+az login --service-principal -u $sp_id -p $sp_password --tenant $tenant_id
+az account set -s $subscriptionId
+```
+
+10. Create compute instance and assign user managed identity to it
+
+```bash
+az ml compute create --name $compute_name --size Standard_E4s_v3 --identity-type UserAssigned --type ComputeInstance --resource-group $rgname --workspace-name $workspace_name --user-assigned-identities $user_managed_id
+```
+
+11. Get SP AAD token for REST API
+
+```bash
+access_token=$(az account get-access-token | jq -r ".accessToken")
+```
+
+12. Construct POST url for runtime
+
+```bash
+runtime_url_post=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName?asyncCall=true")
+```
+
+13. Construct GET url for runtime
+
+```bash
+runtime_url_get=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName")
+```
+
+14. Create runtime using REST API
+
+```bash
+curl --request POST \
+  --url "$runtime_url_post" \
+  --header "Authorization: Bearer $access_token" \
+  --header 'Content-Type: application/json' \
+  --data "{
+    \"runtimeType\": \"ComputeInstance\",
+    \"computeInstanceName\": \"$compute_name\",
+}"
+```
+
+15. Get runtime creation status using REST API. Execute this step multiple times unless either you get output that shows createdOn with a valid date and time value or failure. In case of failure, troubleshoot the issue before moving forward.
+
+```bash
+curl --request GET \
+  --url "$runtime_url_get" \
+  --header "Authorization: Bearer $access_token"
+```
+
+The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution.
+
+This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
+
+The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `config.json` for each use-case example for `RUNTIME_NAME`.
 
 ## Create new Azure DevOps project
 
@@ -205,7 +328,7 @@ From local machine, create a new git branch `featurebranch` from `development` b
 git checkout -b featurebranch
 ```
 
-Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `config.json` file. Update the keyvault name, resource group name and Azure Machine Learning workspace name. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file.
+Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file.
 
 ### Update config.json
 
