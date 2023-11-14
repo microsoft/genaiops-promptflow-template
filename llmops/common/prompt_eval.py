@@ -28,8 +28,7 @@ def prepare_and_execute(
     standard_flow_path = config["STANDARD_FLOW_PATH"]
     data_config_path = f"{flow_to_execute}/configs/data_config.json"
 
-    # un-comment the code here COMPUTE_RUNTIME
-    # runtime= config["RUNTIME_NAME"]
+    runtime= config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
     experiment_name = f"{flow_to_execute}_{stage}"
 
@@ -100,8 +99,9 @@ def prepare_and_execute(
                 data=data_id,
                 run=my_run,
                 column_mapping=mapping_node,
-                # runtime=runtime,  # un-comment the code here comment the line related to resources parameter. COMPUTE_RUNTIME
-                resources={"instance_type": "Standard_E4ds_v4"},
+                runtime=runtime,
+                # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME  
+                #resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_eval_{timestamp}",
                 display_name=f"{experiment_name}_eval_{timestamp}",
                 tags={"build_id": build_id},

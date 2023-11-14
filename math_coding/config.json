@@ -2,7 +2,7 @@
     "envs":[ 
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
