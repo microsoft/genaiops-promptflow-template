@@ -150,7 +150,7 @@ az account set -s $subscriptionId
 az ml compute create --name $compute_name --size Standard_E4s_v3 --identity-type UserAssigned --type ComputeInstance --resource-group $rgname --workspace-name $workspace_name --user-assigned-identities $user_managed_id
 ```
 
-11. Get SP AAD token for REST API
+11. Get Service Principal Azure Entra token for REST API
 
 ```bash
 access_token=$(az account get-access-token | jq -r ".accessToken")
@@ -189,8 +189,7 @@ curl --request GET \
   --header "Authorization: Bearer $access_token"
 ```
 
-The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. 
-This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
+The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
 
 The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `config.json` for each use-case example for `RUNTIME_NAME`.
 
