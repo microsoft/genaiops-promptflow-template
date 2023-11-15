@@ -27,7 +27,7 @@
         },
         {
             "PROMPT_FLOW_CONFIG_NAME": "named_entity_recognition",
-            "ENV_NAME": "prod",
+            "ENV_NAME": "postprodeval",
             "DATA_PURPOSE": "post_production_eval_data",
             "DATA_PATH":"data/production_log.jsonl",
             "DATASET_NAME":"named_entity_recognition_pp_eval",

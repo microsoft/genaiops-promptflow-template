@@ -21,7 +21,7 @@ on:
       - 'named_entity_recognition/**'
 
 jobs:
-  evaluation:
+  post_production_evaluation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Actions
