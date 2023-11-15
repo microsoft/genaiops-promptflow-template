@@ -55,10 +55,16 @@ jobs:
         with:
           step_name: "Execute prompt flow bulk evaluation"
           script_parameter: |
-            python -m llmops.common.prompt_pipeline \
+            python -m llmops.common.prompt_eval_only \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
             --flow_to_execute "named_entity_recognition" \
             --env_name "postprodeval" \
             --data_purpose "post_production_eval_data" \
             --output_file run_id.txt
+
+      - name: Archive CSV
+        uses: actions/upload-artifact@v3
+        with:
+          name: evaluation-reports
+          path: ./reports
