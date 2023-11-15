@@ -197,16 +197,16 @@ def prepare_and_execute(
 
         combined_results_df = pd.concat(dataframes, ignore_index=True)
         combined_metrics_df = pd.DataFrame(metrics)
-        combined_results_df.to_csv(f"./reports/{data_id}_result.csv")
-        combined_metrics_df.to_csv(f"./reports/{data_id}_metrics.csv")
+        combined_results_df.to_csv(f"./reports/{data_ref}_result.csv")
+        combined_metrics_df.to_csv(f"./reports/{data_ref}_metrics.csv")
 
         styled_df = combined_results_df.to_html(index=False)
 
-        with open(f"reports/{data_id}_result.html", "w") as combined_results:
+        with open(f"reports/{data_ref}_result.html", "w") as combined_results:
             combined_results.write(styled_df)
 
         html_table_metrics = combined_metrics_df.to_html(index=False)
-        with open(f"reports/{data_id}_metrics.html", "w") as combined_metrics:
+        with open(f"reports/{data_ref}_metrics.html", "w") as combined_metrics:
             combined_metrics.write(html_table_metrics)
 
         all_eval_df.append(combined_results_df)
