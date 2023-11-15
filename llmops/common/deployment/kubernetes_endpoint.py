@@ -1,10 +1,7 @@
-
 import json
 import argparse
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import (
-    KubernetesOnlineEndpoint
-)
+from azure.ai.ml.entities import KubernetesOnlineEndpoint
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities._deployment.resource_requirements_settings import (
     ResourceRequirementsSettings,
@@ -15,11 +12,27 @@ from azure.ai.ml.entities._deployment.container_resource_settings import (
 
 
 parser = argparse.ArgumentParser("provision_kubernetes_endpoints")
-parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--output_file", type=str, help="outfile file needed for endpoint principal", required=True)
-parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
-parser.add_argument("--env_name",type=str,help="environment name (e.g. dev, test, prod)", required=True)
-parser.add_argument("--flow_to_execute", type=str, help="name of the flow", required=True)
+parser.add_argument(
+    "--subscription_id", type=str, help="Azure subscription id", required=True
+)
+parser.add_argument(
+    "--output_file",
+    type=str,
+    help="outfile file needed for endpoint principal",
+    required=True,
+)
+parser.add_argument(
+    "--build_id", type=str, help="build id for deployment", required=True
+)
+parser.add_argument(
+    "--env_name",
+    type=str,
+    help="environment name (e.g. dev, test, prod)",
+    required=True,
+)
+parser.add_argument(
+    "--flow_to_execute", type=str, help="name of the flow", required=True
+)
 args = parser.parse_args()
 
 build_id = args.build_id
@@ -45,9 +58,9 @@ ml_client = MLClient(
 
 config_file = open(real_config)
 endpoint_config = json.load(config_file)
-for elem in endpoint_config['kubernetes_endpoint']:
-    if 'ENDPOINT_NAME' in elem and 'ENV_NAME' in elem:
-        if stage == elem['ENV_NAME']:
+for elem in endpoint_config["kubernetes_endpoint"]:
+    if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
+        if stage == elem["ENV_NAME"]:
             endpoint_name = elem["ENDPOINT_NAME"]
             endpoint_desc = elem["ENDPOINT_DESC"]
             compute_name = elem["COMPUTE_NAME"]
@@ -58,10 +71,14 @@ for elem in endpoint_config['kubernetes_endpoint']:
                 auth_mode="key",
                 tags={"build_id": build_id},
             )
-            
-            ml_client.online_endpoints.begin_create_or_update(endpoint=endpoint).result()
 
-            principal_id = ml_client.online_endpoints.get(endpoint_name).identity.principal_id
+            ml_client.online_endpoints.begin_create_or_update(
+                endpoint=endpoint
+            ).result()
+
+            principal_id = ml_client.online_endpoints.get(
+                endpoint_name
+            ).identity.principal_id
             if output_file is not None:
                 with open(output_file, "w") as out_file:
                     out_file.write(str(principal_id))

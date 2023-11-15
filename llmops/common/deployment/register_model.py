@@ -1,4 +1,3 @@
-
 import argparse
 import shutil
 import os
@@ -8,14 +7,24 @@ from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
 parser = argparse.ArgumentParser("register Model")
-parser.add_argument("--subscription_id", type=str, help="Azure subscription id", required=True)
-parser.add_argument("--build_id", type=str, help="build id for deployment", required=True)
-parser.add_argument("--env_name", type=str, help="environment name (dev, test, prod) for deployment", required=True)
+parser.add_argument(
+    "--subscription_id", type=str, help="Azure subscription id", required=True
+)
+parser.add_argument(
+    "--build_id", type=str, help="build id for deployment", required=True
+)
+parser.add_argument(
+    "--env_name",
+    type=str,
+    help="environment name (dev, test, prod) for deployment",
+    required=True,
+)
 parser.add_argument("--flow_to_execute", type=str, help="use case name")
-parser.add_argument("--output_file", type=str, required=False, help="A file to save run model version")
+parser.add_argument(
+    "--output_file", type=str, required=False, help="A file to save run model version"
+)
 
 args = parser.parse_args()
-
 
 
 stage = args.env_name
@@ -34,13 +43,12 @@ for obj in model_config["envs"]:
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
-model_path= config["STANDARD_FLOW_PATH"]
+model_path = config["STANDARD_FLOW_PATH"]
 
 print(f"Model name: {model_name}")
 
 
-
-if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"): 
+if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"):
     file_to_replace = "flow.dag.yaml"
     source_path = os.path.join(os.getcwd(), f"{flow_to_execute}/flow.dag.yaml")
     destination_path = os.path.join(os.getcwd(), model_path, file_to_replace)
@@ -51,15 +59,12 @@ ml_client = MLClient(
 )
 
 model = Model(
-    name = model_name,
-    path = f"{flow_to_execute}/{model_path}",
-    stage = "Production",
-    description = f"{flow_to_execute} model registered for prompt flow deployment",
-    properties={
-        "azureml.promptflow.source_flow_id": flow_to_execute
-    },
-    tags={"build_id": build_id}
-
+    name=model_name,
+    path=f"{flow_to_execute}/{model_path}",
+    stage="Production",
+    description=f"{flow_to_execute} model registered for prompt flow deployment",
+    properties={"azureml.promptflow.source_flow_id": flow_to_execute},
+    tags={"build_id": build_id},
 )
 
 model_info = ml_client.models.create_or_update(model)
@@ -67,6 +72,3 @@ model_info = ml_client.models.create_or_update(model)
 if output_file is not None:
     with open(output_file, "w") as out_file:
         out_file.write(str(model_info.version))
-
-
-
