@@ -2,6 +2,7 @@
 import argparse
 import datetime
 import json
+import os
 import time
 import yaml
 import pandas as pd
@@ -190,6 +191,9 @@ def prepare_and_execute(
                 print(df_result.head(10))
             else:
                 raise Exception("Sorry, exiting job with failure..")
+
+        if not os.path.exists("./reports"):
+            os.makedirs("./reports")
 
         combined_results_df = pd.concat(dataframes, ignore_index=True)
         combined_metrics_df = pd.DataFrame(metrics)
