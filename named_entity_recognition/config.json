@@ -2,7 +2,7 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "RUNTIME_NAME": "newnewfinalruntime123",
                 "KEYVAULT_NAME": "researchmlops5963078644",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "researchmlops",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "RUNTIME_NAME": "newnewfinalruntime123",
                 "KEYVAULT_NAME": "researchmlops5963078644",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "researchmlops",
@@ -20,7 +20,7 @@
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "only replace the value if you're using dedicated runtime and compute",
+                "RUNTIME_NAME": "newnewfinalruntime123",
                 "KEYVAULT_NAME": "researchmlops5963078644",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "researchmlops",
