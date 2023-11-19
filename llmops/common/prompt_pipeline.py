@@ -192,7 +192,6 @@ def prepare_and_execute(
                     dataframes.append(df_result)
                 if save_metric:
                     metric_variant = pf.get_metrics(pipeline_job)
-                    metric_variant[variant_id] = variant_string
                     metric_variant["dataset"] = data_id
                     metrics.append(metric_variant)
                 print(df_result.head(10))
