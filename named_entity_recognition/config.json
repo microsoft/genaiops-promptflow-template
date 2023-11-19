@@ -2,10 +2,10 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "newnewfinalruntime123",
-                "KEYVAULT_NAME": "researchmlops5963078644",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "researchmlops",
+                "RUNTIME_NAME": "",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
@@ -19,11 +19,11 @@
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
-                "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "newnewfinalruntime123",
-                "KEYVAULT_NAME": "researchmlops5963078644",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "researchmlops",
+                "ENV_NAME": "",
+                "RUNTIME_NAME": "",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]

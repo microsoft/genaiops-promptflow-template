@@ -230,13 +230,14 @@ def prepare_and_execute(
         styled_df = final_results_df.to_html(index=False)
         with open(f"reports/{experiment_name}_result.html", "w") as final_results:
             final_results.write(styled_df)
+        print("Saved the results in files in reports folder")
     if save_metric:
         final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
         final_metrics_df.to_csv(f"./reports/{experiment_name}_metrics.csv")
         html_table_metrics = final_metrics_df.to_html(index=False)
         with open(f"reports/{experiment_name}_metrics.html", "w") as final_metrics:
             final_metrics.write(html_table_metrics)
-
+        print("Saved the metrics in files in reports folder")
 
 def main():
     parser = argparse.ArgumentParser("prompt_bulk_run")
