@@ -11,6 +11,14 @@ on:
         description: "Environment name"
         required: true
         default: "postprodeval"
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'named_entity_recognition/**'
 
 jobs:
   post_production_evaluation:
