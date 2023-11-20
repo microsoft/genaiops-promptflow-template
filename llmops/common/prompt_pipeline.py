@@ -29,7 +29,7 @@ def prepare_and_execute(
     output_file,
     data_purpose,
 ):
-    main_config = open(f"{flow_to_execute}/config.json")
+    main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:

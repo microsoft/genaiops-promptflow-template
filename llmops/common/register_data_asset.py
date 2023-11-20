@@ -28,7 +28,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 environment_name = args.env_name
-main_config = open(f"{args.flow_to_execute}/config.json")
+main_config = open(f"{args.flow_to_execute}/llmops_config.json")
 config = json.load(main_config)
 
 for obj in config["envs"]:
