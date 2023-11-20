@@ -22,7 +22,9 @@ on:
       - 'llmops/**'
       - 'web_classification/**'
 
-
+#=====================================
+# Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
 jobs:
   execute-platform-pr-workflow:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml

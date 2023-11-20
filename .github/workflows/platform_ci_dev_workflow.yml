@@ -19,7 +19,7 @@ on:
         required: true
     secrets:
       azure_credentials:
-        description: "service principal auth to Azure"
+        description: "service principal authentication to Azure"
         required: true
 
 jobs:
@@ -29,12 +29,15 @@ jobs:
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
+
       - name: Azure login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.azure_credentials }}
+
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
+
       - name: load the current Azure subscription details
         id: subscription_details
         shell: bash
@@ -42,6 +45,10 @@ jobs:
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
+      #=====================================
+      # Registers experiment dataset in Azure ML as Data Asset
+      # Reads appropriate field values from data_config.json based on environment and data purpose
+      #=====================================      
       - name: Register experiment data asset
         uses: ./.github/actions/execute_script
         with:
@@ -52,7 +59,17 @@ jobs:
             --data_purpose "training_data" \
             --flow_to_execute ${{ inputs.flow_type }} \
             --env_name ${{ inputs.env_name }}
-          
+
+      #=====================================
+      # Executes Standard flow for a scenario
+      # Generates Reports for each RUN as well as consolidated one
+      # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
+      # Loads appropriate experiment data from Azure ML data asset
+      # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+      # Prompt Flow connections should pre-exist 
+      # used automatic (serverless) runtime by default
+      # writes the RUN ID in run_id.txt file. Used in next step
+      #=====================================
       - name: Execute prompt flow bulk run
         uses: ./.github/actions/execute_script
         with:
@@ -66,6 +83,10 @@ jobs:
             --data_purpose "training_data" \
             --output_file run_id.txt
 
+      #=====================================
+      # Reads run_id.txt file. Assigns it to variable RUN_NAME
+      # RUN_NAME Used in next step for evaluation of flows
+      #=====================================   
       - name: Read PromptFlow Runs
         shell: bash
         run: |
@@ -75,6 +96,10 @@ jobs:
           echo "RUN_NAME=${run_name}"  >> "$GITHUB_ENV"
           echo $PWD
 
+      #=====================================
+      # Registers evaluation dataset in Azure ML as Data Asset
+      # Reads appropriate field values from data_config.json based on environment and data purpose
+      #=====================================
       - name: Register evaluation data asset
         uses: ./.github/actions/execute_script
         with:
@@ -85,7 +110,16 @@ jobs:
             --data_purpose "test_data" \
             --flow_to_execute ${{ inputs.flow_type }} \
             --env_name ${{ inputs.env_name }}
-            
+
+      #=====================================
+      # Executes all Evaluation flows available for a scenario
+      # Generates Reports for each RUN as well as consolidated one
+      # Uses each RUN ID as input to run evaluation against
+      # Loads appropriate evaluation data from Azure ML data asset
+      # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+      # Prompt Flow connections should pre-exist 
+      # used automatic (serverless) runtime by default
+      #=====================================
       - name: Execute bulk run evaluations
         uses: ./.github/actions/execute_script
         with:
@@ -99,12 +133,19 @@ jobs:
             --data_purpose "test_data" \
             --run_id "$RUN_NAME"
 
+      #=====================================
+      # Published generated reports in csv and html format
+      # Available as pipeline artifacts
+      #=====================================
       - name: Archive CSV
         uses: actions/upload-artifact@v3
         with:
           name: evaluation-reports
           path: ./reports
 
+  #=====================================
+  # Execute platform_cd_dev_workflow flow for deployment of flows
+  #=====================================
   deploy-flow:
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     needs: flow-experiment-and_evaluation
