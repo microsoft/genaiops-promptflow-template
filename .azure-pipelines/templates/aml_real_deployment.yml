@@ -48,7 +48,7 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      config_path="./${{ parameters.flow_to_execute }}/config.json"
+      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
       env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
 
