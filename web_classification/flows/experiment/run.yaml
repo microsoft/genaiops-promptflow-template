@@ -1,0 +1,8 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Run.schema.json
+flow: .
+data: ../../data/data.jsonl
+column_mapping:
+  url: ${data.url}
+
+# define cloud resource
+runtime: <runtime_name>
