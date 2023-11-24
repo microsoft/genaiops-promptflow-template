@@ -14,7 +14,7 @@ from promptflow.azure import PFClient
 def prepare_and_execute(
     subscription_id, build_id, stage, run_id, data_purpose, flow_to_execute
 ):
-    main_config = open(f"{flow_to_execute}/config.json")
+    main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:

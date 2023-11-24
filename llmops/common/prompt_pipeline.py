@@ -33,7 +33,7 @@ def prepare_and_execute(
     save_output,
     save_metric,
 ):
-    main_config = open(f"{flow_to_execute}/config.json")
+    main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
     for obj in model_config["envs"]:

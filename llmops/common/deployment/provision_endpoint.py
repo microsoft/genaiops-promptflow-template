@@ -34,7 +34,7 @@ build_id = args.build_id
 output_file = args.output_file
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
-main_config = open(f"{flow_to_execute}/config.json")
+main_config = open(f"{flow_to_execute}/llmops_config.json")
 model_config = json.load(main_config)
 
 for obj in model_config["envs"]:

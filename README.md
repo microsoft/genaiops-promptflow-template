@@ -59,7 +59,7 @@ Each use case (set of Prompt Flow standard and evaluation flows) should follow t
 - flows            : It should contain minimally two folder - one for standard Prompt Flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
-Additionally, there is a config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
+Additionally, there is a llmops_config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
 
 - The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact execution of all the flows.
 
