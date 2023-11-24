@@ -19,7 +19,7 @@
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
-                "ENV_NAME": "",
+                "ENV_NAME": "postprodeval",
                 "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",

@@ -70,20 +70,20 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Close the Cloud Shell once the service principals are created.
 
 
-## Setup runtime for Prompt flow 
+## Setup runtime for Prompt flow
 
-Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal. 
+Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal.
 
 Compute Instances and Prompt Flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
 
 ### Steps:
 
-1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. 
+1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project.
 
 ```bash
 subscriptionId=<your azure subscription id>
-rgname=<your resource group name>                                                                      
-workspace_name=<your Azure machine learning workspace name> 
+rgname=<your resource group name>
+workspace_name=<your Azure machine learning workspace name>
 userAssignedId=<enter user assigned managed identifier name>
 keyvault=<your Azure machine learning workspace associate key vault name>
 compute_name=<enter compute name>
@@ -101,7 +101,7 @@ az login
 az account set -s $subscriptionId
 ```
 
-3. Create a user-assigned managed identity 
+3. Create a user-assigned managed identity
 
 ```bash
 az identity create -g $rgname -n $userAssignedId --query "id"
@@ -134,7 +134,7 @@ az role assignment create --assignee $principalId --role "AzureML Data Scientist
 8. Grant the user managed identity permission to access the workspace keyvault (get and list)
 
 ```bash
-az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list         
+az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list
 ```
 
 9. login with Service Principal
@@ -189,7 +189,7 @@ curl --request GET \
   --header "Authorization: Bearer $access_token"
 ```
 
-The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
+The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime.
 
 The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `config.json` for each use-case example for `RUNTIME_NAME`.
 
@@ -287,6 +287,8 @@ Modify the configuration values in the `config.json` file available for each exa
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
 - `STANDARD_FLOW_PATH`:  This is the relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
 - `EVALUATION_FLOW_PATH`:  This is a string value referring to relative evaluation flow paths. It can have multiple comma separated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+
+For the optional post production evaluation workflow, the above configuration will be same only `ENV_NAME` will be *postprodeval* and the respective flow path need to be mentioned in `STANDARD_FLOW_PATH` configuration.
 
 ### Update deployment_config.json in config folder
 
