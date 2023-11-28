@@ -29,20 +29,20 @@ The template deploys real-time online endpoints for flows. These endpoints have 
 
 Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
-1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **Contributor** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
 
     ``` bash
     spname="<your sp name>"
     roleName="Owner"
     subscriptionId="<subscription Id>"
     servicePrincipalName="Azure-ARM-${spname}"
-    
+
     # Verify the ID of the active subscription
     echo "Using subscription ID $subscriptionID"
     echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
-    
-    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth 
-    
+
+    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth
+
     echo "Please ensure that the information created here is properly save for future use."
 
 1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
@@ -52,16 +52,16 @@ Create one Azure service principal for the purpose of understanding this reposit
     ```json
 
       {
-      "clientId": "<service principal client id>",  
+      "clientId": "<service principal client id>",
       "clientSecret": "<service principal client secret>",
-      "subscriptionId": "<Azure subscription id>",  
+      "subscriptionId": "<Azure subscription id>",
       "tenantId": "<Azure tenant id>",
       "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
-      "resourceManagerEndpointUrl": "https://management.azure.com/", 
-      "activeDirectoryGraphResourceId": "https://graph.windows.net/", 
+      "resourceManagerEndpointUrl": "https://management.azure.com/",
+      "activeDirectoryGraphResourceId": "https://graph.windows.net/",
       "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
       "galleryEndpointUrl": "https://gallery.azure.com/",
-      "managementEndpointUrl": "https://management.core.windows.net/" 
+      "managementEndpointUrl": "https://management.core.windows.net/"
       }
     ```
 
@@ -70,20 +70,20 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Close the Cloud Shell once the service principals are created.
 
 
-## Setup runtime for Prompt flow 
+## Setup runtime for Prompt flow
 
-Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal. 
+Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal.
 
 Compute Instances and Prompt Flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
 
 ### Steps:
 
-1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. 
+1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project.
 
 ```bash
 subscriptionId=<your azure subscription id>
-rgname=<your resource group name>                                                                      
-workspace_name=<your Azure machine learning workspace name> 
+rgname=<your resource group name>
+workspace_name=<your Azure machine learning workspace name>
 userAssignedId=<enter user assigned managed identifier name>
 keyvault=<your Azure machine learning workspace associate key vault name>
 compute_name=<enter compute name>
@@ -101,7 +101,7 @@ az login
 az account set -s $subscriptionId
 ```
 
-3. Create a user-assigned managed identity 
+3. Create a user-assigned managed identity
 
 ```bash
 az identity create -g $rgname -n $userAssignedId --query "id"
@@ -134,7 +134,7 @@ az role assignment create --assignee $principalId --role "AzureML Data Scientist
 8. Grant the user managed identity permission to access the workspace keyvault (get and list)
 
 ```bash
-az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list         
+az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list
 ```
 
 9. login with Service Principal
@@ -189,7 +189,7 @@ curl --request GET \
   --header "Authorization: Bearer $access_token"
 ```
 
-The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
+The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime.
 
 The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `llmops_config.json` for each use-case example for `RUNTIME_NAME`.
 
@@ -219,9 +219,11 @@ Eventually, the default branch in github repo should show `development` as the d
 
 ![make development branch as default branch](images/default-branch.png)
 
-The template comes with a few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 workflows. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough.
+The template comes with a few Github workflow related to Prompt Flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 primary workflows and 1 optional workflow. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt Flow job can be completed fast enough.
 
 The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
+
+The optional third Github workflow [named_entity_recognition_post_prod_eval.yml](../.github/workflows/named_entity_recognition_post_prod_eval.yml) need to be executed manually after the deployment of the Prompt Flow flow to production and collecting production logs (example log file - [production_log.jsonl](../named_entity_recognition/data/production_log.jsonl)). This workflow is used to evaluate the Prompt Flow flow performance in production.
 
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
 
@@ -285,6 +287,8 @@ Modify the configuration values in the `llmops_config.json` file available for e
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
 - `STANDARD_FLOW_PATH`:  This is the relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
 - `EVALUATION_FLOW_PATH`:  This is a string value referring to relative evaluation flow paths. It can have multiple comma separated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
+
+For the optional post production evaluation workflow, the above configuration will be same only `ENV_NAME` will be *postprodeval* and the respective flow path need to be mentioned in `STANDARD_FLOW_PATH` configuration.
 
 ### Update deployment_config.json in config folder
 
@@ -393,14 +397,19 @@ This Github CI workflow contains the following steps:
 - Assign RBAC permissions to the newly deployed endpoint to Key Vault and Azure ML workspace
 - Test the model/promptflow realtime endpoint.
 
-### Online Endpoint  
-      
+**Run post production deployment evaluation**
+- Upload the sampled production log dataset
+- Execute the evaluation flow on the production log dataset
+- Generate the evaluation report
+
+### Online Endpoint
+
 1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
      ![Managed online endpoint](./images/kubernetes.png)
-   
+
 2. Once pipeline execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
 
      ![online endpoint test in pipeline](./images/pipeline-test.png)

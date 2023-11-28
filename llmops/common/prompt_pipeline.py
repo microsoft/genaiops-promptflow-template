@@ -2,8 +2,10 @@
 import argparse
 import datetime
 import json
+import os
 import time
 import yaml
+import pandas as pd
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
 from promptflow.entities import Run
@@ -28,6 +30,8 @@ def prepare_and_execute(
     stage,
     output_file,
     data_purpose,
+    save_output,
+    save_metric,
 ):
     main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
@@ -94,10 +98,14 @@ def prepare_and_execute(
 
     run_ids = []
     past_runs = []
+    all_eval_df = []
+    all_eval_metrics = []
 
     for data_id in dataset_name:
         data_ref = data_id.replace("azureml:", "")
         data_ref = data_ref.split(":")[0]
+        dataframes = []
+        metrics = []
 
         if len(all_variants) != 0:
             for variant in all_variants:
@@ -124,8 +132,8 @@ def prepare_and_execute(
                         run = Run(
                             flow=flow,
                             data=data_id,
-                            runtime=runtime, 
-                            # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME  
+                            runtime=runtime,
+                            # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME
                             #resources={"instance_type": "Standard_E4ds_v4"},
                             variant=variant_string,
                             name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
@@ -145,7 +153,13 @@ def prepare_and_execute(
                         ):
                             print("job completed")
                             df_result = pf.get_details(pipeline_job)
-                            run_details = pf.runs.get_metrics(pipeline_job.name)
+                            if save_output:
+                                dataframes.append(df_result)
+                            if save_metric:
+                                metric_variant = pf.get_metrics(pipeline_job)
+                                metric_variant[variant_id] = variant_string
+                                metric_variant["dataset"] = data_id
+                                metrics.append(metric_variant)
                             print(df_result.head(10))
                             print("done")
                         else:
@@ -155,8 +169,8 @@ def prepare_and_execute(
             run = Run(
                 flow=flow,
                 data=data_id,
-                runtime=runtime, 
-                # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME  
+                runtime=runtime,
+                # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME
                 #resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_{timestamp}_{data_ref}",
                 display_name=f"{experiment_name}_{timestamp}_{data_ref}",
@@ -174,16 +188,56 @@ def prepare_and_execute(
             ):  # 4
                 print("job completed")
                 df_result = pf.get_details(pipeline_job)
-                run_details = pf.runs.get_metrics(pipeline_job.name)
+                if save_output:
+                    dataframes.append(df_result)
+                if save_metric:
+                    metric_variant = pf.get_metrics(pipeline_job)
+                    metric_variant["dataset"] = data_id
+                    metrics.append(metric_variant)
                 print(df_result.head(10))
             else:
                 raise Exception("Sorry, exiting job with failure..")
+
+        if (save_output or save_metric) and not os.path.exists("./reports"):
+            os.makedirs("./reports")
+
+        if save_output:
+            combined_results_df = pd.concat(dataframes, ignore_index=True)
+            combined_results_df.to_csv(f"./reports/{data_ref}_result.csv")
+            styled_df = combined_results_df.to_html(index=False)
+            with open(f"reports/{data_ref}_result.html", "w") as combined_results:
+                combined_results.write(styled_df)
+            all_eval_df.append(combined_results_df)
+        if save_metric:
+            combined_metrics_df = pd.DataFrame(metrics)
+            combined_metrics_df.to_csv(f"./reports/{data_ref}_metrics.csv")
+            html_table_metrics = combined_metrics_df.to_html(index=False)
+            with open(f"reports/{data_ref}_metrics.html", "w") as combined_metrics:
+                combined_metrics.write(html_table_metrics)
+            all_eval_metrics.append(combined_metrics_df)
 
     if output_file is not None:
         with open(output_file, "w") as out_file:
             out_file.write(str(run_ids))
     print(str(run_ids))
 
+    if save_output:
+        final_results_df = pd.concat(all_eval_df, ignore_index=True)
+        final_results_df["stage"] = stage
+        final_results_df["experiment_name"] = experiment_name
+        final_results_df["build"] = build_id
+        final_results_df.to_csv(f"./reports/{experiment_name}_result.csv")
+        styled_df = final_results_df.to_html(index=False)
+        with open(f"reports/{experiment_name}_result.html", "w") as final_results:
+            final_results.write(styled_df)
+        print("Saved the results in files in reports folder")
+    if save_metric:
+        final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
+        final_metrics_df.to_csv(f"./reports/{experiment_name}_metrics.csv")
+        html_table_metrics = final_metrics_df.to_html(index=False)
+        with open(f"reports/{experiment_name}_metrics.html", "w") as final_metrics:
+            final_metrics.write(html_table_metrics)
+        print("Saved the metrics in files in reports folder")
 
 def main():
     parser = argparse.ArgumentParser("prompt_bulk_run")
@@ -214,6 +268,12 @@ def main():
     parser.add_argument(
         "--flow_to_execute", type=str, help="flow use case name", required=True
     )
+    parser.add_argument(
+        "--save_output", help="Save the outputs in files", required=False, action='store_true'
+    )
+    parser.add_argument(
+        "--save_metric", help="Save the metrics in files", required=False, action='store_true'
+    )
     args = parser.parse_args()
 
     prepare_and_execute(
@@ -223,6 +283,8 @@ def main():
         args.env_name,
         args.output_file,
         args.data_purpose,
+        args.save_output,
+        args.save_metric,
     )
 
 
