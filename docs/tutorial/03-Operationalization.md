@@ -6,7 +6,7 @@ This tutorial will guide you through the process of operationalizing of a LLM fl
 
 ## Prerequisites
 
-This tutorial assumes that you have completed the previous tutorials ([Tutorial 01](01-Introduction.md) and [Tutorial 02](02-Development.md)) and have a working LLM flow.
+This tutorial assumes that you have completed the previous tutorials ([Tutorial 01](./01-Introduction.md) and [Tutorial 02](./02-Development.md)) and have a working LLM flow.
 
 ## Exercises
 
