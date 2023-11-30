@@ -35,7 +35,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "training_data" \
+                --data_purpose "pr_data" \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
                 --env_name ${{ parameters.exec_environment }}
 
