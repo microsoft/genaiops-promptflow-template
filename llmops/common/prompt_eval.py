@@ -99,9 +99,9 @@ def prepare_and_execute(
                 data=data_id,
                 run=my_run,
                 column_mapping=mapping_node,
-                runtime=runtime,
+                #runtime=runtime,
                 # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME  
-                #resources={"instance_type": "Standard_E4ds_v4"},
+                resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_eval_{timestamp}",
                 display_name=f"{experiment_name}_eval_{timestamp}",
                 tags={"build_id": build_id},

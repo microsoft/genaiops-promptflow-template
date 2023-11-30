@@ -2,7 +2,7 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "pf-compute-runtime",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "newresearchmlo2998779544",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "newresearchmlops",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "pf-compute-runtime",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "newresearchmlo2998779544",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "newresearchmlops",
@@ -20,7 +20,7 @@
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "pf-compute-runtime",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "newresearchmlo2998779544",
                 "RESOURCE_GROUP_NAME": "mlops",
                 "WORKSPACE_NAME": "newresearchmlops",
