@@ -1,11 +1,38 @@
 subscriptionId=ae21abab-664c-4bb6-a9df-e9f822899ddd
-rgname=rg-genai-lcf96d44e207d460493                                                                     
-workspace_name=mlw-genai-lcf96d44e207d460493
-userAssignedId=user-llmops
-keyvault=mlwgenaikeyvaulta7869855
+rgname=rg-prompt-flow                                                                  
+workspace_name=mlw-prompt-flow
+userAssignedId=user-pf-llmops
+keyvault=mlwpromptflow2857801320
 compute_name=instancellmops
 location=westeurope
 runtimeName=runtimellmops
-sp_id=b59ffe5a-619f-44e5-a632-6c04551d9103
-sp_password=ALa8Q~zeWEdatOC_XJ7sCpBxObCJtKhIE9hCOa7H
+sp_id=3e9f7880-4e74-4813-94f5-c922404c28ad
+sp_password=icJ8Q~hSrTaz9bstpO6LdyLcTuMBdqYN7PhTtazj
 tenant_id=16b3c013-d300-468d-ac64-7eda0820b6d3
+
+spname="sp-pf-llomps"
+roleName="Owner"
+subscriptionId="ae21abab-664c-4bb6-a9df-e9f822899ddd"
+servicePrincipalName="Azure-ARM-${spname}"
+
+# Verify the ID of the active subscription
+echo "Using subscription ID $subscriptionID"
+echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
+
+az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth
+
+echo "Please ensure that the information created here is properly save for future use."
+
+
+{
+  "clientId": "3e9f7880-4e74-4813-94f5-c922404c28ad",
+  "clientSecret": "icJ8Q~hSrTaz9bstpO6LdyLcTuMBdqYN7PhTtazj",
+  "subscriptionId": "ae21abab-664c-4bb6-a9df-e9f822899ddd",
+  "tenantId": "16b3c013-d300-468d-ac64-7eda0820b6d3",
+  "activeDirectoryEndpointUrl": "https://login.microsoftonline.com",
+  "resourceManagerEndpointUrl": "https://management.azure.com/",
+  "activeDirectoryGraphResourceId": "https://graph.windows.net/",
+  "sqlManagementEndpointUrl": "https://management.core.windows.net:8443/",
+  "galleryEndpointUrl": "https://gallery.azure.com/",
+  "managementEndpointUrl": "https://management.core.windows.net/"
+}

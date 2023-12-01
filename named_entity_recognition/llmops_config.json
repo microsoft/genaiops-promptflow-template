@@ -3,27 +3,27 @@
             {
                 "ENV_NAME": "pr",
                 "RUNTIME_NAME": "runtimellmops",
-                "KEYVAULT_NAME": "mlwgenaikeyvaulta7869855",
-                "RESOURCE_GROUP_NAME": "rg-genai-lcf96d44e207d460493",
-                "WORKSPACE_NAME": "mlw-genai-lcf96d44e207d460493",
+                "KEYVAULT_NAME": "mlwpromptflow2857801320",
+                "RESOURCE_GROUP_NAME": "rg-prompt-flow",
+                "WORKSPACE_NAME": "mlw-prompt-flow",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
                 "RUNTIME_NAME": "runtimellmops",
-                "KEYVAULT_NAME": "mlwgenaikeyvaulta7869855",
-                "RESOURCE_GROUP_NAME": "rg-genai-lcf96d44e207d460493",
-                "WORKSPACE_NAME": "mlw-genai-lcf96d44e207d460493",
+                "KEYVAULT_NAME": "mlwpromptflow2857801320",
+                "RESOURCE_GROUP_NAME": "rg-prompt-flow",
+                "WORKSPACE_NAME": "mlw-prompt-flow",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtimellmops",
+                "KEYVAULT_NAME": "mlwpromptflow2857801320",
+                "RESOURCE_GROUP_NAME": "rg-prompt-flow",
+                "WORKSPACE_NAME": "mlw-prompt-flow",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
