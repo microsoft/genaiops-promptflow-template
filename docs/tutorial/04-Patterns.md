@@ -14,7 +14,7 @@ This tutorial assumes that you have completed the previous tutorials ([Tutorial 
 
 Each Flow has multiple nodes. Each node can have multiple variants. Think of variants as different versions of a recipe. You can tweak the recipe by changing ingredients or hyperparameters and see how it affects the outcome. Identifying and deploying the right variant based on its performance is critical.
 
-In the basic flow add multiple variants by following the steps mentioned in this document: [Tune prompts using variants](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/how-to-tune-prompts-using-variants?view=azureml-api-2)
+In the basic flow add multiple variants by following the steps mentioned in this document: [Tune prompts using variants](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/how-to-tune-prompts-using-variants?view=azureml-api-2). Example for [web_classification](../../web_classification/) use case there are multiple variants defined in: [experiment](../../web_classification/flows/experiment/flow.dag.yaml).
 
 ### Create flows with Multiple Evaluation Flows and Metrics
 
