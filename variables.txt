@@ -1,0 +1,11 @@
+subscriptionId=ae21abab-664c-4bb6-a9df-e9f822899ddd
+rgname=rg-genai-lcf96d44e207d460493                                                                     
+workspace_name=mlw-genai-lcf96d44e207d460493
+userAssignedId=user-llmops
+keyvault=mlwgenaikeyvaulta7869855
+compute_name=instancellmops
+location=westeurope
+runtimeName=runtimellmops
+sp_id=b59ffe5a-619f-44e5-a632-6c04551d9103
+sp_password=ALa8Q~zeWEdatOC_XJ7sCpBxObCJtKhIE9hCOa7H
+tenant_id=16b3c013-d300-468d-ac64-7eda0820b6d3

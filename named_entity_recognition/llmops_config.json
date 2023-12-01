@@ -2,19 +2,19 @@
     "envs":[ 
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtimellmops",
+                "KEYVAULT_NAME": "mlwgenaikeyvaulta7869855",
+                "RESOURCE_GROUP_NAME": "rg-genai-lcf96d44e207d460493",
+                "WORKSPACE_NAME": "mlw-genai-lcf96d44e207d460493",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtimellmops",
+                "KEYVAULT_NAME": "mlwgenaikeyvaulta7869855",
+                "RESOURCE_GROUP_NAME": "rg-genai-lcf96d44e207d460493",
+                "WORKSPACE_NAME": "mlw-genai-lcf96d44e207d460493",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             }
