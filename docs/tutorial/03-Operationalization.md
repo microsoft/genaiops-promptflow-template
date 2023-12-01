@@ -12,6 +12,8 @@ This tutorial assumes that you have completed the previous tutorials ([Tutorial 
 
 Follow the steps as mentioned in the [How to setup the repo with Github Workflows](../github_workflows_how_to_setup.md) document to setup the repo with Github Workflows.
 
+NOTE: The similar steps can be performed using Azure DevOps Pipelines as well by following the steps mentioned in the [How to setup the repo with Azure DevOps](../Azure_devops_how_to_setup.md) document.
+
 ## Expected Outcome
 
 - A Pull Request (PR) validation Github Workflow that validates the flow while a PR is created.
