@@ -1,52 +1,64 @@
 name: named_entity_recognition_post_production_evaluation
 
 on:
-  workflow_call:
-    secrets:
-      azure_openai_endpoint:
-        description: "Azure OpenAI Endpoint URL"
+  workflow_dispatch:
+    inputs:
+      flow_type:
+        description: "Flow type to execute"
         required: true
-      azure_openai_key:
-        description: "Azure OpenAI Key"
+        default: "named_entity_recognition"
+      env_name:
+        description: "Environment name"
         required: true
+        default: "postprodeval"
 
 jobs:
-  evaluation:
-    runs-on: u
+  post_production_evaluation:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+      - name: Azure login
+        uses: azure/login@v1
         with:
-          python-version: '3.10'
-          cache: 'pip'
+          creds: ${{ secrets.azure_credentials }}
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
-      - name: PromptFlow create connection
+      - name: load the current Azure subscription details
+        id: subscription_details
+        shell: bash
         run: |
-          pf connection create -f named_entity_recognition/flows/post-production-evaluation/azure_openai.yml \
-            --set api_key="${{ secrets.azure_openai_key }}" \
-            --set api_base="${{ secrets.azure_openai_endpoint }}"
-      - name: PromptFlow Post Production Evaluation Run
-        run: |
-          pf run create \
-          --flow named_entity_recognition/flows/post-production-evaluation/ \
-          --data named_entity_recognition/data/production_log.jsonl \
-          --name eval_run_${{ github.run_number }}_${{ github.run_attempt }} \
-          --column-mapping text='${data.text}' entity_type='${data.entity_type}' llm_result='${data.llm_result}' \
-          --stream
-      - name: PromptFlow Evaluation Results Metrics
-        run: |
-          pf run show-metrics -n eval_run_${{ github.run_number }}_${{ github.run_attempt }}
-      - name: PromptFlow Evaluation Results Generation
-        id: evaluation_report_generation
-        run: |
-          REPORT_FILE_NAME=$(pf run visualize -n "eval_base_run_${{ github.run_number }}_${{ github.run_attempt }},eval_run_${{ github.run_number }}_${{ github.run_attempt }}" | grep 'The HTML file is generated at' | cut -d "'" -f 2)
-          echo "Generated report file: $REPORT_FILE_NAME"
-          echo "report_file_name=$REPORT_FILE_NAME" >> $GITHUB_OUTPUT
-          echo "Registered outout variable: ${{ steps.evaluation_report_generation.outputs.report_file_name }}"
-      - name: PromptFlow Evaluation Results Report
+          export subscriptionId=$(az account show --query id -o tsv)
+          echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
+
+      - name: Register experiment data asset
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register experiment data asset"
+          script_parameter: |
+            python -m llmops.common.register_data_asset \
+            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+            --data_purpose "post_production_eval_data" \
+            --flow_to_execute "named_entity_recognition" \
+            --env_name "postprodeval"
+
+      - name: Execute prompt flow bulk evaluation
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Execute prompt flow bulk evaluation"
+          script_parameter: |
+            python -m llmops.common.prompt_pipeline \
+            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+            --build_id ${{ github.run_id }} \
+            --flow_to_execute "named_entity_recognition" \
+            --env_name "postprodeval" \
+            --data_purpose "post_production_eval_data" \
+            --output_file run_id.txt \
+            --save_output \
+            --save_metric
+
+      - name: Archive CSV
         uses: actions/upload-artifact@v3
         with:
-          name: evaluation_report
-          path: ${{ steps.evaluation_report_generation.outputs.report_file_name }}
+          name: evaluation-reports
+          path: ./reports
