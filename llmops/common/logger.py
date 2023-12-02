@@ -3,12 +3,12 @@ import logging
 import sys
 
 
-def get_logger(name: str = "llmops",
-               level: int = logging.INFO) -> logging.Logger:
-    """Get logger.
+def llmops_logger(name: str = "llmops",
+                  level: int = logging.INFO) -> logging.Logger:
+    """Get LLMOps logger.
 
     Args:
-        name (str, optional): Logger name. Defaults to "mlops".
+        name (str, optional): Logger name. Defaults to "llmops".
         level (int, optional): Log level. Defaults to logging.INFO.
 
     Returns:
