@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "pf-compute-runtime",
-                "KEYVAULT_NAME": "newresearchmlo2998779544",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "newresearchmlops",
+                "RUNTIME_NAME": "",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "pf-compute-runtime",
-                "KEYVAULT_NAME": "newresearchmlo2998779544",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "newresearchmlops",
+                "RUNTIME_NAME": "",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "pf-compute-runtime",
-                "KEYVAULT_NAME": "newresearchmlo2998779544",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "newresearchmlops",
+                "RUNTIME_NAME": "",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
