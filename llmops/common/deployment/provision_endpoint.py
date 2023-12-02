@@ -1,3 +1,20 @@
+"""
+This module creates Managed AML online endpoint as flow deployment process.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--output_file: The file path for the output needed for storing
+the endpoint principal id.
+--build_id: The build ID for deployment.
+This argument is required to identify the build to be deployed.
+--env_name: The environment name for deployment.
+This argument is required to specify the
+deployment environment (dev, test, prod).
+--flow_to_execute: The name of the flow to execute.
+This argument is required to specify the name of the flow for execution.
+"""
+
 import json
 import argparse
 from azure.ai.ml import MLClient
@@ -7,7 +24,10 @@ from azure.identity import DefaultAzureCredential
 
 parser = argparse.ArgumentParser("provision_endpoints")
 parser.add_argument(
-    "--subscription_id", type=str, help="Azure subscription id", required=True
+    "--subscription_id",
+    type=str,
+    help="Azure subscription id",
+    required=True
 )
 parser.add_argument(
     "--output_file",
@@ -16,7 +36,10 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--build_id", type=str, help="build id for deployment", required=True
+    "--build_id",
+    type=str,
+    help="build id for deployment",
+    required=True
 )
 parser.add_argument(
     "--env_name",
@@ -25,7 +48,10 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--flow_to_execute", type=str, help="name of the flow", required=True
+    "--flow_to_execute",
+    type=str,
+    help="name of the flow",
+    required=True
 )
 args = parser.parse_args()
 
@@ -48,7 +74,10 @@ real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
+    DefaultAzureCredential(),
+    args.subscription_id,
+    resource_group_name,
+    workspace_name
 )
 
 

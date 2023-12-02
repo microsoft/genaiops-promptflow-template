@@ -1,3 +1,23 @@
+"""
+This module does deployment of flows to AML Managed compute.
+
+The code used AML compute as deployment target.
+It configures Managed Online deployments for Prompt Flow 'flows'
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--model_version: The registered model version to be deployed.
+This argument is required to specify the version of the model for deployment.
+--build_id: The build ID for deployment.
+This argument is required to identify the build to be deployed.
+--env_name: The environment name for deployment.
+This argument is required to specify the
+deployment environment (dev, test, prod).
+--flow_to_execute: The name of the flow to execute.
+This argument is required to specify the name of the flow for execution.
+"""
+
 import json
 import argparse
 
@@ -9,10 +29,15 @@ from azure.ai.ml.entities import (
 )
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("provision_deployment")
 
 parser = argparse.ArgumentParser("provision_deployment")
 parser.add_argument(
-    "--subscription_id", type=str, help="Azure subscription id", required=True
+    "--subscription_id",
+    type=str,
+    help="Azure subscription id",
+    required=True
 )
 parser.add_argument(
     "--model_version",
@@ -21,7 +46,10 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--build_id", type=str, help="build id for deployment", required=True
+    "--build_id",
+    type=str,
+    help="build id for deployment",
+    required=True
 )
 parser.add_argument(
     "--env_name",
@@ -30,7 +58,10 @@ parser.add_argument(
     required=True,
 )
 parser.add_argument(
-    "--flow_to_execute", type=str, help="name of the flow", required=True
+    "--flow_to_execute",
+    type=str,
+    help="name of the flow",
+    required=True
 )
 
 
@@ -53,10 +84,13 @@ resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
-print(f"Model name: {model_name}")
+logger.info(f"Model name: {model_name}")
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
+    DefaultAzureCredential(),
+    args.subscription_id,
+    resource_group_name,
+    workspace_name
 )
 
 model = ml_client.models.get(model_name, model_version)
@@ -84,8 +118,13 @@ for elem in endpoint_config["azure_managed_endpoint"]:
             environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
             environment_variables[
                 "PRT_CONFIG_OVERRIDE"
-            ] = f"deployment.subscription_id={args.subscription_id},deployment.resource_group={resource_group_name},deployment.workspace_name={workspace_name},deployment.endpoint_name={endpoint_name},deployment.deployment_name={deployment_name}"
-
+            ] = (
+                f"deployment.subscription_id={args.subscription_id},"
+                f"deployment.resource_group={resource_group_name},"
+                f"deployment.workspace_name={workspace_name},"
+                f"deployment.endpoint_name={endpoint_name},"
+                f"deployment.deployment_name={deployment_name}"
+            )
             environment = Environment(
                 image=deployment_base_image,
                 inference_config={
@@ -96,13 +135,18 @@ for elem in endpoint_config["azure_managed_endpoint"]:
             )
 
             traffic_allocation = {}
-            deployments = ml_client.online_deployments.list(endpoint_name, local=False)
+            deployments = ml_client.online_deployments.list(
+                endpoint_name,
+                local=False
+                )
 
             deploy_count = sum(1 for _ in deployments)
 
             if deploy_count >= 1:
-                traffic_allocation[deployment_name] = deployment_traffic_allocation
-                traffic_allocation[prior_deployment_name] = 100 - int(
+                traffic_allocation[deployment_name] = \
+                    deployment_traffic_allocation
+                traffic_allocation[prior_deployment_name] = \
+                    100 - int(
                     deployment_traffic_allocation
                 )
             else:
@@ -117,15 +161,23 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 instance_type=deployment_vm_size,
                 instance_count=deployment_instance_count,
                 environment_variables=dict(environment_variables),
-                tags={"build_id": build_id},
+                tags={
+                    "build_id": build_id
+                    },
                 app_insights_enabled=True,
-                request_settings=OnlineRequestSettings(request_timeout_ms=90000),
+                request_settings=OnlineRequestSettings(
+                    request_timeout_ms=90000
+                    ),
             )
 
             ml_client.online_deployments.begin_create_or_update(
                 blue_deployment
             ).result()
 
-            endpoint = ml_client.online_endpoints.get(endpoint_name, local=False)
+            endpoint = ml_client.online_endpoints.get(
+                endpoint_name,
+                local=False
+                )
+
             endpoint.traffic = traffic_allocation
             ml_client.begin_create_or_update(endpoint).result()
