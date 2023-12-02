@@ -29,6 +29,8 @@ from azure.ai.ml.entities import (
 )
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import get_logger
+logger = get_logger("provision_deployment")
 
 parser = argparse.ArgumentParser("provision_deployment")
 parser.add_argument(
@@ -82,7 +84,7 @@ resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
-print(f"Model name: {model_name}")
+logger.info(f"Model name: {model_name}")
 
 ml_client = MLClient(
     DefaultAzureCredential(),

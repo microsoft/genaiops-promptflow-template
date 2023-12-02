@@ -20,6 +20,9 @@ from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 import json
 
+from llmops.common.logger import get_logger
+logger = get_logger("register_data_asset")
+
 parser = argparse.ArgumentParser("register data assets")
 parser.add_argument(
     "--subscription_id", type=str, help="Azure subscription id", required=True
@@ -89,5 +92,5 @@ for elem in data_config["datasets"]:
                 name=dataset_name, label="latest"
             )
 
-            print(aml_dataset_unlabeled.latest_version)
-            print(aml_dataset_unlabeled.id)
+            logger.info(aml_dataset_unlabeled.latest_version)
+            logger.info(aml_dataset_unlabeled.id)

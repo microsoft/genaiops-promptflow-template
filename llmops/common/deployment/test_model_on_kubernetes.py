@@ -17,6 +17,9 @@ from azure.ai.ml import MLClient
 
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import get_logger
+logger = get_logger("test_model_on_kubernetes")
+
 parser = argparse.ArgumentParser("test_flow")
 parser.add_argument(
     "--subscription_id",
@@ -86,4 +89,4 @@ for elem in endpoint_config["kubernetes_endpoint"]:
                 request_file=f"{flow_to_execute}/{test_model_file}",
             )
 
-            print(request_result)
+            logger.info(request_result)

@@ -1,9 +1,9 @@
-"""Reusable logger for model_factory."""
+"""Reusable logger for llmops for promptflow."""
 import logging
 import sys
 
 
-def get_logger(name: str = "mlops",
+def get_logger(name: str = "llmops",
                level: int = logging.INFO) -> logging.Logger:
     """Get logger.
 

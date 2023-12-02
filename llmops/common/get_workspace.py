@@ -11,7 +11,10 @@ AML workspace.
 
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
+from llmops.common.logger import get_logger
 import argparse
+
+logger = get_logger("get_workspace")
 
 
 def get_workspace(subscription_id: str,
@@ -31,7 +34,7 @@ def get_workspace(subscription_id: str,
         object: The generated workspace object
     """
     try:
-        print(f"Getting access to {workspace_name} workspace.")
+        logger.info(f"Getting access to {workspace_name} workspace.")
         client = MLClient(
             DefaultAzureCredential(),
             subscription_id=subscription_id,
@@ -40,11 +43,11 @@ def get_workspace(subscription_id: str,
         )
 
         workspace = client.workspaces.get(workspace_name)
-        print(f"Reference to {workspace_name} has been obtained.")
+        logger.info(f"Reference to {workspace_name} has been obtained.")
         return workspace
     except Exception as ex:
-        print("Oops! invalid credentials.. Try again...")
-        print(ex)
+        logger.info("Oops! invalid credentials.. Try again...")
+        logger.error(ex)
         raise
 
 

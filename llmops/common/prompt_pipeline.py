@@ -36,6 +36,10 @@ from azure.ai.ml import MLClient
 from promptflow.entities import Run
 from promptflow.azure import PFClient
 
+from llmops.common.logger import get_logger
+
+logger = get_logger("prompt_pipeline")
+
 
 def are_dictionaries_similar(dict1, dict2):
     """
@@ -106,7 +110,7 @@ def prepare_and_execute(
         resource_group_name,
         workspace_name
     )
-    print(data_mapping_config)
+    logger.info(data_mapping_config)
     flow = f"{flow_to_execute}/{standard_flow_path}"
     dataset_name = []
     config_file = open(data_config_path)
@@ -119,7 +123,7 @@ def prepare_and_execute(
                 data = ml_client.data.get(name=data_name, label="latest")
                 data_id = f"azureml:{data.name}:{data.version}"
                 dataset_name.append(data_id)
-    print(dataset_name)
+    logger.info(dataset_name)
     flow_file = f"{flow}/flow.dag.yaml"
 
     with open(flow_file, "r") as yaml_file:
@@ -161,7 +165,7 @@ def prepare_and_execute(
             for variant in all_variants:
                 for variant_id, node_id in variant.items():
                     variant_string = f"${{{node_id}.{variant_id}}}"
-                    print(variant_string)
+                    logger.info(variant_string)
 
                     get_current_defaults = {
                         key: value
@@ -170,7 +174,7 @@ def prepare_and_execute(
                     }
                     get_current_defaults[node_id] = variant_id
                     get_current_defaults["dataset"] = data_ref
-                    print(get_current_defaults)
+                    logger.info(get_current_defaults)
 
                     if (
                         len(past_runs) == 0
@@ -224,7 +228,7 @@ def prepare_and_execute(
                             pipeline_job.status == "Completed"
                             or pipeline_job.status == "Finished"
                         ):
-                            print("job completed")
+                            logger.info("job completed")
                             df_result = pf.get_details(pipeline_job)
                             if save_output:
                                 dataframes.append(df_result)
@@ -233,8 +237,7 @@ def prepare_and_execute(
                                 metric_variant[variant_id] = variant_string
                                 metric_variant["dataset"] = data_id
                                 metrics.append(metric_variant)
-                            print(df_result.head(10))
-                            print("done")
+                            logger.info(df_result.head(10))
                         else:
                             raise Exception("Sorry, job failured..")
         else:
@@ -267,7 +270,7 @@ def prepare_and_execute(
             if (pipeline_job.status == "Completed" or
                     pipeline_job.status == "Finished"):
 
-                print("job completed")
+                logger.info("job completed")
                 df_result = pf.get_details(pipeline_job)
                 if save_output:
                     dataframes.append(df_result)
@@ -275,7 +278,7 @@ def prepare_and_execute(
                     metric_variant = pf.get_metrics(pipeline_job)
                     metric_variant["dataset"] = data_id
                     metrics.append(metric_variant)
-                print(df_result.head(10))
+                logger.info(df_result.head(10))
             else:
                 raise Exception("Sorry, exiting job with failure..")
 
@@ -306,7 +309,7 @@ def prepare_and_execute(
     if output_file is not None:
         with open(output_file, "w") as out_file:
             out_file.write(str(run_ids))
-    print(str(run_ids))
+    logger.info(str(run_ids))
 
     if save_output:
         final_results_df = pd.concat(all_eval_df, ignore_index=True)
@@ -319,7 +322,7 @@ def prepare_and_execute(
         styled_df = final_results_df.to_html(index=False)
         with open(f"reports/{experiment_name}_result.html", "w") as results:
             results.write(styled_df)
-        print("Saved the results in files in reports folder")
+        logger.info("Saved the results in files in reports folder")
 
     if save_metric:
         final_metrics_df = pd.concat(
@@ -338,7 +341,7 @@ def prepare_and_execute(
         with open(f"reports/{experiment_name}_metrics.html", "w") as f_metrics:
             f_metrics.write(html_table_metrics)
 
-        print("Saved the metrics in files in reports folder")
+        logger.info("Saved the metrics in files in reports folder")
 
 
 def main():

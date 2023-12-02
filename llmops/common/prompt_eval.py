@@ -28,6 +28,10 @@ from azure.identity import DefaultAzureCredential
 from promptflow.entities import Run
 from promptflow.azure import PFClient
 
+from llmops.common.logger import get_logger
+
+logger = get_logger("prompt_eval")
+
 
 def prepare_and_execute(
     subscription_id,
@@ -94,7 +98,6 @@ def prepare_and_execute(
                     }
                 )
 
-    print(dataset_name)
     standard_flow_file = f"{standard_flow}/flow.dag.yaml"
 
     with open(standard_flow_file, "r") as yaml_file:
@@ -135,7 +138,6 @@ def prepare_and_execute(
                     break
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            print(flow)
 
             eval_run = Run(
                 flow=flow.strip(),
@@ -159,7 +161,7 @@ def prepare_and_execute(
             time.sleep(15)
 
             if eval_job.status == "Completed" or eval_job.status == "Finished":
-                print(eval_job.status)
+                logger.info(eval_job.status)
                 df_result = pf.get_details(eval_job)
                 metric_variant = pf.get_metrics(eval_job)
 
@@ -191,8 +193,8 @@ def prepare_and_execute(
                 dataframes.append(df_result)
                 metrics.append(metric_variant)
 
-                print(json.dumps(metrics, indent=4))
-                print(df_result.head(10))
+                logger.info(json.dumps(metrics, indent=4))
+                logger.info(df_result.head(10))
 
             else:
                 raise Exception("Sorry, exiting job with failure..")

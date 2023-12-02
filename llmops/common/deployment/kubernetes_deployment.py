@@ -35,6 +35,8 @@ from azure.ai.ml.entities._deployment.container_resource_settings import (
     ResourceSettings,
 )
 
+from llmops.common.logger import get_logger
+logger = get_logger("kubernetes_deployment")
 
 parser = argparse.ArgumentParser("provision_kubernetes_deployment")
 parser.add_argument(
@@ -85,7 +87,7 @@ resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
-print(f"Model name: {model_name}")
+logger.info(f"Model name: {model_name}")
 
 ml_client = MLClient(
     DefaultAzureCredential(),

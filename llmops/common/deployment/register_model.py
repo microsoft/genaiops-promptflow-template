@@ -23,6 +23,9 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import get_logger
+logger = get_logger("register_model")
+
 parser = argparse.ArgumentParser("register Flow")
 parser.add_argument(
     "--subscription_id",
@@ -77,7 +80,7 @@ resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
 model_path = config["STANDARD_FLOW_PATH"]
 
-print(f"Model name: {model_name}")
+logger.info(f"Model name: {model_name}")
 
 
 if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"):
