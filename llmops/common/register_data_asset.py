@@ -1,9 +1,27 @@
+"""
+This module executes experiment jobs/bulk-runs using standard flows.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--data_purpose: The data identified by its purpose.
+This argument is required to specify the purpose of the data.
+--flow_to_execute: The name of the flow use case.
+This argument is required to specify the name of the flow for execution.
+--env_name: The environment name for execution and deployment.
+This argument is required to specify the environment (dev, test, prod)
+for execution or deployment.
+"""
+
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 import argparse
 from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 import json
+
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("register_data_asset")
 
 parser = argparse.ArgumentParser("register data assets")
 parser.add_argument(
@@ -43,12 +61,15 @@ data_purpose = args.data_purpose
 
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
+    DefaultAzureCredential(),
+    args.subscription_id,
+    resource_group_name,
+    workspace_name
 )
 
 config_file = open(data_config_path)
 data_config = json.load(config_file)
-# csv_file_path = 'output.csv'
+
 for elem in data_config["datasets"]:
     if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
         if (
@@ -71,5 +92,5 @@ for elem in data_config["datasets"]:
                 name=dataset_name, label="latest"
             )
 
-            print(aml_dataset_unlabeled.latest_version)
-            print(aml_dataset_unlabeled.id)
+            logger.info(aml_dataset_unlabeled.latest_version)
+            logger.info(aml_dataset_unlabeled.id)

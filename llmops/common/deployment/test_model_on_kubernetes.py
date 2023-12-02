@@ -1,16 +1,40 @@
+"""
+This module tests a standard flow deployed on AML Kubernetes attached compute.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--flow_to_execute: The name of the flow to test.
+This argument is required to specify the name of the flow for testing.
+--env_name: The environment name for deployment.
+This argument is required to specify the
+deployment environment (dev, test, prod).
+"""
+
 import argparse
 import json
 from azure.ai.ml import MLClient
 
 from azure.identity import DefaultAzureCredential
 
-parser = argparse.ArgumentParser("test_model")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("test_model_on_kubernetes")
+
+parser = argparse.ArgumentParser("test_flow")
 parser.add_argument(
-    "--subscription_id", type=str, help="Azure subscription id", required=True
+    "--subscription_id",
+    type=str,
+    help="Azure subscription id",
+    required=True
 )
+
 parser.add_argument(
-    "--flow_to_execute", type=str, help="name of the flow", required=True
+    "--flow_to_execute",
+    type=str,
+    help="name of the flow",
+    required=True
 )
+
 parser.add_argument(
     "--env_name",
     type=str,
@@ -37,7 +61,10 @@ workspace_name = config["WORKSPACE_NAME"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
+    DefaultAzureCredential(),
+    args.subscription_id,
+    resource_group_name,
+    workspace_name
 )
 
 config_file = open(real_config)
@@ -62,4 +89,4 @@ for elem in endpoint_config["kubernetes_endpoint"]:
                 request_file=f"{flow_to_execute}/{test_model_file}",
             )
 
-            print(request_result)
+            logger.info(request_result)
