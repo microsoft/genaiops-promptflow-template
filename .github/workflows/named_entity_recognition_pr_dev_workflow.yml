@@ -13,22 +13,6 @@ on:
         description: "The flow usecase to execute"
         required: true
         default: "named_entity_recognition"
-  workflow_dispatch:
-      inputs:
-        env_name:
-          type: string
-          description: "Execution Environment"
-          required: true
-          default: "dev"
-        flow_type:
-          type: string
-          description: "The flow usecase to execute"
-          required: true
-          default: "named_entity_recognition"
-        is_kubernetes_deployment:
-          type: string
-          description: "Determine managed(False) or kubernetes(True) deployment"
-          required: true
   pull_request:
     branches:
       - main
