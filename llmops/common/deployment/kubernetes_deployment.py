@@ -35,8 +35,8 @@ from azure.ai.ml.entities._deployment.container_resource_settings import (
     ResourceSettings,
 )
 
-from llmops.common.logger import get_logger
-logger = get_logger("kubernetes_deployment")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("kubernetes_deployment")
 
 parser = argparse.ArgumentParser("provision_kubernetes_deployment")
 parser.add_argument(

@@ -17,8 +17,8 @@ from azure.ai.ml import MLClient
 
 from azure.identity import DefaultAzureCredential
 
-from llmops.common.logger import get_logger
-logger = get_logger("test_model_on_aml")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("test_model_on_aml")
 
 parser = argparse.ArgumentParser("test_flow")
 parser.add_argument(

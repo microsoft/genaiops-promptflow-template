@@ -23,8 +23,8 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
-from llmops.common.logger import get_logger
-logger = get_logger("register_model")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("register_model")
 
 parser = argparse.ArgumentParser("register Flow")
 parser.add_argument(

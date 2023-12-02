@@ -11,10 +11,10 @@ AML workspace.
 
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from llmops.common.logger import get_logger
+from llmops.common.logger import llmops_logger
 import argparse
 
-logger = get_logger("get_workspace")
+logger = llmops_logger("get_workspace")
 
 
 def get_workspace(subscription_id: str,

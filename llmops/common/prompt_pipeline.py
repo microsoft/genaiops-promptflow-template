@@ -36,9 +36,9 @@ from azure.ai.ml import MLClient
 from promptflow.entities import Run
 from promptflow.azure import PFClient
 
-from llmops.common.logger import get_logger
+from llmops.common.logger import llmops_logger
 
-logger = get_logger("prompt_pipeline")
+logger = llmops_logger("prompt_pipeline")
 
 
 def are_dictionaries_similar(dict1, dict2):

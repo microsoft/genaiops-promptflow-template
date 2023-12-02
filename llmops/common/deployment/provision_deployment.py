@@ -29,8 +29,8 @@ from azure.ai.ml.entities import (
 )
 from azure.identity import DefaultAzureCredential
 
-from llmops.common.logger import get_logger
-logger = get_logger("provision_deployment")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("provision_deployment")
 
 parser = argparse.ArgumentParser("provision_deployment")
 parser.add_argument(

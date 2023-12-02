@@ -28,9 +28,9 @@ from azure.identity import DefaultAzureCredential
 from promptflow.entities import Run
 from promptflow.azure import PFClient
 
-from llmops.common.logger import get_logger
+from llmops.common.logger import llmops_logger
 
-logger = get_logger("prompt_eval")
+logger = llmops_logger("prompt_eval")
 
 
 def prepare_and_execute(

@@ -20,8 +20,8 @@ from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 import json
 
-from llmops.common.logger import get_logger
-logger = get_logger("register_data_asset")
+from llmops.common.logger import llmops_logger
+logger = llmops_logger("register_data_asset")
 
 parser = argparse.ArgumentParser("register data assets")
 parser.add_argument(
