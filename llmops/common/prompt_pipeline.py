@@ -1,3 +1,28 @@
+"""
+Execute experiment jobs/bulk-runs using standard flows.
+
+This function executes experiment jobs or bulk-runs using
+predefined standard flows.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--build_id: The unique identifier for build execution.
+This argument is required to identify the specific build execution.
+--env_name: The environment name for execution and deployment.
+This argument is required to specify the environment (dev, test, prod)
+for execution or deployment.
+--data_purpose: The data identified by its purpose.
+This argument is required to specify the purpose of the data.
+--output_file: A file path to save run IDs.
+This argument is required to specify the file to save the run IDs.
+--flow_to_execute: The name of the flow use case.
+This argument is required to specify the name of the flow for execution.
+--save_output: Flag to save the outputs in files.
+If provided, the outputs will be saved in files.
+--save_metric: Flag to save the metrics in files.
+If provided, the metrics will be saved in files.
+"""
 
 import argparse
 import datetime
@@ -12,9 +37,14 @@ from promptflow.entities import Run
 from promptflow.azure import PFClient
 
 
+def are_dictionaries_similar(dict1, dict2):
+    """
+    Compare 2 dictionaries.
 
-def are_dictionaries_similar(dict1, old_runs):
-    for old_run in old_runs:
+    Returns:
+        None
+    """
+    for old_run in dict2:
         set1 = {frozenset(dict(old_run).items())}
         set2 = {frozenset(dict1.items())}
         if set1 == set2:
@@ -33,6 +63,19 @@ def prepare_and_execute(
     save_output,
     save_metric,
 ):
+    """
+    Run the experimentation loop by executing standard flows.
+
+    reads latest experiment data assets.
+    identifies all variants across all nodes.
+    executes the flow creating a new job using
+    unique variant combination across nodes.
+    saves the results in both csv and html format.
+    saves the job ids in text file for later use.
+
+    Returns:
+        None
+    """
     main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
@@ -47,15 +90,21 @@ def prepare_and_execute(
     standard_flow_path = config["STANDARD_FLOW_PATH"]
     data_config_path = f"{flow_to_execute}/configs/data_config.json"
 
-    runtime= config["RUNTIME_NAME"]
+    runtime = config["RUNTIME_NAME"]
     experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(
-        DefaultAzureCredential(), subscription_id, resource_group_name, workspace_name
+        DefaultAzureCredential(),
+        subscription_id,
+        resource_group_name,
+        workspace_name
     )
 
     pf = PFClient(
-        DefaultAzureCredential(), subscription_id, resource_group_name, workspace_name
+        DefaultAzureCredential(),
+        subscription_id,
+        resource_group_name,
+        workspace_name
     )
     print(data_mapping_config)
     flow = f"{flow_to_execute}/{standard_flow_path}"
@@ -64,7 +113,8 @@ def prepare_and_execute(
     data_config = json.load(config_file)
     for elem in data_config["datasets"]:
         if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
-            if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
+            if (stage == elem["ENV_NAME"] and
+                    data_purpose == elem["DATA_PURPOSE"]):
                 data_name = elem["DATASET_NAME"]
                 data = ml_client.data.get(name=data_name, label="latest")
                 data_id = f"azureml:{data.name}:{data.version}"
@@ -124,26 +174,49 @@ def prepare_and_execute(
 
                     if (
                         len(past_runs) == 0
-                        or are_dictionaries_similar(get_current_defaults, past_runs)
-                        == False
+                        or are_dictionaries_similar(
+                            get_current_defaults,
+                            past_runs
+                            )
+                        is False
                     ):
                         past_runs.append(get_current_defaults)
-                        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                        timestamp = datetime.datetime.now().strftime(
+                            "%Y%m%d_%H%M%S"
+                            )
+
                         run = Run(
                             flow=flow,
                             data=data_id,
                             runtime=runtime,
-                            # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME
-                            #resources={"instance_type": "Standard_E4ds_v4"},
+                            # un-comment the resources line and
+                            # comment the argument runtime to
+                            # enable automatic runtime.
+                            # Reference: COMPUTE_RUNTIME
+                            # resources={"instance_type": "Standard_E4ds_v4"},
                             variant=variant_string,
-                            name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
-                            display_name=f"{experiment_name}_{variant_id}_{timestamp}_{data_ref}",
-                            environment_variables={"key1": "value1"},
+                            name=(
+                                f"{experiment_name}_{variant_id}"
+                                f"_{timestamp}_{data_ref}"
+                                ),
+                            display_name=(
+                                f"{experiment_name}_{variant_id}"
+                                f"_{timestamp}_{data_ref}"
+                            ),
+                            environment_variables={
+                                "key1": "value1"
+                                },
                             column_mapping=exp_config_node,
-                            tags={"build_id": build_id},
+                            tags={
+                                "build_id": build_id
+                                },
                         )
 
-                        pipeline_job = pf.runs.create_or_update(run, stream=True)
+                        pipeline_job = pf.runs.create_or_update(
+                            run,
+                            stream=True
+                            )
+
                         run_ids.append(pipeline_job.name)
                         df_result = None
                         time.sleep(15)
@@ -163,29 +236,37 @@ def prepare_and_execute(
                             print(df_result.head(10))
                             print("done")
                         else:
-                            raise Exception("Sorry, exiting job with failure..")
+                            raise Exception("Sorry, job failured..")
         else:
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             run = Run(
                 flow=flow,
                 data=data_id,
                 runtime=runtime,
-                # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME
-                #resources={"instance_type": "Standard_E4ds_v4"},
+                # un-comment the resources line and
+                # comment the argument runtime to
+                # enable automatic runtime.
+                # Reference: COMPUTE_RUNTIME
+                # resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_{timestamp}_{data_ref}",
                 display_name=f"{experiment_name}_{timestamp}_{data_ref}",
-                environment_variables={"key1": "value1"},
+                environment_variables={
+                    "key1": "value1"
+                    },
                 column_mapping=exp_config_node,
-                tags={"build_id": build_id},
+                tags={
+                    "build_id": build_id
+                    },
             )
             run._experiment_name = experiment_name
             pipeline_job = pf.runs.create_or_update(run, stream=True)
             run_ids.append(pipeline_job.name)
             time.sleep(15)
             df_result = None
-            if (
-                pipeline_job.status == "Completed" or pipeline_job.status == "Finished"
-            ):  # 4
+
+            if (pipeline_job.status == "Completed" or
+                    pipeline_job.status == "Finished"):
+
                 print("job completed")
                 df_result = pf.get_details(pipeline_job)
                 if save_output:
@@ -205,15 +286,21 @@ def prepare_and_execute(
             combined_results_df = pd.concat(dataframes, ignore_index=True)
             combined_results_df.to_csv(f"./reports/{data_ref}_result.csv")
             styled_df = combined_results_df.to_html(index=False)
-            with open(f"reports/{data_ref}_result.html", "w") as combined_results:
-                combined_results.write(styled_df)
+            with open(f"reports/{data_ref}_result.html", "w") as c_results:
+                c_results.write(styled_df)
             all_eval_df.append(combined_results_df)
         if save_metric:
             combined_metrics_df = pd.DataFrame(metrics)
-            combined_metrics_df.to_csv(f"./reports/{data_ref}_metrics.csv")
-            html_table_metrics = combined_metrics_df.to_html(index=False)
-            with open(f"reports/{data_ref}_metrics.html", "w") as combined_metrics:
-                combined_metrics.write(html_table_metrics)
+            combined_metrics_df.to_csv(
+                f"./reports/{data_ref}_metrics.csv"
+                )
+
+            html_table_metrics = combined_metrics_df.to_html(
+                index=False
+                )
+
+            with open(f"reports/{data_ref}_metrics.html", "w") as full_metric:
+                full_metric.write(html_table_metrics)
             all_eval_metrics.append(combined_metrics_df)
 
     if output_file is not None:
@@ -226,20 +313,41 @@ def prepare_and_execute(
         final_results_df["stage"] = stage
         final_results_df["experiment_name"] = experiment_name
         final_results_df["build"] = build_id
-        final_results_df.to_csv(f"./reports/{experiment_name}_result.csv")
+        final_results_df.to_csv(
+            f"./reports/{experiment_name}_result.csv"
+            )
         styled_df = final_results_df.to_html(index=False)
-        with open(f"reports/{experiment_name}_result.html", "w") as final_results:
-            final_results.write(styled_df)
+        with open(f"reports/{experiment_name}_result.html", "w") as results:
+            results.write(styled_df)
         print("Saved the results in files in reports folder")
+
     if save_metric:
-        final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
-        final_metrics_df.to_csv(f"./reports/{experiment_name}_metrics.csv")
-        html_table_metrics = final_metrics_df.to_html(index=False)
-        with open(f"reports/{experiment_name}_metrics.html", "w") as final_metrics:
-            final_metrics.write(html_table_metrics)
+        final_metrics_df = pd.concat(
+            all_eval_metrics,
+            ignore_index=True
+            )
+
+        final_metrics_df.to_csv(
+            f"./reports/{experiment_name}_metrics.csv"
+            )
+
+        html_table_metrics = final_metrics_df.to_html(
+            index=False
+            )
+
+        with open(f"reports/{experiment_name}_metrics.html", "w") as f_metrics:
+            f_metrics.write(html_table_metrics)
+
         print("Saved the metrics in files in reports folder")
 
+
 def main():
+    """
+    Run experimentation loop by executing standard Prompt Flows.
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser("prompt_bulk_run")
     parser.add_argument(
         "--subscription_id",
@@ -256,23 +364,38 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name (dev, test, prod) for execution and deployment",
+        help="environment name(dev, test, prod) for execution and deployment",
         required=True,
     )
     parser.add_argument(
-        "--data_purpose", type=str, help="data identified by purpose", required=True
+        "--data_purpose",
+        type=str,
+        help="data identified by purpose",
+        required=True
     )
     parser.add_argument(
-        "--output_file", type=str, required=True, help="A file to save run ids"
+        "--output_file",
+        type=str,
+        required=True,
+        help="a file to save run ids"
     )
     parser.add_argument(
-        "--flow_to_execute", type=str, help="flow use case name", required=True
+        "--flow_to_execute",
+        type=str,
+        help="flow use case name",
+        required=True
     )
     parser.add_argument(
-        "--save_output", help="Save the outputs in files", required=False, action='store_true'
+        "--save_output",
+        help="Save the outputs in files",
+        required=False,
+        action="store_true",
     )
     parser.add_argument(
-        "--save_metric", help="Save the metrics in files", required=False, action='store_true'
+        "--save_metric",
+        help="Save the metrics in files",
+        required=False,
+        action="store_true",
     )
     args = parser.parse_args()
 

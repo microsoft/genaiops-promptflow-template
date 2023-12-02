@@ -1,3 +1,20 @@
+"""
+This module registers a flow in AML workspace model registry.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--build_id: The build ID for deployment.
+This argument is required to identify the build to be deployed.
+--env_name: The environment name for deployment.
+This argument is required to specify the
+deployment environment (dev, test, prod).
+--flow_to_execute: The name of the flow to execute.
+This argument is required to specify the name of the flow for execution.
+--output_file: The file path for the output file needed for
+storing model version number.
+"""
+
 import argparse
 import shutil
 import os
@@ -6,26 +23,41 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
-parser = argparse.ArgumentParser("register Model")
+parser = argparse.ArgumentParser("register Flow")
 parser.add_argument(
-    "--subscription_id", type=str, help="Azure subscription id", required=True
+    "--subscription_id",
+    type=str,
+    help="Azure subscription id",
+    required=True
 )
+
 parser.add_argument(
-    "--build_id", type=str, help="build id for deployment", required=True
+    "--build_id",
+    type=str,
+    help="build id for deployment",
+    required=True
 )
+
 parser.add_argument(
     "--env_name",
     type=str,
     help="environment name (dev, test, prod) for deployment",
     required=True,
 )
-parser.add_argument("--flow_to_execute", type=str, help="use case name")
+
 parser.add_argument(
-    "--output_file", type=str, required=False, help="A file to save run model version"
+    "--flow_to_execute",
+    type=str,
+    help="use case name")
+
+parser.add_argument(
+    "--output_file",
+    type=str,
+    required=False,
+    help="a file to save run model version"
 )
 
 args = parser.parse_args()
-
 
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
@@ -55,14 +87,20 @@ if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"):
     shutil.copy(source_path, destination_path)
 
 ml_client = MLClient(
-    DefaultAzureCredential(), args.subscription_id, resource_group_name, workspace_name
+    DefaultAzureCredential(),
+    args.subscription_id,
+    resource_group_name,
+    workspace_name
 )
 
 model = Model(
     name=model_name,
     path=f"{flow_to_execute}/{model_path}",
     stage="Production",
-    description=f"{flow_to_execute} model registered for prompt flow deployment",
+    description=(
+        f"{flow_to_execute} model registered for "
+        f"prompt flow deployment"
+        ),
     properties={"azureml.promptflow.source_flow_id": flow_to_execute},
     tags={"build_id": build_id},
 )

@@ -1,3 +1,21 @@
+"""
+This module evaluates bulk-runs using evaluation flows.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--build_id: The unique identifier for build execution.
+This argument is required to identify the specific build execution.
+--env_name: The environment name for execution/deployment.
+This argument is required to specify the environment (dev, test, prod)
+--data_purpose: The data identified by its purpose.
+This argument is required to specify the purpose of the data.
+--run_id: The bulk run IDs.
+This argument is required to specify the bulk run IDs for execution.
+--flow_to_execute: The name of the flow use case.
+This argument is required to specify the name of the flow for execution.
+"""
+
 import argparse
 import ast
 import datetime
@@ -12,8 +30,23 @@ from promptflow.azure import PFClient
 
 
 def prepare_and_execute(
-    subscription_id, build_id, stage, run_id, data_purpose, flow_to_execute
+    subscription_id,
+    build_id, stage,
+    run_id,
+    data_purpose,
+    flow_to_execute
 ):
+    """
+    Run the evaluation loop by executing evaluation flows.
+
+    reads latest evaluation data assets
+    executes evaluation flow against each provided bulk-run
+    executes the flow creating a new evaluation job
+    saves the results in both csv and html format
+
+    Returns:
+        None
+    """
     main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
@@ -28,14 +61,17 @@ def prepare_and_execute(
     standard_flow_path = config["STANDARD_FLOW_PATH"]
     data_config_path = f"{flow_to_execute}/configs/data_config.json"
 
-    runtime= config["RUNTIME_NAME"]
+    runtime = config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
     experiment_name = f"{flow_to_execute}_{stage}"
 
     eval_flows = eval_flow_path.split(",")
 
     pf = PFClient(
-        DefaultAzureCredential(), subscription_id, resource_group_name, workspace_name
+        DefaultAzureCredential(),
+        subscription_id,
+        resource_group_name,
+        workspace_name
     )
 
     standard_flow = f"{flow_to_execute}/{standard_flow_path}"
@@ -44,12 +80,19 @@ def prepare_and_execute(
     data_config = json.load(config_file)
     for elem in data_config["datasets"]:
         if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
-            if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
+            if (stage == elem["ENV_NAME"] and
+                    data_purpose == elem["DATA_PURPOSE"]):
+
                 data_name = elem["DATASET_NAME"]
                 related_data = elem["RELATED_EXP_DATASET"]
                 data = pf.ml_client.data.get(name=data_name, label="latest")
                 data_id = f"azureml:{data.name}:{data.version}"
-                dataset_name.append({"data_id": data_id, "ref_data": related_data})
+                dataset_name.append(
+                    {
+                        "data_id": data_id,
+                        "ref_data": related_data
+                    }
+                )
 
     print(dataset_name)
     standard_flow_file = f"{standard_flow}/flow.dag.yaml"
@@ -100,8 +143,11 @@ def prepare_and_execute(
                 run=my_run,
                 column_mapping=mapping_node,
                 runtime=runtime,
-                # un-comment the resources line and comment the line related to runtime to enable automatic runtime. COMPUTE_RUNTIME  
-                #resources={"instance_type": "Standard_E4ds_v4"},
+                # un-comment the resources line and
+                # comment the argument runtime to
+                # enable automatic runtime.
+                # Reference: COMPUTE_RUNTIME
+                # resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_eval_{timestamp}",
                 display_name=f"{experiment_name}_eval_{timestamp}",
                 tags={"build_id": build_id},
@@ -118,13 +164,16 @@ def prepare_and_execute(
                 metric_variant = pf.get_metrics(eval_job)
 
                 if (
-                    my_run.properties.get("azureml.promptflow.node_variant", None)
-                    is not None
+                    my_run.properties.get(
+                        "azureml.promptflow.node_variant",
+                        None) is not None
                 ):
-                    variant_id = my_run.properties["azureml.promptflow.node_variant"]
+                    variant_id = \
+                        my_run.properties["azureml.promptflow.node_variant"]
                     start_index = variant_id.find("{") + 1
                     end_index = variant_id.find("}")
-                    variant_value = variant_id[start_index:end_index].split(".")
+                    variant_value = \
+                        variant_id[start_index:end_index].split(".")
 
                     df_result[variant_value[0]] = variant_value[1]
                     metric_variant[variant_value[0]] = variant_value[1]
@@ -163,12 +212,12 @@ def prepare_and_execute(
 
         styled_df = combined_results_df.to_html(index=False)
 
-        with open(f"reports/{run_data_id}_result.html", "w") as combined_results:
-            combined_results.write(styled_df)
+        with open(f"reports/{run_data_id}_result.html", "w") as c_results:
+            c_results.write(styled_df)
 
         html_table_metrics = combined_metrics_df.to_html(index=False)
-        with open(f"reports/{run_data_id}_metrics.html", "w") as combined_metrics:
-            combined_metrics.write(html_table_metrics)
+        with open(f"reports/{run_data_id}_metrics.html", "w") as c_metrics:
+            c_metrics.write(html_table_metrics)
 
         all_eval_df.append(combined_results_df)
         all_eval_metrics.append(combined_metrics_df)
@@ -183,15 +232,21 @@ def prepare_and_execute(
     final_metrics_df.to_csv(f"./reports/{experiment_name}_metrics.csv")
 
     styled_df = final_results_df.to_html(index=False)
-    with open(f"reports/{experiment_name}_result.html", "w") as final_results:
-        final_results.write(styled_df)
+    with open(f"reports/{experiment_name}_result.html", "w") as f_results:
+        f_results.write(styled_df)
 
     html_table_metrics = final_metrics_df.to_html(index=False)
-    with open(f"reports/{experiment_name}_metrics.html", "w") as final_metrics:
-        final_metrics.write(html_table_metrics)
+    with open(f"reports/{experiment_name}_metrics.html", "w") as f_metrics:
+        f_metrics.write(html_table_metrics)
 
 
 def main():
+    """
+    Run the main evaluation loop by executing evaluation flows.
+
+    Returns:
+        None
+    """
     parser = argparse.ArgumentParser("prompt_evaluation")
     parser.add_argument(
         "--subscription_id",
@@ -208,13 +263,21 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name (dev, test, prod) for execution and deployment",
+        help="environment name(dev, test, prod) for execution/deployment",
         required=True,
     )
     parser.add_argument(
-        "--data_purpose", type=str, help="data identified by purpose", required=True
+        "--data_purpose",
+        type=str,
+        help="data identified by purpose",
+        required=True
     )
-    parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
+    parser.add_argument(
+        "--run_id",
+        type=str,
+        required=True,
+        help="bulk run ids")
+
     parser.add_argument(
         "--flow_to_execute", type=str, help="flow use case name", required=True
     )
