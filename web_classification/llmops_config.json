@@ -2,19 +2,19 @@
     "envs":[
                 {
                     "ENV_NAME": "pr",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "llmops-runtime",
+                    "KEYVAULT_NAME": "ml-vault-manjinder",
+                    "RESOURCE_GROUP_NAME": "datascience",
+                    "WORKSPACE_NAME": "ml-manjinder",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation"
                 },
                 {
                     "ENV_NAME": "dev",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "llmops-runtime",
+                    "KEYVAULT_NAME": "ml-vault-manjinder",
+                    "RESOURCE_GROUP_NAME": "datascience",
+                    "WORKSPACE_NAME": "ml-manjinder",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
