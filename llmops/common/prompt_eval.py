@@ -145,8 +145,9 @@ def prepare_and_execute(
                 run=my_run,
                 column_mapping=mapping_node,
                 runtime=runtime,
-                # un-comment the resources line and
-                # comment the argument runtime to
+                # un-comment the resources parameter assignment
+                # and update the size of the compute and also
+                # comment the runtime parameter assignment to
                 # enable automatic runtime.
                 # Reference: COMPUTE_RUNTIME
                 # resources={"instance_type": "Standard_E4ds_v4"},

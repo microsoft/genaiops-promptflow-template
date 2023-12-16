@@ -57,5 +57,5 @@ stages:
                 --build_id $(BUILD.BUILDID) \
                 --env_name ${{ parameters.exec_environment }} \
                 --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "training_data" \
+                --data_purpose "pr_data" \
                 --output_file run_id.txt
