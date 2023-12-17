@@ -11,6 +11,6 @@ steps:
   parameters:
     flow_to_execute: ${{ parameters.flow_to_execute }}
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
-    CONNECTION_DETAILS: "${{ parameters.CONNECTION_DETAILS }}"
+    CONNECTION_DETAILS: '${{ parameters.CONNECTION_DETAILS }}'
 
 
