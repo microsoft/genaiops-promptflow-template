@@ -76,6 +76,8 @@ steps:
 
         docker run "${docker_args[@]}"
         sleep 15
+        docker ps -a
+        echo $("./${{ parameters.flow_to_execute }}/sample-request.json")
         curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
         inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" | grep '200 OK')
         if [[ $(echo "$inference_output") =~ "200 OK" ]]
