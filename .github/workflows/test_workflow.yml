@@ -1,4 +1,4 @@
-name: test_workflow
+name: named_entity_recognition_ci_dev_pipeline
 
 on:
   workflow_call:
@@ -10,20 +10,37 @@ on:
         default: "dev"
       flow_type:
         type: string
-        description: "The flow use-case to execute"
+        description: "The flow usecase to execute"
         required: true
-        default: "web_classification"
+        default: "named_entity_recognition"
       deployment_type:
         type: string
-        description:  "Determine type of deployment - aml, aks, webapp"
+        description: "Determine type of deployment - aml, aks, webapp"
         required: true
-    secrets:
-      azure_credentials:
-        description: "service principal authentication to Azure"
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
         required: true
-      connection_details:
-        description: "prompt flow connection details"
-        required: false
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "named_entity_recognition"
+      deployment_type:
+        type: string
+        description: "Determine type of deployment - aml, aks, webapp"
+        required: true
+  push:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'named_entity_recognition/**'
 
 jobs:
   deploy-flow:
