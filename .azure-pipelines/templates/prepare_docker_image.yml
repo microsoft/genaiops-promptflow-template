@@ -61,7 +61,11 @@ steps:
         CONNECTION_NAME=$(echo "$webapp_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
         while IFS= read -r con_name; do
           echo "$con_name"
+          api_key=$(jq -r '.[] | select(.name == $con_name) | .api_key' '${{ parameters.CONNECTION_DETAILS }}')
         done <<< "$CONNECTION_NAME"
+        abc=$(jq -r --arg postfix "_API_KEY" '.[] | "\(.name | ascii_upcase)\($postfix)=\(.api_key)"' '${{ parameters.CONNECTION_DETAILS }}' | tr '\n' ' ')
+        echo $abc
+
         
       else
         echo "Object in config file not found"
