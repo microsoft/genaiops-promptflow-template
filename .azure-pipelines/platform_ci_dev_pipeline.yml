@@ -4,8 +4,8 @@ parameters:
    default: "dev"
  - name: flow_to_execute
    displayName: "type of model to execute"
- - name: IS_KUBERNETES_DEPLOYMENT
-   displayName: "determine managed or kubernetes deployment"
+ - name: deployment_type
+   displayName: "determine type of deployment - aks, aml, webapp"
 
 stages:
     - stage: execute_prompt_experiment
@@ -194,10 +194,10 @@ stages:
               echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version" 
 
         #=====================================
-        # Executed Kubernetes deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'True'
+        # Executed Kubernetes deployment when parameter deployment_type == 'aks'
         # Reads 'kubernetes_endpoint' field values from deployment_config.json
         #=====================================              
-        - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'True') }}:
+        - ${{ if eq(lower(parameters.deployment_type), 'aks') }}:
           - template: templates/kubernetes_deployment.yml  
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
@@ -207,10 +207,10 @@ stages:
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         #=====================================
-        # Executed AML Compute deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'False'
+        # Executed AML Compute deployment when parameter deployment_type == 'aml'
         # Reads 'azure_managed_endpoint' field values from deployment_config.json
         #=====================================     
-        - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'False') }}:
+        - ${{ if eq(lower(parameters.deployment_type), 'aml') }}:
           - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)

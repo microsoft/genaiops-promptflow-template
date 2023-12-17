@@ -13,9 +13,9 @@ on:
         description: "The flow use-case to execute"
         required: true
         default: "web_classification"
-      is_kubernetes_deployment:
+      deployment_type:
         type: string
-        description: "Determine managed(False) or kubernetes(True) deployment"
+        description:  "Determine type of deployment - aml, aks, webapp"
         required: true
     secrets:
       azure_credentials:
@@ -152,7 +152,7 @@ jobs:
     with:
       env_name: ${{ inputs.env_name }}
       flow_type: ${{ inputs.flow_type }} 
-      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment }}
+      deployment_type: ${{ inputs.deployment_type }}
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
 

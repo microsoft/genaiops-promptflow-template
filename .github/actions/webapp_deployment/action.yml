@@ -1,6 +1,6 @@
-name: kubernetes_deployment
+name: webapp_deployment
 
-description: execute an online endpoint for real time inference
+description: deploys container on webapp
 
 inputs:
   SUBSCRIPTION_ID:

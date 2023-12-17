@@ -13,9 +13,9 @@ on:
         description: "The flow usecase to execute"
         required: true
         default: "named_entity_recognition"
-      is_kubernetes_deployment:
+      deployment_type:
         type: string
-        description: "Determine managed(False) or kubernetes(True) deployment"
+        description: "Determine type of deployment - aml, aks, webapp"
         required: true
   push:
     branches:
@@ -35,6 +35,6 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
-      is_kubernetes_deployment: ${{ inputs.is_kubernetes_deployment|| 'False' }}
+      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
