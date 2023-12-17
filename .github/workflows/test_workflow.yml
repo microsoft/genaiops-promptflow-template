@@ -1,4 +1,4 @@
-name: named_entity_recognition_ci_dev_pipeline
+name: test_workflow
 
 on:
   workflow_call:
