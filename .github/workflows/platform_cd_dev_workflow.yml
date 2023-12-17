@@ -124,7 +124,7 @@ jobs:
           flow_to_execute: ${{ inputs.flow_type }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
         env:
-          connection_details: ${{ secrets.connection_details }}
+          connection_details: ${{ secrets.NAMED_ENTITY_RECOGNITION_AOAI_CONNECTIONS }}
 
 
 
