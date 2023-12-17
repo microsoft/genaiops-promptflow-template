@@ -19,6 +19,9 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
+      connection_details:
+        description: "prompt flow connection details"
+        required: false
   workflow_dispatch:
     inputs:
       env_name:
@@ -118,10 +121,10 @@ jobs:
         if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/webapp_deployment
         with:
-          SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
           flow_to_execute: ${{ inputs.flow_type }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
-          MODEL_VERSION: $MODEL_VERSION
+          connection_details: ${{ secrets.connection_details }}
+
 
 
         

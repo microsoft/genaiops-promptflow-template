@@ -1,0 +1,37 @@
+name: test_workflow
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow use-case to execute"
+        required: true
+        default: "web_classification"
+      deployment_type:
+        type: string
+        description:  "Determine type of deployment - aml, aks, webapp"
+        required: true
+    secrets:
+      azure_credentials:
+        description: "service principal authentication to Azure"
+        required: true
+      connection_details:
+        description: "prompt flow connection details"
+        required: false
+
+jobs:
+  deploy-flow:
+    uses: ./.github/workflows/platform_cd_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name }}
+      flow_type: ${{ inputs.flow_type }} 
+      deployment_type: ${{ inputs.deployment_type }}
+    secrets:
+      azure_credentials: ${{ secrets.azure_credentials }}  
+      connection_details: ${{ secrets.connection_details }}

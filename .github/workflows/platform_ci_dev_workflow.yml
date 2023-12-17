@@ -21,6 +21,9 @@ on:
       azure_credentials:
         description: "service principal authentication to Azure"
         required: true
+      connection_details:
+        description: "prompt flow connection details"
+        required: false
 
 jobs:
   flow-experiment-and_evaluation:
@@ -155,4 +158,4 @@ jobs:
       deployment_type: ${{ inputs.deployment_type }}
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
-
+      connection_details: ${{ secrets.connection_details }}
