@@ -37,3 +37,4 @@ stages:
           parameters:
             flow_to_execute: ${{ parameters.flow_to_execute }}
             DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
+            CONNECTION_DETAILS: '$(NAMED_ENTITY_RECOGNITION_AOAI_CONNECTIONS)'

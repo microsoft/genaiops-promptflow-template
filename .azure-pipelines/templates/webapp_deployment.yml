@@ -3,11 +3,14 @@ parameters:
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
+- name: CONNECTION_DETAILS
+  type: string
 
 steps:
 - template: ./prepare_docker_image.yml
   parameters:
     flow_to_execute: ${{ parameters.flow_to_execute }}
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
+    CONNECTION_DETAILS: ${{ parameters.CONNECTION_DETAILS }}
 
 

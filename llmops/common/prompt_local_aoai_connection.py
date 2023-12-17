@@ -67,16 +67,17 @@ def prepare_and_execute(
                 for con in con_to_create:
                     for avail_con in secret_config:
                         if avail_con['name'] == con:
-                            connection = AzureOpenAIConnection(
-                                name=avail_con['name'],
-                                api_key=avail_con['api_key'],
-                                api_base=avail_con['api_base'],
-                                api_type=avail_con['api_type'],
-                                api_version=avail_con['api_version']
-                            )
-                            pf.connections.create_or_update(connection)
+                            if avail_con['type'] == "azure_open_ai":
+                                connection = AzureOpenAIConnection(
+                                    name=avail_con['name'],
+                                    api_key=avail_con['api_key'],
+                                    api_base=avail_con['api_base'],
+                                    api_type=avail_con['api_type'],
+                                    api_version=avail_con['api_version']
+                                )
+                                pf.connections.create_or_update(connection)
 
-                            logger.info("connection created successfully !")
+                                logger.info(f"connection {avail_con['name']} created successfully!")
 
 
 def main():
