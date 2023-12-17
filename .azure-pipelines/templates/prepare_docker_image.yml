@@ -61,7 +61,7 @@ steps:
         CONNECTION_NAME=$(echo "$webapp_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
         postfix="_API_KEY"  
 
-        abc=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg postfix "$postfix" '.[] | "\(.con_name | ascii_upcase)\($postfix)=\(.api_key)"' | tr '\n' ' ')
+        abc=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg postfix "$postfix" '.[] | "\(.name | ascii_upcase)\($postfix)=\(.api_key)"' | tr '\n' ' ')
         
         echo $abc
 
