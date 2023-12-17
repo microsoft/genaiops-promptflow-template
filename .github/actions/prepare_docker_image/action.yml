@@ -9,10 +9,10 @@ inputs:
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
     required: true
-secrets:
-  connection_details:
-    description: "prompt flow connection details"
-    required: true
+  CONNECTION_DETAILS:
+    description: "PF connection details"
+    required: false
+
 
 runs:
   using: composite
@@ -25,4 +25,4 @@ runs:
           python -m llmops.common.prompt_local_aoai_connection \
             --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --flow_to_execute ${{ inputs.flow_to_execute }} \
-            --connection_details '${{ secrets.CONNECTION_DETAILS }}'
+            --connection_details '${{ inputs.CONNECTION_DETAILS }}'

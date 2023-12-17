@@ -123,6 +123,7 @@ jobs:
         with:
           flow_to_execute: ${{ inputs.flow_type }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+        env:
           connection_details: ${{ secrets.connection_details }}
 
 
