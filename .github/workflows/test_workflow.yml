@@ -29,9 +29,9 @@ jobs:
   deploy-flow:
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     with:
-      env_name: ${{ inputs.env_name }}
-      flow_type: ${{ inputs.flow_type }} 
-      deployment_type: ${{ inputs.deployment_type }}
+        env_name: ${{ inputs.env_name || 'dev'}}
+        flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
+        deployment_type: ${{ inputs.deployment_type|| 'aml' }}
     secrets:
-      azure_credentials: ${{ secrets.azure_credentials }}  
-      connection_details: ${{ secrets.connection_details }}
+        azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+        connection_details: ${{ secrets.NAMED_ENTITY_RECOGNITION_AOAI_CONNECTIONS }}
