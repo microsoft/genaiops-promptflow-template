@@ -1,0 +1,19 @@
+parameters:
+ - name: exec_environment
+   displayName: "Execution Environment"
+   default: "dev"
+ - name: flow_to_execute
+   displayName: "type of model to execute"
+ - name: deployment_type
+   displayName: "determine type of deployment - aks, aml, webapp"
+
+stages:
+
+      jobs:
+      - job: Execute_ml_Job_Pipeline
+        steps:
+        - ${{ if eq(containsValue(['webapp'], lower(parameters.deployment_type))) }}:
+          - template: templates/webapp_deployment.yml 
+            parameters:
+              flow_to_execute: ${{ parameters.flow_to_execute }}
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}

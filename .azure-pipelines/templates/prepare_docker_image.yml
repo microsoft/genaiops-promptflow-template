@@ -1,0 +1,17 @@
+parameters:
+- name: flow_to_execute
+  type: string
+- name: DEPLOY_ENVIRONMENT
+  type: string
+
+steps:
+- template: templates/configure_azureml_agent.yml
+
+- template: execute_python_code.yml
+  parameters:
+    step_name: "Create local Connection"
+    script_parameter: |
+      python -m llmops.common.prompt_local_aoai_connection \
+        --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
+        --flow_to_execute ${{ parameters.flow_to_execute }} \
+        --connection_details $(AOAI_CONNECTIONS)

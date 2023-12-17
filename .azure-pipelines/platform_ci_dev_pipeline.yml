@@ -218,3 +218,14 @@ stages:
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
+
+
+        #=====================================
+        # Executed AML Compute deployment when parameter deployment_type == 'aml'
+        # Reads 'azure_managed_endpoint' field values from deployment_config.json
+        #=====================================     
+        - ${{ if eq(containsValue(['webapp'], lower(parameters.deployment_type))) }}:
+          - template: templates/webapp_deployment.yml 
+            parameters:
+              flow_to_execute: ${{ parameters.flow_to_execute }}
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
