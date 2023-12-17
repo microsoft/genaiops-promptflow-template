@@ -5,7 +5,7 @@ parameters:
   type: string
 
 steps:
-- template: templates/prepare_docker_image.yml
+- template: ./prepare_docker_image.yml
   parameters:
     flow_to_execute: ${{ parameters.flow_to_execute }}
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
