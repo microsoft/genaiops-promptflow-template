@@ -45,7 +45,7 @@ def prepare_and_execute(
     main_config = open(f"{flow_to_execute}/llmops_config.json")
     model_config = json.load(main_config)
 
-    secret_config = json.load(connection_details)
+    secret_config = json.loads(connection_details)
 
     for obj in model_config["envs"]:
         if obj.get("ENV_NAME") == stage:
