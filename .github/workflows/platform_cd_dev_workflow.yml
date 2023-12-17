@@ -119,12 +119,14 @@ jobs:
       #=====================================     
       - name: Deploy to webapp 
         if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
-        uses: ./.github/actions/webapp_deployment
+        uses: ./.github/actions/execute_script
         with:
-          flow_to_execute: ${{ inputs.flow_type }}
-          DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
-        env:
-          connection_details: "${{ secrets.NAMED_ENTITY_RECOGNITION_AOAI_CONNECTIONS }}"
+          step_name: "Create local PF connections"
+          script_parameter: |
+            python -m llmops.common.prompt_local_aoai_connection \
+              --env_name ${{ inputs.env_name }} \
+              --flow_to_execute ${{ inputs.flow_type }} \
+              --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
 
 
