@@ -64,9 +64,9 @@ steps:
         abc=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg postfix "$postfix" '.[] | "\(.name | ascii_upcase)\($postfix)=\(.api_key)"' | tr '\n' ' ')
         
         echo $abc
-        docker run -dp 8080:8080 -e "$abc" localpf:latest
+        docker run -dp 8080:8080 -e $abc localpf:latest
         sleep 15
-        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data ./${{ parameters.flow_to_execute }}/sample-request.json
+        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
         inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data ./${{ parameters.flow_to_execute }}/sample-request.json | grep '200 OK')
         if [[ $(echo "$inference_output") =~ "200 OK" ]]
         then
