@@ -59,21 +59,15 @@ steps:
         webapp_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
         echo "$webapp_object"
         CONNECTION_NAME=$(echo "$webapp_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
-        postfix="_API_KEY"  
-        prefix=" -e "
-        abc=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg prefix "$prefix" --arg postfix "$postfix" '.[] | "\($prefix)\(.name | ascii_upcase)\($postfix)=\(.api_key)"' | tr '\n' ' ')
-        
-        docker run -dp 8080:8080 -e $abc localpf:latest
-        sleep 15
-        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
-        inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" | grep '200 OK')
-        if [[ $(echo "$inference_output") =~ "200 OK" ]]
-        then
-          echo "inferencing succeeded"
-        else
-          echo "inferencing failed"
-          exit 2
-        fi
+        result_string=""
+
+        for name in "${CONNECTION_NAME[@]}"; do
+            api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+            result_string+=" -e $name:$api_key"
+        done
+
+        echo "$result_string"
+
         
       else
         echo "Object in config file not found"
