@@ -12,7 +12,7 @@ stages:
       jobs:
       - job: Execute_ml_Job_Pipeline
         steps:
-        - ${{ if eq(containsValue(['webapp'], lower(parameters.deployment_type))) }}:
+        - ${{ if eq(containsValue('webapp', lower(parameters.deployment_type))) }}:
           - template: templates/webapp_deployment.yml 
             parameters:
               flow_to_execute: ${{ parameters.flow_to_execute }}
