@@ -17,3 +17,52 @@ steps:
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }} \
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
+
+- task: AzureCLI@2
+  displayName: "setup the build server"
+  continueOnError: false
+  inputs:
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az extension add -n ml -y
+      az upgrade --yes
+      az config set extension.use_dynamic_install=yes_without_prompt
+
+- task: AzureCLI@2
+  displayName: Build Docker Image with flow artifacts
+  continueOnError: false
+  inputs: 
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -e # fail on error
+      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
+      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+
+      if [[ -n "$selected_object" ]]; then
+        echo "$selected_object"
+        STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
+        docker login "$(registry_uri)" -u "$(registry_username)" -p "$(registry_password)"
+        pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
+        
+        mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
+        cat "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
+
+        docker build -t localpf "./${{ parameters.flow_to_execute }}/docker" --no-cache
+        
+        docker images
+        deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
+        webapp_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+        echo "$webapp_object"
+        CONNECTION_NAME=$(echo "$webapp_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
+        while IFS= read -r con_name; do
+          echo "$con_name"
+        done <<< "$CONNECTION_NAME"
+        
+      else
+        echo "Object in config file not found"
+      fi
