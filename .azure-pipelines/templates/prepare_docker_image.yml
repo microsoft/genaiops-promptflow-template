@@ -75,13 +75,13 @@ steps:
         docker_args+=(-dp 8080:8080 localpf:latest)
 
         docker run "${docker_args[@]}"
-        sleep 15
+        sleep 30
         docker ps -a
         chmod +x "./${{ parameters.flow_to_execute }}/sample-request.json" 
         file_contents=$(<./${{ parameters.flow_to_execute }}/sample-request.json)
         echo "$file_contents"
-        curl -X POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' -d "$file_contents" -m 60 -v --insecure
-        inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' -d "$file_contents"  -m 60 -v --insecure | grep '200 OK')
+        curl -X POST  "http://127.0.0.1:8080/score" --header 'Content-Type: application/json' -L -d "$file_contents" -m 60 -v --insecure
+        inference_output=$(curl -i --request POST  "http://127.0.0.1:8080/score" --header 'Content-Type: application/json' -L -d "$file_contents"  -m 60 -v --insecure | grep '200 OK')
         if [[ $(echo "$inference_output") =~ "200 OK" ]]
         then
           echo "inferencing succeeded"
