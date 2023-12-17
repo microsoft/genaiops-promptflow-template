@@ -63,12 +63,23 @@ steps:
 
         for name in "${CONNECTION_NAME[@]}"; do
             api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-            result_string+=" -e $name:$api_key"
+            result_string+=" -e $name=$api_key"
         done
 
         echo "$result_string"
 
-        
+        docker run -dp 8080:8080 "$result_string" localpf:latest
+        sleep 15
+        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
+        inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" | grep '200 OK')
+        if [[ $(echo "$inference_output") =~ "200 OK" ]]
+        then
+          echo "inferencing succeeded"
+        else
+          echo "inferencing failed"
+          exit 2
+        fi
+
       else
         echo "Object in config file not found"
       fi
