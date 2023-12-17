@@ -77,9 +77,10 @@ steps:
         docker run "${docker_args[@]}"
         sleep 15
         docker ps -a
+        chmod +x "./${{ parameters.flow_to_execute }}/sample-request.json" 
         echo $("./${{ parameters.flow_to_execute }}/sample-request.json")
-        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
-        inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" | grep '200 OK')
+        curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" -m 60 -v --insecure
+        inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"  -m 60 -v --insecure | grep '200 OK')
         if [[ $(echo "$inference_output") =~ "200 OK" ]]
         then
           echo "inferencing succeeded"
