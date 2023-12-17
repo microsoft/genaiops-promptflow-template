@@ -1,3 +1,22 @@
+pr: none
+trigger:
+  branches:
+   include:
+     - main
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - llmops/*
+      - named_entity_recognition/*
+
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: llmops_platform_dev_vg
+
 parameters:
  - name: exec_environment
    displayName: "Execution Environment"
