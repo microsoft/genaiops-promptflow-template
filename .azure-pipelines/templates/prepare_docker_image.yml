@@ -16,4 +16,4 @@ steps:
       python -m llmops.common.prompt_local_aoai_connection \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.flow_to_execute }} \
-        --connection_details: "${{ parameters.CONNECTION_DETAILS }}"
+        --connection_details "${{ parameters.CONNECTION_DETAILS }}"
