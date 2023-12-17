@@ -70,7 +70,11 @@ steps:
 
         echo "$result_string"
 
-        docker run -dp 8080:8080 "$result_string" localpf:latest
+        IFS=' ' read -r -a docker_args <<< "$result_string"
+
+        docker_args+=(-dp 8080:8080 localpf:latest)
+
+        docker run "${docker_args[@]}"
         sleep 15
         curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json"
         inference_output=$(curl -i --request POST  "http://0.0.0.0:8080/score" --header 'Content-Type: application/json' --data @"./${{ parameters.flow_to_execute }}/sample-request.json" | grep '200 OK')
