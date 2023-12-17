@@ -72,7 +72,7 @@ steps:
 
         IFS=' ' read -r -a docker_args <<< "$result_string"
 
-        docker_args+=(-dp 8080:8080 localpf:latest)
+        docker_args+=(-itp 8080:8080 localpf:latest)
 
         docker run "${docker_args[@]}"
         sleep 30
