@@ -5,7 +5,7 @@ parameters:
   type: string
 
 steps:
-- template: templates/configure_azureml_agent.yml
+- template: ./configure_azureml_agent.yml
 
 - template: execute_python_code.yml
   parameters:
