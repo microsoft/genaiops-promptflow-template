@@ -46,7 +46,7 @@ steps:
       if [[ -n "$selected_object" ]]; then
         echo "$selected_object"
         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
-        docker login "$(registry_uri)" -u "$(registry_username)" -p "$(registry_password)"
+        
         pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
         
         mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
