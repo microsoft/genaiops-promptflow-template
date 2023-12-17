@@ -19,4 +19,4 @@ runs:
       with:
         flow_to_execute: ${{ inputs.flow_to_execute }}
         DEPLOY_ENVIRONMENT: ${{ inputs.DEPLOY_ENVIRONMENT }}
-        connection_details: $connection_details
+        connection_details: "${{ env.connection_details }}"
