@@ -8,12 +8,11 @@ parameters:
    displayName: "determine type of deployment - aks, aml, webapp"
 
 stages:
-
-      jobs:
-      - job: Execute_ml_Job_Pipeline
-        steps:
-        - ${{ if eq(containsValue('webapp', lower(parameters.deployment_type)), True) }}:
-          - template: templates/webapp_deployment.yml 
-            parameters:
-              flow_to_execute: ${{ parameters.flow_to_execute }}
-              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
+  jobs:
+  - job: Execute_ml_Job_Pipeline
+    steps:
+    - ${{ if eq(containsValue('webapp', lower(parameters.deployment_type)), True) }}:
+      - template: templates/webapp_deployment.yml 
+        parameters:
+          flow_to_execute: ${{ parameters.flow_to_execute }}
+          DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
