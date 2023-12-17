@@ -19,7 +19,7 @@ This argument is required to specify the name of the flow for execution.
 import argparse
 import json
 from promptflow.entities import AzureOpenAIConnection
-from promptflow.azure import PFClient
+from promptflow import PFClient
 
 from llmops.common.logger import llmops_logger
 
