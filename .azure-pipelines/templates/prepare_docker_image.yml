@@ -50,7 +50,7 @@ steps:
         pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
         ls ./${{ parameters.flow_to_execute }}/docker
         ls ./${{ parameters.flow_to_execute }}/docker/connections
-        ls ./${{ parameters.flow_to_execute }}/flow
+        ls ./${{ parameters.flow_to_execute }}/docker/flow
         mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
         cat "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
 
@@ -74,7 +74,7 @@ steps:
 
         IFS=' ' read -r -a docker_args <<< "$result_string"
 
-        docker_args+=(-dp 8080:8080 localpf:latest -m 512m --memory-reservation=256m --cpus=2)
+        docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
 
         docker run "${docker_args[@]}"
 
