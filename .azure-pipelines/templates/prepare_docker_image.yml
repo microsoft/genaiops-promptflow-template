@@ -5,7 +5,8 @@ parameters:
   type: string
 - name: CONNECTION_DETAILS
   type: string
-
+- name: REGISTRY_DETAILS
+  type: string
 steps:
 - template: ./configure_azureml_agent.yml
 
@@ -44,19 +45,18 @@ steps:
 
         deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-        #CONNECTION_NAME=$(echo "$con_object" | jq -r '.CONNECTION_NAMES[]')
+
         read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
         echo $connection_names
         result_string=""
 
         for name in "${connection_names[@]}"; do
-            echo $name
             api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name="${name^^}"
             modified_name="${uppercase_name}_API_KEY"
             result_string+=" -e $modified_name=$api_key"
         done
-        echo "$result_string"
+
         IFS=' ' read -r -a docker_args <<< "$result_string"
         docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
         docker run "${docker_args[@]}"
@@ -72,6 +72,23 @@ steps:
         
         python -m llmops.common.deployment.test_local_flow \
                 --flow_to_execute ${{ parameters.flow_to_execute }}
+
+        REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+
+        registry_object=$(jq ".[] | select(.registry_name == \"$REGISTRY_NAME\")" "${{ parameters.REGISTRY_DETAILS }}")
+        register_server=$(echo "$registry_object" | jq -r '.registry_object')
+        registry_username=$(echo "$registry_object" | jq -r '.registry_username')
+        registry_password=$(echo "$registry_object" | jq -r '.registry_password')
+
+        echo "$(REGISTRY_NAME)"
+        echo "$(register_server)"
+        echo "$(registry_username)"
+        echo "$(registry_password)"
+
+        docker login "$register_server" -u "$registry_username" -p "$registry_password" 
+        docker tag localpf "$register_server"/${{ parameters.model_name }}:$(Build.BuildNumber)
+        docker push "$(registry-uri)"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        
       else
         echo "Object in config file not found"
       fi

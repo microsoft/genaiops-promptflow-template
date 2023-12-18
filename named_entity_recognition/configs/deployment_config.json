@@ -46,7 +46,8 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai", "abra"]
+            "CONNECTION_NAMES": ["aoai", "abra"],
+            "REGISTRY_NAME": "researchmlops"
         }
     ]
 }
