@@ -44,23 +44,20 @@ steps:
       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
-        echo "$selected_object"
         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
         
         pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
-        ls ./${{ parameters.flow_to_execute }}/docker
-        ls ./${{ parameters.flow_to_execute }}/docker/connections
-        ls ./${{ parameters.flow_to_execute }}/docker/flow
+
         mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
-        cat "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
 
         docker build -t localpf "./${{ parameters.flow_to_execute }}/docker" --no-cache
         
         docker images
+
         deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
-        webapp_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-        echo "$webapp_object"
-        CONNECTION_NAME=$(echo "$webapp_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
+        con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+        CONNECTION_NAME=$(echo "$con_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
+        
         result_string=""
 
         for name in "${CONNECTION_NAME[@]}"; do
@@ -70,26 +67,21 @@ steps:
             result_string+=" -e $modified_name=$api_key"
         done
 
-        echo "$result_string"
-
         IFS=' ' read -r -a docker_args <<< "$result_string"
-
         docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
+        docker run "${docker_args[@]}"
 
-        aa=$(docker run "${docker_args[@]}")
+        sleep 15
 
-        echo $aa
-
-        
-
-        sleep 30
         docker ps -a
+        
         chmod +x "./${{ parameters.flow_to_execute }}/sample-request.json" 
+        
         file_contents=$(<./${{ parameters.flow_to_execute }}/sample-request.json)
         echo "$file_contents"
+        
         python -m llmops.common.deployment.test_local_flow \
                 --flow_to_execute ${{ parameters.flow_to_execute }}
-        docker logs "$aa"
       else
         echo "Object in config file not found"
       fi
