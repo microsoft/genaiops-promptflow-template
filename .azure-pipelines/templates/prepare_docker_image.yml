@@ -80,7 +80,7 @@ steps:
 
         echo $aa
 
-        docker logs "$aa"
+        
 
         sleep 30
         docker ps -a
@@ -89,7 +89,7 @@ steps:
         echo "$file_contents"
         python -m llmops.common.deployment.test_local_flow \
                 --flow_to_execute ${{ parameters.flow_to_execute }}
-
+        docker logs "$aa"
       else
         echo "Object in config file not found"
       fi
