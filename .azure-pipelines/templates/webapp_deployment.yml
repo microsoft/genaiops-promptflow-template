@@ -29,6 +29,7 @@ steps:
       appserviceplan=pfnerappplan
       appserviceweb=pfnerappweb
 
+      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
       deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
       con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
       REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
