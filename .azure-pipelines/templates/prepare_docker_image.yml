@@ -76,7 +76,11 @@ steps:
 
         docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
 
-        docker run "${docker_args[@]}"
+        aa=$(docker run "${docker_args[@]}")
+
+        echo $aa
+
+        docker logs "$aa"
 
         sleep 30
         docker ps -a
