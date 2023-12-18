@@ -23,17 +23,17 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-
-      rgname=pfwebapprg
-      udmid=pfwebappmid
-      appserviceplan=pfnerappplan
-      appserviceweb=pfnerappweb
-      acr_rg=mlops
-
+      set -e # fail on error
       env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
       deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
       con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
       REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+      rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
+      udmid=$(echo "$con_object" | jq -r '.USER_MANAGED_ID')
+      appserviceplan=$(echo "$con_object" | jq -r '.APP_PLAN_NAME')
+      appserviceweb=$(echo "$con_object" | jq -r '.WEB_APP_NAME')
+      acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
+      websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
 
       read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
       echo $connection_names
@@ -48,7 +48,7 @@ steps:
       registryId=$(az acr show --resource-group $acr_rg \
         --name $REGISTRY_NAME --query id --output tsv)
       az role assignment create --assignee $principalId --scope $registryId --role "AcrPull"
-      az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku B3
+      az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
       az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
         $REGISTRY_NAME.azurecr.io/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
