@@ -45,7 +45,7 @@ steps:
         deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
         #CONNECTION_NAME=$(echo "$con_object" | jq -r '.CONNECTION_NAMES[]')
-        read -r -a connection_names <<< "$(echo "$json_data" | jq -r '.CONNECTION_NAMES | join(" ")')"
+        read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
         echo $connection_names
         result_string=""
 
