@@ -41,7 +41,7 @@ steps:
       az group create --name $rgname --location westeurope
       
       az identity create --name $udmid --resource-group $rgname
-      
+      sleep 15
       principalId=$(az identity show --resource-group $rgname \
         --name $udmid --query principalId --output tsv)
       
