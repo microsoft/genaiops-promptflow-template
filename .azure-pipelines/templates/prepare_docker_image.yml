@@ -48,7 +48,7 @@ steps:
         echo $CONNECTION_NAME
         result_string=""
 
-        for name in "${CONNECTION_NAME[@]}"; do
+        for name in "$CONNECTION_NAME"; do
             echo $name
             api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name="${name^^}"
