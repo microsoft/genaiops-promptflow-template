@@ -6,6 +6,10 @@ parameters:
    displayName: "type of model to execute"
  - name: deployment_type
    displayName: "determine type of deployment - aks, aml, webapp"
+ - name: connection_details
+   displayName: "determine the variable containing all connection details"
+ - name: registry_details
+  displayName: "determine the variable containing acr details"
 
 stages:
     - stage: execute_prompt_experiment
@@ -229,5 +233,5 @@ stages:
             parameters:
               flow_to_execute: ${{ parameters.flow_to_execute }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
-              CONNECTION_DETAILS: '$(NAMED_ENTITY_RECOGNITION_DEV_CONNECTIONS)'
-              REGISTRY_DETAILS: '$(DOCKER_IMAGE_REGISTRY)'
+              CONNECTION_DETAILS: ${{ parameters.connection_details }}
+              REGISTRY_DETAILS: ${{ parameters.registry_details }}
