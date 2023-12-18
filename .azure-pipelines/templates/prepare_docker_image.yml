@@ -86,8 +86,8 @@ steps:
         echo "$(registry_password)"
 
         docker login "$register_server" -u "$registry_username" -p "$registry_password" 
-        docker tag localpf "$register_server"/${{ parameters.model_name }}:$(Build.BuildNumber)
-        docker push "$(registry-uri)"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker tag localpf "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker push "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
         
       else
         echo "Object in config file not found"
