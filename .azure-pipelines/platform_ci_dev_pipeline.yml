@@ -228,7 +228,7 @@ stages:
         # Executed AML Compute deployment when parameter deployment_type == 'aml'
         # Reads 'azure_managed_endpoint' field values from deployment_config.json
         #=====================================     
-        - ${{ if eq(containsValue(['webapp'], lower(parameters.deployment_type))) }}:
+        - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
           - template: templates/webapp_deployment.yml 
             parameters:
               flow_to_execute: ${{ parameters.flow_to_execute }}
