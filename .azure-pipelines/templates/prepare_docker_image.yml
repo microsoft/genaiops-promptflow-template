@@ -19,18 +19,6 @@ steps:
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
 
 - task: AzureCLI@2
-  displayName: "setup the build server"
-  continueOnError: false
-  inputs:
-    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
-      az extension add -n ml -y
-      az upgrade --yes
-      az config set extension.use_dynamic_install=yes_without_prompt
-
-- task: AzureCLI@2
   displayName: Build Docker Image with flow artifacts
   continueOnError: false
   inputs: 
@@ -56,7 +44,7 @@ steps:
 
         deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-        CONNECTION_NAME=$(echo "$con_object" | jq -r '.AOAI_CONNECTION_NAMES[]')
+        CONNECTION_NAME=$(echo "$con_object" | jq -r '.CONNECTION_NAMES[]')
         
         result_string=""
 

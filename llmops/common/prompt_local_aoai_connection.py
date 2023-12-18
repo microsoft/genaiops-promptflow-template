@@ -60,9 +60,9 @@ def prepare_and_execute(
 
     connection_config = json.load(config_file)
     for elem in connection_config["webapp_endpoint"]:
-        if "AOAI_CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
+        if "CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
             if stage == elem["ENV_NAME"]:
-                con_to_create = list(elem["AOAI_CONNECTION_NAMES"])
+                con_to_create = list(elem["CONNECTION_NAMES"])
 
                 for con in con_to_create:
                     for avail_con in secret_config:
