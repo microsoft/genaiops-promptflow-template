@@ -9,7 +9,7 @@ parameters:
  - name: connection_details
    displayName: "determine the variable containing all connection details"
  - name: registry_details
-  displayName: "determine the variable containing acr details"
+   displayName: "determine the variable containing acr details"
 
 stages:
     - stage: execute_prompt_experiment
