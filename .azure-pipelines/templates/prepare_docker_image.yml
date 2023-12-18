@@ -44,11 +44,12 @@ steps:
 
         deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-        CONNECTION_NAME=$(echo "$con_object" | jq -r '.CONNECTION_NAMES[]')
-        echo $CONNECTION_NAME
+        #CONNECTION_NAME=$(echo "$con_object" | jq -r '.CONNECTION_NAMES[]')
+        read -r -a connection_names <<< "$(echo "$json_data" | jq -r '.CONNECTION_NAMES | join(" ")')"
+        echo $connection_names
         result_string=""
 
-        for name in "$CONNECTION_NAME"; do
+        for name in "${connection_names[@]}"; do
             echo $name
             api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name="${name^^}"
