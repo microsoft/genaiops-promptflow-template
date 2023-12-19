@@ -22,10 +22,10 @@ runs:
     - name: prepare docker image
       uses: ./.github/actions/prepare_docker_image
       with:
-        CONNECTION_DETAILS: ${{ inputs.connection_details }}
-        FLOW_TO_EXECUTE: ${{ inputs.flow_type }}
-        DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
-        REGISTRY_DETAILS: ${{ inputs.registry_details }}
+        CONNECTION_DETAILS: ${{ inputs.CONNECTION_DETAILS }}
+        FLOW_TO_EXECUTE: ${{ inputs.FLOW_TO_EXECUTE }}
+        DEPLOY_ENVIRONMENT: ${{ inputs.DEPLOY_ENVIRONMENT }}
+        REGISTRY_DETAILS: ${{ inputs.REGISTRY_DETAILS }}
 
     - name: create docker image
       shell: bash
