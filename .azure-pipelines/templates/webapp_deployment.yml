@@ -57,10 +57,16 @@ steps:
         --settings WEBSITES_PORT=8080
 
       for name in "${connection_names[@]}"; do
-      api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' \
+          | jq -r --arg name "$name" '.[] \
+          | select(.name == $name) \
+          | .api_key')
+
         uppercase_name="${name^^}"
         modified_name="${uppercase_name}_API_KEY"
-        az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
+        az webapp config appsettings set \
+          --resource-group $rgname \
+          --name $appserviceweb \
           --settings $modified_name=$api_key
       done
 
