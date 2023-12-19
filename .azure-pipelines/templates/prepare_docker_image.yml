@@ -17,16 +17,16 @@ steps:
         --flow_to_execute ${{ parameters.flow_to_execute }} \
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
 
-- task: AzureCLI@2
+- task: Bash@3
   displayName: Build Docker Image with flow artifacts
   continueOnError: false
   inputs: 
-    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
-    scriptType: bash
-    scriptLocation: scriptPath
-    scriptPath: ./llmops/common/scripts/gen_docker_image.sh
-    arguments: >
-    -flow_to_execute ${{ parameters.flow_to_execute }}
-    -deploy_environment ${{ parameters.DEPLOY_ENVIRONMENT }}
-    -connection_details ${{ parameters.CONNECTION_DETAILS }}
-    -registry_details ${{ parameters.REGISTRY_DETAILS }}
+    targetType: filePath
+    filePath: ./llmops/common/scripts/gen_docker_image.sh
+    failOnStderr: true
+  env:
+    flow_to_execute: ${{ parameters.flow_to_execute }}
+    deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
+    connection_details: ${{ parameters.CONNECTION_DETAILS }}
+    registry_details: ${{ parameters.REGISTRY_DETAILS }}
+
