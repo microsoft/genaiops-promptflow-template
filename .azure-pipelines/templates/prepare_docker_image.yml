@@ -8,7 +8,7 @@ parameters:
 - name: REGISTRY_DETAILS
   type: string
 steps:
-- template: templates/configure_azureml_agent.yml
+- template: configure_azureml_agent.yml
 - template: execute_python_code.yml
   parameters:
     step_name: "Create local Connection"
