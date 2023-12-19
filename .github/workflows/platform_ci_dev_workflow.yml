@@ -24,7 +24,9 @@ on:
       connection_details:
         description: "prompt flow connection details"
         required: false
-
+      registry_details:
+        description: "prompt flow registry details"
+        required: false
 jobs:
   flow-experiment-and_evaluation:
     name: prompt flow experiment and evaluation job
@@ -159,3 +161,4 @@ jobs:
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
       connection_details: ${{ secrets.connection_details }}
+      registry_details: ${{ secrets.registry_details }}

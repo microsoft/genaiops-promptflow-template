@@ -1,28 +1,86 @@
-name: kubernetes_deployment
+name: prep_docker_image
 
-description: execute an online endpoint for real time inference
+description: Creates a new docker images for PF deployment
 
 inputs:
-  flow_to_execute:
+  FLOW_TO_EXECUTE:
     description: "the flow to be registered and deployed"
     required: true
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
     required: true
   CONNECTION_DETAILS:
-    description: "PF connection details"
-    required: false
+    description: "pf connection details"
+    required: true
+  REGISTRY_DETAILS:
+    description: "docker image registry details"
+    required: true
 
 
 runs:
   using: composite
   steps:
-    - name: create local connections
-      uses: ./.github/actions/execute_script
-      with:
-        step_name: "Create local PF connections"
-        script_parameter: |
-          python -m llmops.common.prompt_local_aoai_connection \
-            --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
-            --flow_to_execute ${{ inputs.flow_to_execute }} \
-            --connection_details '${{ inputs.CONNECTION_DETAILS }}'
+    - name: create docker image
+      run: |
+       set -e # fail on error
+       config_path="./${{ github.event.inputs.FLOW_TO_EXECUTE }}/llmops_config.json"
+       env_name=${{ github.event.inputs.DEPLOY_ENVIRONMENT }}
+       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+
+       if [[ -n "$selected_object" ]]; then
+         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
+        
+         pf flow build --source "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/$STANDARD_FLOW" --output "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/docker"  --format docker 
+
+         mv "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/environment/Dockerfile" "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/docker/Dockerfile"
+
+         docker build -t localpf "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/docker" --no-cache
+        
+         docker images
+
+         deploy_config="./${{ github.event.inputs.FLOW_TO_EXECUTE }}/configs/deployment_config.json"
+         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+
+         read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+         echo $connection_names
+         result_string=""
+
+         for name in "${connection_names[@]}"; do
+            api_key=$(echo '${{ github.event.inputs.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+            uppercase_name="${name^^}"
+            modified_name="${uppercase_name}_API_KEY"
+            result_string+=" -e $modified_name=$api_key"
+         done
+
+         IFS=' ' read -r -a docker_args <<< "$result_string"
+         docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
+         docker run "${docker_args[@]}"
+
+         sleep 15
+
+         docker ps -a
+        
+         chmod +x "./${{ github.event.inputs.FLOW_TO_EXECUTE }}/sample-request.json" 
+        
+         file_contents=$(<./${{ github.event.inputs.FLOW_TO_EXECUTE }}/sample-request.json)
+         echo "$file_contents"
+        
+         python -m llmops.common.deployment.test_local_flow \
+                 --flow_to_execute ${{ github.event.inputs.FLOW_TO_EXECUTE }}
+
+         REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+
+         registry_object=$(echo '${{ github.event.inputs.REGISTRY_DETAILS }}' | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+         register_server=$(echo "$registry_object" | jq -r '.register_server')
+         registry_username=$(echo "$registry_object" | jq -r '.registry_username')
+         registry_password=$(echo "$registry_object" | jq -r '.registry_password')
+
+
+         docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+         docker tag localpf "$register_server"/${{ github.event.inputs.FLOW_TO_EXECUTE }}_${{ github.event.inputs.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+         docker push "$register_server"/${{ github.event.inputs.FLOW_TO_EXECUTE }}_${{ github.event.inputs.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        
+       else
+         echo "Object in config file not found"
+       fi
+

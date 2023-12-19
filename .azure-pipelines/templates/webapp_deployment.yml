@@ -1,5 +1,5 @@
 parameters:
-- name: flow_to_execute
+- name: FLOW_TO_EXECUTE
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
@@ -10,7 +10,7 @@ parameters:
 steps:
 - template: ./prepare_docker_image.yml
   parameters:
-    flow_to_execute: ${{ parameters.flow_to_execute }}
+    FLOW_TO_EXECUTE: ${{ parameters.FLOW_TO_EXECUTE }}
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
     CONNECTION_DETAILS: '${{ parameters.CONNECTION_DETAILS }}'
     REGISTRY_DETAILS: '${{ parameters.REGISTRY_DETAILS }}'
@@ -25,7 +25,7 @@ steps:
     inlineScript: |
       set -e # fail on error
       env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
-      deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
+      deploy_config="./${{ parameters.FLOW_TO_EXECUTE }}/configs/deployment_config.json"
       con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
       REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
       rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
@@ -51,7 +51,7 @@ steps:
       az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
       az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-        $REGISTRY_NAME.azurecr.io/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        $REGISTRY_NAME.azurecr.io/${{ parameters.FLOW_TO_EXECUTE }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
 
       az webapp config appsettings set --resource-group $rgname --name $appserviceweb --settings WEBSITES_PORT=8080
 

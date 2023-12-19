@@ -22,6 +22,9 @@ on:
       connection_details:
         description: "prompt flow connection details"
         required: false
+      registry_details:
+        description: "prompt flow registry details"
+        required: false
   workflow_dispatch:
     inputs:
       env_name:
@@ -117,7 +120,7 @@ jobs:
       # Executed AML Compute deployment when parameter deployment_type == 'aks'
       # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================     
-      - name: Deploy to webapp 
+      - name: Create local PF Connections 
         if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/execute_script
         with:
@@ -128,7 +131,18 @@ jobs:
               --flow_to_execute ${{ inputs.flow_type }} \
               --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
-
+      #=====================================
+      # Executed AML Compute deployment when parameter deployment_type == 'aks'
+      # Reads 'azure_managed_endpoint' field values from deployment_config.json
+      #=====================================     
+      - name: Deploy to webapp
+        if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
+        uses: ./.github/actions/webapp_deployment
+        with:
+          CONNECTION_DETAILS: ${{ secrets.connection_details }}
+          FLOW_TO_EXECUTE: ${{ inputs.flow_type }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          REGISTRY_DETAILS: ${{ secrets.registry_details }}
 
         
             

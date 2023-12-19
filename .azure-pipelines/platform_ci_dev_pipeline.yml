@@ -231,7 +231,7 @@ stages:
         - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
           - template: templates/webapp_deployment.yml 
             parameters:
-              flow_to_execute: ${{ parameters.flow_to_execute }}
+              FLOW_TO_EXECUTE: ${{ parameters.flow_to_execute }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}

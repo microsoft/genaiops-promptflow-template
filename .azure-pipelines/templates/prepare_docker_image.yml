@@ -1,5 +1,5 @@
 parameters:
-- name: flow_to_execute
+- name: FLOW_TO_EXECUTE
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
@@ -8,15 +8,13 @@ parameters:
 - name: REGISTRY_DETAILS
   type: string
 steps:
-- template: ./configure_azureml_agent.yml
-
 - template: execute_python_code.yml
   parameters:
     step_name: "Create local Connection"
     script_parameter: |
       python -m llmops.common.prompt_local_aoai_connection \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }} \
+        --flow_to_execute ${{ parameters.FLOW_TO_EXECUTE }} \
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
 
 - task: AzureCLI@2
@@ -28,22 +26,22 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
       set -e # fail on error
-      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
+      config_path="./${{ parameters.FLOW_TO_EXECUTE }}/llmops_config.json"
       env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
         
-        pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
+        pf flow build --source "./${{ parameters.FLOW_TO_EXECUTE }}/$STANDARD_FLOW" --output "./${{ parameters.FLOW_TO_EXECUTE }}/docker"  --format docker 
 
-        mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
+        mv "./${{ parameters.FLOW_TO_EXECUTE }}/environment/Dockerfile" "./${{ parameters.FLOW_TO_EXECUTE }}/docker/Dockerfile"
 
-        docker build -t localpf "./${{ parameters.flow_to_execute }}/docker" --no-cache
+        docker build -t localpf "./${{ parameters.FLOW_TO_EXECUTE }}/docker" --no-cache
         
         docker images
 
-        deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
+        deploy_config="./${{ parameters.FLOW_TO_EXECUTE }}/configs/deployment_config.json"
         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
         read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
@@ -65,13 +63,13 @@ steps:
 
         docker ps -a
         
-        chmod +x "./${{ parameters.flow_to_execute }}/sample-request.json" 
+        chmod +x "./${{ parameters.FLOW_TO_EXECUTE }}/sample-request.json" 
         
-        file_contents=$(<./${{ parameters.flow_to_execute }}/sample-request.json)
+        file_contents=$(<./${{ parameters.FLOW_TO_EXECUTE }}/sample-request.json)
         echo "$file_contents"
         
         python -m llmops.common.deployment.test_local_flow \
-                --flow_to_execute ${{ parameters.flow_to_execute }}
+                --flow_to_execute ${{ parameters.FLOW_TO_EXECUTE }}
 
         REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
@@ -82,8 +80,8 @@ steps:
 
 
         docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-        docker tag localpf "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
-        docker push "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker tag localpf "$register_server"/${{ parameters.FLOW_TO_EXECUTE }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker push "$register_server"/${{ parameters.FLOW_TO_EXECUTE }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
         
       else
         echo "Object in config file not found"
