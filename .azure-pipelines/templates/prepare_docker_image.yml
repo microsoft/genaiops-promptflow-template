@@ -24,7 +24,6 @@ steps:
   inputs: 
     targetType: filePath
     filePath: ./llmops/common/scripts/gen_docker_image.sh
-    failOnStderr: true
   env:
     flow_to_execute: ${{ parameters.flow_to_execute }}
     deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
