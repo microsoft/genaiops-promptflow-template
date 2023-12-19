@@ -35,11 +35,9 @@ steps:
       if [[ -n "$selected_object" ]]; then
         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
         
-        pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" \
-          --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
+        pf flow build --source "./${{ parameters.flow_to_execute }}/$STANDARD_FLOW" --output "./${{ parameters.flow_to_execute }}/docker"  --format docker 
 
-        mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" \
-          "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
+        mv "./${{ parameters.flow_to_execute }}/environment/Dockerfile" "./${{ parameters.flow_to_execute }}/docker/Dockerfile"
 
         docker build -t localpf "./${{ parameters.flow_to_execute }}/docker" --no-cache
         
@@ -53,10 +51,7 @@ steps:
         result_string=""
 
         for name in "${connection_names[@]}"; do
-            api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' \
-              | jq -r --arg name "$name" '.[] \
-              | select(.name == $name) \
-              | .api_key')
+            api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name="${name^^}"
             modified_name="${uppercase_name}_API_KEY"
             result_string+=" -e $modified_name=$api_key"
@@ -80,20 +75,16 @@ steps:
 
         REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-        registry_object=$(echo '${{ parameters.REGISTRY_DETAILS }}' \
-          | jq -r --arg name "$REGISTRY_NAME" '.[] \
+        registry_object=$(echo '${{ parameters.REGISTRY_DETAILS }}' | jq -r --arg name "$REGISTRY_NAME" '.[] \
           | select(.registry_name == $name)')
         register_server=$(echo "$registry_object" | jq -r '.register_server')
         registry_username=$(echo "$registry_object" | jq -r '.registry_username')
         registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
 
-        docker login "$register_server" -u "$registry_username" \
-          --password-stdin <<< "$registry_password" 
-        docker tag localpf \
-          "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
-        docker push \
-          "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+        docker tag localpf "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+        docker push "$register_server"/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
         
       else
         echo "Object in config file not found"
