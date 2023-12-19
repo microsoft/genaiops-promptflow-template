@@ -28,6 +28,7 @@ runs:
         REGISTRY_DETAILS: ${{ inputs.registry_details }}
 
     - name: create docker image
+      shell: bash
       run: |
         set -e # fail on error
         env_name=${{ github.event.inputs.DEPLOY_ENVIRONMENT }}

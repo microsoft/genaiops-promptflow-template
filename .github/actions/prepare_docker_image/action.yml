@@ -21,6 +21,7 @@ runs:
   using: composite
   steps:
     - name: create docker image
+      shell: bash
       run: |
        set -e # fail on error
        config_path="./${{ github.event.inputs.FLOW_TO_EXECUTE }}/llmops_config.json"
