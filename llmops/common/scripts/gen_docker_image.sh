@@ -20,10 +20,11 @@ if [[ -n "$selected_object" ]]; then
     docker build -t localpf "./$flow_to_execute/docker" --no-cache
         
     docker images
-
+    echo $flow_to_execute
     deploy_config="./$flow_to_execute/configs/deployment_config.json"
+    echo "$deploy_config"
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-
+    echo "$con_object"
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
     echo $connection_names
         
@@ -31,7 +32,9 @@ if [[ -n "$selected_object" ]]; then
 
     for name in "${connection_names[@]}"; do
         api_key=$(echo '$connection_details' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key') 
+        echo "$api_key"
         uppercase_name="${name^^}"
+        echo "$uppercase_name"
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
     done
