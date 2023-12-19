@@ -25,8 +25,8 @@ steps:
     scriptType: bash
     scriptLocation: scriptPath
     scriptPath: ./llmops/common/scripts/gen_docker_image.sh
-   env:
-    flow_to_execute: ${{ parameters.flow_to_execute }}
-    deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
-    connection_details: ${{ parameters.CONNECTION_DETAILS }}
-    registry_details: ${{ parameters.REGISTRY_DETAILS }}
+    arguments: >
+    -flow_to_execute ${{ parameters.flow_to_execute }}
+    -deploy_environment ${{ parameters.DEPLOY_ENVIRONMENT }}
+    -connection_details ${{ parameters.CONNECTION_DETAILS }}
+    -registry_details ${{ parameters.REGISTRY_DETAILS }}
