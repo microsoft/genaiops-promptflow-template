@@ -53,21 +53,13 @@ steps:
       az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
         $REGISTRY_NAME.azurecr.io/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
 
-      az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
-        --settings WEBSITES_PORT=8080
+      az webapp config appsettings set --resource-group $rgname --name $appserviceweb --settings WEBSITES_PORT=8080
 
       for name in "${connection_names[@]}"; do
-        api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' \
-          | jq -r --arg name "$name" '.[] \
-          | select(.name == $name) \
-          | .api_key')
-
+      api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name="${name^^}"
         modified_name="${uppercase_name}_API_KEY"
-        az webapp config appsettings set \
-          --resource-group $rgname \
-          --name $appserviceweb \
-          --settings $modified_name=$api_key
+        az webapp config appsettings set --resource-group $rgname --name $appserviceweb --settings $modified_name=$api_key
       done
 
       id=$(az identity show --resource-group $rgname --name $udmid --query id --output tsv)
