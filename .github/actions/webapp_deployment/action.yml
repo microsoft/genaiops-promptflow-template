@@ -58,7 +58,7 @@ runs:
         az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
         az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-          $REGISTRY_NAME.azurecr.io/${{ inputs.FLOW_TO_EXECUTE }}_${{ inputs.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+          $REGISTRY_NAME.azurecr.io/${{ inputs.FLOW_TO_EXECUTE }}_${{ inputs.DEPLOY_ENVIRONMENT }}:${{ github.run_id }}
 
         az webapp config appsettings set --resource-group $rgname --name $appserviceweb --settings WEBSITES_PORT=8080
 
