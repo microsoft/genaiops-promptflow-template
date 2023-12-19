@@ -25,7 +25,7 @@ steps:
   inputs: 
     azureSubscription: $(AZURE_RM_SVC_CONNECTION)
     scriptType: bash
-    scriptLocation: scriptPath
+    scriptLocation: inlineScript
     inlineScript: |
       set -e # fail on error
       config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
