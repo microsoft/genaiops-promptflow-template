@@ -57,7 +57,7 @@ runs:
          #echo $docker_args
          #docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
          #echo $docker_args
-         docker run "${docker_args[@]}"
+         #docker run "${docker_args[@]}"
 
          sleep 15
 
