@@ -37,7 +37,8 @@ runs:
          deploy_config="./${{ inputs.FLOW_TO_EXECUTE }}/configs/deployment_config.json"
          con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
-         read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+         #read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+         connection_names=($(echo "$con_object" | jq -r '.CONNECTION_NAMES[]'))
          echo $connection_names
          result_string=""
          echo ${connection_names[@]}
@@ -50,7 +51,7 @@ runs:
             echo $api_key
             uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
             echo $uppercase_name
-            modified_name=${constant}${uppercase_name}_API_KEY
+            modified_name=${uppercase_name}_API_KEY
             echo $modified_name
             result_string+=" -e $modified_name=$api_key"
             echo $result_string
