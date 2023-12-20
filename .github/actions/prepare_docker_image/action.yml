@@ -46,7 +46,7 @@ runs:
             api_key=$(echo $secret_con | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
             modified_name=${uppercase_name}_API_KEY
-            result_string+=" -e $modified_name=$api_key"
+            result_string+=" -e $modified_name=$api_key "
          done
          echo $result_string 
          
