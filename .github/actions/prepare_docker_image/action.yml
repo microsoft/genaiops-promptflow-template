@@ -47,7 +47,7 @@ runs:
          result_string=""
 
          for name in "${connection_names[@]}"; do
-            api_key=$(echo ${{ inputs.CONNECTION_DETAILS }} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+            api_key=$(echo "${{ inputs.CONNECTION_DETAILS }}" | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             uppercase_name="${name^^}"
             modified_name="${uppercase_name}_API_KEY"
             result_string+=" -e $modified_name=$api_key"
@@ -73,7 +73,7 @@ runs:
 
          REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-         registry_object=$(echo ${{ inputs.REGISTRY_DETAILS }} | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+         registry_object=$(echo "${{ inputs.REGISTRY_DETAILS }}" | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
          register_server=$(echo "$registry_object" | jq -r '.register_server')
          registry_username=$(echo "$registry_object" | jq -r '.registry_username')
          registry_password=$(echo "$registry_object" | jq -r '.registry_password')
