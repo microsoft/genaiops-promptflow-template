@@ -42,7 +42,7 @@ runs:
          result_string=""
          echo ${connection_names[@]}
          secret_con=$(echo "$CONNECTION_DETAILS") 
-         constant=" -e "
+         constant=' -e '
          for name in "${connection_names[@]}"; do
             echo $name
             echo "$secret_con"
@@ -50,9 +50,9 @@ runs:
             echo $api_key
             uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
             echo $uppercase_name
-            modified_name="${uppercase_name}_API_KEY"
+            modified_name=${constant}${uppercase_name}_API_KEY
             echo $modified_name
-            result_string+="$constant$modified_name=$api_key"
+            result_string+=" -e $modified_name=$api_key"
             echo $result_string
          done
 
