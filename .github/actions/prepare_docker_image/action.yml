@@ -39,7 +39,7 @@ runs:
 
          #read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
          connection_names=($(echo "$con_object" | jq -r '.CONNECTION_NAMES[]'))
-
+         constant=' -e '
          result_string=""
          secret_con=$(echo "$CONNECTION_DETAILS") 
          for name in "${connection_names[@]}"; do
@@ -48,12 +48,13 @@ runs:
             modified_name=${uppercase_name}_API_KEY
             result_string+=" -e $modified_name=$api_key"
          done
-         result_string=$constant$result_string
+         result_string="$constant$result_string"
          echo $result_string 
          
          IFS=' ' read -r -a docker_args <<< "$result_string"
+         echo $docker_args
          docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
-         echo $("${docker_args[@]}")
+         echo $docker_args
          docker run "${docker_args[@]}"
 
          sleep 15
