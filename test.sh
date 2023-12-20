@@ -21,4 +21,4 @@ echo $result_string
 
 docker_args=$result_string
 docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
-docker run $($docker_args)
+docker run $(echo "$docker_args")
