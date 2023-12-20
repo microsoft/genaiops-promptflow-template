@@ -24,8 +24,8 @@ runs:
       shell: bash
       run: sh ./llmops/common/scripts/gen_docker_image.sh
   		env:
-    	  flow_to_execute: ${{ inputs.FLOW_TO_EXECUTE }}
-        deploy_environment: ${{ inputs.DEPLOY_ENVIRONMENT }}
-        connection_details: ${{ inputs.CONNECTION_DETAILS }}
-        registry_details: ${{ inputs.REGISTRY_DETAILS }}
-        build_id: ${{ github.run_id }}
+    	  FLOW_TO_EXECUTE: ${{ inputs.FLOW_TO_EXECUTE }}
+        DEPLOY_ENVIRONMENT: ${{ inputs.DEPLOY_ENVIRONMENT }}
+        CONNECTION_DETAILS: ${{ inputs.CONNECTION_DETAILS }}
+        REGISTRY_DETAILS: ${{ inputs.REGISTRY_DETAILS }}
+        BUILD_ID: ${{ github.run_id }}
