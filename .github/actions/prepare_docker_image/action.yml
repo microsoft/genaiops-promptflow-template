@@ -48,7 +48,6 @@ runs:
             modified_name=${uppercase_name}_API_KEY
             result_string+=" -e $modified_name=$api_key"
          done
-         result_string="$constant$result_string"
          echo $result_string 
          
          docker_args=$result_string
