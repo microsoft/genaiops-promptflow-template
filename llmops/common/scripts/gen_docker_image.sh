@@ -33,9 +33,9 @@ if [[ -n "$selected_object" ]]; then
         result_string+=" -e $modified_name=$api_key"
     done
 
-    IFS=' ' read -r -a docker_args <<< "$result_string"
-    docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
-    docker run "${docker_args[@]}"
+    docker_args=$result_string
+    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    docker run $(echo "$docker_args")
 
     sleep 15
 
