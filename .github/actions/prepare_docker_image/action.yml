@@ -46,10 +46,11 @@ runs:
          echo $connection_names
          result_string=""
          echo ${connection_names[@]}
+         secret_con=$(echo "${{ inputs.CONNECTION_DETAILS }}" | base64 -d) 
          for name in "${connection_names[@]}"; do
             echo $name
-            echo "${{ toJson(inputs.CONNECTION_DETAILS) }}"
-            api_key=$(echo "${{ toJson(inputs.CONNECTION_DETAILS) }}" | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+            echo "$secret_con"
+            api_key=$(echo $secret_con | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
             echo $api_key
             uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
             echo $uppercase_name

@@ -52,3 +52,4 @@ jobs:
     secrets:
         azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
         connection_details: ${{ secrets.NAMED_ENTITY_RECOGNITION_DEV_CONNECTIONS }}
+        registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
