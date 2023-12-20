@@ -11,36 +11,30 @@ selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_pat
 if [[ -n "$selected_object" ]]; then
     STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
         
-    pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" \
-        --output "./$flow_to_execute/docker"  --format docker 
+    pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
 
-    mv "./$flow_to_execute/environment/Dockerfile" \
-        "./$flow_to_execute/docker/Dockerfile"
+    mv "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
 
     docker build -t localpf "./$flow_to_execute/docker" --no-cache
         
     docker images
-    echo $flow_to_execute
+
     deploy_config="./$flow_to_execute/configs/deployment_config.json"
-    echo "$deploy_config"
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-    echo "$con_object"
+
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
     echo $connection_names
-        
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo '$connection_details' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key') 
-        echo "$api_key"
+        api_key=$(echo '$connection_details' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name="${name^^}"
-        echo "$uppercase_name"
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
     done
-    echo "$result_string"
+
     IFS=' ' read -r -a docker_args <<< "$result_string"
-    docker_args+=('-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest' )
+    docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
     docker run "${docker_args[@]}"
 
     sleep 15
@@ -53,27 +47,20 @@ if [[ -n "$selected_object" ]]; then
     echo "$file_contents"
         
     python -m llmops.common.deployment.test_local_flow \
-        --flow_to_execute $flow_to_execute
+            --flow_to_execute $flow_to_execute
 
-    registry_name=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+    REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-    registry_object=$(echo '$registry_details' \
-        | jq -r --arg name "$registry_name" '.[] \
-        | select(.registry_name == $name)')
+    registry_object=$(echo '$registry_details' | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
     register_server=$(echo "$registry_object" | jq -r '.register_server')
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
 
-    docker login "$register_server" -u "$registry_username" \
-        --password-stdin <<< "$registry_password" 
-    docker tag localpf \
-        "$register_server"/$flow_to_execute_$deploy_environment:$(Build.BuildNumber)
-    docker push \
-        "$register_server"/$flow_to_execute_$deploy_environment:$(Build.BuildNumber)
+    docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+    docker tag localpf "$register_server"/$flow_to_execute_$deploy_environment:$build_id
+    docker push "$register_server"/$flow_to_execute_$deploy_environment:$build_id
         
-else
-    echo "Object in config file not found"
-fi
-
-
+    else
+        echo "Object in config file not found"
+    fi
