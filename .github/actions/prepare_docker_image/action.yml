@@ -53,7 +53,7 @@ runs:
             result_string+=" -e $modified_name=$api_key"
          done
          constant=" -e "
-         result_string = "${constant}${result_string}"
+         result_string = "$constant$result_string"
          echo $result_string 
          IFS=' ' read -r -a docker_args <<< "$result_string"
          docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
