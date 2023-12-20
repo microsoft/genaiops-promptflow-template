@@ -22,4 +22,67 @@ runs:
   steps:
     - name: create docker image
       shell: bash
-      run: flow_to_execute="${{ inputs.FLOW_TO_EXECUTE }}" deploy_environment="${{ inputs.DEPLOY_ENVIRONMENT }}" connection_details="${{ inputs.CONNECTION_DETAILS }}" registry_details="${{ inputs.REGISTRY_DETAILS }}" build_id="${{ github.run_id }}"  ./llmops/common/scripts/gen_docker_image.sh
+      run: |
+       set -e # fail on error
+       config_path="./${{ inputs.FLOW_TO_EXECUTE }}/llmops_config.json"
+       env_name=${{ inputs.DEPLOY_ENVIRONMENT }}
+       selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+
+       if [[ -n "$selected_object" ]]; then
+         STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
+        
+         pf flow build --source "./${{ inputs.FLOW_TO_EXECUTE }}/$STANDARD_FLOW" --output "./${{ inputs.FLOW_TO_EXECUTE }}/docker"  --format docker 
+
+         cp "./${{ inputs.FLOW_TO_EXECUTE }}/environment/Dockerfile" "./${{ inputs.FLOW_TO_EXECUTE }}/docker/Dockerfile"
+
+         docker build -t localpf "./${{ inputs.FLOW_TO_EXECUTE }}/docker" --no-cache
+        
+         docker images
+
+         deploy_config="./${{ inputs.FLOW_TO_EXECUTE }}/configs/deployment_config.json"
+         con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+
+         read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+         echo $connection_names
+         result_string=""
+
+         for name in "${connection_names[@]}"; do
+            api_key=$(echo '${{ inputs.CONNECTION_DETAILS }}' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+            uppercase_name="${name^^}"
+            modified_name="${uppercase_name}_API_KEY"
+            result_string+=" -e $modified_name=$api_key"
+         done
+         constant=" -e "
+         result_string = "${constant}${result_string}"
+         echo $result_string 
+         IFS=' ' read -r -a docker_args <<< "$result_string"
+         docker_args+=(-m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest )
+         docker run "${docker_args[@]}"
+
+         sleep 15
+
+         docker ps -a
+        
+         chmod +x "./${{ inputs.FLOW_TO_EXECUTE }}/sample-request.json" 
+        
+         file_contents=$(<./${{ inputs.FLOW_TO_EXECUTE }}/sample-request.json)
+         echo "$file_contents"
+        
+         python -m llmops.common.deployment.test_local_flow \
+                 --flow_to_execute ${{ inputs.FLOW_TO_EXECUTE }}
+
+         REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+
+         registry_object=$(echo '${{ inputs.REGISTRY_DETAILS }}' | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+         register_server=$(echo "$registry_object" | jq -r '.register_server')
+         registry_username=$(echo "$registry_object" | jq -r '.registry_username')
+         registry_password=$(echo "$registry_object" | jq -r '.registry_password')
+
+
+         docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+         docker tag localpf "$register_server"/${{ inputs.FLOW_TO_EXECUTE }}_${{ inputs.DEPLOY_ENVIRONMENT }}:${{ github.run_id }}
+         docker push "$register_server"/${{ inputs.FLOW_TO_EXECUTE }}_${{ inputs.DEPLOY_ENVIRONMENT }}:${{ github.run_id }}
+        
+       else
+         echo "Object in config file not found"
+       fi
