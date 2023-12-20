@@ -21,10 +21,11 @@ runs:
   using: composite
   steps:
     - name: create docker image
+      shell: bash
       run: ./llmops/common/scripts/gen_docker_image.sh
   		env:
-    	  flow_to_execute: ${{ inputs.flow_to_execute }}
-        deploy_environment: ${{ inputs.DEPLOY_ENVIRONMENT }}
-        connection_details: ${{ inputs.CONNECTION_DETAILS }}
-        registry_details: ${{ inputs.REGISTRY_DETAILS }}
-        build_id: ${{ github.run_id }}
+    	 flow_to_execute: ${{ inputs.flow_to_execute }}
+       deploy_environment: ${{ inputs.DEPLOY_ENVIRONMENT }}
+       connection_details: ${{ inputs.CONNECTION_DETAILS }}
+       registry_details: ${{ inputs.REGISTRY_DETAILS }}
+       build_id: ${{ github.run_id }}
