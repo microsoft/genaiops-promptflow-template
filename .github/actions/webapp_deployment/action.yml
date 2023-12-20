@@ -9,13 +9,7 @@ inputs:
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
     required: true
-secrets:
-  CONNECTION_DETAILS:
-    description: "pf connection details"
-    required: true
-  REGISTRY_DETAILS:
-    description: "docker image registry details"
-    required: true
+
 
 runs:
   using: composite
@@ -23,11 +17,9 @@ runs:
     - name: prepare docker image
       uses: ./.github/actions/prepare_docker_image
       with:
-        CONNECTION_DETAILS: ${{ inputs.CONNECTION_DETAILS }}
         FLOW_TO_EXECUTE: ${{ inputs.FLOW_TO_EXECUTE }}
-      secrets:
-        DEPLOY_ENVIRONMENT: ${{ secrets.DEPLOY_ENVIRONMENT }}
-        REGISTRY_DETAILS: ${{ secrets.REGISTRY_DETAILS }}
+        DEPLOY_ENVIRONMENT: ${{ inputs.DEPLOY_ENVIRONMENT }}
+
 
     - name: create webapp
       shell: bash
