@@ -9,6 +9,7 @@ inputs:
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
     required: true
+secrets:
   CONNECTION_DETAILS:
     description: "pf connection details"
     required: true
@@ -46,7 +47,7 @@ runs:
          echo $connection_names
          result_string=""
          echo ${connection_names[@]}
-         secret_con=$(echo "${{ inputs.CONNECTION_DETAILS }}" | base64 -d) 
+         secret_con=$(echo "${{ secrets.CONNECTION_DETAILS }}" | base64 -d) 
          for name in "${connection_names[@]}"; do
             echo $name
             echo "$secret_con"
@@ -79,7 +80,7 @@ runs:
 
          REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-         registry_object=$(echo "${{ toJson(inputs.REGISTRY_DETAILS) }}" | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+         registry_object=$(echo "${{ secrets.REGISTRY_DETAILS }}" | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
          register_server=$(echo "$registry_object" | jq -r '.register_server')
          registry_username=$(echo "$registry_object" | jq -r '.registry_username')
          registry_password=$(echo "$registry_object" | jq -r '.registry_password')
