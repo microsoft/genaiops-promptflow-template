@@ -13,7 +13,7 @@ if [[ -n "$selected_object" ]]; then
         
     pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
 
-    mv "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
+    cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
 
     docker build -t localpf "./$flow_to_execute/docker" --no-cache
         
@@ -27,8 +27,8 @@ if [[ -n "$selected_object" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo '$connection_details' | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-        uppercase_name="${name^^}"
+        api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
     done
@@ -51,15 +51,15 @@ if [[ -n "$selected_object" ]]; then
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-    registry_object=$(echo '$registry_details' | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+    registry_object=$(echo $registry_details | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
     register_server=$(echo "$registry_object" | jq -r '.register_server')
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
 
     docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-    docker tag localpf "$register_server"/$flow_to_execute_$deploy_environment:$build_id
-    docker push "$register_server"/$flow_to_execute_$deploy_environment:$build_id
+    docker tag localpf "$register_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker push "$register_server"/"$flow_to_execute"_"$deploy_environment":$build_id
         
     else
         echo "Object in config file not found"
