@@ -24,4 +24,4 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      flow_to_execute=${{ parameters.FLOW_TO_EXECUTE }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.Buildid) CONNECTION_DETAILS='${{ parameters.CONNECTION_DETAILS }}' "./llmops/common/scripts/az_webapp_deploy.sh" 
+      flow_to_execute=${{ parameters.FLOW_TO_EXECUTE }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.BuildNumber) CONNECTION_DETAILS='${{ parameters.CONNECTION_DETAILS }}' "./llmops/common/scripts/az_webapp_deploy.sh" 
