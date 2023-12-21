@@ -4,8 +4,8 @@
 # This script deploys prompt flow image to Azure Web App
 
 set -e # fail on error
-env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
-deploy_config="./${{ parameters.flow_to_execute }}/configs/deployment_config.json"
+env_name=$deploy_environment
+deploy_config="./$flow_to_execute/configs/deployment_config.json"
 con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
@@ -33,18 +33,15 @@ az role assignment create --assignee $principalId --scope $registryId --role "Ac
 az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/${{ parameters.flow_to_execute }}_${{ parameters.DEPLOY_ENVIRONMENT }}:$(Build.BuildNumber)
+    $REGISTRY_NAME.azurecr.io/$flow_to_execute_$deploy_environment:$build_id
 
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
     --settings WEBSITES_PORT=8080
 
 for name in "${connection_names[@]}"; do
-    api_key=$(echo '${{ parameters.CONNECTION_DETAILS }}' \
-        | jq -r --arg name "$name" '.[] \
-        | select(.name == $name) \
-        | .api_key')
+    api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
-    uppercase_name="${name^^}"
+    uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
         --resource-group $rgname \
