@@ -26,6 +26,6 @@ steps:
   env:
     flow_to_execute: ${{ parameters.flow_to_execute }}
     deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
-    connection_details: ${{ parameters.CONNECTION_DETAILS }}
-    registry_details: ${{ parameters.REGISTRY_DETAILS }}
+    CONNECTION_DETAILS: ${{ parameters.CONNECTION_DETAILS }}
+    REGISTRY_DETAILS: ${{ parameters.REGISTRY_DETAILS }}
     build_id: $(Build.BuildNumber)
