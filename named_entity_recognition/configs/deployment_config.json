@@ -46,7 +46,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai", "abra"],
+            "CONNECTION_NAMES": ["aoai"],
             "REGISTRY_NAME": "researchmlops",
             "REGISTRY_RG_NAME": "mlops",
             "APP_PLAN_NAME": "pfnerappplan",

@@ -37,3 +37,6 @@ stages:
       exec_environment: ${{ parameters.env_name }}
       flow_to_execute: ${{ parameters.flow_to_execute }}
       deployment_type: ${{ lower(parameters.deployment_type) }}
+      connection_details: '$(NAMED_ENTITY_RECOGNITION_DEV_CONNECTIONS)'
+      registry_details: '$(DOCKER_IMAGE_REGISTRY)'
+      
