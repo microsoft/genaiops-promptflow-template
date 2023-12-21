@@ -17,5 +17,5 @@ runs:
   steps:
     - name: create docker image
       shell: bash
-      run: flow_to_execute=${{ inputs.FLOW_TO_EXECUTE }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} registry_details=$REGISTRY_DETAILS connection_details=$CONNECTION_DETAILS build_id=${{ github.run_id }} ./l
+      run: flow_to_execute=${{ inputs.FLOW_TO_EXECUTE }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./l
 lmops/common/scripts/gen_docker_image.sh 
