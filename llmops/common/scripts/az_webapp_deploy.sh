@@ -33,7 +33,7 @@ az role assignment create --assignee $principalId --scope $registryId --role "Ac
 az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/$flow_to_execute_$deploy_environment:$build_id
+    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":$build_id
 
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
     --settings WEBSITES_PORT=8080

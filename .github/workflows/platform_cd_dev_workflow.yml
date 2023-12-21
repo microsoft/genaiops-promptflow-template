@@ -104,7 +104,7 @@ jobs:
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
-      # Executed AML Compute deployment when parameter deployment_type == 'aks'
+      # Executes AML Compute deployment when parameter deployment_type == 'aks'
       # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
@@ -117,7 +117,7 @@ jobs:
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
-      # Executed AML Compute deployment when parameter deployment_type == 'aks'
+      # Executes AML Compute deployment when parameter deployment_type == 'aks'
       # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Create local PF Connections 
@@ -131,10 +131,11 @@ jobs:
               --flow_to_execute ${{ inputs.flow_type }} \
               --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
-      #=====================================
-      # Executed AML Compute deployment when parameter deployment_type == 'aks'
-      # Reads 'azure_managed_endpoint' field values from deployment_config.json
-      #=====================================     
+        #=====================================
+        # Executes Azure Webapp deployment when parameter 
+        # deployment_type == 'webapp' using docke image
+        # Reads 'webapp_endpoint' field values from deployment_config.json
+        #=====================================     
       - name: Deploy to webapp
         if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/webapp_deployment

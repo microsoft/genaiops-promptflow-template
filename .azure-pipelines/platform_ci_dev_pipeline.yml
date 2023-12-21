@@ -198,7 +198,7 @@ stages:
               echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version" 
 
         #=====================================
-        # Executed Kubernetes deployment when parameter deployment_type == 'aks'
+        # Executes Kubernetes deployment when parameter deployment_type == 'aks'
         # Reads 'kubernetes_endpoint' field values from deployment_config.json
         #=====================================              
         - ${{ if eq(lower(parameters.deployment_type), 'aks') }}:
@@ -211,7 +211,7 @@ stages:
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         #=====================================
-        # Executed AML Compute deployment when parameter deployment_type == 'aml'
+        # Executes AML Compute deployment when parameter deployment_type == 'aml'
         # Reads 'azure_managed_endpoint' field values from deployment_config.json
         #=====================================     
         - ${{ if eq(lower(parameters.deployment_type), 'aml') }}:
@@ -225,7 +225,8 @@ stages:
 
 
         #=====================================
-        # Executed AML Compute deployment when parameter deployment_type == 'webapp'
+        # Executes Azure Webapp deployment when parameter 
+        # deployment_type == 'webapp' using docke image
         # Reads 'webapp_endpoint' field values from deployment_config.json
         #=====================================     
         - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
