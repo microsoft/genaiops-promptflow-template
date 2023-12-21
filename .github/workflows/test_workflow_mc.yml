@@ -1,4 +1,4 @@
-name: math_coding_ci_dev_workflow
+name: test_workflow_mc
 
 on:
   workflow_call:
