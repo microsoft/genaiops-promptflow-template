@@ -22,5 +22,6 @@ steps:
   inputs:
     azureSubscription: $(AZURE_RM_SVC_CONNECTION)
     scriptType: bash
-    scriptLocation: scriptPath
-    scriptPath: flow_to_execute=${{ parameters.FLOW_TO_EXECUTE }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.Buildid) CONNECTION_DETAILS=${{ parameters.CONNECTION_DETAILS }} ./llmops/common/scripts/az_webapp_deploy.sh 
+    scriptLocation: inlineScript
+    inlineScript: |
+      flow_to_execute=${{ parameters.FLOW_TO_EXECUTE }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.Buildid) CONNECTION_DETAILS=${{ parameters.CONNECTION_DETAILS }} ./llmops/common/scripts/az_webapp_deploy.sh 
