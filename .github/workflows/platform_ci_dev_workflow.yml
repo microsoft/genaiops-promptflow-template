@@ -17,6 +17,14 @@ on:
         type: string
         description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
+      connection_details:
+        type: string
+        description: "prompt flow connection details"
+        required: false
+      registry_details:
+        type: string
+        description: "prompt flow registry details"
+        required: false
     secrets:
       azure_credentials:
         description: "service principal authentication to Azure"
