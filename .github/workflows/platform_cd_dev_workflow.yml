@@ -126,7 +126,7 @@ jobs:
         with:
           step_name: "Create local PF connections"
           script_parameter: |
-            python -m llmops.common.prompt_local_aoai_connection \
+            python -m llmops.common.prompt_local_connections \
               --env_name ${{ inputs.env_name }} \
               --flow_to_execute ${{ inputs.flow_type }} \
               --connection_details '${{ secrets.CONNECTION_DETAILS }}'

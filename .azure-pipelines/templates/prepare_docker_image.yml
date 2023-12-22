@@ -12,7 +12,7 @@ steps:
   parameters:
     step_name: "Create local Connection"
     script_parameter: |
-      python -m llmops.common.prompt_local_aoai_connection \
+      python -m llmops.common.prompt_local_connections \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
         --flow_to_execute ${{ parameters.FLOW_TO_EXECUTE }} \
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
