@@ -1,20 +1,20 @@
 {
     "envs":[
-                {
+            {
                     "ENV_NAME": "pr",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "runtime-phhinder-llmops",
+                    "KEYVAULT_NAME": "wherethemagich5177025894",
+                    "RESOURCE_GROUP_NAME": "AI",
+                    "WORKSPACE_NAME": "wherethemagichappens",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation"
                 },
                 {
                     "ENV_NAME": "dev",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "runtime-phhinder-llmops",
+                    "KEYVAULT_NAME": "wherethemagich5177025894",
+                    "RESOURCE_GROUP_NAME": "AI",
+                    "WORKSPACE_NAME": "wherethemagichappens",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
