@@ -8,7 +8,6 @@ parameters:
 - name: REGISTRY_DETAILS
   type: string
 steps:
-- template: execute_python_code.yml
   parameters:
     step_name: "Create local Connection"
     script_parameter: |
