@@ -41,5 +41,20 @@
                 "example-name": "example-value"
             }
         }
+    ],
+    "webapp_endpoint":[
+        {
+            "ENV_NAME": "dev",
+            "TEST_FILE_PATH": "sample-request.json",
+            "CONNECTION_NAMES": ["aoai"],
+            "REGISTRY_NAME": "researchmlops",
+            "REGISTRY_RG_NAME": "mlops",
+            "APP_PLAN_NAME": "pfnerappplan",
+            "WEB_APP_NAME": "pfnerappweb",
+            "WEB_APP_RG_NAME": "pfwebapprg",
+            "WEB_APP_SKU": "B3",
+            "USER_MANAGED_ID": "pfwebappmid"
+            
+        }
     ]
 }
