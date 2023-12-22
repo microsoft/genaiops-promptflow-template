@@ -52,14 +52,14 @@ if [[ -n "$selected_object" ]]; then
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
     registry_object=$(echo $REGISTRY_DETAILS | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
-    register_server=$(echo "$registry_object" | jq -r '.register_server')
+    registry_server=$(echo "$registry_object" | jq -r '.registry_server')
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
 
-    docker login "$register_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-    docker tag localpf "$register_server"/"$flow_to_execute"_"$deploy_environment":$build_id
-    docker push "$register_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
         
     else
         echo "Object in config file not found"
