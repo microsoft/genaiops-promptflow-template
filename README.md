@@ -79,7 +79,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 
 # Deployment
 
-The repo helps in deploying to **Kubernetes, Kubernetes ARC and AzureML Managed compute** along with **A/B deployment** for them.
+The repo helps in deploying to **Kubernetes, Kubernetes ARC , Azure Web Apps and AzureML Managed compute** along with **A/B deployment** for AzureML Managed compute.
 
 ![Deployment](./docs/images/endpoints.png)
 

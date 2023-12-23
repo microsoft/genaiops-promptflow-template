@@ -6,7 +6,7 @@ This template supports Azure Machine Learning (ML) as a platform for LLMOps, and
 * Running multiple Prompt flow evaluations to ensure results are high quality
 * Registering of prompt flow models
 * Deployment of prompt flow models
-* Deployment to Kubernetes and/or Azure ML compute
+* Deployment to Kubernetes, web app and Azure ML compute
 * A/B deployments
 * Role based access control (RBAC) permissions to deployment system managed id to key vault and Azure ML workspace
 * Endpoint testing
@@ -23,7 +23,7 @@ It is recommended to understand how [Prompt flow works](https://learn.microsoft.
 - Azure OpenAI with Model deployed with name `gpt-35-turbo`.
 - In case of Kubernetes based deployment, Kubernetes resources and associating it with Azure Machine Learning workspace would be required. More details about using Kubernetes as compute in AzureML is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-attach-kubernetes-anywhere?view=azureml-api-2).
 
-The template deploys real-time online endpoints for flows. These endpoints have Managed ID assigned to them and in many cases they need access to Azure Machine learning workspace and its associated key vault. The template by default provides access to both the key vault and Azure Machine Learning workspace based on this [document](https://learn.microsoft.com/en-ca/azure/machine-learning/prompt-flow/how-to-deploy-for-real-time-inference?view=azureml-api-2#grant-permissions-to-the-endpoint)
+The template deploys real-time online endpoints for flows. These endpoints have Managed ID assigned to them and in many cases they need access to Azure Machine learning workspace and its associated key vault. The template by default provides access to both the key vault and Azure Machine Learning workspace based on this [document](https://learn.microsoft.com/en-ca/azure/machine-learning/prompt-flow/how-to-deploy-for-real-time-inference?view=azureml-api-2#grant-permissions-to-the-endpoint).
 
 ## Create Azure service principal
 
@@ -253,6 +253,51 @@ The configuration for connection used while authoring the repo:
 
 ![connection details](images/connection-details.png)
 
+## Set up Secrets in GitHub
+
+### Prompt Flow Connection
+
+Create a Github repository secret named 'COMMON_DEV_CONNECTIONS' with information related to Prompt Flow connections. The value for this secret is a json string with given structure. Create one json object for each connection. As of now, Azure Open AI Connections are supported and more will get added soon. Information for each connection can be obtained from Azure OpenAI resource.
+
+```json
+[
+{
+	"name": "aoai",
+	"type": "azure_open_ai",
+    "api_base": "https://qweqeqweqwe/",
+    "api_key": "xxxxxxxxxxxx",
+    "api_type": "azure",
+    "api_version": "2023-03-15-preview"
+},
+{
+	"name": "another_connection",
+	"type": "azure_open_ai",
+    "api_base": "https://asdasdwqedsfsdfsdf/",
+    "api_key": "xxxxxxxxxxxx",
+    "api_type": "azure",
+    "api_version": "2023-03-15-preview"
+}
+]
+
+```
+
+### Azure Container Registry
+
+Create another Github repository secret named 'DOCKER_IMAGE_REGISTRY' with information related to Docker Image Registry. The value for this secret is also a json string with given structure. Create one json object for each registry. As of now, Azure Container Registry are supported and more will get added soon. Information for each registry can be obtained from Azure Container Registry resource.
+
+
+```json
+[
+	{
+		"registry_name" : "xxxxxxxx",
+		"register_server" : "xxxx.azurecr.io",
+		"registry_username" : "xxxxxxxxx",
+		"registry_password": "xxxxxxxxxxxxxx"
+	}
+]
+
+```
+
 ## Cloning the repo
 
  Now, we can clone the forked repo on your local machine using command shown here. Replace the repo url with your url.
@@ -274,7 +319,7 @@ git checkout -b featurebranch
 
 ```
 
-Update code so that we can create a pull request. Update the `llmops_config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file.
+Update the `llmops_config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file  for deployment to Azure Machine Learning compute. Update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`,  and `USER_MANAGED_ID` in `configs/deployment_config.json` file  for deployment to Azure Web App.
 
 ### Update llmops_config.json
 
@@ -310,6 +355,20 @@ Modify the configuration values in the `deployment_config.json` file for each en
 - `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
 
 Kubernetes deployments have additional properties - `COMPUTE_NAME`, `DEPLOYMENT_VM_SIZE`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements. These should also be updates with your values before executing Kubernetes based deployments.
+
+Azure Web APP deployments do not have similar properties as that of Kubernetes and Azure ML compute. For Azure Web App, following properties should be updated.
+
+- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
+- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model.
+- `CONNECTION_NAMES`: The name of the connections used in standard flow in json aray format. e.g. ["aoai", "another_connection"],
+- `REGISTRY_NAME`: This is the name of the Container Registry that is available in the `DOCKER_IMAGE_REGISTRY` secret. Based on this name, appropriate registry details will be used for `Docker` image management.
+- `REGISTRY_RG_NAME`: This is the name of the resource group related to the Container Registry. It is used for downloading the Docker Image.
+- `APP_PLAN_NAME`: TName of the App Services plan. It will be provisioned by the pipeline.
+- `WEB_APP_NAME`: Name of the web app. It will be provisioned by the pipeline.
+- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and web app. It will be provisioned by the pipeline.
+- `WEB_APP_SKU`: This is the `SKU` (size) of the web app. e.g. "B3"
+- `USER_MANAGED_ID`: This is the name of the user defined managed id created during deployment associated with the web app.
+
 
 Now, push the new feature branch to the newly forked repo.
 
