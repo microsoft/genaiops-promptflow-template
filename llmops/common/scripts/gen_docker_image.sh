@@ -4,6 +4,8 @@
 # This script generates docker image for Prompt flow deployment
 
 set -e # fail on error
+
+# read values from llmops_config.json related to given environment
 config_path="./$flow_to_execute/llmops_config.json"
 env_name=$deploy_environment
 selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
@@ -15,6 +17,7 @@ if [[ -n "$selected_object" ]]; then
 
     cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
 
+    # docker build the prompt flow based image
     docker build -t localpf "./$flow_to_execute/docker" --no-cache
         
     docker images

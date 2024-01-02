@@ -6,7 +6,7 @@ This template supports Azure Machine Learning (ML) as a platform for LLMOps, and
 * Running multiple Prompt flow evaluations to ensure results are high quality
 * Registering of prompt flow models
 * Deployment of prompt flow models
-* Deployment to Kubernetes, web app and Azure ML compute
+* Deployment to Kubernetes, Azure Web Apps and Azure ML compute
 * A/B deployments
 * Role based access control (RBAC) permissions to deployment system managed id to key vault and Azure ML workspace
 * Endpoint testing
@@ -48,6 +48,8 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
 1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
+
+`NOTE: The below information should never be part of your repository and its branches. These are important secrets and should never be pushed to any branch in any repository.`
 
     ```json
 
@@ -264,7 +266,7 @@ Create a Github repository secret named 'COMMON_DEV_CONNECTIONS' with informatio
 {
 	"name": "aoai",
 	"type": "azure_open_ai",
-    "api_base": "https://qweqeqweqwe/",
+    "api_base": "https://xxxxxxxxxxx/",
     "api_key": "xxxxxxxxxxxx",
     "api_type": "azure",
     "api_version": "2023-03-15-preview"
@@ -272,7 +274,7 @@ Create a Github repository secret named 'COMMON_DEV_CONNECTIONS' with informatio
 {
 	"name": "another_connection",
 	"type": "azure_open_ai",
-    "api_base": "https://asdasdwqedsfsdfsdf/",
+    "api_base": "https://xxxxxxxxxxxx/",
     "api_key": "xxxxxxxxxxxx",
     "api_type": "azure",
     "api_version": "2023-03-15-preview"
@@ -356,7 +358,7 @@ Modify the configuration values in the `deployment_config.json` file for each en
 
 Kubernetes deployments have additional properties - `COMPUTE_NAME`, `DEPLOYMENT_VM_SIZE`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements. These should also be updates with your values before executing Kubernetes based deployments.
 
-Azure Web APP deployments do not have similar properties as that of Kubernetes and Azure ML compute. For Azure Web App, following properties should be updated.
+Azure Web App deployments do not have similar properties as that of Kubernetes and Azure ML compute. For Azure Web App, following properties should be updated.
 
 - `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
 - `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model.
@@ -364,11 +366,12 @@ Azure Web APP deployments do not have similar properties as that of Kubernetes a
 - `REGISTRY_NAME`: This is the name of the Container Registry that is available in the `DOCKER_IMAGE_REGISTRY` secret. Based on this name, appropriate registry details will be used for `Docker` image management.
 - `REGISTRY_RG_NAME`: This is the name of the resource group related to the Container Registry. It is used for downloading the Docker Image.
 - `APP_PLAN_NAME`: TName of the App Services plan. It will be provisioned by the pipeline.
-- `WEB_APP_NAME`: Name of the web app. It will be provisioned by the pipeline.
-- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and web app. It will be provisioned by the pipeline.
-- `WEB_APP_SKU`: This is the `SKU` (size) of the web app. e.g. "B3"
-- `USER_MANAGED_ID`: This is the name of the user defined managed id created during deployment associated with the web app.
+- `WEB_APP_NAME`: Name of the Web App. It will be provisioned by the pipeline.
+- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and Web App. It will be provisioned by the pipeline.
+- `WEB_APP_SKU`: This is the `SKU` (size) of the Web App. e.g. "B3"
+- `USER_MANAGED_ID`: This is the name of the user defined managed id created during deployment associated with the Web App.
 
+`NOTE: For Docker based deployments, ensure to add promptflow, promptflow[azure], promptflow-tools packages in each flow's requirements.txt file`. Check-out existing use-cases (named_entity_recognition, math_coding, web_classification) for examples.`
 
 Now, push the new feature branch to the newly forked repo.
 
