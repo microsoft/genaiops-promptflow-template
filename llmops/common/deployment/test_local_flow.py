@@ -36,12 +36,21 @@ max_retries = 3
 retry_delay = 2
 for attempt in range(max_retries):
     try:
-        response = requests.post(url, data=json.dumps(json_data), headers=headers, timeout=30)
+        response = requests.post(
+            url,
+            data=json.dumps(json_data),
+            headers=headers,
+            timeout=30
+        )
+
         if response.status_code == 200:
-            print("POST request successful!")
-            print("Response:", response.json())  # Print the response content
+            logger.info("POST request successful!")
+            # Print the response content
+            logger.info("Response:", response.json())
         else:
-            print("POST request failed with status code:", response.status_code)        
+            logger.info(
+                "POST request failed with status code:", response.status_code
+                )
     except (requests.exceptions.RequestException, ConnectionResetError) as e:
-        print(f"Error occurred: {e}")
+        logger.info(f"Error occurred: {e}")
         time.sleep(retry_delay)

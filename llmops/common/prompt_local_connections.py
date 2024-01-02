@@ -29,7 +29,7 @@ logger = llmops_logger("prompt_aoai_connection")
 def prepare_and_execute(
     flow_to_execute,
     stage,
-    connection_details, 
+    connection_details,
 ):
     """
     Run the evaluation loop by executing evaluation flows.
@@ -49,10 +49,9 @@ def prepare_and_execute(
 
     for obj in model_config["envs"]:
         if obj.get("ENV_NAME") == stage:
-            config = obj
+            logger.info("valid environment is found")
             break
 
-    standard_flow_path = config["STANDARD_FLOW_PATH"]
     dep_config = f"{flow_to_execute}/configs/deployment_config.json"
     config_file = open(dep_config)
 
@@ -77,7 +76,9 @@ def prepare_and_execute(
                                 )
                                 pf.connections.create_or_update(connection)
 
-                                logger.info(f"connection {avail_con['name']} created successfully!")
+                                logger.info(
+                                    f"{avail_con['name']} created successfully"
+                                    )
 
 
 def main():
@@ -109,7 +110,6 @@ def main():
         help="details of local pf connection name",
         required=True,
     )
-    
 
     args = parser.parse_args()
 
