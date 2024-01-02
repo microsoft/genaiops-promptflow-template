@@ -21,9 +21,9 @@
             {
                 "ENV_NAME": "postprodeval",
                 "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "newresearchmlo2998779544",
-                "RESOURCE_GROUP_NAME": "mlops",
-                "WORKSPACE_NAME": "newresearchmlops",
+                "KEYVAULT_NAME": "",
+                "RESOURCE_GROUP_NAME": "",
+                "WORKSPACE_NAME": "",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
