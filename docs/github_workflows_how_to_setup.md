@@ -365,7 +365,7 @@ Azure Web App deployments do not have similar properties as that of Kubernetes a
 - `CONNECTION_NAMES`: The name of the connections used in standard flow in json aray format. e.g. ["aoai", "another_connection"],
 - `REGISTRY_NAME`: This is the name of the Container Registry that is available in the `DOCKER_IMAGE_REGISTRY` secret. Based on this name, appropriate registry details will be used for `Docker` image management.
 - `REGISTRY_RG_NAME`: This is the name of the resource group related to the Container Registry. It is used for downloading the Docker Image.
-- `APP_PLAN_NAME`: TName of the App Services plan. It will be provisioned by the pipeline.
+- `APP_PLAN_NAME`: Name of the App Services plan. It will be provisioned by the pipeline.
 - `WEB_APP_NAME`: Name of the Web App. It will be provisioned by the pipeline.
 - `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and Web App. It will be provisioned by the pipeline.
 - `WEB_APP_SKU`: This is the `SKU` (size) of the Web App. e.g. "B3"
