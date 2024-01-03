@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "promptflow-llmops-runtime",
+                "KEYVAULT_NAME": "openaisamplews6276468618",
+                "RESOURCE_GROUP_NAME": "opai-example-rg",
+                "WORKSPACE_NAME": "openaisamplews",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "promptflow-llmops-runtime",
+                "KEYVAULT_NAME": "openaisamplews6276468618",
+                "RESOURCE_GROUP_NAME": "opai-example-rg",
+                "WORKSPACE_NAME": "openaisamplews",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "promptflow-llmops-runtime",
+                "KEYVAULT_NAME": "openaisamplews6276468618",
+                "RESOURCE_GROUP_NAME": "opai-example-rg",
+                "WORKSPACE_NAME": "openaisamplews",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
