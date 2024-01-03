@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtime-pf-llmops",
+                "KEYVAULT_NAME": "azureml239999794194",
+                "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
+                "WORKSPACE_NAME": "AzureML_23",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtime-pf-llmops",
+                "KEYVAULT_NAME": "azureml239999794194",
+                "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
+                "WORKSPACE_NAME": "AzureML_23",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "runtime-pf-llmops",
+                "KEYVAULT_NAME": "azureml239999794194",
+                "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
+                "WORKSPACE_NAME": "AzureML_23",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
