@@ -95,7 +95,7 @@ jobs:
       # Reads 'kubernetes_endpoint' field values from deployment_config.json
       #=====================================             
       - name: Deploy to AML real-time online endpoint
-        if: ${{ github.event.inputs.deployment_type == 'aml'  }}
+        if: ${{ inputs.deployment_type == 'aml'  }}
         uses: ./.github/actions/aml_real_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
@@ -108,7 +108,7 @@ jobs:
       # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
-        if: ${{ github.event.inputs.deployment_type == 'aks'  }}  
+        if: ${{ inputs.deployment_type == 'aks'  }}  
         uses: ./.github/actions/kubernetes_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
@@ -121,7 +121,7 @@ jobs:
       # Uses secret CONNECTION_DETAILS for creating connections
       #=====================================     
       - name: Create local PF Connections 
-        if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
+        if: ${{ inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/execute_script
         with:
           step_name: "Create local PF connections"
@@ -137,7 +137,7 @@ jobs:
         # Reads 'webapp_endpoint' field values from deployment_config.json
         #=====================================     
       - name: Deploy to webapp
-        if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
+        if: ${{ inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/webapp_deployment
         with:
           FLOW_TO_EXECUTE: ${{ inputs.flow_type }}

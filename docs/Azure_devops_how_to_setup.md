@@ -284,7 +284,7 @@ It is important to note that there can be any number of variables and each stori
 [
 	{
 		"registry_name" : "xxxxxxxx",
-		"register_server" : "xxxx.azurecr.io",
+		"registry_server" : "xxxx.azurecr.io",
 		"registry_username" : "xxxxxxxxx",
 		"registry_password": "xxxxxxxxxxxxxx"
 	}
