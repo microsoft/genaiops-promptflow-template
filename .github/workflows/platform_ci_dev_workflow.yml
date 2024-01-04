@@ -25,6 +25,11 @@ on:
         type: string
         description: "prompt flow registry details"
         required: false
+      execution_mode:
+        type: string
+        description: "execution mode can either be experiment or deployment"
+        default: "experiment"
+        required: false
     secrets:
       azure_credentials:
         description: "service principal authentication to Azure"
@@ -155,6 +160,7 @@ jobs:
   # Execute platform_cd_dev_workflow flow for deployment of flows
   #=====================================
   deploy-flow:
+    if: ${{ github.event.inputs.execution_mode == 'deployment'  }}  
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     needs: flow-experiment-and_evaluation
     with:

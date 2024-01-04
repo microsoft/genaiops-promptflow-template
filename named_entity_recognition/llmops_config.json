@@ -12,9 +12,9 @@
             {
                 "ENV_NAME": "dev",
                 "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "KEYVAULT_NAME": "newresearchmlo2998779544",
+                "RESOURCE_GROUP_NAME": "mlops",
+                "WORKSPACE_NAME": "newresearchmlops",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
