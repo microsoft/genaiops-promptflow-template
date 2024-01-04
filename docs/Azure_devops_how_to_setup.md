@@ -1,18 +1,19 @@
 # How to setup the repo with Azure DevOps
 
-This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Azure DevOps pipelines as a platform for Flow operationalization. LLMOps with Prompt Flow provides automation of:
+This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Azure DevOps pipelines as a platform for Flow operationalization. LLMOps with Prompt flow provides automation of:
 
-* Running Prompt flow after a Pull Request
-* Running multiple Prompt flow evaluation to ensure results are high quality 
-* Registering of prompt flow models
-* Deployment of prompt flow models
-* Deployment to Kubernetes and/or Azure ML compute
+* Experimentation by executing prompt flow 'flows'
+* Evaluation of prompts along with their variants  
+* Registration of prompt flow 'flows'
+* Deployment of prompt flow 'flows'
+* Generation of Docker Image
+* Deployment to Kubernetes, Azure Web Apps and Azure ML compute
 * A/B deployments
 * Role based access control (RBAC) permissions to deployment system managed id to key vault and Azure ML workspace
 * Endpoint testing
 * Report generation
 
-It is recommended to understand how [Prompt flow works](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/get-started-prompt-flow?view=azureml-api-2) before using this template.
+It is important to understand how [Prompt flow works](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/get-started-prompt-flow?view=azureml-api-2) before using this template.
 
 ## Prerequisites
 
@@ -27,7 +28,7 @@ The template deploys real-time online endpoints for flows. These endpoints have 
 
 ## Setup connections for Prompt flow 
 
-Prompt Flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
+Prompt flow Connections helps securely store and manage secret keys or other sensitive credentials required for interacting with LLM and other external tools for example Azure OpenAI.
 
 This repository has 3 examples and all the examples uses connection named `aoai` inside, we need to set up a connection with this name if we haven’t created it before.
 
@@ -35,7 +36,7 @@ This repository has all the examples using Azure OpenAI model `gpt-35-turbo` dep
 
 Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Azure OpenAI`, then follow the instruction to create your own connections called `aoai`. Learn more on [connections](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/concept-connections?view=azureml-api-2). The samples uses a connection named "aoai" connecting to a gpt-35-turbo model deployed with the same name in Azure OpenAI. This connection should be created before executing the out-of-box flows provided with the template.
 
-  ![aoai connection in Prompt Flow](images/connection.png)
+  ![aoai connection in Prompt flow](images/connection.png)
 
 The configuration for connection used while authoring the repo:
 
@@ -64,7 +65,9 @@ Create an Azure service principal for the purpose of working with this repositor
 
 1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
-1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
+1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub. 
+
+`NOTE: The below information should never be part of your repository and its branches. These are important secrets and should never be pushed to any branch in any repository.`
 
     ```json
 
@@ -88,9 +91,9 @@ Create an Azure service principal for the purpose of working with this repositor
 
 ## Setup runtime for Prompt flow 
 
-Prompt Flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt Flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal. 
+Prompt flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal. 
 
-Compute Instances and Prompt Flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
+Compute Instances and Prompt flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
 
 ### Steps:
 
@@ -241,9 +244,57 @@ Create a new variable group `llmops_platform_dev_vg` ([follow the documentation]
 
 ![Variable group](./images/variable-group.png)
 
+## Set up addition Variables in Azure DevOps
+
+### Prompt flow Connection variable
+
+Create a variable named 'COMMON_DEV_CONNECTIONS' within the llmops_platform_dev_vg variable group with information related to Prompt flow connections. The value for this secret is a json string with given structure as shown next. Create one json object for each connection as shown in example. As of now, Azure Open AI Connections are supported and more will get added soon. Information for each connection can be obtained from respective Azure OpenAI resource.
+
+It is important to note that there can be any number of variables and each storing Prompt flow connection details as shown next and they can be named anything permissible based on your preference. You should use the same variable in your use-case related CI pipelines. The template by default uses 'COMMON_DEV_CONNECTIONS' for this purpose.
+
+```json
+[
+{
+	"name": "aoai",
+	"type": "azure_open_ai",
+    "api_base": "https://xxxxxxxxxx/",
+    "api_key": "xxxxxxxxxxxx",
+    "api_type": "azure",
+    "api_version": "2023-03-15-preview"
+},
+{
+	"name": "another_connection",
+	"type": "azure_open_ai",
+    "api_base": "https://xxxxxxxxxxxx/",
+    "api_key": "xxxxxxxxxxxx",
+    "api_type": "azure",
+    "api_version": "2023-03-15-preview"
+}
+]
+
+```
+
+### Azure Container Registry variable
+
+Create another variable named 'DOCKER_IMAGE_REGISTRY' within the `llmops_platform_dev_vg` variable group with information related to Docker Image Registry. The value for this secret is also a json string with given structure. Create one json object for each available registry. As of now, Azure Container Registry are supported and more will get added soon. Information for each registry can be obtained from Azure Container Registry resource.
+
+It is important to note that there can be any number of variables and each storing Azure Container Registry details as shown next and they can be named anything permissible based on your preference. You should use the same variable in your use-case related CI pipelines. The template by default uses 'DOCKER_IMAGE_REGISTRY' for this purpose.
+
+```json
+[
+	{
+		"registry_name" : "xxxxxxxx",
+		"register_server" : "xxxx.azurecr.io",
+		"registry_username" : "xxxxxxxxx",
+		"registry_password": "xxxxxxxxxxxxxx"
+	}
+]
+
+```
+
 ## Configure Azure DevOps local and remote repository
 
-Clone this Github Repository [LLMOps Prompt Flow Template](https://github.com/microsoft/llmops-promptflow-template) locally on your workstation. This repo has reusable LLMOps code that can be used across multiple projects. 
+Clone this Github Repository [LLMOps Prompt flow Template](https://github.com/microsoft/llmops-promptflow-template) locally on your workstation. This repo has reusable LLMOps code that can be used across multiple projects. 
 
 ``` bash
 git clone --branch main https://github.com/microsoft/llmops-promptflow-template.git
@@ -261,7 +312,7 @@ git remote set-url origin https://yoururl@dev.azure.com/yoururl/test-llmops-temp
 git push --all
 ```
 
-As a result the code for LLMOps Prompt Flow template will now be available in Azure DevOps repository. 
+As a result the code for LLMOps Prompt flow template will now be available in Azure DevOps repository. 
 
   ![repo-status](images/devops-branch.png)
 
@@ -272,7 +323,7 @@ As a result the code for LLMOps Prompt Flow template will now be available in Az
 
 6. Create two Azure Pipelines [[how to create a basic Azure Pipeline](https://learn.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs)] for each scenario (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files:
 
-- The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt Flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
+- The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
 
 - The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
 
@@ -326,14 +377,14 @@ From local machine, create a new git branch `featurebranch` from `development` b
 git checkout -b featurebranch
 ```
 
-Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file.
+ Update the `llmops_config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file  for deployment to Azure Machine Learning compute. Update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`,  and `USER_MANAGED_ID` in `configs/deployment_config.json` file  for deployment to Azure Web App.
 
 ### Update llmops_config.json
 
 Modify the configuration values in `llmops_config.json` file available for each example based on description. Update the `KEYVAULT_NAME`, `RESOURCE_GROUP_NAME` and Azure Machine Learning `WORKSPACE_NAME`.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is name of a Prompt Flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
+- `RUNTIME_NAME`:  This is name of a Prompt flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
 - `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
 - `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
@@ -356,12 +407,27 @@ Modify the configuration values in `deployment_config.json` file for each enviro
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
 - `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment. A value of 100 indicates that all traffic is directed to this deployment.
 - `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
-- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt Flow runtime.
+- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt flow runtime.
 -  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
 - `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
 - `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
 
 Kubernetes deployments have additional properties - `COMPUTE_NAME`, `DEPLOYMENT_VM_SIZE`, `CPU_ALLOCATION` and `MEMORY_ALLOCATION` related to infrastructure and resource requirements. These should also be updates with your values before executing Kubernetes based deployments.
+
+Azure Web App deployments do not have similar properties as that of Kubernetes and Azure ML compute. For Azure Web App, following properties should be updated.
+
+- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
+- `TEST_FILE_PATH`: The value represents the file path containing sample input used for testing the deployed model.
+- `CONNECTION_NAMES`: The name of the connections used in standard flow in json aray format. e.g. ["aoai", "another_connection"].
+- `REGISTRY_NAME`: This is the name of the Container Registry that is available in the `DOCKER_IMAGE_REGISTRY` variable in `llmops_platform_dev_vg` variable group. Based on this name, appropriate registry details will be used for `Docker` image management.
+- `REGISTRY_RG_NAME`: This is the name of the resource group related to the Container Registry. It is used for downloading the Docker Image.
+- `APP_PLAN_NAME`: Name of the App Services plan. It will be provisioned by the pipeline.
+- `WEB_APP_NAME`: Name of the Web App. It will be provisioned by the pipeline.
+- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and Web App. It will be provisioned by the pipeline.
+- `WEB_APP_SKU`: This is the `SKU` (size) of the Web App. e.g. "B3"
+- `USER_MANAGED_ID`: This is the name of the user defined managed id created during deployment associated with the Web App.
+
+`NOTE: For Docker based deployments, ensure to add promptflow, promptflow[azure], promptflow-tools packages in each flow's requirements.txt file`. Check-out existing use-cases (named_entity_recognition, math_coding, web_classification) for examples.`
 
 Now, push the new feature branch to the newly forked repo.
 
@@ -388,7 +454,7 @@ Now a new PR can be opened from `development` branch to the `main` branch. This 
 
 ## Update more configurations for Prompt flow and Azure DevOps pipeline
 
-There are multiple configuration files for enabling Prompt Flow run and evaluation in Azure ML and Azure DevOps pipelines.
+There are multiple configuration files for enabling Prompt flow run and evaluation in Azure ML and Azure DevOps pipelines.
 
 ### Update mapping_config.json in config folder
 
@@ -410,7 +476,7 @@ Modify the configuration values in data_config.json file based on the environmen
 
 ### Update data folder with data files
 
-Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt Flows.
+Add your data into data folder under use case folder. It supports jsonl files and the examples already contains data files for both running and evaluating Prompt flows.
 
 ### Update Standard and evaluation flows
 
@@ -449,8 +515,8 @@ This Azure DevOps CI pipelines contains the following steps:
 **Manual Approval**
 - approval required before deployment 
 
-**Register Prompt Flow LLM App**
-- Register Prompt Flow as a Model in Azure Machine Learning Model Registry
+**Register Prompt flow LLM App**
+- Register Prompt flow as a Model in Azure Machine Learning Model Registry
 
 **Deploy and Test LLM App**
 - Deploy the Flow as a model to development environment either as Kubernetes or Azure ML Compute endpoint
@@ -471,6 +537,6 @@ This Azure DevOps CI pipelines contains the following steps:
 
 ## Moving to production
 
-The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt Flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
+The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
 
 The sample Prompt flow run & evaluation and Azure DevOps pipelines can be used as a starting point to adapt your own prompt engineering code and data.

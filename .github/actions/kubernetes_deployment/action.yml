@@ -1,4 +1,4 @@
-name: aml_real_deployment
+name: kubernetes_deployment
 
 description: execute an online endpoint for real time inference
 
