@@ -16,15 +16,35 @@ storing model version number.
 """
 
 import argparse
-import shutil
 import os
 import json
+import hashlib
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
 
 from llmops.common.logger import llmops_logger
-logger = llmops_logger("register_model")
+logger = llmops_logger("register_flow")
+
+
+def hash_folder(folder_path):
+    """
+    Generate hash for entire folder.
+
+    Returns:
+        hash as string
+    """
+    sha256 = hashlib.sha256()
+
+    for root, _, files in os.walk(folder_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            with open(file_path, 'rb') as f:
+                file_content = f.read()
+                sha256.update(file_content)
+
+    return sha256.hexdigest()
+
 
 parser = argparse.ArgumentParser("register Flow")
 parser.add_argument(
@@ -64,6 +84,7 @@ args = parser.parse_args()
 
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
+subscription_id = args.subscription_id
 model_name = f"{flow_to_execute}_{stage}"
 build_id = args.build_id
 output_file = args.output_file
@@ -82,19 +103,15 @@ model_path = config["STANDARD_FLOW_PATH"]
 
 logger.info(f"Model name: {model_name}")
 
-
-if os.path.exists(f"{flow_to_execute}/flow.dag.yaml"):
-    file_to_replace = "flow.dag.yaml"
-    source_path = os.path.join(os.getcwd(), f"{flow_to_execute}/flow.dag.yaml")
-    destination_path = os.path.join(os.getcwd(), model_path, file_to_replace)
-    shutil.copy(source_path, destination_path)
-
 ml_client = MLClient(
     DefaultAzureCredential(),
-    args.subscription_id,
+    subscription_id,
     resource_group_name,
     workspace_name
 )
+
+model_hash = hash_folder(f"{flow_to_execute}/{model_path}")
+print("Hash of the folder:", model_hash)
 
 model = Model(
     name=model_name,
@@ -105,10 +122,27 @@ model = Model(
         f"prompt flow deployment"
         ),
     properties={"azureml.promptflow.source_flow_id": flow_to_execute},
-    tags={"build_id": build_id},
+    tags={"build_id": build_id, "model_hash": model_hash},
 )
 
-model_info = ml_client.models.create_or_update(model)
+try:
+    model_info = ml_client.models.get(
+        name=model_name,
+        label='latest'
+    )
+    m_hash = dict(model_info.tags).get("model_hash")
+    if m_hash is not None:
+        if m_hash != model_hash:
+            ml_client.models.create_or_update(model)
+    else:
+        ml_client.models.create_or_update(model)
+except Exception:
+    ml_client.models.create_or_update(model)
+
+model_info = ml_client.models.get(
+        name=model_name,
+        label='latest'
+    )
 
 if output_file is not None:
     with open(output_file, "w") as out_file:
