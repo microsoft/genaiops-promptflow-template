@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This tutorial will guide you through the process of operationalizing of a LLM flow using Prompt Flow.
+This tutorial will guide you through the process of operationalizing of a LLM flow using Prompt flow.
 
 ## Prerequisites
 
