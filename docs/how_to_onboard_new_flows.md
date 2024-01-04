@@ -1,16 +1,16 @@
 # How to Onboard new flow
 
-Welcome to the process of onboarding a new Prompt Flow `flow`! The content here will guide you through all the necessary steps and provide detailed instructions for adding a new flow to your factory's repository.
+Welcome to the process of onboarding a new Prompt flow `flow`! The content here will guide you through all the necessary steps and provide detailed instructions for adding a new flow to your factory's repository.
 
 ## Prerequisites
 
 Before you begin the onboarding process, ensure you have the following prerequisites in place:
 
-**Prompt Flow Environment:** Azure DevOps project/Github repository along with Azure resources are provisioned before on-boarding new flows.
+**Prompt flow Environment:** Azure DevOps project/Github repository along with Azure resources are provisioned before on-boarding new flows.
 
-**New Flow:** You should already have the Prompt Flow standard and evaluation flows. These are the custom flows that you've developed.
+**New Flow:** You should already have the Prompt flow standard and evaluation flows. These are the custom flows that you've developed.
 
-**Experience with Prompt Flow and examples in this template:** New Flows should be on-boarded only after you get comfortable with the example flows in this repo and are able to execute them successfully either through Azure DevOps or Github workflows.
+**Experience with Prompt flow and examples in this template:** New Flows should be on-boarded only after you get comfortable with the example flows in this repo and are able to execute them successfully either through Azure DevOps or Github workflows.
 
 ## Steps to Onboard new Flows
 
@@ -41,4 +41,4 @@ paths in `trigger and pr section` and the `default value` for `flow_to_execute` 
 
 **Write tests in tests folder:** The `tests` folder contains unit test implementation for the flows. These are python tests that will get executed as part of PR pipelines.
 
-**Update sample-request.json:** Create a new file 'sample-request.json' containing data needed to test a Prompt Flow endpoint after deployment from within the pipelines.
+**Update sample-request.json:** Create a new file 'sample-request.json' containing data needed to test a Prompt flow endpoint after deployment from within the pipelines.

@@ -1,0 +1,20 @@
+name: prep_docker_image
+
+description: Creates a new docker images for PF deployment
+
+inputs:
+  FLOW_TO_EXECUTE:
+    description: "the flow to be registered and deployed"
+    required: true
+  DEPLOY_ENVIRONMENT:
+    description: "env stage e.g. dev, test, prod"
+    required: true
+
+
+
+runs:
+  using: composite
+  steps:
+    - name: create docker image
+      shell: bash
+      run: flow_to_execute=${{ inputs.FLOW_TO_EXECUTE }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/gen_docker_image.sh 

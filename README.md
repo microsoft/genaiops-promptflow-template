@@ -1,4 +1,4 @@
-# LLMOps with Prompt Flow (preview)
+# LLMOps with Prompt flow (preview)
 Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
@@ -19,11 +19,11 @@ As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingl
 
 - LLM-infused applications are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that need engineering cadence and rigour.
 - Prompt flow is a powerful feature that simplifies and streamlines the Prompt Engineering process for LLM-infused applications. It enables users to create, evaluate, and deploy high-quality flows with ease and efficiency.
-- How do we best augment LLM-infused applications with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt Flow and LLMOps.
+- How do we best augment LLM-infused applications with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt flow and LLMOps.
 
 # Solution
 
-That's where **LLMOps with Prompt Flow** comes in. LLMOps with Prompt Flow is a "LLMOps template and guidance" to help you build LLM-infused apps using Prompt Flow. It provides the following features:
+That's where **LLMOps with Prompt flow** comes in. LLMOps with Prompt flow is a "LLMOps template and guidance" to help you build LLM-infused apps using Prompt flow. It provides the following features:
 
 - **Centralized Code Hosting:** This repo supports hosting code for multiple flows based on prompt flow, providing a single repository for all your flows. Think of this platform as a single repository where all your prompt flow code resides. It's like a library for your flows, making it easy to find, access, and collaborate on different projects.
 
@@ -46,17 +46,17 @@ That's where **LLMOps with Prompt Flow** comes in. LLMOps with Prompt Flow is a 
 - Endpoint testing within pipeline after deployment to check its availability and readiness.
 - Provides optional Human-in-loop to validate prompt metrics before deployment.
 
-LLMOps with Prompt Flow provides capabilities for both simple as well as complex LLM-infused apps. It is completely customizable to the needs of the application.
+LLMOps with Prompt flow provides capabilities for both simple as well as complex LLM-infused apps. It is completely customizable to the needs of the application.
 
 # Folder structure
 
-Each use case (set of Prompt Flow standard and evaluation flows) should follow the folder structure as shown here:
+Each use case (set of Prompt flow standard and evaluation flows) should follow the folder structure as shown here:
 
 - .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
 - configs          : It contains data, deployment, and prompt flow data mapping related configuration files.
-- data             : This folder contains data files related to Prompt Flow standard and evaluation flow
+- data             : This folder contains data files related to Prompt flow standard and evaluation flow
 - environment      : It contains a Conda file for python package dependencies needed for deployment environment.
-- flows            : It should contain minimally two folder - one for standard Prompt Flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
+- flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
 Additionally, there is a llmops_config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
@@ -79,7 +79,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 
 # Deployment
 
-The repo helps in deploying to **Kubernetes, Kubernetes ARC and AzureML Managed compute** along with **A/B deployment** for them.
+The repo helps in deploying to **Kubernetes, Kubernetes ARC , Azure Web Apps and AzureML Managed compute** along with **A/B deployment** for AzureML Managed compute.
 
 ![Deployment](./docs/images/endpoints.png)
 

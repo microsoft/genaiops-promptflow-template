@@ -4,8 +4,12 @@ parameters:
    default: "dev"
  - name: flow_to_execute
    displayName: "type of model to execute"
- - name: IS_KUBERNETES_DEPLOYMENT
-   displayName: "determine managed or kubernetes deployment"
+ - name: deployment_type
+   displayName: "determine type of deployment - aks, aml, docker, webapp"
+ - name: connection_details
+   displayName: "determine the variable containing all connection details"
+ - name: registry_details
+   displayName: "determine the variable containing acr details"
 
 stages:
     - stage: execute_prompt_experiment
@@ -194,10 +198,10 @@ stages:
               echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version" 
 
         #=====================================
-        # Executed Kubernetes deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'True'
+        # Executes Kubernetes deployment when parameter deployment_type == 'aks'
         # Reads 'kubernetes_endpoint' field values from deployment_config.json
         #=====================================              
-        - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'True') }}:
+        - ${{ if eq(lower(parameters.deployment_type), 'aks') }}:
           - template: templates/kubernetes_deployment.yml  
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
@@ -207,10 +211,10 @@ stages:
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         #=====================================
-        # Executed AML Compute deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'False'
+        # Executes AML Compute deployment when parameter deployment_type == 'aml'
         # Reads 'azure_managed_endpoint' field values from deployment_config.json
         #=====================================     
-        - ${{ if eq(parameters.IS_KUBERNETES_DEPLOYMENT, 'False') }}:
+        - ${{ if eq(lower(parameters.deployment_type), 'aml') }}:
           - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
@@ -218,3 +222,16 @@ stages:
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
+
+        #=====================================
+        # Executes Azure Webapp deployment when parameter 
+        # deployment_type == 'webapp' using docker image
+        # Reads 'webapp_endpoint' field values from deployment_config.json
+        #=====================================     
+        - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
+          - template: templates/webapp_deployment.yml 
+            parameters:
+              FLOW_TO_EXECUTE: ${{ parameters.flow_to_execute }}
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
+              CONNECTION_DETAILS: ${{ parameters.connection_details }}
+              REGISTRY_DETAILS: ${{ parameters.registry_details }}

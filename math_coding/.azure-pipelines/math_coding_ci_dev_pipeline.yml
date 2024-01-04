@@ -24,9 +24,9 @@ parameters:
  - name: flow_to_execute
    displayName: "flow to execute"
    default: "math_coding"
- - name: IS_KUBERNETES_DEPLOYMENT
-   displayName: "determine managed or kubernetes deployment"
-   default: "False"
+ - name: deployment_type
+   displayName: "Determine type of deployment - aml, aks, docker, webapp"
+   default: "aml"
 
 #=====================================
 # Execute platform_ci_dev_pipeline pipeline for experiment, evaluation and deployment of flows
@@ -36,4 +36,6 @@ stages:
     parameters:
       exec_environment: ${{ parameters.env_name }}
       flow_to_execute: ${{ parameters.flow_to_execute }}
-      IS_KUBERNETES_DEPLOYMENT: ${{ parameters.IS_KUBERNETES_DEPLOYMENT }}
+      deployment_type: ${{ lower(parameters.deployment_type) }}
+      connection_details: '$(COMMON_DEV_CONNECTIONS)'
+      registry_details: '$(DOCKER_IMAGE_REGISTRY)'

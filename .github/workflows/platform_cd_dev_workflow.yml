@@ -11,14 +11,20 @@ on:
         type: string
         description: "The flow use-case to execute"
         required: true
-      is_kubernetes_deployment:
+      deployment_type:
         type: string
-        description: "Determine managed(False) or kubernetes(True) deployment"
+        description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
     secrets:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
+      connection_details:
+        description: "prompt flow connection details"
+        required: false
+      registry_details:
+        description: "prompt flow registry details"
+        required: false
   workflow_dispatch:
     inputs:
       env_name:
@@ -30,9 +36,9 @@ on:
         type: string
         description: "The flow use-case to execute"
         required: true
-      is_kubernetes_deployment:
+      deployment_type:
         type: string
-        description: "Determine managed(False) or kubernetes(True) deployment"
+        description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
 
 jobs:
@@ -85,11 +91,11 @@ jobs:
           echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
 
       #=====================================
-      # Executed Kubernetes deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'True'
+      # Executes Kubernetes deployment when parameter deployment_type == 'aml'
       # Reads 'kubernetes_endpoint' field values from deployment_config.json
       #=====================================             
       - name: Deploy to AML real-time online endpoint
-        if: ${{ inputs.is_kubernetes_deployment == 'False'  }} 
+        if: ${{ github.event.inputs.deployment_type == 'aml'  }}
         uses: ./.github/actions/aml_real_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
@@ -98,11 +104,11 @@ jobs:
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
-      # Executed AML Compute deployment when parameter IS_KUBERNETES_DEPLOYMENT == 'False'
+      # Executes AML Compute deployment when parameter deployment_type == 'aks'
       # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
-        if: ${{ inputs.is_kubernetes_deployment == 'True'  }}  
+        if: ${{ github.event.inputs.deployment_type == 'aks'  }}  
         uses: ./.github/actions/kubernetes_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
@@ -110,7 +116,35 @@ jobs:
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
           MODEL_VERSION: $MODEL_VERSION
 
+      #=====================================
+      # Creates local pf connections when deployment type is webapp
+      # Uses secret CONNECTION_DETAILS for creating connections
+      #=====================================     
+      - name: Create local PF Connections 
+        if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Create local PF connections"
+          script_parameter: |
+            python -m llmops.common.prompt_local_connections \
+              --env_name ${{ inputs.env_name }} \
+              --flow_to_execute ${{ inputs.flow_type }} \
+              --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
+        #=====================================
+        # Executes Azure Webapp deployment when parameter 
+        # deployment_type == 'webapp' using docker image
+        # Reads 'webapp_endpoint' field values from deployment_config.json
+        #=====================================     
+      - name: Deploy to webapp
+        if: ${{ github.event.inputs.deployment_type == 'webapp'  }}  
+        uses: ./.github/actions/webapp_deployment
+        with:
+          FLOW_TO_EXECUTE: ${{ inputs.flow_type }}
+          DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+        env:
+          CONNECTION_DETAILS: ${{ secrets.connection_details }} 
+          REGISTRY_DETAILS: ${{ secrets.registry_details }}
         
             
 
