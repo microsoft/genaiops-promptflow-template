@@ -4,7 +4,7 @@
 
             "ENV_NAME": "dev",           
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "llm_ep",
+            "ENDPOINT_NAME": "llm_endppoint",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "llm-dn",
@@ -24,7 +24,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "llm_ep_aks",
+            "ENDPOINT_NAME": "llm_endpoint_aks",
             "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for named entity",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "llm-dn",
