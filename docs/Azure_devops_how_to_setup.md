@@ -50,9 +50,9 @@ Create an Azure service principal for the purpose of working with this repositor
 1. Copy the following bash commands to your computer and update the **spname** (of your choice) and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription. 
 
     ``` bash
-    spname="<your sp name>"
+    spname="<provide a name to create a new sp name>"
     roleName="Owner"
-    subscriptionId="<subscription Id>"
+    subscriptionId="<provide your subscription Id>"
     servicePrincipalName="Azure-ARM-${spname}"
 
     # Verify the ID of the active subscription
@@ -85,7 +85,7 @@ Create an Azure service principal for the purpose of working with this repositor
       }
     ```
 
-1. Copy the output, braces included. Save this information to a safe location, it will be use later in the demo to configure GitHub Repo.
+1. Copy the output, braces included. It will be used later in the demo to configure GitHub Repo.
 
 1. Close the Cloud Shell once the service principals are created. 
 
@@ -97,23 +97,23 @@ Compute Instances and Prompt flow runtimes can be created using cloud shell, loc
 
 ### Steps:
 
-1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. 
+1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. Note that there should not be any spaces between both side of "=" operator while assigning values to bash variables.
 
 ```bash
 subscriptionId=<your azure subscription id>
 rgname=<your resource group name>                                                                      
 workspace_name=<your Azure machine learning workspace name> 
-userAssignedId=<enter user assigned managed identifier name>
+userAssignedId=<provide a name to create a new user assigned managed identifier>
 keyvault=<your Azure machine learning workspace associate key vault name>
-compute_name=<enter compute name>
+compute_name=<provide a name to create a new Azure ML compute>
 location=<your Azure machine learning workspace region>
-runtimeName=<enter runtime name>
-sp_id=<your azure service principal or client id>
-sp_password=<your service principal password>
+runtimeName=<provide a name to create a new Prompt Flow runtime>
+sp_id=<your azure service principal or client id that was recently created>
+sp_password=<your service principal password or clientSecret from previous step>
 tenant_id=<your azure tenant id>
 ```
 
-2. This next 2 commands should not be performed from Cloud shell. It should be performed from local shells. It helps with interactive azure login and selects a subscription.
+2. This next set of commands should not be performed from Cloud shell. It should be performed if you are using a local terminal. The commands help to interactively log in to Azure and selects a subscription.
 
 ```bash
 az login
@@ -210,7 +210,7 @@ curl --request GET \
 
 The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
 
-The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `llmops_config.json` for each use-case example for `RUNTIME_NAME`.
+The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (Search for COMPUTE_RUNTIME in code for such changes.The comments in code provides additional information and context for required changes.) and also remove any value in `llmops_config.json` for each use-case example for `RUNTIME_NAME`.
 
 ## Create new Azure DevOps project
 
