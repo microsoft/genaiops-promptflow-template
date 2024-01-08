@@ -2,7 +2,7 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "runtime-pf-llmops",
+                "RUNTIME_NAME": "runtime-pf-llmops1",
                 "KEYVAULT_NAME": "azureml239999794194",
                 "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
                 "WORKSPACE_NAME": "AzureML_23",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "runtime-pf-llmops",
+                "RUNTIME_NAME": "runtime-pf-llmops1",
                 "KEYVAULT_NAME": "azureml239999794194",
                 "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
                 "WORKSPACE_NAME": "AzureML_23",
@@ -20,7 +20,7 @@
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "runtime-pf-llmops",
+                "RUNTIME_NAME": "runtime-pf-llmops1",
                 "KEYVAULT_NAME": "azureml239999794194",
                 "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
                 "WORKSPACE_NAME": "AzureML_23",
