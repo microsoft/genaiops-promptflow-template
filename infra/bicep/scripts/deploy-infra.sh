@@ -64,17 +64,15 @@ function usage() {
     echo "Arguments:"
     echo -e " -e  [ENV] set environment where ENV=DEV, QA, PREPROD or PROD"
     echo -e " -r  [RESOURCE_GROUP] set resource group"
+    echo -e " -i  [NETWORK_ISOLATION] trigger on/off network isolation for AML workspace and its dependant resources. Set to false by default"
 
     echo
     echo "Example:"
-    echo -e " bash ./deploy-infra.sh -e DEV -r DevRessourceGroup "
-    echo -e " bash ./deploy-infra.sh -e QA -r QARessourceGroup "
-    echo -e " bash ./deploy-infra.sh -e PREPROD -r PREPRODRessourceGroup"    
+    echo -e " bash ./deploy-infra.sh -e DEV -r DevRessourceGroup"
+    echo -e " bash ./deploy-infra.sh -e QA -r QARessourceGroup -i false"
+    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -true"    
 }
 
-set -a # automatically export all variables
-source "$repoRoot/config/.env" 2> /dev/null || true
-set +a
 
 NETWORK_ISOLATION=false
 # shellcheck disable=SC2034
@@ -166,32 +164,23 @@ echo "networkIsolationBool=$networkIsolationBool"
 echo "environmentType=$environmentType"
 echo "resourceGroupName=$resourceGroupName"
 
-# # printProgress "Deploying resources in resource group ${resourceGroupName}..."
+#Deploy infrastructure using main.bicep file
+printProgress "Deploying resources in resource group ${resourceGroupName}..."
 az deployment group create --mode Incremental --resource-group $resourceGroupName --template-file $pathToBicep  --parameters environmentType=$environmentType keyVaultSku='standard' jumpboxSshKey="$publicSshKey" jumpboxSshPrivateKey="$privateSshKey" enableNetworkIsolation=$networkIsolationBool
 
+#Get Azure Key Vault and Azure ML workspace name from the deployment named "main"
+keyVaultName=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.keyVault.value -o tsv)
+nameAmlWorkspace=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.nameMachineLearning.value -o tsv)
+
+#Exporting variable names in llmops_config.json file at the root of the repo
+./bicep/scripts/export-deployment-variables.sh -k $keyVaultName -g $resourceGroupName -e $environmentType -w $workspaceName -r $runtimeName
+
 if [ $networkIsolationBool = true ]; then
-    printMessage "Getting AML Workspace name deployed in ${resourceGroupName} ..."
-
-    nameAmlWorkspace=$(az deployment group show --resource-group ${resourceGroupName} --name azuremlWorkspace --query properties.outputs.nameMachineLearning.value -o tsv)
-    usedSuffix=$(az deployment group show --resource-group ${resourceGroupName} --name azuremlWorkspace --query properties.outputs.usedSuffix.value -o tsv)
-    nameStorageAccount=$(az deployment group show --resource-group ${resourceGroupName} --name storageMlops --query properties.outputs.nameStorage.value -o tsv)
-
-
     if [ -z "$nameAmlWorkspace" ];  then
         printProgress "Missing AML workspace name"
-        printProgress "AML workspace name: ${nameAmlWorkspace}"
         exit 1
     fi
-
     printProgress "AML workspace name: ${nameAmlWorkspace}"
-
-    if [ -z "$usedSuffix"  ];  then
-        printProgress "Missing suffix, unable to create a managed compute instance for AML workspace"
-        printProgress "Suffix: ${usedSuffix}"
-        exit 1
-    fi
-    printProgress "Used suffix: ${usedSuffix}"
-
     printProgress "Provisionning AML managed VNET..."
     az ml workspace provision-network --name ${nameAmlWorkspace} -g ${resourceGroupName}
 fi

@@ -43,7 +43,7 @@ var subnetJumpbox = [
   }
 ]
 
-var subnets = (enableNetworkIsolation ? subnetLlmops : concat(subnetLlmops, subnetJumpbox))
+var subnets = (enableNetworkIsolation ? concat(subnetLlmops, subnetJumpbox) : subnetLlmops)
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   name: vnetName

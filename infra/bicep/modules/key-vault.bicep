@@ -105,7 +105,7 @@ resource keyVaultPrivateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtu
 
 
 resource sshLinuxPrivateKey 'Microsoft.KeyVault/vaults/secrets@2023-02-01' = if (enableNetworkIsolation) {
-  name: 'ssh-key-linux'
+  name: 'ssh-private-key-linux'
   parent: keyVault
   properties: {
     value: sshPrivateKey

@@ -185,3 +185,6 @@ module linuxmachine 'modules/linux-machine.bicep' = if (enableNetworkIsolation) 
     networkSecurityGroupId: nsg.outputs.networkSecurityGroup
   }
 }
+
+output keyVaultName string = keyVault.name
+output amlWorkspaceName string = azuremlWorkspace.outputs.nameMachineLearning
