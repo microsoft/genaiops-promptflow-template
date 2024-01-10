@@ -186,5 +186,5 @@ module linuxmachine 'modules/linux-machine.bicep' = if (enableNetworkIsolation) 
   }
 }
 
-output keyVaultName string = keyVault.name
+output keyVaultName string = keyVault.outputs.keyVaultName
 output amlWorkspaceName string = azuremlWorkspace.outputs.nameMachineLearning

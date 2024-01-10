@@ -13,11 +13,10 @@ while getopts "k:g:e:w:r:" opt; do
     w) workspaceName=$OPTARG ;;      
     r) runtimeName=$OPTARG ;;      
     :)
-        printError "Error: -${OPTARG} requires a value"
+        echo "Error: -${OPTARG} requires a value"
         exit 1
         ;;
     *)
-        usage
         exit 1
         ;;
     esac

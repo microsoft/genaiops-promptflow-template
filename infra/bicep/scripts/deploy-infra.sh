@@ -1,9 +1,3 @@
-#Bash shell
-#Remaining TODO:
-##Call create or update SP
-## Pass sp secrets on as env vars to the bicep 
-## Add the secrets in the keyvault
-
 #!/bin/bash
 repoRoot=$(
     cd "$(dirname "${BASH_SOURCE[0]}")/../../"
@@ -168,18 +162,25 @@ echo "resourceGroupName=$resourceGroupName"
 printProgress "Deploying resources in resource group ${resourceGroupName}..."
 az deployment group create --mode Incremental --resource-group $resourceGroupName --template-file $pathToBicep  --parameters environmentType=$environmentType keyVaultSku='standard' jumpboxSshKey="$publicSshKey" jumpboxSshPrivateKey="$privateSshKey" enableNetworkIsolation=$networkIsolationBool
 
-#Get Azure Key Vault and Azure ML workspace name from the deployment named "main"
-keyVaultName=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.keyVault.value -o tsv)
-nameAmlWorkspace=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.nameMachineLearning.value -o tsv)
+echo "repo root: $repoRoot"
 
+#Getting Azure Key Vault and Azure ML workspace names from the deployment named "main" and "azuremlWorkspace"
+keyVaultName=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.keyVaultName.value -o tsv)
+nameAmlWorkspace=$(az deployment group show --resource-group ${resourceGroupName} --name azuremlWorkspace --query properties.outputs.nameMachineLearning.value -o tsv)
+echo $nameAmlWorkspace
 #Exporting variable names in llmops_config.json file at the root of the repo
-./bicep/scripts/export-deployment-variables.sh -k $keyVaultName -g $resourceGroupName -e $environmentType -w $workspaceName -r $runtimeName
+if [ -z "$keyVaultName" ];  then
+    printProgress "Missing keyVaultName"
+    exit 1
+fi
+if [ -z "$nameAmlWorkspace" ];  then
+    printProgress "Missing nameAmlWorkspace"
+    exit 1
+fi
+runtimeName="myruntime"
+${repoRoot}/bicep/scripts/export-deployment-variables.sh -k $keyVaultName -g $resourceGroupName -e $environmentType -w $nameAmlWorkspace -r $runtimeName
 
 if [ $networkIsolationBool = true ]; then
-    if [ -z "$nameAmlWorkspace" ];  then
-        printProgress "Missing AML workspace name"
-        exit 1
-    fi
     printProgress "AML workspace name: ${nameAmlWorkspace}"
     printProgress "Provisionning AML managed VNET..."
     az ml workspace provision-network --name ${nameAmlWorkspace} -g ${resourceGroupName}
