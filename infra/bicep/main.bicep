@@ -11,6 +11,7 @@ param keyVaultSku string = 'premium'
 param jumpboxSshKey string
 
 @description('Associated private SSH key to connect to the Linux jumpbox')
+@secure()
 param jumpboxSshPrivateKey string
 
 @description('Enable public access to ease dev tests?')

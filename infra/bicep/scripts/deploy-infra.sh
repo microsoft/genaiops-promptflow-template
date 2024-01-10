@@ -64,7 +64,7 @@ function usage() {
     echo "Example:"
     echo -e " bash ./deploy-infra.sh -e DEV -r DevRessourceGroup"
     echo -e " bash ./deploy-infra.sh -e QA -r QARessourceGroup -i false"
-    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -true"    
+    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -i true"    
 }
 
 
@@ -111,22 +111,10 @@ else
 fi
 checkLoginAndSubscription
 
-printProgress "Installing jq..."
-if [ "${OSTYPE}" == "msys" ]; then
-    curl -s -L -o /usr/bin/jq.exe https://github.com/stedolan/jq/releases/latest/download/jq-win64.exe 
-else
-    sudo apt-get -y install  jq
-fi
 
-printProgress "Adding ml extension if not installed..."
-az extension add --name "ml"
 
 printProgress "Getting Resource Group Name..."
-resourceGroupName=$(az group show -g "${RESOURCE_GROUP}" 2> /dev/null | jq '.name' | tr -d '"' ) || true
-if [[ -z $resourceGroupName ]]; then
-    printError "Resource Group ${RESOURCE_GROUP} doesn't exist"
-    exit 1
-fi     
+resourceGroupName="${RESOURCE_GROUP}"
 printProgress "Resource Group Name: ${resourceGroupName}"
 
 # Deploy the infrastructure for DEV environment
@@ -154,15 +142,9 @@ else
     privateSshKey=""
 fi
 
-echo "networkIsolationBool=$networkIsolationBool"
-echo "environmentType=$environmentType"
-echo "resourceGroupName=$resourceGroupName"
-
 #Deploy infrastructure using main.bicep file
 printProgress "Deploying resources in resource group ${resourceGroupName}..."
 az deployment group create --mode Incremental --resource-group $resourceGroupName --template-file $pathToBicep  --parameters environmentType=$environmentType keyVaultSku='standard' jumpboxSshKey="$publicSshKey" jumpboxSshPrivateKey="$privateSshKey" enableNetworkIsolation=$networkIsolationBool
-
-echo "repo root: $repoRoot"
 
 #Getting Azure Key Vault and Azure ML workspace names from the deployment named "main" and "azuremlWorkspace"
 keyVaultName=$(az deployment group show --resource-group ${resourceGroupName} --name main --query properties.outputs.keyVaultName.value -o tsv)
