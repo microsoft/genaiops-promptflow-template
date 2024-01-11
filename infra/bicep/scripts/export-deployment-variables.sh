@@ -5,13 +5,14 @@ repoRoot=$(
 )
 
 # shellcheck disable=SC2034
-while getopts "k:g:e:w:r:" opt; do
+while getopts "k:g:e:w:r:i:" opt; do
     case $opt in
     k) kvName=$OPTARG ;;
     g) rgName=$OPTARG ;;  
     e) envName=$OPTARG ;;      
     w) workspaceName=$OPTARG ;;      
     r) runtimeName=$OPTARG ;;      
+    i) networkIsolationBool=$OPTARG ;;      
     :)
         echo "Error: -${OPTARG} requires a value"
         exit 1
@@ -23,7 +24,7 @@ while getopts "k:g:e:w:r:" opt; do
 done
 
 # The JSON file
-FILE="${repoRoot}/llmops_config.json"
+FILE="${repoRoot}/llmops_confdig.json"
 
 #If the llmops_config.json file does not exist, create it and add one block containing the environment variables
 if [[ ! -e $FILE ]]; then
@@ -35,6 +36,7 @@ if [[ ! -e $FILE ]]; then
                     \"KEYVAULT_NAME\": \"$kvName\",
                     \"RESOURCE_GROUP_NAME\": \"$rgName\",
                     \"WORKSPACE_NAME\": \"$workspaceName\",
+                    \"NETWORK_ISOLATION\": $networkIsolationBool,
                     \"STANDARD_FLOW_PATH\": \"flows/experiment\",
                     \"EVALUATION_FLOW_PATH\": \"flows/evaluation, flows/evaluation_adv\"
                 }"

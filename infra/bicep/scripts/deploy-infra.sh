@@ -159,8 +159,8 @@ if [ -z "$nameAmlWorkspace" ];  then
     printProgress "Missing nameAmlWorkspace"
     exit 1
 fi
-runtimeName="myruntime"
-${repoRoot}/bicep/scripts/export-deployment-variables.sh -k $keyVaultName -g $resourceGroupName -e $environmentType -w $nameAmlWorkspace -r $runtimeName
+runtimeName="runtime1"
+${repoRoot}/bicep/scripts/export-deployment-variables.sh -k "$keyVaultName" -g "$resourceGroupName" -e "$environmentType" -w "$nameAmlWorkspace" -r "$runtimeName" -i $networkIsolationBool
 
 if [ $networkIsolationBool = true ]; then
     printProgress "AML workspace name: ${nameAmlWorkspace}"
