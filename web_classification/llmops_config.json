@@ -16,7 +16,7 @@
                 "RESOURCE_GROUP_NAME": "Azure_Machine_Learning_Service_23",
                 "WORKSPACE_NAME": "AzureML_23",
                 "STANDARD_FLOW_PATH": "flows/experiment",
-                "EVALUATION_FLOW_PATH": "flows/evaluation,flows/evaluation_dev"
+                "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
             }
     ]
 }
