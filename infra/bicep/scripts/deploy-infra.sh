@@ -130,10 +130,9 @@ sshKeyName=$(az sshkey list -g "$resourceGroupName" --query "[?contains(name, 's
 
 if [ -z "$sshKeyName" ] || [ "$sshKeyName" == "" ];  then
     printProgress "Creating ssh keys in resource group ${resourceGroupName}..."
-    yes y | ssh-keygen -t rsa -N "" -f /tmp/deploy_id_rsa
-    privateSshKey=$(cat /tmp/deploy_id_rsa)
-    publicSshKey=$(cat /tmp/deploy_id_rsa.pub)
-    rm /tmp/deploy_id_rsa*
+    yes y | ssh-keygen -t rsa -N "" -f ${repoRoot}/../.ssh/jumpbox_private_key
+    privateSshKey=$(cat ${repoRoot}/../.ssh/jumpbox_private_key)
+    publicSshKey=$(cat ${repoRoot}/../.ssh/jumpbox_private_key.pub)
     printProgress "publicSshKey=$publicSshKey"
     printProgress "privateSshKey=$privateSshKey"
 else

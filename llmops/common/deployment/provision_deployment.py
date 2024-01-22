@@ -101,6 +101,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
     if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
         if stage == elem["ENV_NAME"]:
             endpoint_name = elem["ENDPOINT_NAME"]
+            public_access = elem["PUBLIC_ACCESS"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
             deployment_conda_path = elem["DEPLOYMENT_CONDA_PATH"]
             deployment_base_image = elem["DEPLOYMENT_BASE_IMAGE_NAME"]
@@ -168,6 +169,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 request_settings=OnlineRequestSettings(
                     request_timeout_ms=90000
                     ),
+                public_access=public_access,
             )
 
             ml_client.online_deployments.begin_create_or_update(
