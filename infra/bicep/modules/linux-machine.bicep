@@ -69,7 +69,7 @@ var linuxConfigurationWithSSH = {
   ssh: {
     publicKeys: [
       {
-        path: '/home/${adminUsername}/.ssh/authorized_keys'
+        path: '/home/${adminUsername}/ssh/authorized_keys'
         keyData: publicSshKey.properties.publicKey
       }
     ]

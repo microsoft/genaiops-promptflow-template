@@ -1,8 +1,11 @@
 #!/bin/bash
 repoRoot=$(
-    cd "$(dirname "${BASH_SOURCE[0]}")/../../"
+    cd "$(dirname "${BASH_SOURCE[0]}")/../../../"
     pwd -P
 )
+
+echo "repoRoot=$repoRoot"
+
 ##############################################################################
 # colors for formatting the output
 ##############################################################################
@@ -119,7 +122,7 @@ printProgress "Resource Group Name: ${resourceGroupName}"
 
 # Deploy the infrastructure for DEV environment
 
-pathToBicep="${repoRoot}/bicep/main.bicep"
+pathToBicep="${repoRoot}/infra/bicep/main.bicep"
 environmentType="${TYPE_ENVIRONMENT}"
 networkIsolationBool=${NETWORK_ISOLATION}
 
@@ -130,9 +133,9 @@ sshKeyName=$(az sshkey list -g "$resourceGroupName" --query "[?contains(name, 's
 
 if [ -z "$sshKeyName" ] || [ "$sshKeyName" == "" ];  then
     printProgress "Creating ssh keys in resource group ${resourceGroupName}..."
-    yes y | ssh-keygen -t rsa -N "" -f ${repoRoot}/../.ssh/jumpbox_private_key
-    privateSshKey=$(cat ${repoRoot}/../.ssh/jumpbox_private_key)
-    publicSshKey=$(cat ${repoRoot}/../.ssh/jumpbox_private_key.pub)
+    yes y | ssh-keygen -t rsa -N "" -f ${repoRoot}/ssh/jumpbox_private_key
+    privateSshKey=$(cat ${repoRoot}/ssh/jumpbox_private_key)
+    publicSshKey=$(cat ${repoRoot}/ssh/jumpbox_private_key.pub)
     printProgress "publicSshKey=$publicSshKey"
     printProgress "privateSshKey=$privateSshKey"
 else
@@ -159,7 +162,7 @@ if [ -z "$nameAmlWorkspace" ];  then
     exit 1
 fi
 runtimeName="runtime1"
-${repoRoot}/bicep/scripts/export-deployment-variables.sh -k "$keyVaultName" -g "$resourceGroupName" -e "$environmentType" -w "$nameAmlWorkspace" -r "$runtimeName" -i $networkIsolationBool
+${repoRoot}/infra/bicep/scripts/export-deployment-variables.sh -k "$keyVaultName" -g "$resourceGroupName" -e "$environmentType" -w "$nameAmlWorkspace" -r "$runtimeName" -i $networkIsolationBool
 
 if [ $networkIsolationBool = true ]; then
     printProgress "AML workspace name: ${nameAmlWorkspace}"
