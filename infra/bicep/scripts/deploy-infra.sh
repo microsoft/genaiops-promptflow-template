@@ -67,10 +67,10 @@ function usage() {
 
     echo
     echo "Example:"
-    echo -e " bash ./deploy-infra.sh -e DEV -r DevRessourceGroup"
-    echo -e " bash ./deploy-infra.sh -e QA -r QARessourceGroup -i false"
-    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -i true"    
-    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -i true  -a 1234abcd-123a-1234-abcd-123456abcdef -p password -t 1234abcd-123a-1234-abcd-123456abcdef -s 1234abcd-123a-1234-abcd-123456abcdef"    
+    echo -e " bash ./deploy-infra.sh -e DEV -r DevResourceGroup"
+    echo -e " bash ./deploy-infra.sh -e QA -r QAResourceGroup -i false"
+    echo -e " bash ./deploy-infra.sh -e PROD -r PRODResourceGroup -i true"    
+    echo -e " bash ./deploy-infra.sh -e PROD -r PRODResourceGroup -i true  -a 1234abcd-123a-1234-abcd-123456abcdef -p password -t 1234abcd-123a-1234-abcd-123456abcdef -s 1234abcd-123a-1234-abcd-123456abcdef"    
 }
 
 
