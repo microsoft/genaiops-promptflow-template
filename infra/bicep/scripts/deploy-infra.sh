@@ -4,8 +4,6 @@ repoRoot=$(
     pwd -P
 )
 
-echo "repoRoot=$repoRoot"
-
 ##############################################################################
 # colors for formatting the output
 ##############################################################################
@@ -62,22 +60,31 @@ function usage() {
     echo -e " -e  [ENV] set environment where ENV=DEV, QA, PREPROD or PROD"
     echo -e " -r  [RESOURCE_GROUP] set resource group"
     echo -e " -i  [NETWORK_ISOLATION] trigger on/off network isolation for AML workspace and its dependant resources. Set to false by default"
+    echo -e " -i  [APP_ID] set the APP_ID when you want to use a service principal to login to Azure"
+    echo -e " -i  [PASSWORD] set the PASSWORD when you want to use a service principal to login to Azure"
+    echo -e " -i  [TENANT_ID] set TENANT_ID"
+    echo -e " -i  [SUBSCRIPTION_ID] set SUBSCRIPTION_ID"
 
     echo
     echo "Example:"
     echo -e " bash ./deploy-infra.sh -e DEV -r DevRessourceGroup"
     echo -e " bash ./deploy-infra.sh -e QA -r QARessourceGroup -i false"
     echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -i true"    
+    echo -e " bash ./deploy-infra.sh -e PROD -r PRODRessourceGroup -i true  -a 1234abcd-123a-1234-abcd-123456abcdef -p password -t 1234abcd-123a-1234-abcd-123456abcdef -s 1234abcd-123a-1234-abcd-123456abcdef"    
 }
 
 
 NETWORK_ISOLATION=false
 # shellcheck disable=SC2034
-while getopts "e:r:i:" opt; do
+while getopts "e:r:i:a:p:t:s:" opt; do
     case $opt in
     e) TYPE_ENVIRONMENT=$OPTARG ;;
     r) RESOURCE_GROUP=$OPTARG ;;  
     i) NETWORK_ISOLATION=$OPTARG ;;      
+    a) APP_ID=$OPTARG ;;      
+    p) PASSWORD=$OPTARG ;;      
+    t) TENANT_ID=$OPTARG ;; 
+    s) SUBSCRIPTION_ID=$OPTARG ;; 
     :)
         printError "Error: -${OPTARG} requires a value"
         exit 1
@@ -96,25 +103,25 @@ if [[ -z "${TYPE_ENVIRONMENT}" || -z "${RESOURCE_GROUP}" ]]; then
     exit 1
 fi
 
-if [[ -z "$appId" || -z $password || -z $tenantId || -z $subId ]]; then
-    printWarning "Variables \$appId \$password \$tenantId \$subId not set"
+if [[ -z "$APP_ID" || -z $PASSWORD || -z $TENANT_ID || -z $SUBSCRIPTION_ID ]]; then
+    printWarning "Variables \$APP_ID \$PASSWORD \$TENANT_ID \$SUBSCRIPTION_ID not set"
     printProgress "Interactive Azure login..."
-    if [[ -z $tenantId ]]; then
-        az login
+    if [[ -z $TENANT_ID ]]; then
+        az login || exit 1
     else
-        az login -t $tenantId
+        az login -t $TENANT_ID || exit 1
     fi  
-    if [[ ! -z $subId ]]; then
-        az account set -s $subId
+    if [[ ! -z $SUBSCRIPTION_ID ]]; then
+        az account set -s $SUBSCRIPTION_ID
     fi     
 else
     printProgress "Service Principal Azure login..."
-    az login --service-principal -u $appId -p $password -t $tenantId
-    az account set -s $subId
+    az login --service-principal -u $APP_ID -p $PASSWORD -t $TENANT_ID || exit 1
+    az account set -s $SUBSCRIPTION_ID
 fi
 checkLoginAndSubscription
 
-
+az account show
 
 printProgress "Getting Resource Group Name..."
 resourceGroupName="${RESOURCE_GROUP}"
@@ -127,15 +134,18 @@ environmentType="${TYPE_ENVIRONMENT}"
 networkIsolationBool=${NETWORK_ISOLATION}
 
 printProgress "generate keys for the jumpbox..."
-
 printProgress "Check if ssh keys already created in resource group ${resourceGroupName}..."
+
 sshKeyName=$(az sshkey list -g "$resourceGroupName" --query "[?contains(name, 'sshkey-linuxmachine')].name" -o tsv)
 
 if [ -z "$sshKeyName" ] || [ "$sshKeyName" == "" ];  then
     printProgress "Creating ssh keys in resource group ${resourceGroupName}..."
-    yes y | ssh-keygen -t rsa -N "" -f ${repoRoot}/ssh/jumpbox_private_key
-    privateSshKey=$(cat ${repoRoot}/ssh/jumpbox_private_key)
-    publicSshKey=$(cat ${repoRoot}/ssh/jumpbox_private_key.pub)
+
+    folder_ssh="${repoRoot}/ssh"
+    if [ ! -d "${folder_ssh}" ]; then mkdir "${folder_ssh}"; fi
+    yes y | ssh-keygen -t rsa -N "" -f ${folder_ssh}/jumpbox_private_key
+    privateSshKey=$(cat ${folder_ssh}/jumpbox_private_key)
+    publicSshKey=$(cat ${folder_ssh}/jumpbox_private_key.pub)
     printProgress "publicSshKey=$publicSshKey"
     printProgress "privateSshKey=$privateSshKey"
 else
