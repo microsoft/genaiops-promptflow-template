@@ -186,7 +186,7 @@ resource filePrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = if 
 }
 
 resource filePrivateEndpointDns 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2022-01-01' = if (enableNetworkIsolation) {
-  name: 'flie-PrivateDnsZoneGroup'
+  name: 'file-PrivateDnsZoneGroup'
   parent: storagePrivateEndpointFile
   properties:{
     privateDnsZoneConfigs: [
