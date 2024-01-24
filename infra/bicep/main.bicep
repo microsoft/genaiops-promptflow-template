@@ -155,7 +155,7 @@ module azureOpenAI 'modules/azure-openai.bicep' = {
     //Azure OpenAI resource
     nameAOAI: 'aoai-eastus-${environmentType}-${uniqueString(resourceGroup().id)}'
     location: location
-    nameDeploymentAOAI: 'deployment-${environmentType}-gpt35-0301'
+    nameDeploymentAOAI: 'gpt-35-turbo'
     nameDeployedModel: 'gpt-35-turbo'
     versionDeployedModel: '0301'
     skuAOAI: {
