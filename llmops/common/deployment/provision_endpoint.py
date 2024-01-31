@@ -93,7 +93,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 name=endpoint_name,
                 description=endpoint_desc,
                 auth_mode="key",
-                public_access=public_access,
+                public_network_access=public_access,
                 tags={"build_id": build_id},
             )
 

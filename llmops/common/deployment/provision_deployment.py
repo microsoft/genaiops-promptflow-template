@@ -169,7 +169,6 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 request_settings=OnlineRequestSettings(
                     request_timeout_ms=90000
                     ),
-                public_access=public_access,
             )
 
             ml_client.online_deployments.begin_create_or_update(
