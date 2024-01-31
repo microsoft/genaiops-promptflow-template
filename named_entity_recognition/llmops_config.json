@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "githubforllmops",
+                "KEYVAULT_NAME": "thomasamlstudi3943032736",
+                "RESOURCE_GROUP_NAME": "ch-tm-LLMOPS",
+                "WORKSPACE_NAME": "thomasamlstudio",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "githubforllmops",
+                "KEYVAULT_NAME": "thomasamlstudi3943032736",
+                "RESOURCE_GROUP_NAME": "ch-tm-LLMOPS",
+                "WORKSPACE_NAME": "thomasamlstudio",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "githubforllmops",
+                "KEYVAULT_NAME": "thomasamlstudi3943032736",
+                "RESOURCE_GROUP_NAME": "ch-tm-LLMOPS",
+                "WORKSPACE_NAME": "thomasamlstudio",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
