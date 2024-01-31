@@ -86,12 +86,14 @@ endpoint_config = json.load(config_file)
 for elem in endpoint_config["azure_managed_endpoint"]:
     if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
         if stage == elem["ENV_NAME"]:
+            public_access = elem["PUBLIC_ACCESS"]
             endpoint_name = elem["ENDPOINT_NAME"]
             endpoint_desc = elem["ENDPOINT_DESC"]
             endpoint = ManagedOnlineEndpoint(
                 name=endpoint_name,
                 description=endpoint_desc,
                 auth_mode="key",
+                public_network_access=public_access,
                 tags={"build_id": build_id},
             )
 

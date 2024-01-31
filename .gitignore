@@ -1,3 +1,6 @@
+llmops_config.json
+ssh/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
