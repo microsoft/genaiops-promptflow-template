@@ -37,7 +37,7 @@ on:
     paths:
       - '.github/**'
       - 'dataops/**'
-      - 'dataops_named_entity_recognition/**'
+      - 'dataops_named_entity_recognition/**'          
 jobs:
   deploy_aml_data_pipeline:
     runs-on: ubuntu-latest
@@ -67,11 +67,11 @@ jobs:
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
       - name: Deploy data pipeline
-      uses: ./.github/actions/execute_script
-      with:
-        step_name: "Register experiment data asset"
-        script_parameter: |
-          python -m dataops.common.aml_pipeline \
-          --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-          --resource_group_name ${{ secrets.RESOURCE_GROUP }} \
-          --workspace_name ${{ secrets.WORKSPACE_NAME }}
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register experiment data asset"
+          script_parameter: |
+            python -m dataops.common.aml_pipeline \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }}
