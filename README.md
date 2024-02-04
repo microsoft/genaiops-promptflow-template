@@ -20,6 +20,7 @@ As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingl
 - LLM-infused applications are designed to understand and generate human-like text based on the input they receive. They comprise of prompts that need engineering cadence and rigour.
 - Prompt flow is a powerful feature that simplifies and streamlines the Prompt Engineering process for LLM-infused applications. It enables users to create, evaluate, and deploy high-quality flows with ease and efficiency.
 - How do we best augment LLM-infused applications with LLMOps and engineering rigour? This template aims to assist in the development of those types of applications using Prompt flow and LLMOps.
+- Bringing discipline to the data preparation for LLM app development by following DataOps best practices.
 
 # Solution
 
@@ -76,6 +77,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
 - Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
 - Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
+- Documentation for implementing DataOps for LLM app data preparation is available [here](./docs/dataops_for_llmops.md). 
 
 # Deployment
 
