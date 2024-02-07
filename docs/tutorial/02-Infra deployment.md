@@ -76,3 +76,7 @@ bash ./deploy-infra.sh -e PROD -r ProdResourceGroup -i true"
 ```bash
 bash ./deploy-infra.sh -e PROD -r PRODResourceGroup -i true  -a 1234abcd-123a-1234-abcd-123456abcdef -p password -t 1234abcd-123a-1234-abcd-123456abcdef -s 1234abcd-123a-1234-abcd-123456abcdef"
 ```
+
+### Connect to network-isolated AML workspace
+
+In the above process, an SSH key-pair was generated in the ssh folder. You can use the private key to connect to the Linux VM and access the Azure Machine Learning workspace. The steps are detailed in the [Access the LLMOPs environment behind a VNET using SSH tunneling](./ssh_tunelling_access_workspace_vnet.md) tutorial.

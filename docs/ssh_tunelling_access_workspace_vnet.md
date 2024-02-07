@@ -1,13 +1,13 @@
-# Access the MLOps dev environment behind a VNET using SSH tunneling
+# Access the LLMOps environment behind a VNET using SSH tunneling
 
-If you deploy the MLOps dev environment with ```enableNetworkIsolation=true```, you can not access the resources behind the VNET.
+If you deploy an environment with ```enableNetworkIsolation=true```, you can not access the resources behind the VNET.
 
 Hence, we use SSH tunneling.
 You have access to a virtual machine that will serve as a jumpbox. Here are the step to proceed:
 
 1. Get the private key to access the jumpbox via ssh generated during deployment from the Keyvault
 
-1. Navigate to the `~/.ssh` directory, and paste your clipboard into a new file:
+1. Navigate to the `~/ssh` directory, and paste your clipboard into a new file:
 
 ```bash
 /> vi jumpbox
