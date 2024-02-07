@@ -1,3 +1,7 @@
 promptflow
 promptflow-tools
 promptflow-sdk[builtins]
+jinja2
+promptflow[azure]
+openai
+python-dotenv

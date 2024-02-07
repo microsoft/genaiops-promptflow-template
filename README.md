@@ -110,7 +110,9 @@ To harness the capabilities of the **local execution**, follow these installatio
 git clone https://github.com/microsoft/llmops-promptflow-template.git
 ```
 
-2. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed. All the flow examples in this repo uses AzureOpenAI connection named `aoai`. Add a line `aoai={"api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}` with updated values for api_key and api_base. If additional connections with different names are used in your flows, they should be added accordingly. Currently, flow with AzureOpenAI as provider as supported. 
+1. **Optional: Use the dev container:** The code includes a dev container configuration file that can be used to create a development container with all the dependencies installed. This is the recommended way to run the code. If you are using VS Code, you can open the folder in a container by clicking on the "Reopen in Container" button in the bottom right corner of the window. The required packages and PromptFlow VS Code extension will be installed automatically when the container is created. If you are using another IDE, you can use the dev container configuration file to create a [development container](https://code.visualstudio.com/docs/devcontainers/containers). This requires [Docker Desktop ](https://www.docker.com/products/docker-desktop/) to be installed on your machine. 
+
+1. **setup env file**: create .env file at top folder level and provide information for items mentioned. Add as many connection names as needed. All the flow examples in this repo uses AzureOpenAI connection named `aoai`. Add a line `aoai={"api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}` with updated values for api_key and api_base. If additional connections with different names are used in your flows, they should be added accordingly. Currently, flow with AzureOpenAI as provider as supported. 
 
 ```bash
 
@@ -118,17 +120,20 @@ experiment_name=
 connection_name_1={ "api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}
 connection_name_2={ "api_key": "","api_base": "","api_type": "azure","api_version": "2023-03-15-preview"}
 ```
-3. Prepare the local conda or virtual environment to install the dependencies.
+1. Prepare the local conda or virtual environment to install the dependencies.
 
+If you decide to not use the dev container, you can create a virtual environment or conda environment and install the dependencies using the following command:
 ```bash
 
 python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] python-dotenv
 
 ```
 
-4. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
+1. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
 
-5. Write python scripts similar to the provided examples in local_execution folder.
+1. Write python scripts similar to the provided examples in local_execution folder.
+
+1. 
 
 ## Contributing
 
