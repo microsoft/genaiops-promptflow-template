@@ -197,6 +197,8 @@ curl --request POST \
 }"
 ```
 
+**Note:** If you have provisioned a managed VNET for your Azure ML workspace, this operation will not work for now. You need to use a serverless runtime for now.
+
 15. Get runtime creation status using REST API. Execute this step multiple times unless either you get output that shows createdOn with a valid date and time value or failure. In case of failure, troubleshoot the issue before moving forward.
 
 ```bash
@@ -330,6 +332,8 @@ Update configuration so that we can create a pull request for any one of the exa
 
 ### Update llmops_config.json
 
+**Note:** If you decide to use [the infrastructure deployed with the deployment script of this code base](../docs/tutorial/02-Infra%20deployment.md), this file is created and populated automatically.
+
 Modify the configuration values in `llmops_config.json` file available for each example based on description. Update the `KEYVAULT_NAME`, `RESOURCE_GROUP_NAME` and Azure Machine Learning `WORKSPACE_NAME`.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
@@ -343,6 +347,8 @@ Modify the configuration values in `llmops_config.json` file available for each 
 The template uses 'pr' and 'dev' to refer to environment types. The template can be extended by implementing additional environment types.
 
 ### Update config/deployment_config.json
+
+**Note:** If you decide to use [the infrastructure deployed with the deployment script of this code base](../docs/tutorial/02-Infra%20deployment.md), this file is created and populated automatically. You can modify some of the default values if required.
 
 Modify the configuration values in `deployment_config.json` file for each environment. These are required for deploying Prompt flows in Azure ML. Ensure the values for `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` are changed before pushing the changes to remote repository.
 

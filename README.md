@@ -73,6 +73,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 
 # Documentation
 
+- Full documentation on deploying an base architecture with/without network isolation can be found [here](./docs/tutorial/02-Infra%20deployment.md)
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
 - Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
 - Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
@@ -83,8 +84,11 @@ The repo helps in deploying to **Kubernetes, Kubernetes ARC and AzureML Managed 
 
 ![Deployment](./docs/images/endpoints.png)
 
-
 ![A/B Deployments](./docs/images/abdeployments.png)
+
+You will also find infrastructure as code to deploy the deploy resources with the choice to enable network isolation:
+
+![Architecture](./docs/images/architecture.png)
 
 # Pipeline
 
@@ -132,8 +136,6 @@ python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptfl
 1. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
 
 1. Write python scripts similar to the provided examples in local_execution folder.
-
-1. 
 
 ## Contributing
 

@@ -23,6 +23,8 @@ When network isolation is enabled, the following components are also deployed:
 - Linux Virtual Machine to resort to SSH tunnelling to acces the Azure Machine Learning Workspace
 - Azure Machine Learning Managed
 
+![Architecture diagram of the components deployed with network isolation enabled. All resources are in the LLMOps subnet of the custom virtual network. A managed virtual network is provisioned for the Azure Machine Learning workspace](../images/architecture.png)
+
 ### Network isolation
 
 When you deploy the architecture with the bicep code with `enableNetworkIsolation=true`, the resources are deployed in a custom VNET and the Azure ML workspace uses a [managed VNET](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-managed-network?view=azureml-api-2&tabs=azure-cli):
