@@ -2,19 +2,19 @@
     "envs":[
                 {
                     "ENV_NAME": "pr",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "llm-compute",
+                    "KEYVAULT_NAME": "mlworkspacellm7456911651",
+                    "RESOURCE_GROUP_NAME": "mlworkspacellm7456911651",
+                    "WORKSPACE_NAME": "MLworkspace-LLM",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation"
                 },
                 {
                     "ENV_NAME": "dev",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "llm-compute",
+                    "KEYVAULT_NAME": "mlworkspacellm7456911651",
+                    "RESOURCE_GROUP_NAME": "mlworkspacellm7456911651",
+                    "WORKSPACE_NAME": "MLworkspace-LLM",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
