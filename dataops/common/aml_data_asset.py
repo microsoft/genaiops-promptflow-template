@@ -22,50 +22,6 @@ import argparse
 
 pipeline_components = []
 
-@pipeline(
-    compute="serverless",
-    description="data prep pipeline",
-)
-def ner_data_prep_pipeline(
-    raw_data_dir
-):
-    prep_data_job = pipeline_components[0](
-        raw_data_dir=raw_data_dir
-    )
-
-    return {
-        "target_dir": prep_data_job.outputs.target_dir
-    }
-
-def get_prep_data_component(
-        name,
-        display_name,
-        description,
-        data_pipeline_code_dir,
-        environment
-):
-    data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-
-    prep_data_component = command(
-        name = name,
-        display_name = display_name,
-        description = description,
-        inputs={
-            "raw_data_dir": Input(type="uri_folder")
-        },
-        outputs=dict(
-            target_dir=Output(type="uri_folder", mode="rw_mount")
-        ),
-        code=data_pipeline_code_dir,
-        command="""python prep_data.py \
-                --raw_data_dir ${{inputs.raw_data_dir}} \
-                --target_dir ${{outputs.target_dir}} \
-                """,
-        environment=environment,
-    )
-
-    return prep_data_component
-
 def get_aml_client(
         subscription_id,
         resource_group_name,
@@ -80,25 +36,21 @@ def get_aml_client(
 
     return aml_client
 
-def create_pipeline_job(
-        experiment_name,
-        pipeline_job,
-        aml_client,
+def register_data_asset(
+        name,
+        description,
+        target_dir,
+        aml_client
 ):
-    aml_client.jobs.create_or_update(
-        job = pipeline_job, 
-        experiment_name = experiment_name
+    target_path = os.path.join(target_dir, 'data.jsonl')
+    aml_dataset = Data(
+        path = target_path,
+        type = AssetTypes.URI_FILE,
+        description = description,
+        name = name
     )
 
-def schedule_pipeline_job(
-        experiment_name,
-        pipeline_job,
-        aml_client,
-):
-    aml_client.jobs.create_or_update(
-        job = pipeline_job, 
-        experiment_name = experiment_name
-    )
+    aml_client.data.create_or_update(aml_dataset)
 
 def main():
     parser = argparse.ArgumentParser()
@@ -138,7 +90,6 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    env_name = args.env_name
     step_action = args.step_action
     
     raw_data_dir = 'dataops_named_entity_recognition/data'
@@ -148,37 +99,18 @@ def main():
     data_prep_component_name = 'prep_data'
     data_asset_name = 'ner_exp'
 
-    prep_data_component = get_prep_data_component(
-        name = data_prep_component_name,
-        display_name = 'Preapre data',
-        description = 'Loading and processing data for prompt engineering.',
-        data_pipeline_code_dir = data_pipeline_code_dir,
-        environment = env_name
-    )
-
-    pipeline_components.append(prep_data_component)
-
-    pipeline_job = ner_data_prep_pipeline(
-        raw_data_dir = Input(type="uri_folder", path=os.path.join(os.getcwd(), raw_data_dir))
-    )
-
     aml_client = get_aml_client(
         subscription_id,
         resource_group_name,
         workspace_name,
     )
 
-    if step_action == 'deploy_pipeline':
-        create_pipeline_job(
-            experiment_name,
-            pipeline_job,
-            aml_client,
-        )
-    elif step_action == 'schedule_pipeline':
-        schedule_pipeline_job(
-            experiment_name,
-            pipeline_job,
-            aml_client,
+    if step_action == 'register_data_asset':
+        register_data_asset(
+            name = data_asset_name,
+            description = 'ner experiment data',
+            target_dir = target_dir,
+            aml_client = aml_client
         )
 
 if __name__ == "__main__":

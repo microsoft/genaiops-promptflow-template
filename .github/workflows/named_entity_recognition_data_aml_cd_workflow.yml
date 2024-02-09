@@ -15,6 +15,10 @@ on:
           description: Azure ML workspace name
           type: string
           required: true
+      env_name:
+            description: Environment name
+            type: string
+            required: true
   # workflow_dispatch allows to run workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -30,6 +34,10 @@ on:
           description: Azure ML workspace name
           type: string
           required: true
+      env_name:
+            description: Environment name
+            type: string
+            required: true
   push:
     branches:
       - main
@@ -69,9 +77,35 @@ jobs:
       - name: Deploy data pipeline
         uses: ./.github/actions/execute_script
         with:
-          step_name: "Register experiment data asset"
+          step_name: "Deploy data pipeline"
           script_parameter: |
             python -m dataops.common.aml_pipeline \
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --env_name ${{ inputs.env_name }} \
+            --step_action deploy_pipeline
+
+      - name: Schedule data pipeline
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Schedule data pipeline"
+          script_parameter: |
+            python -m dataops.common.schedule_aml_pipeline \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }}
+            --env_name ${{ inputs.env_name }} \
+            --step_action schedule_pipeline
+
+      - name: Register data asset
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register data asset"
+          script_parameter: |
+            python -m dataops.common.aml_data_asset \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }}
+            --env_name ${{ inputs.env_name }} \
+            --step_action register_data_asset
