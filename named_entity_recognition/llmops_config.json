@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "llmopsrt",
+                "KEYVAULT_NAME": "amlupskillexpe1684230782",
+                "RESOURCE_GROUP_NAME": "aml_upskill",
+                "WORKSPACE_NAME": "aml_upskill_experiments",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "llmopsrt",
+                "KEYVAULT_NAME": "amlupskillexpe1684230782",
+                "RESOURCE_GROUP_NAME": "aml_upskill",
+                "WORKSPACE_NAME": "aml_upskill_experiments",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "llmopsrt",
+                "KEYVAULT_NAME": "amlupskillexpe1684230782",
+                "RESOURCE_GROUP_NAME": "aml_upskill",
+                "WORKSPACE_NAME": "aml_upskill_experiments",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
