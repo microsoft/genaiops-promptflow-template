@@ -1,0 +1,53 @@
+parameters:
+- name: SUBSCRIPTION_ID
+  type: string
+- name: RESOURCE_GROUP_NAME
+  type: string
+- name: WORKSPACE_NAME
+  type: string
+- name: ENV_NAME
+  type: string
+
+trigger: none
+
+variables:
+  python.version: '3.9'
+
+jobs:
+- job: deploy_aml_data_pipeline
+  displayName: 'Deploy AML Data Pipeline'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - checkout: self
+
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: $(python.version)
+
+  - script: |
+      python -m dataops.common.aml_pipeline \
+      --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+      --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+      --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+      --env_name ${{ parameters.ENV_NAME }} \
+      --step_action deploy_pipeline
+    displayName: 'Deploy data pipeline'
+
+  - script: |
+      python -m dataops.common.schedule_aml_pipeline \
+      --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+      --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+      --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+      --env_name ${{ parameters.ENV_NAME }} \
+      --step_action schedule_pipeline
+    displayName: 'Schedule data pipeline'
+
+  - script: |
+      python -m dataops.common.aml_data_asset \
+      --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
+      --resource_group_name ${{ parameters.RESOURCE_GROUP_NAME }} \
+      --workspace_name ${{ parameters.WORKSPACE_NAME }} \
+      --env_name ${{ parameters.ENV_NAME }} \
+      --step_action register_data_asset
+    displayName: 'Register data asset'
