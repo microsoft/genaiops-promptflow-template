@@ -19,6 +19,7 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.constants import AssetTypes
 import os
 import argparse
+import json
 
 pipeline_components = []
 
@@ -73,15 +74,9 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--env_name",
+        "--config_path_root_dir",
         type=str,
-        help="Azure environment name",
-        required=True,
-    )
-    parser.add_argument(
-        "--step_action",
-        type=str,
-        help="Step action",
+        help="Root dir for config file",
         required=True,
     )
 
@@ -90,14 +85,17 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    step_action = args.step_action
+    config_path_root_dir = args.config_path_root_dir
+
+    config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/deployment_config.json")
+    config = json.load(open(config_path))
     
-    raw_data_dir = 'dataops_named_entity_recognition/data'
-    target_dir = 'dataops_named_entity_recognition/data'
-    data_pipeline_code_dir = 'dataops_named_entity_recognition/aml/data_pipeline'
-    experiment_name = 'NER data pipeline'
-    data_prep_component_name = 'prep_data'
-    data_asset_name = 'ner_exp'
+    path_config = config['PATH']
+    target_data_dir = path_config['TARGET_DATA_DIR']
+
+    data_asset_config = config['DATA_ASSET']
+    data_asset_name = data_asset_config['NAME']
+    data_asset_description = data_asset_config['DESCRIPTION']
 
     aml_client = get_aml_client(
         subscription_id,
@@ -105,13 +103,12 @@ def main():
         workspace_name,
     )
 
-    if step_action == 'register_data_asset':
-        register_data_asset(
-            name = data_asset_name,
-            description = 'ner experiment data',
-            target_dir = target_dir,
-            aml_client = aml_client
-        )
+    register_data_asset(
+        name = data_asset_name,
+        description = data_asset_description,
+        target_dir = target_data_dir,
+        aml_client = aml_client
+    )
 
 if __name__ == "__main__":
     main()

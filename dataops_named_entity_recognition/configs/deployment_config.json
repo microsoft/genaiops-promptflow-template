@@ -1,0 +1,28 @@
+{        
+    "DATA_PREP_COMPONENT":
+        {
+            "COMPONENT_NAME": "prep_data_component",
+            "COMPONENT_DISPLAY_NAME": "Preapre data component",
+            "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
+        }
+    ,
+    "PATH":
+        {
+            "RAW_DATA_DIR": "dataops_named_entity_recognition/data",
+            "TARGET_DATA_DIR": "dataops_named_entity_recognition/data",
+            "DATA_PIPELINE_CODE_DIR": "dataops_named_entity_recognition/aml"
+        }
+    ,
+    "SCHEDULE":
+        {
+            "NAME": "ner_data_pipeline_schedule",
+            "CRON_EXPRESSION": "15 10 * * *",
+            "TIMEZONE": "Eastern Standard Time"
+        }
+        ,
+    "DATA_ASSET":
+        {
+            "NAME": "ner_eval",
+            "DESCRIPTION": "NER experiment data asset"
+        }
+}

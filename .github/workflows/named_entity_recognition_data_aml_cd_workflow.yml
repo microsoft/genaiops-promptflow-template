@@ -15,10 +15,16 @@ on:
           description: Azure ML workspace name
           type: string
           required: true
-      env_name:
+      aml_env_name:
             description: Environment name
             type: string
             required: true
+      config_path_root_dir:
+              description: Root dir for config file
+              type: string
+              required: true
+              default: "dataops_named_entity_recognition"
+
   # workflow_dispatch allows to run workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -34,10 +40,16 @@ on:
           description: Azure ML workspace name
           type: string
           required: true
-      env_name:
+      aml_env_name:
             description: Environment name
             type: string
             required: true
+      config_path_root_dir:
+              description: Root dir for config file
+              type: string
+              required: true
+              default: "dataops_named_entity_recognition"
+
   push:
     branches:
       - main
@@ -83,20 +95,8 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
-            --env_name ${{ inputs.env_name }} \
-            --step_action deploy_pipeline
-
-      - name: Schedule data pipeline
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Schedule data pipeline"
-          script_parameter: |
-            python -m dataops.common.schedule_aml_pipeline \
-            --subscription_id ${{ inputs.subscription_id }} \
-            --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }}
-            --env_name ${{ inputs.env_name }} \
-            --step_action schedule_pipeline
+            --aml_env_name ${{ inputs.aml_env_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}
 
       - name: Register data asset
         uses: ./.github/actions/execute_script
@@ -106,6 +106,5 @@ jobs:
             python -m dataops.common.aml_data_asset \
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }}
-            --env_name ${{ inputs.env_name }} \
-            --step_action register_data_asset
+            --workspace_name ${{ inputs.workspace_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}
