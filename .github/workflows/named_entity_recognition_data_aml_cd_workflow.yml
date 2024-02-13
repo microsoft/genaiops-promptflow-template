@@ -23,7 +23,7 @@ on:
               description: Root dir for config file
               type: string
               required: true
-              default: "dataops_named_entity_recognition"
+              default: "named_entity_recognition"
 
   # workflow_dispatch allows to run workflow manually from the Actions tab
   workflow_dispatch:
@@ -48,7 +48,7 @@ on:
               description: Root dir for config file
               type: string
               required: true
-              default: "dataops_named_entity_recognition"
+              default: "named_entity_recognition"
 
   push:
     branches:
@@ -57,7 +57,7 @@ on:
     paths:
       - '.github/**'
       - 'dataops/**'
-      - 'dataops_named_entity_recognition/**'          
+      - 'named_entity_recognition/**'          
 jobs:
   deploy_aml_data_pipeline:
     runs-on: ubuntu-latest

@@ -179,7 +179,7 @@ def main():
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
 
-    config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/deployment_config.json")
+    config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
 
     component_config = config['DATA_PREP_COMPONENT']
