@@ -8,9 +8,9 @@
     ,
     "PATH":
         {
-            "RAW_DATA_DIR": "dataops_named_entity_recognition/data",
-            "TARGET_DATA_DIR": "dataops_named_entity_recognition/data",
-            "DATA_PIPELINE_CODE_DIR": "dataops_named_entity_recognition/aml"
+            "RAW_DATA_DIR": "named_entity_recognition/data",
+            "TARGET_DATA_DIR": "named_entity_recognition/data",
+            "DATA_PIPELINE_CODE_DIR": "named_entity_recognition/data_pipelines/aml"
         }
     ,
     "SCHEDULE":
