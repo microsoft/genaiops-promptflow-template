@@ -1,0 +1,17 @@
+# <component>
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: postprocess
+display_name: Process promptflow output and output some metrics
+version: 1
+type: command
+inputs:
+  input_data_path:
+    type: uri_file
+outputs:
+  output_data_path:
+    type: uri_file
+code: ../src
+environment: azureml:azureml-sklearn-1.0:23
+
+command: >-
+  python postprocess.py --input_data_path "${{inputs.input_data_path}}" --output_data_path "${{outputs.output_data_path}}"

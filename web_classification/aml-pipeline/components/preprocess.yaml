@@ -1,0 +1,19 @@
+# <component>
+$schema: https://azuremlschemas.azureedge.net/latest/commandComponent.schema.json
+name: preprocess
+display_name: Read jsonl file and filter some data
+version: 1
+type: command
+inputs:
+  input_data_path:
+    type: uri_file
+  max_records:
+    type: integer
+outputs:
+  output_data_path:
+    type: uri_file
+code: ../src
+environment: azureml:azureml-sklearn-1.0:23
+command: >-
+  python preprocess.py --input_data_path "${{inputs.input_data_path}}" --max_records "${{inputs.max_records}}" --output_data_path "${{outputs.output_data_path}}"
+# </component>
