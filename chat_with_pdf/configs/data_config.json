@@ -14,6 +14,7 @@
             "DATA_PURPOSE": "test_data",
             "DATA_PATH":"data/data.jsonl",
             "DATASET_NAME":"rag_eval",
+            "RELATED_EXP_DATASET": "bert-paper-qna-3-line",
             "DATASET_DESC":"this dataset is for evaluating flows"
         },
         {
