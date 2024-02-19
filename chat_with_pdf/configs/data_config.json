@@ -20,8 +20,8 @@
             "PROMPT_FLOW_CONFIG_NAME": "chat_with_pdf",
             "ENV_NAME": "dev",
             "DATA_PURPOSE": "training_data",
-            "DATA_PATH":"data/bert-paper-qna.jsonl",
-            "DATASET_NAME":"bert-paper-qna",
+            "DATA_PATH":"data/bert-paper-qna-3-line.jsonl",
+            "DATASET_NAME":"bert-paper-qna-3-line",
             "DATASET_DESC":"this dataset is for prompt experiments"
         }
     ]
