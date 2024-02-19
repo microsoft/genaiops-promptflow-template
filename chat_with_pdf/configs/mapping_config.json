@@ -1,7 +1,9 @@
 {
     "experiment": {
-        "text": "${data.text}", 
-        "entity_type": "${data.entity_type}"
+        "chat_history": "${data.chat_history}",
+        "pdf_url": "${data.pdf_url}",
+        "question": "${data.question}",
+        "config": "${data.config}"
     },
     "evaluation": {
         "evaluation": {
