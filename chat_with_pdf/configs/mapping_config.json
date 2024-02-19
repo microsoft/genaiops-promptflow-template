@@ -9,7 +9,7 @@
         "evaluation": {
             "question": "${data.question}",
             "answer": "${run.outputs.answer}",
-            "context": "${run.outputs.context}"
+            "documents": "${run.outputs.context}"
         }
     }
 
