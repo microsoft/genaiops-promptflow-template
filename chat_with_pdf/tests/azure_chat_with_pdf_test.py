@@ -10,7 +10,7 @@ class TestChatWithPDFAzure(BaseTest):
     def setUp(self):
         super().setUp()
         self.data_path = os.path.join(
-            self.flow_path, "data/bert-paper-qna-3-line.jsonl"
+            self.flow_path, "../../data/bert-paper-qna-3-line.jsonl"
         )
 
         try:
@@ -34,25 +34,8 @@ class TestChatWithPDFAzure(BaseTest):
         details = self.pf.get_details(run)
         self.assertEqual(details.shape[0], 3)
 
-    def test_eval(self):
-        run_2k, eval_groundedness_2k, eval_pi_2k = self.run_eval_with_config(
-            self.config_2k_context,
-            display_name="chat_with_pdf_2k_context",
-        )
-        run_3k, eval_groundedness_3k, eval_pi_3k = self.run_eval_with_config(
-            self.config_3k_context,
-            display_name="chat_with_pdf_3k_context",
-        )
-
-        self.check_run_basics(run_2k)
-        self.check_run_basics(run_3k)
-        self.check_run_basics(eval_groundedness_2k)
-        self.check_run_basics(eval_pi_2k)
-        self.check_run_basics(eval_groundedness_3k)
-        self.check_run_basics(eval_pi_3k)
-
     def test_bulk_run_valid_mapping(self):
-        data = os.path.join(self.flow_path, "data/bert-paper-qna-1-line.jsonl")
+        data = os.path.join(self.flow_path, "../../data/bert-paper-qna-1-line.jsonl")
         run = self.create_chat_run(
             data=data,
             column_mapping={

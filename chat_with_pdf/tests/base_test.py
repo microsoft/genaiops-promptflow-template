@@ -6,10 +6,10 @@ import traceback
 
 class BaseTest(unittest.TestCase):
     def setUp(self):
-        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../")
-        self.flow_path = os.path.join(root, "chat-with-pdf")
+        root = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../")
+        self.flow_path = os.path.join(root, "flows/standard")
         self.data_path = os.path.join(
-            self.flow_path, "data/bert-paper-qna-3-line.jsonl"
+            root, "data/bert-paper-qna-3-line.jsonl"
         )
         self.eval_groundedness_flow_path = os.path.join(
             root, "../evaluation/eval-groundedness"
@@ -20,7 +20,7 @@ class BaseTest(unittest.TestCase):
         self.all_runs_generated = []
         self.config_3k_context = {
             "EMBEDDING_MODEL_DEPLOYMENT_NAME": "text-embedding-ada-002",
-            "CHAT_MODEL_DEPLOYMENT_NAME": "gpt-35-turbo",
+            "CHAT_MODEL_DEPLOYMENT_NAME": "aoai",
             "PROMPT_TOKEN_LIMIT": 3000,
             "MAX_COMPLETION_TOKENS": 256,
             "VERBOSE": True,
@@ -29,7 +29,7 @@ class BaseTest(unittest.TestCase):
         }
         self.config_2k_context = {
             "EMBEDDING_MODEL_DEPLOYMENT_NAME": "text-embedding-ada-002",
-            "CHAT_MODEL_DEPLOYMENT_NAME": "gpt-35-turbo",
+            "CHAT_MODEL_DEPLOYMENT_NAME": "aoai",
             "PROMPT_TOKEN_LIMIT": 2000,
             "MAX_COMPLETION_TOKENS": 256,
             "VERBOSE": True,
