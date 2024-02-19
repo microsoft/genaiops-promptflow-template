@@ -422,7 +422,7 @@ nodes:
     type: code
     path: rag_groundedness_prompt.jinja2
   inputs:
-    deployment_name: gpt-4
+    deployment_name: aoai
     temperature: 0
     top_p: 1
     max_tokens: 1000
@@ -431,7 +431,7 @@ nodes:
     FullBody: ${inputs.documents}
     answer: ${inputs.answer}
     question: ${inputs.question}
-  connection: gpt-4
+  connection: aoai
   api: chat
   activate:
     when: ${validate_input.output.gpt_groundedness}
@@ -443,7 +443,7 @@ nodes:
     type: code
     path: rag_retrieval_prompt.jinja2
   inputs:
-    deployment_name: gpt-4
+    deployment_name: aoai
     temperature: 0
     top_p: 1
     max_tokens: 1000
@@ -451,7 +451,7 @@ nodes:
     frequency_penalty: 0
     FullBody: ${inputs.documents}
     question: ${inputs.question}
-  connection: gpt-4
+  connection: aoai
   api: chat
   activate:
     when: ${validate_input.output.gpt_retrieval_score}
@@ -463,7 +463,7 @@ nodes:
     type: code
     path: rag_generation_prompt.jinja2
   inputs:
-    deployment_name: gpt-4
+    deployment_name: aoai
     temperature: 0
     top_p: 1
     max_tokens: 1000
@@ -472,7 +472,7 @@ nodes:
     FullBody: ${inputs.documents}
     answer: ${inputs.answer}
     question: ${inputs.question}
-  connection: gpt-4
+  connection: aoai
   api: chat
   activate:
     when: ${validate_input.output.gpt_relevance}

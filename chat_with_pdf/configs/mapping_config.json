@@ -7,8 +7,9 @@
     },
     "evaluation": {
         "evaluation": {
-            "ground_truth": "${data.results}",
-            "entities": "${run.outputs.entities}"
+            "question": "${data.question}",
+            "answer": "${run.outputs.answer}",
+            "context": "${run.outputs.context}"
         }
     }
 
