@@ -12,8 +12,8 @@
             "PROMPT_FLOW_CONFIG_NAME": "chat_with_pdf",
             "ENV_NAME": "dev",
             "DATA_PURPOSE": "test_data",
-            "DATA_PATH":"data/bert-paper-qna-3-line.jsonl",
-            "DATASET_NAME":"bert-paper-qna-3-line",
+            "DATA_PATH":"data/data.jsonl",
+            "DATASET_NAME":"rag_eval",
             "DATASET_DESC":"this dataset is for evaluating flows"
         },
         {
