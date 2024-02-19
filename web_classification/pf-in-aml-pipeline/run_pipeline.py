@@ -9,8 +9,8 @@ from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 
-EXPERIMENT_NAME = "pf_in_pipeline_experiment"
-PIPELINE_NAME = "my_pipeline"
+AML_EXPERIMENT_NAME = "pf_in_pipeline_experiment"
+AML_PIPELINE_NAME = "my_pipeline"
 AML_DATASTORE_PATH_PREFIX = "azureml://datastores/externalstore/paths/"
 AML_DATASTORE_PREPROCESS_FILE_NAME = "data.jsonl"
 AML_DATASTORE_PROMPTFLOW_FILE_NAME = "pf_output.jsonl"
@@ -104,6 +104,12 @@ def build_pipeline(pipeline_name: str):
 
 
 def get_ml_client():
+    """
+    Get a handle to the Azure Machine Learning client.
+
+    Returns:
+        MLClient: The Azure Machine Learning client.
+    """
     # authenticate
     credential = DefaultAzureCredential()
 
@@ -123,7 +129,7 @@ if __name__ == "__main__":
     load_dotenv()
 
     compute_target = os.getenv("AML_COMPUTE_TARGET")
-    pipeline_name = "my_pipeline"
+    pipeline_name = AML_PIPELINE_NAME
     
     pipeline_definition = build_pipeline(
         pipeline_name=pipeline_name,
@@ -136,7 +142,7 @@ if __name__ == "__main__":
     # Execute the ML Pipeline
     job = ml_client.jobs.create_or_update(
         pipeline_job,
-        experiment_name="pf_in_pipeline_experiment",
+        experiment_name=AML_EXPERIMENT_NAME,
     )
     
     ml_client.jobs.stream(name=job.name)

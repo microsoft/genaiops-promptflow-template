@@ -1,0 +1,5 @@
+azure-identity
+azure-ai-ml
+promptflow
+promptflow-tools
+python-dotenv
