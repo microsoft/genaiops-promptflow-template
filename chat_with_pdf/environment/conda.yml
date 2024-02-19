@@ -1,0 +1,11 @@
+name: math-coding-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - jinja2
+    - langchain
+    - sympy
+
