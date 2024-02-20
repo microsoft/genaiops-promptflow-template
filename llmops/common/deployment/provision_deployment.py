@@ -141,7 +141,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 environment = Environment(
                     build=BuildContext(
                         path=deployment_dockerfile_path,
-                        dockerfile_path="Dockerfile"
+                        dockerfile_path="Dockerfile.aml"
                     ),
                     inference_config=inference_config
                 )

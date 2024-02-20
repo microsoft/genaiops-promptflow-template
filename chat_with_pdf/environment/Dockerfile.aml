@@ -3,7 +3,7 @@ FROM docker.io/continuumio/miniconda3:latest
 
 WORKDIR /
 
-COPY ./flow/requirements.txt /flow/requirements.txt
+# COPY ./flow/requirements.txt /flow/requirements.txt
 # COPY requirements.txt /flow/requirements.txt
 # gcc is for build psutil in MacOS
 RUN apt-get update && apt-get install -y runit gcc
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y runit gcc
 # create conda environment
 RUN conda create -n promptflow-serve python=3.9.16 pip=23.0.1 -q -y && \
     conda run -n promptflow-serve \
-    pip install -r /flow/requirements.txt && \
+    pip install PyPDF2 faiss-cpu openai jinja2 python-dotenv tiktoken promptflow promptflow[azure] promptflow-tools && \
     conda run -n promptflow-serve pip install keyrings.alt && \
     conda run -n promptflow-serve pip install gunicorn==20.1.0 && \
     conda run -n promptflow-serve pip cache purge && \
