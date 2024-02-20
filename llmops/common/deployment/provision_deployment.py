@@ -105,7 +105,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
             deployment_conda_path = elem["DEPLOYMENT_CONDA_PATH"]
             deployment_base_image = elem["DEPLOYMENT_BASE_IMAGE_NAME"]
-            deployment_dockerfile = elem["DEPLOYMENT_DOCKERFILE"]
+            deployment_dockerfile_path = elem["DEPLOYMENT_DOCKERFILE_PATH"]
             deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
             deployment_instance_count = elem["DEPLOYMENT_INSTANCE_COUNT"]
             deployment_traffic_allocation = elem[
@@ -137,10 +137,11 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 image=deployment_base_image,
                 inference_config=inference_config
             )
-            elif deployment_dockerfile:
+            elif deployment_dockerfile_path:
                 environment = Environment(
                     build=BuildContext(
-                    dockerfile_path=deployment_dockerfile,
+                        path=deployment_dockerfile_path,
+                        dockerfile_path="Dockerfile"
                     ),
                     inference_config=inference_config
                 )
