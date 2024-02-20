@@ -52,7 +52,7 @@
             "REGISTRY_RG_NAME": "openai_rg",
             "APP_PLAN_NAME": "chat-pdf",
             "WEB_APP_NAME": "rag",
-            "WEB_APP_RG_NAME": "openai_rg",
+            "WEB_APP_RG_NAME": "openai_webapp_rg",
             "WEB_APP_SKU": "B3",
             "USER_MANAGED_ID": "chatpdfuser"
             
