@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 
 AML_EXPERIMENT_NAME = "pf_in_pipeline_experiment"
 AML_PIPELINE_NAME = "my_pipeline"
-AML_DATASTORE_PATH_PREFIX = "azureml://datastores/externalstore/paths/"
+AML_DATASTORE_PATH_PREFIX = "azureml://datastores/workspaceblobstore/paths/"
 AML_DATASTORE_PREPROCESS_FILE_NAME = "data.jsonl"
 AML_DATASTORE_PROMPTFLOW_FILE_NAME = "pf_output.jsonl"
 AML_DATASTORE_POSTPROCESS_FILE_NAME = "postprocess.jsonl"
@@ -42,7 +42,7 @@ def create_dynamic_evaluation_pipeline(
         preprocess_output_path = Output(
             path=AML_DATASTORE_PATH_PREFIX + "preprocess_output.jsonl",
             type=AssetTypes.URI_FILE,
-            mode="rw_mount",
+            mode="direct",
         )
         preprocess = pipeline_components[0](
             input_data_path=pf_input_path, max_records=2
@@ -52,7 +52,7 @@ def create_dynamic_evaluation_pipeline(
         pf_output = Output(
             path=AML_DATASTORE_PATH_PREFIX + AML_DATASTORE_PROMPTFLOW_FILE_NAME,
             type=AssetTypes.URI_FILE,
-            mode="rw_mount",
+            mode="direct",
         )
 
         experiment = pipeline_components[1](
@@ -60,15 +60,10 @@ def create_dynamic_evaluation_pipeline(
             url="${data.url}",
         )
         experiment.outputs.flow_outputs = pf_output
-        postprocess_output_path = Output(
-            path=AML_DATASTORE_PATH_PREFIX + AML_DATASTORE_POSTPROCESS_FILE_NAME,
-            type=AssetTypes.URI_FILE,
-            mode="rw_mount",
-        )
+
         postprocess = pipeline_components[2](
             input_data_path=experiment.outputs.flow_outputs,
         )
-        postprocess.outputs.output_data_path = postprocess_output_path
 
     return evaluation_pipeline
 

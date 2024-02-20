@@ -15,6 +15,8 @@ outputs:
 code: ../src
 environment:
   image: mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu22.04
+  conda_file: ../environment/conda.yaml
+
 command: >-
   python preprocess.py --input_data_path "${{inputs.input_data_path}}" --max_records "${{inputs.max_records}}" --output_data_path "${{outputs.output_data_path}}"
 # </component>

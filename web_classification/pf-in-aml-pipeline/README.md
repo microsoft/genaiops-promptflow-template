@@ -9,8 +9,8 @@ Go to [Use Flow in Azure ML Pipeline Job](https://microsoft.github.io/promptflow
 1. Azure ML workspace 
 
 ## Steps to run the AML pipeline
-1. Create an external ADLS Gen2 storage account and a container named `data` to store the input data, transient data and the output data.
-2. Upload the input data  `web_classification/data/data.jsonl` to the `data` container.
+1. Go to the default blob data store of AML workspace.
+2. Upload the input data  `web_classification/data/data.jsonl` to the .
 Update your .env.template in pf-in-aml-pipeline folder with the required values and rename it to .env
 3. Setup a python environment with the packages mentioned in requirements.txt:
 ```bash

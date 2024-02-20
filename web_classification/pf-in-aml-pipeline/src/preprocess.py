@@ -1,6 +1,4 @@
 import argparse
-import glob
-import json
 
 import pandas as pd
 
@@ -31,8 +29,7 @@ def main():
     print("Maximum records to keep", args.max_records)
 
     input_data_path = args.input_data_path
-    path = glob(input_data_path)
-    input_data_df = pd.read_json(path, lines=True)
+    input_data_df = pd.read_json(input_data_path, lines=True)
 
     # take only max_records from input_data_df
     input_data_df = input_data_df.head(args.max_records)

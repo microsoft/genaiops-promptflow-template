@@ -1,0 +1,11 @@
+name: pf-in-aml-pipeline-env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - azure-ai-ml==1.12.1
+    - azure-identity==1.15.0
+    - azureml-dataprep[pandas]
+    - pandas
