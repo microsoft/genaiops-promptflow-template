@@ -9,6 +9,7 @@ trigger:
       - .azure-pipelines/*
       - llmops/*
       - chat_with_pdf/*
+      - environment/*
 
 
 pool:
