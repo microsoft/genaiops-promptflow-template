@@ -4,7 +4,7 @@ FROM docker.io/continuumio/miniconda3:latest
 WORKDIR /
 
 # COPY ./flow/requirements.txt /flow/requirements.txt
-COPY chat_with_pdf/flows/standard/requirements.txt /flow/requirements.txt
+COPY requirements.txt /flow/requirements.txt
 # gcc is for build psutil in MacOS
 RUN apt-get update && apt-get install -y runit gcc
 
@@ -22,7 +22,7 @@ COPY ./flow /flow
 
 EXPOSE 8080
 
-COPY ./connections/* /connections/
+# COPY ./connections/* /connections/
 
 # reset runsvdir
 RUN rm -rf /var/runit
