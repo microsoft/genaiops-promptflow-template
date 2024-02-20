@@ -11,7 +11,8 @@
             "CURRENT_DEPLOYMENT_NAME": "chat-pdf-deployment",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest",
+            "DEPLOYMENT_BASE_IMAGE_NAME": "",
+            "DEPLOYMENT_DOCKERFILE": "chat_with_pdf/environment/Dockerfile",
             "DEPLOYMENT_CONDA_PATH": "chat_with_pdf/environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
