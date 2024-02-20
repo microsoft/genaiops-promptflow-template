@@ -4,5 +4,6 @@ openai
 jinja2
 python-dotenv
 tiktoken
+promptflow
 promptflow[azure]
 promptflow-tools
