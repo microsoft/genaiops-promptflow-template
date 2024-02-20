@@ -127,6 +127,7 @@ for elem in endpoint_config["azure_managed_endpoint"]:
             )
             environment = Environment(
                 image=deployment_base_image,
+                conda_file=deployment_conda_path,
                 inference_config={
                     "liveness_route": {"path": "/health", "port": "8080"},
                     "readiness_route": {"path": "/health", "port": "8080"},
