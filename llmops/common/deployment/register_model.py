@@ -111,7 +111,7 @@ ml_client = MLClient(
 )
 
 model_hash = hash_folder(f"{flow_to_execute}/{model_path}")
-print("Hash of the folder:", model_hash)
+print("Hash of the folder is :", model_hash)
 
 model = Model(
     name=model_name,
