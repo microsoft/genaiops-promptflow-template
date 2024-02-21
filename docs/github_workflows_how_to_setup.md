@@ -33,16 +33,17 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
 
     ``` bash
-    spname="sp-llmops"
+    spname="sp-llmops-210224"
     roleName="Owner"
     subscriptionId="24bb913a-ff44-4766-b6c1-b64192f6355f"
+    resourceGroupName="1ssGold-template-openai"
     servicePrincipalName="Azure-ARM-${spname}"
 
     # Verify the ID of the active subscription
     echo "Using subscription ID $subscriptionID"
     echo "Creating SP for RBAC with name $servicePrincipalName, with role $roleName and in scopes     /subscriptions/$subscriptionId"
 
-    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scopes /subscriptions/$subscriptionId --sdk-auth
+    az ad sp create-for-rbac --name $servicePrincipalName --role $roleName --scope /subscriptions/$subscriptionId/resourceGroups/$resourceGroupName --sdk-auth
 
     echo "Please ensure that the information created here is properly save for future use."
 
@@ -84,27 +85,56 @@ Compute Instances and Prompt flow runtimes can be created using cloud shell, loc
 1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. Note that there should not be any spaces between both side of "=" operator while assigning values to bash variables.
 
 ```bash
-subscriptionId=<your azure subscription id>
-rgname=<your resource group name>                                                                      
-workspace_name=<your Azure machine learning workspace name> 
-userAssignedId=<provide a name to create a new user assigned managed identifier>
-keyvault=<your Azure machine learning workspace associate key vault name>
-compute_name=<provide a name to create a new Azure ML compute>
-location=<your Azure machine learning workspace region>
-runtimeName=<provide a name to create a new Prompt Flow runtime>
-sp_id=<your azure service principal or client id that was recently created>
-sp_password=<your service principal password or clientSecret from previous step>
-tenant_id=<your azure tenant id>
+subscriptionId="24bb913a-ff44-4766-b6c1-b64192f6355f"
+rgname="1ssGold-template-openai"                                                                    
+workspace_name="1ssGold-template-amlworkspace"
+userAssignedId="cocoates"
+keyvault="a1ssgoldtempla8163083899"
+compute_name="compute-1ssGold-template"
+location="eastus"
+runtimeName="1ssGold-template-pf-runtime"
+sp_id="<your service principal>"
+sp_password="<your password>"
+tenant_id="<your tenant>"
 ```
 
 2. This next set of commands should not be performed from Cloud shell. It should be performed if you are using a local terminal. The commands help to interactively log in to Azure and selects a subscription.
+
+full script:
+```bash
+az login
+az account set -s $subscriptionId
+az identity create -g $rgname -n $userAssignedId --query "id"
+um_details=$(az identity show -g $rgname -n $userAssignedId --query "[id, clientId, principalId]")
+user_managed_id="$(echo $um_details | jq -r '.[0]')"
+principalId="$(echo $um_details | jq -r '.[2]')"
+az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
+az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list
+az login --service-principal -u $sp_id -p $sp_password --tenant $tenant_id
+az account set -s $subscriptionId
+az ml compute create --name $compute_name --size Standard_E4s_v3 --identity-type UserAssigned --type ComputeInstance --resource-group $rgname --workspace-name $workspace_name --user-assigned-identities $user_managed_id
+access_token=$(az account get-access-token | jq -r ".accessToken")
+runtime_url_post=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName?asyncCall=true")
+runtime_url_get=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName")
+curl --request POST \
+  --url "$runtime_url_post" \
+  --header "Authorization: Bearer $access_token" \
+  --header 'Content-Type: application/json' \
+  --data "{
+    \"runtimeType\": \"ComputeInstance\",
+    \"computeInstanceName\": \"$compute_name\",
+}"
+curl --request GET \
+  --url "$runtime_url_get" \
+  --header "Authorization: Bearer $access_token"
+```
 
 ```bash
 az login
 az account set -s $subscriptionId
 ```
 
-3. Create a user-assigned managed identity
+1. Create a user-assigned managed identity
 
 ```bash
 az identity create -g $rgname -n $userAssignedId --query "id"
