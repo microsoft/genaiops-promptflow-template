@@ -1,5 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/promptflow/latest/AzureOpenAIConnection.schema.json
-name: "open_ai_connection"
+name: "aoai"
 type: azure_open_ai
 api_key: "to_replace_with_azure_openai_api_key"
 api_base: "to_replace_with_azure_openai_api_endpoint"

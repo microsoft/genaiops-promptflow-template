@@ -101,6 +101,7 @@ The repo generates multiple reports (experiments-runs and metrics examples are s
 ![metrics](./docs/images/metrics.png)
 
 # Local Execution
+To run a flow locally, you will need an Azure OpenAI instance. That instance will need a local deployment.
 
 To harness the capabilities of the **local execution**, follow these installation steps:
 
@@ -126,9 +127,51 @@ python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptfl
 
 ```
 
-4. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
+4. Each flow will have its own connection config to Azure OpenAI. Create a folder called `connections` in the root of your new flow. Create a new file `azure_openai.yml` in the new `connections` folder. Put the following contents in that file:
+```yaml
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/AzureOpenAIConnection.schema.json
+name: "<your connection name>"
+type: azure_open_ai
+api_key: "to_replace_with_azure_openai_api_key"
+api_base: "to_replace_with_azure_openai_api_endpoint"
+api_type: "azure"
+api_version: "2023-07-01-preview"
+```
 
-5. Write python scripts similar to the provided examples in local_execution folder.
+5. In your flow directory, create the connection:
+```bash
+# Override keys with --set to avoid yaml file changes
+pf connection create -f connections/azure_openai.yml --set api_key=<your_api_key> api_base=<your_api_base>
+```
+
+You can check that you have created your `<your connection name>` connection.
+```bash
+pf connection show -n <your connection name>
+```
+
+1. In your flow.dag.yaml, make sure your deployment name is what you set in Azure OpenAI
+
+```yaml
+inputs:
+    # This is to easily switch between openai and azure openai.
+    # deployment_name is required by azure openai, model is required by openai.
+    deployment_name: <your-deployment-name-here>
+    model: gpt-35-turbo
+    question: ${inputs.math_question}
+    examples: ${math_example.output}
+```
+
+8. Test that your flow works:
+```bash
+pf flow test --flow .
+```
+
+9. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
+
+10.  Write python scripts similar to the provided examples in local_execution folder.
+
+
+
 
 ## Contributing
 

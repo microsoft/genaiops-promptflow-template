@@ -33,9 +33,9 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
 
     ``` bash
-    spname="<provide a name to create a new sp name>"
+    spname="sp-llmops"
     roleName="Owner"
-    subscriptionId="<provide your subscription Id>"
+    subscriptionId="24bb913a-ff44-4766-b6c1-b64192f6355f"
     servicePrincipalName="Azure-ARM-${spname}"
 
     # Verify the ID of the active subscription

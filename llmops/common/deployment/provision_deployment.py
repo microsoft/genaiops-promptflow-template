@@ -9,7 +9,7 @@ Args:
 This argument is required for identifying the Azure subscription.
 --model_version: The registered model version to be deployed.
 This argument is required to specify the version of the model for deployment.
---build_id: The build ID for deployment.
+--build_id: The build ID for deployment. 
 This argument is required to identify the build to be deployed.
 --env_name: The environment name for deployment.
 This argument is required to specify the
@@ -17,7 +17,7 @@ deployment environment (dev, test, prod).
 --flow_to_execute: The name of the flow to execute.
 This argument is required to specify the name of the flow for execution.
 """
-
+# Override keys with --set to avoid yaml file changes
 import json
 import argparse
 
