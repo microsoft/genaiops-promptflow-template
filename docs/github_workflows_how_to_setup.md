@@ -355,8 +355,6 @@ Modify the configuration values in the `deployment_config.json` file for each en
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
 - `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment. A value of 100 indicates that all traffic is directed to this deployment.
 - `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
-- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt flow runtime.
--  `DEPLOYMENT_CONDA_PATH`: This parameter specifies the path to a Conda environment configuration file (usually named conda.yml), which is used to set up the deployment environment.
 - `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
 - `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
 
@@ -431,7 +429,7 @@ The `flows` folder contains one folder for each standard and evaluation flow. Ea
 
 ### Update Environment related dependencies
 
-The `environment` folder contains a `conda.yml` file and any additional dependencies needed by the flow should be added to it. This file is used during deployment process.
+The `environment folder` contains dockerfile file for webapp and function app deployments. Any additional dependencies needed by the flow should be added to it. This file is used during deployment process.
 
 ### Update test data
 

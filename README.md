@@ -55,7 +55,7 @@ Each use case (set of Prompt flow standard and evaluation flows) should follow t
 - .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
 - configs          : It contains data, deployment, and prompt flow data mapping related configuration files.
 - data             : This folder contains data files related to Prompt flow standard and evaluation flow
-- environment      : It contains a Conda file for python package dependencies needed for deployment environment.
+- environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps.
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 

@@ -65,8 +65,15 @@ steps:
       az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
       
       echo "assigning permissions to Principal to Key vault.."
-      az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
-      
+      auth_type=$(az keyvault show -n $KEY_VAULT_NAME  -g $RESOURCE_GROUP_NAME --query "properties.enableRbacAuthorization")
+      if [[ -z "$auth_type" ]]; then
+          echo "assigning RBAC permission"
+          az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "Key Vault Reader" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.KeyVault/vaults/$KEY_VAULT_NAME"
+      else
+          echo "assigning policy permission"
+          az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --secret-permissions get list
+      fi
+
 - template: execute_python_code.yml
   parameters:
     step_name: "Provision Deployment"

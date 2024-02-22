@@ -35,7 +35,7 @@ paths in `trigger and pr section` and the `default value` for `flow_to_execute` 
 
 **Bring Data**  The `data` folder contains data that would be uploaded to AzureML data assets and used for both bulk run and evaluation purpose. You can copy the data in this folder in `jsonl` format.
 
-**Update Environment dependencies** The `environment` folder contains the `conda.yml` file needed during flow deployment for installing all python package dependencies.
+**Update Environment dependencies** The `environment` folder contains the `dockerfile` file needed during flow deployment to Azure web apps as Docker containers.
 
 **Update local execution file**  You can start by copying one of the scripts in the `local_execution` folder and execute it after modifying variable values related to flow and data location.
 
