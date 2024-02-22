@@ -19,6 +19,8 @@ inputs:
 
 runs:
   using: composite
+  permissions:
+    actions: write
   steps:
     - name: Provision AML Online Endpoint
       uses: ./.github/actions/execute_script
