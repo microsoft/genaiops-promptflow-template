@@ -32,7 +32,6 @@
             "COMPUTE_NAME": "",
             "DEPLOYMENT_VM_SIZE": "",
             "DEPLOYMENT_BASE_IMAGE_NAME": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest",
-
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "CPU_ALLOCATION": "",
             "MEMORY_ALLOCATION": "",
