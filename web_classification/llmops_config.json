@@ -11,10 +11,10 @@
                 },
                 {
                     "ENV_NAME": "dev",
-                    "RUNTIME_NAME": "",
-                    "KEYVAULT_NAME": "",
-                    "RESOURCE_GROUP_NAME": "",
-                    "WORKSPACE_NAME": "",
+                    "RUNTIME_NAME": "pf-runtime",
+                    "KEYVAULT_NAME": "shazazureworks7759289478",
+                    "RESOURCE_GROUP_NAME": "shaz-resource-grp1",
+                    "WORKSPACE_NAME": "shaz-azure-workspace",
                     "STANDARD_FLOW_PATH": "flows/experiment",
                     "EVALUATION_FLOW_PATH": "flows/evaluation, flows/evaluation_adv"
                 }
