@@ -6,7 +6,7 @@ version: 1
 type: command
 inputs:
   input_data_path:
-    type: uri_file
+    type: uri_folder
 
 code: ../src
 environment:

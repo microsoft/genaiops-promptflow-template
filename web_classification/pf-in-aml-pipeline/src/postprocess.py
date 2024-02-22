@@ -3,6 +3,8 @@ import glob
 
 import pandas as pd
 
+PF_OUTPUT_FILE_NAME = "parallel_run_step.jsonl"
+
 
 def parse_args():
     """
@@ -26,10 +28,11 @@ def main():
     """
     args = parse_args()
 
-    input_data_path = args.input_data_path
+    input_data_path = args.input_data_path + PF_OUTPUT_FILE_NAME
+
     input_data_df = pd.read_json(input_data_path, lines=True)
 
-    print(input_data_df)
+    print(input_data_df.head())
     return
 
 

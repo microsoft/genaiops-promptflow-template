@@ -11,10 +11,10 @@ from dotenv import load_dotenv
 
 AML_EXPERIMENT_NAME = "pf_in_pipeline_experiment"
 AML_PIPELINE_NAME = "my_pipeline"
-AML_DATASTORE_PATH_PREFIX = "azureml://datastores/workspaceblobstore/paths/"
+AML_DATASTORE_PATH_PREFIX = (
+    "azureml://datastores/workspaceblobstore/paths/pf_in_pipeline_test/"
+)
 AML_DATASTORE_PREPROCESS_FILE_NAME = "data.jsonl"
-AML_DATASTORE_PROMPTFLOW_FILE_NAME = "pf_output.jsonl"
-AML_DATASTORE_POSTPROCESS_FILE_NAME = "postprocess.jsonl"
 
 
 pipeline_components = []
@@ -40,9 +40,7 @@ def create_dynamic_evaluation_pipeline(
             type=AssetTypes.URI_FILE,
         )
         preprocess_output_path = Output(
-            path=AML_DATASTORE_PATH_PREFIX + "preprocess_output.jsonl",
-            type=AssetTypes.URI_FILE,
-            mode="direct",
+            path=AML_DATASTORE_PATH_PREFIX, type=AssetTypes.URI_FOLDER, mode="rw_mount"
         )
         preprocess = pipeline_components[0](
             input_data_path=pf_input_path, max_records=2
@@ -50,9 +48,9 @@ def create_dynamic_evaluation_pipeline(
         preprocess.outputs.output_data_path = preprocess_output_path
 
         pf_output = Output(
-            path=AML_DATASTORE_PATH_PREFIX + AML_DATASTORE_PROMPTFLOW_FILE_NAME,
-            type=AssetTypes.URI_FILE,
-            mode="direct",
+            path=AML_DATASTORE_PATH_PREFIX,
+            type=AssetTypes.URI_FOLDER,
+            mode="rw_mount",
         )
 
         experiment = pipeline_components[1](
@@ -120,12 +118,13 @@ def get_ml_client():
     )
     return ml_client
 
+
 if __name__ == "__main__":
     load_dotenv()
 
     compute_target = os.getenv("AML_COMPUTE_TARGET")
     pipeline_name = AML_PIPELINE_NAME
-    
+
     pipeline_definition = build_pipeline(
         pipeline_name=pipeline_name,
     )
@@ -133,11 +132,11 @@ if __name__ == "__main__":
     ml_client = get_ml_client()
     pipeline_job = pipeline_definition(name=pipeline_name)
     pipeline_job.settings.default_compute = compute_target
-    
+
     # Execute the ML Pipeline
     job = ml_client.jobs.create_or_update(
         pipeline_job,
         experiment_name=AML_EXPERIMENT_NAME,
     )
-    
+
     ml_client.jobs.stream(name=job.name)
