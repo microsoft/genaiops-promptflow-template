@@ -355,7 +355,6 @@ Modify the configuration values in the `deployment_config.json` file for each en
 - `CURRENT_DEPLOYMENT_NAME`: The name of current deployment.
 - `CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION`: The traffic allocation of current deployment. A value of 100 indicates that all traffic is directed to this deployment.
 - `DEPLOYMENT_VM_SIZE`: This parameter specifies the size or configuration of the virtual machine instances used for the deployment.
-- `DEPLOYMENT_BASE_IMAGE_NAME`: This parameter represents the name of the base image used for creating the Prompt flow runtime.
 - `DEPLOYMENT_INSTANCE_COUNT`:This parameter specifies the number of instances (virtual machines) that should be deployed for this particular configuration.
 - `ENVIRONMENT_VARIABLES`: This parameter represents a set of environment variables that can be passed to the deployment.
 
