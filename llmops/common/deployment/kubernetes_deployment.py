@@ -105,8 +105,6 @@ for elem in endpoint_config["kubernetes_endpoint"]:
         if stage == elem["ENV_NAME"]:
             endpoint_name = elem["ENDPOINT_NAME"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
-            deployment_conda_path = elem["DEPLOYMENT_CONDA_PATH"]
-            deployment_base_image = elem["DEPLOYMENT_BASE_IMAGE_NAME"]
             deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
             deployment_instance_count = elem["DEPLOYMENT_INSTANCE_COUNT"]
             deployment_traffic_allocation = elem[
