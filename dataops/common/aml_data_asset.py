@@ -93,22 +93,23 @@ def main():
     path_config = config['PATH']
     target_data_dir = path_config['TARGET_DATA_DIR']
 
-    data_asset_config = config['DATA_ASSET']
-    data_asset_name = data_asset_config['NAME']
-    data_asset_description = data_asset_config['DESCRIPTION']
-
     aml_client = get_aml_client(
         subscription_id,
         resource_group_name,
         workspace_name,
     )
 
-    register_data_asset(
-        name = data_asset_name,
-        description = data_asset_description,
-        target_dir = target_data_dir,
-        aml_client = aml_client
-    )
+    data_asset_configs = config['DATA_ASSETS']
+    for data_asset_config in data_asset_configs:
+        data_asset_name = data_asset_config['NAME']
+        data_asset_description = data_asset_config['DESCRIPTION']
+
+        register_data_asset(
+            name = data_asset_name,
+            description = data_asset_description,
+            target_dir = target_data_dir,
+            aml_client = aml_client
+        )
 
 if __name__ == "__main__":
     main()

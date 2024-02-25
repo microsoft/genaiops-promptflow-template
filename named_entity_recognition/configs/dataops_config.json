@@ -20,9 +20,11 @@
             "TIMEZONE": "Eastern Standard Time"
         }
         ,
-    "DATA_ASSET":
+    "DATA_ASSETS":[
         {
             "NAME": "ner_eval",
             "DESCRIPTION": "NER experiment data asset"
         }
+
+    ]
 }
