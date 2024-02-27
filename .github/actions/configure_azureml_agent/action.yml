@@ -24,7 +24,18 @@ runs:
         set -e # fail on error
 
         sudo apt-get remove azure-cli
-        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        # curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+        apt-cache policy azure-cli
+
+        # Obtain the currently installed distribution
+        AZ_DIST=$(lsb_release -cs)
+
+        # Store an Azure CLI version of choice
+        AZ_VER=2.52.0
+
+        # Install a specific version
+        sudo apt-get install azure-cli=$AZ_VER-1~$AZ_DIST
 
         python -m pip install --upgrade pip
         python -m pip install -r .github/requirements/execute_job_requirements.txt
