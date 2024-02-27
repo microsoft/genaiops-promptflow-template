@@ -8,6 +8,3 @@ pytest==7.1.2
 azure-ai-ml==1.13.0
 azure-identity==1.11.0
 mldesigner==0.1.0b4
-promptflow==1.5.0
-promptflow-tools==1.2.0
-

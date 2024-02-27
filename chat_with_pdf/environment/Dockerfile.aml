@@ -1,3 +1,0 @@
-FROM mcr.microsoft.com/azureml/promptflow/promptflow-runtime:20240205.v2
-
-RUN pip install PyPDF2 faiss-cpu openai jinja2 python-dotenv tiktoken promptflow promptflow[azure] promptflow-tools
