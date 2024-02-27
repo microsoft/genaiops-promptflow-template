@@ -13,6 +13,7 @@ selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_pat
 if [[ -n "$selected_object" ]]; then
     STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
         
+    pip install -r ./$flow_to_execute/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
 
     cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"

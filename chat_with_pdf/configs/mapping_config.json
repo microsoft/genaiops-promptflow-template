@@ -1,0 +1,16 @@
+{
+    "experiment": {
+        "chat_history": "${data.chat_history}",
+        "pdf_url": "${data.pdf_url}",
+        "question": "${data.question}",
+        "config": "${data.config}"
+    },
+    "evaluation": {
+        "evaluation": {
+            "question": "${data.question}",
+            "answer": "${run.outputs.answer}",
+            "documents": "${run.outputs.context}"
+        }
+    }
+
+}
