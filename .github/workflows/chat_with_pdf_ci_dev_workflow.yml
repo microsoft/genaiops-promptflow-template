@@ -2,6 +2,7 @@ name: chat_with_pdf_ci_dev_workflow
 
 on:
   workflow_call:
+  workflow_dispatch:
     inputs:
       env_name:
         type: string
@@ -25,6 +26,7 @@ on:
       - '.github/**'
       - 'llmops/**'
       - 'chat_with_pdf/**'
+  
 
 #=====================================
 # Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
