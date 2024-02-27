@@ -23,7 +23,7 @@ runs:
       run: |
         set -e # fail on error
 
-        sudo apt-get uninstall azure-cli
+        sudo apt-get remove azure-cli
         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
         python -m pip install --upgrade pip
