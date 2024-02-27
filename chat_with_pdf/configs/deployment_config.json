@@ -3,17 +3,14 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "chat-pdf-endpoint",
+            "ENDPOINT_NAME": "",
             "ENDPOINT_DESC": "An online endpoint serving a flow for chat with pdf flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "chat-pdf-deployment",
+            "CURRENT_DEPLOYMENT_NAME": "",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
-            "DEPLOYMENT_BASE_IMAGE_NAME": "",
-            "DEPLOYMENT_DOCKERFILE_PATH": "chat_with_pdf/environment/",
-            "DEPLOYMENT_CONDA_PATH": "chat_with_pdf/environment/conda.yml",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
                 "example-name": "example-value"
