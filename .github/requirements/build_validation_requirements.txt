@@ -1,3 +1,4 @@
+azure-core==1.30.0
 flake8-docstrings==1.6.0
 flake8==4.0.1
 pep8-naming==0.13.0
@@ -6,6 +7,5 @@ pytest-azurepipelines==1.0.3
 pytest-mock==3.7.0
 pytest==7.1.2
 azure-ai-ml==1.13.0
-azure-identity==1.14.0
+azure-identity==1.15.0
 mldesigner==0.1.0b4
-

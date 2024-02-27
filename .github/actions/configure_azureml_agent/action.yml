@@ -5,7 +5,7 @@ description: Prepares build environment for python and prompt flow related workf
 inputs:
   versionSpec:
     description: "The Python version to use in the environment."
-    default: "3.9"
+    default: "3.10"
 
 
 runs:
