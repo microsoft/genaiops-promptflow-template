@@ -14,17 +14,17 @@ set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
-deploy_config="./$flow_to_execute/configs/deployment_config.json"
-con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
-rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
-udmid=$(echo "$con_object" | jq -r '.USER_MANAGED_ID')
-appserviceplan=$(echo "$con_object" | jq -r '.APP_PLAN_NAME')
-appserviceweb=$(echo "$con_object" | jq -r '.WEB_APP_NAME')
-acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
-websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
+config="./$flow_to_execute/configs/config.yaml"
+con_object=$(yq ".deployment_configs.webapp_endpoint.'$env_name'" "$config")
+REGISTRY_NAME=$(echo "$con_object" | yq -r '.REGISTRY_NAME')
+rgname=$(echo "$con_object" | yq -r '.WEB_APP_RG_NAME')
+udmid=$(echo "$con_object" | yq -r '.USER_MANAGED_ID')
+appserviceplan=$(echo "$con_object" | yq -r '.APP_PLAN_NAME')
+appserviceweb=$(echo "$con_object" | yq -r '.WEB_APP_NAME')
+acr_rg=$(echo "$con_object" | yq -r '.REGISTRY_RG_NAME')
+websku=$(echo "$con_object" | yq -r '.WEB_APP_SKU')
 
-read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+read -r -a connection_names <<< "$(echo "$con_object" | yq -r '.CONNECTION_NAMES | join(" ")')"
 echo $connection_names
 
 # create a resource group

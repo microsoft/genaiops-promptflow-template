@@ -6,12 +6,12 @@
 set -e # fail on error
 
 # read values from llmops_config.json related to given environment
-config_path="./$flow_to_execute/llmops_config.json"
+config_path="./$flow_to_execute/configs/config.yaml"
 env_name=$deploy_environment
-selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+selected_object=$(yq ".llmops_config.'$env_name'" "$config_path")
 
 if [[ -n "$selected_object" ]]; then
-    STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
+    STANDARD_FLOW=$(echo "$selected_object" | yq -r '.STANDARD_FLOW_PATH')
         
     pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
 
@@ -22,10 +22,9 @@ if [[ -n "$selected_object" ]]; then
         
     docker images
 
-    deploy_config="./$flow_to_execute/configs/deployment_config.json"
-    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+    con_object=$(yq ".deployment_configs.webapp_endpoint.'$env_name'" "$config_path")
 
-    read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+    read -r -a connection_names <<< "$(echo "$con_object" | yq -r '.CONNECTION_NAMES | join(" ")')"
     echo $connection_names
     result_string=""
 

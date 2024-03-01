@@ -1,0 +1,26 @@
+{
+    "name": "llmops_promptflow_container",
+    "image": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime-stable:20240205.v2",
+	
+    "customizations": {
+		"vscode": {
+            "extensions": [
+		        "ms-python.python",
+            "ms-python.debugpy",
+		        "ms-toolsai.vscode-ai",
+		        "ms-toolsai.jupyter",
+		        "redhat.vscode-yaml",
+		        "prompt-flow.prompt-flow"
+	        ]
+        }
+    },
+
+    "features": {
+      "ghcr.io/devcontainers/features/azure-cli:1": {
+        "version": "latest"
+      }
+    },
+    "containerEnv": { "SUBSCRIPTION_ID": "${localEnv:SUBSCRIPTION_ID}" },
+    "postCreateCommand": "pip3 install -r /workspaces/llmops-promptflow-template/.devcontainer/requirements.txt"    
+
+  }

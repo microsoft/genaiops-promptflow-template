@@ -1,0 +1,129 @@
+
+llmops_config:
+  pr:
+    ENV_NAME: pr
+    RUNTIME_NAME: 
+    KEYVAULT_NAME:
+    SUBSCRIPTION_ID: ${SUBSCRIPTION_ID}
+    RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
+    WORKSPACE_NAME: ${WORKSPACE_NAME}
+    STANDARD_FLOW_PATH: flows/experiment
+    EVALUATION_FLOW_PATH: flows/evaluation
+        
+  dev:
+    ENV_NAME: dev
+    RUNTIME_NAME: 
+    KEYVAULT_NAME: 
+    SUBSCRIPTION_ID: ${SUBSCRIPTION_ID}
+    RESOURCE_GROUP_NAME: ${RESOURCE_GROUP_NAME}
+    WORKSPACE_NAME: ${WORKSPACE_NAME}
+    STANDARD_FLOW_PATH: flows/experiment
+    EVALUATION_FLOW_PATH: "flows/evaluation, flows/evaluation_adv"
+    
+datasets_config:
+  pr:
+    - dataset : web_classification_pr
+      PROMPT_FLOW_CONFIG_NAME: web_classification
+      ENV_NAME: pr
+      DATA_PURPOSE: pr_data
+      DATA_PATH: data/data.jsonl
+      DATASET_NAME: web_classification_pr
+      DATASET_DESC: this dataset is for pr validation only
+
+  dev:
+    - dataset: web_classification_train_eval
+      PROMPT_FLOW_CONFIG_NAME: web_classification
+      ENV_NAME: dev
+      DATA_PURPOSE: test_data
+      DATA_PATH: data/eval_data.jsonl
+      DATASET_NAME: web_classification_train_eval
+      RELATED_EXP_DATASET: web_classification_train
+      DATASET_DESC: this dataset is for evaluating flows
+
+    - dataset: web_classification_train_new_eval
+      PROMPT_FLOW_CONFIG_NAME: web_classification
+      ENV_NAME: dev
+      DATA_PURPOSE: test_data
+      DATA_PATH: data/eval_data_new.jsonl
+      DATASET_NAME: web_classification_train_new_eval
+      RELATED_EXP_DATASET: web_classification_train_new
+      DATASET_DESC: this dataset is for evaluating flows
+    
+    - dataset: web_classification_train
+      PROMPT_FLOW_CONFIG_NAME: web_classification
+      ENV_NAME: dev
+      DATA_PURPOSE: training_data
+      DATA_PATH: data/data.jsonl
+      DATASET_NAME: web_classification_train
+      DATASET_DESC": this dataset is for prompt experiments
+    
+    - dataset: web_classification_train_new
+      PROMPT_FLOW_CONFIG_NAME: web_classification
+      ENV_NAME: dev
+      DATA_PURPOSE: training_data
+      DATA_PATH: data/data_new.jsonl
+      DATASET_NAME": web_classification_train_new
+      DATASET_DESC: this dataset is for prompt experiments
+      
+
+mapping_config:
+  experiment: 
+      url: ${data.url}
+  evaluation: 
+    evaluation: 
+      groundtruth: ${data.answer}
+      prediction: ${run.outputs.category}
+
+    evaluation_adv: 
+      groundtruth: ${data.answer}
+      prediction: ${run.outputs.category}
+
+deployment_configs:
+  azure_managed_endpoint:
+    dev:
+      ENV_NAME: dev
+      TEST_FILE_PATH: sample-request.json
+      ENDPOINT_NAME: 
+      ENDPOINT_DESC: An AML compute based endpoint serving a flow for web classification
+      DEPLOYMENT_DESC: prompt flow deployment
+      PRIOR_DEPLOYMENT_NAME: 
+      PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION: "0"
+      CURRENT_DEPLOYMENT_NAME:
+      CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION: "100"
+      DEPLOYMENT_VM_SIZE: Standard_E16s_v3
+      DEPLOYMENT_INSTANCE_COUNT: 1
+      ENVIRONMENT_VARIABLES: 
+        example-name: example-value
+            
+  kubernetes_endpoint:
+    dev:
+      ENV_NAME: dev
+      TEST_FILE_PATH: sample-request.json
+      ENDPOINT_NAME:
+      ENDPOINT_DESC: An kubernetes endpoint serving a flow for web classification
+      DEPLOYMENT_DESC: prompt flow deployment
+      PRIOR_DEPLOYMENT_NAME:
+      PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION:
+      CURRENT_DEPLOYMENT_NAME:
+      CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION: 100,
+      COMPUTE_NAME:
+      DEPLOYMENT_VM_SIZE:
+      DEPLOYMENT_INSTANCE_COUNT: 1
+      CPU_ALLOCATION: 
+      MEMORY_ALLOCATION: 
+      ENVIRONMENT_VARIABLES: 
+        example-name: example-value
+           
+  webapp_endpoint:
+    dev:
+      ENV_NAME: dev
+      TEST_FILE_PATH: sample-request.json
+      CONNECTION_NAMES:
+        - aoai
+      REGISTRY_NAME:
+      REGISTRY_RG_NAME:
+      APP_PLAN_NAME:
+      WEB_APP_NAME:
+      WEB_APP_RG_NAME:
+      WEB_APP_SKU: "B3"
+      USER_MANAGED_ID:

@@ -35,6 +35,7 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.ml import MLClient
 from promptflow.entities import Run
 from promptflow.azure import PFClient
+from llmops.common.config_utils import LLMOpsConfig
 
 from llmops.common.logger import llmops_logger
 
@@ -80,21 +81,14 @@ def prepare_and_execute(
     Returns:
         None
     """
-    main_config = open(f"{flow_to_execute}/llmops_config.json")
-    model_config = json.load(main_config)
+    config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+    model_config = config.model_config
 
-    for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
-            config = obj
-            break
+    resource_group_name = model_config["RESOURCE_GROUP_NAME"]
+    workspace_name = model_config["WORKSPACE_NAME"]
+    standard_flow_path = model_config["STANDARD_FLOW_PATH"]
 
-    resource_group_name = config["RESOURCE_GROUP_NAME"]
-    workspace_name = config["WORKSPACE_NAME"]
-    data_mapping_config = f"{flow_to_execute}/configs/mapping_config.json"
-    standard_flow_path = config["STANDARD_FLOW_PATH"]
-    data_config_path = f"{flow_to_execute}/configs/data_config.json"
-
-    runtime = config["RUNTIME_NAME"]
+    runtime = model_config["RUNTIME_NAME"]
     experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(
@@ -110,12 +104,11 @@ def prepare_and_execute(
         resource_group_name,
         workspace_name
     )
-    logger.info(data_mapping_config)
+
     flow = f"{flow_to_execute}/{standard_flow_path}"
     dataset_name = []
-    config_file = open(data_config_path)
-    data_config = json.load(config_file)
-    for elem in data_config["datasets"]:
+    data_config = config.datasets_config
+    for elem in data_config:
         if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
             if (stage == elem["ENV_NAME"] and
                     data_purpose == elem["DATA_PURPOSE"]):
@@ -146,8 +139,7 @@ def prepare_and_execute(
         if nodes.get("type", {}) == "llm":
             all_llm_nodes.add(nodes["name"])
 
-    mapping_file = open(data_mapping_config)
-    mapping_config = json.load(mapping_file)
+    mapping_config = config.mapping_config
     exp_config_node = mapping_config["experiment"]
 
     run_ids = []

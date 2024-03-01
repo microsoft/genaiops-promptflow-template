@@ -21,6 +21,7 @@ from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 from azure.identity import DefaultAzureCredential
 from llmops.common.logger import llmops_logger
+from llmops.common.config_utils import LLMOpsConfig
 
 
 logger = llmops_logger("register_data_asset")
@@ -71,15 +72,11 @@ parser.add_argument(
 args = parser.parse_args()
 
 environment_name = args.env_name
-main_config = open(f"{args.flow_to_execute}/llmops_config.json")
-config = json.load(main_config)
+flow_name = args.flow_to_execute
+config = LLMOpsConfig(flow_name=flow_name, environment=environment_name)
+model_config = config.model_config
+data_config = config.datasets_config
 
-for obj in config["envs"]:
-    if obj.get("ENV_NAME") == environment_name:
-        model_config = obj
-        break
-
-data_config_path = f"{args.flow_to_execute}/configs/data_config.json"
 resource_group_name = model_config["RESOURCE_GROUP_NAME"]
 workspace_name = model_config["WORKSPACE_NAME"]
 data_purpose = args.data_purpose
@@ -91,10 +88,7 @@ ml_client = MLClient(
     workspace_name
 )
 
-config_file = open(data_config_path)
-data_config = json.load(config_file)
-
-for elem in data_config["datasets"]:
+for elem in data_config:
     if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
         if (
             data_purpose == elem["DATA_PURPOSE"]

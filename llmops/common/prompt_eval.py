@@ -29,6 +29,7 @@ from promptflow.entities import Run
 from promptflow.azure import PFClient
 
 from llmops.common.logger import llmops_logger
+from llmops.common.config_utils import LLMOpsConfig
 
 logger = llmops_logger("prompt_eval")
 
@@ -51,20 +52,13 @@ def prepare_and_execute(
     Returns:
         None
     """
-    main_config = open(f"{flow_to_execute}/llmops_config.json")
-    model_config = json.load(main_config)
-
-    for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
-            config = obj
-            break
-
+    
+    main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+    config = main_config.model_config
+ 
     resource_group_name = config["RESOURCE_GROUP_NAME"]
     workspace_name = config["WORKSPACE_NAME"]
-    data_mapping_config = f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path = config["STANDARD_FLOW_PATH"]
-    data_config_path = f"{flow_to_execute}/configs/data_config.json"
-
     runtime = config["RUNTIME_NAME"]
     eval_flow_path = config["EVALUATION_FLOW_PATH"]
     experiment_name = f"{flow_to_execute}_{stage}"
@@ -80,9 +74,8 @@ def prepare_and_execute(
 
     standard_flow = f"{flow_to_execute}/{standard_flow_path}"
     dataset_name = []
-    config_file = open(data_config_path)
-    data_config = json.load(config_file)
-    for elem in data_config["datasets"]:
+    data_config = main_config.datasets_config
+    for elem in data_config:
         if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
             if (stage == elem["ENV_NAME"] and
                     data_purpose == elem["DATA_PURPOSE"]):
@@ -99,7 +92,6 @@ def prepare_and_execute(
                 )
 
     standard_flow_file = f"{standard_flow}/flow.dag.yaml"
-
     with open(standard_flow_file, "r") as yaml_file:
         yaml_data = yaml.safe_load(yaml_file)
 
@@ -110,8 +102,7 @@ def prepare_and_execute(
         node_variant_mapping[node_name] = default_variant
         default_variants.append(node_variant_mapping)
 
-    mapping_file = open(data_mapping_config)
-    mapping_config = json.load(mapping_file)
+    mapping_config = main_config.mapping_config
     eval_config_node = mapping_config["evaluation"]
 
     all_eval_df = []

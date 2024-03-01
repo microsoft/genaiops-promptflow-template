@@ -22,6 +22,7 @@ from promptflow.entities import AzureOpenAIConnection
 from promptflow import PFClient
 
 from llmops.common.logger import llmops_logger
+from llmops.common.config_utils import LLMOpsConfig
 
 logger = llmops_logger("prompt_aoai_connection")
 
@@ -42,43 +43,36 @@ def prepare_and_execute(
     Returns:
         None
     """
-    main_config = open(f"{flow_to_execute}/llmops_config.json")
-    model_config = json.load(main_config)
+    main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+    model_config = main_config.model_config
+    logger.info("valid environment is found")
 
     secret_config = json.loads(connection_details)
 
-    for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
-            logger.info("valid environment is found")
-            break
-
-    dep_config = f"{flow_to_execute}/configs/deployment_config.json"
-    config_file = open(dep_config)
-
     pf = PFClient()
 
-    connection_config = json.load(config_file)
-    for elem in connection_config["webapp_endpoint"]:
-        if "CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
-            if stage == elem["ENV_NAME"]:
-                con_to_create = list(elem["CONNECTION_NAMES"])
+    webapp_endpoint_config = main_config.webapp_endpoint_config
+    
+    if "CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
+        if stage == elem["ENV_NAME"]:
+            con_to_create = list(elem["CONNECTION_NAMES"])
 
-                for con in con_to_create:
-                    for avail_con in secret_config:
-                        if avail_con['name'] == con:
-                            if avail_con['type'] == "azure_open_ai":
-                                connection = AzureOpenAIConnection(
-                                    name=avail_con['name'],
-                                    api_key=avail_con['api_key'],
-                                    api_base=avail_con['api_base'],
-                                    api_type=avail_con['api_type'],
-                                    api_version=avail_con['api_version']
-                                )
-                                pf.connections.create_or_update(connection)
+            for con in con_to_create:
+                for avail_con in secret_config:
+                    if avail_con['name'] == con:
+                        if avail_con['type'] == "azure_open_ai":
+                            connection = AzureOpenAIConnection(
+                                name=avail_con['name'],
+                                api_key=avail_con['api_key'],
+                                api_base=avail_con['api_base'],
+                                api_type=avail_con['api_type'],
+                                api_version=avail_con['api_version']
+                            )
+                            pf.connections.create_or_update(connection)
 
-                                logger.info(
-                                    f"{avail_con['name']} created successfully"
-                                    )
+                            logger.info(
+                                f"{avail_con['name']} created successfully"
+                            )
 
 
 def main():
