@@ -28,7 +28,7 @@ datasets_config:
       DATA_PURPOSE: pr_data
       DATA_PATH: data/math_data.jsonl
       DATASET_NAME: math_coding_pr
-      DATASET_DESC": this dataset is for pr validation only
+      DATASET_DESC: this dataset is for pr validation only
 
   dev:
     - dataset: math_coding_test

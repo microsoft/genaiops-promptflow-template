@@ -63,7 +63,7 @@ datasets_config:
       DATA_PURPOSE: post_production_eval_data
       DATA_PATH: data/production_log.jsonl
       DATASET_NAME: named_entity_recognition_pp_eval
-      DATASET_DESC": this dataset is for post production evaluation
+      DATASET_DESC: this dataset is for post production evaluation
 
 mapping_config:
   experiment: 

@@ -31,27 +31,32 @@ class LLMOpsConfig:
     
     @property
     def model_config(self):
+        """Get model configuration."""
         return self._raw_config['llmops_config'][self._environment]
     
     @property
     def datasets_config(self):
+        """Get datasets configuration."""
         return self._raw_config['datasets_config'][self._environment]
 
     @property
     def azure_managed_endpoint_config(self):
+        """Get azure managed endpoint deployment configuration."""
         return self._raw_config['deployment_configs']['azure_managed_endpoint'][self._environment]
     
     @property
     def kubernetes_endpoint_config(self):
+        """Get kubernetes endpoint deployment configuration."""
         return self._raw_config['deployment_configs']['kubernetes_endpoint'][self._environment]
     
     @property
     def webapp_endpoint_config(self):
+        """Get webapp endpoint deployment configuration."""
         return self._raw_config['deployment_configs']['webapp_endpoint'][self._environment]
 
 
 if __name__ == "__main__":
-    config = LLMOpsConfig(flow_name="math_coding", environment="dev")
+    config = LLMOpsConfig(flow_name="web_classification", environment="dev")
     print(config.model_config)
     print(config.datasets_config)
     print(config.deployment_configs)
