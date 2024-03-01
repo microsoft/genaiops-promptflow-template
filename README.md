@@ -1,4 +1,4 @@
-# LLMOps with Prompt flow (preview)
+# LLMOps with Prompt flow 
 Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
@@ -56,7 +56,7 @@ Each use case (set of Prompt flow standard and evaluation flows) should follow t
 - .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
 - configs          : It contains data, deployment, and prompt flow data mapping related configuration files.
 - data             : This folder contains data files related to Prompt flow standard and evaluation flow
-- environment      : It contains a Conda file for python package dependencies needed for deployment environment.
+- environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps.
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
