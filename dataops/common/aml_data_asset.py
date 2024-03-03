@@ -102,12 +102,13 @@ def main():
     data_asset_configs = config['DATA_ASSETS']
     for data_asset_config in data_asset_configs:
         data_asset_name = data_asset_config['NAME']
+        data_asset_file_path = data_asset_config['PATH']
         data_asset_description = data_asset_config['DESCRIPTION']
 
         register_data_asset(
             name = data_asset_name,
             description = data_asset_description,
-            target_dir = target_data_dir,
+            target_dir = data_asset_file_path,
             aml_client = aml_client
         )
 
