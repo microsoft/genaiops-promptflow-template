@@ -6,7 +6,7 @@
 set -e # fail on error
 
 # read values from llmops_config.json related to given environment
-config_path="./$flow_to_execute/configs/config.yaml"
+config_path="./$flow_to_execute/configs/llmops_config.yaml"
 env_name=$deploy_environment
 selected_object=$(yq ".llmops_config.'$env_name'" "$config_path")
 
@@ -22,7 +22,7 @@ if [[ -n "$selected_object" ]]; then
         
     docker images
 
-    con_object=$(yq ".deployment_configs.webapp_endpoint.'$env_name'" "$config_path")
+    con_object=$(yq ".llmops_config.'$env_name'.deployment_configs.webapp_endpoint" "$config_path")
 
     read -r -a connection_names <<< "$(echo "$con_object" | yq -r '.CONNECTION_NAMES | join(" ")')"
     echo $connection_names

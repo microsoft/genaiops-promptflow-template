@@ -15,7 +15,7 @@ class LLMOpsConfig:
         self, 
         flow_name: str = "",
         environment: str = "pr", 
-        config_path: str = "configs/config.yaml"
+        config_path: str = "configs/llmops_config.yaml"
     ):
         """Intialize MLConfig with yaml config data."""
         self.config_path = Path(flow_name, config_path)
@@ -35,24 +35,35 @@ class LLMOpsConfig:
         return self._raw_config['llmops_config'][self._environment]
     
     @property
+    def mapping_config(self):
+        """Get dataset mapping configuration."""
+        return self._raw_config['llmops_config']['mapping_config']
+    
+    @property
+    def deployment_configs(self):
+        """Get webapp endpoint deployment configuration."""
+        return self.model_config['deployment_configs']
+
+    @property
     def datasets_config(self):
         """Get datasets configuration."""
-        return self._raw_config['datasets_config'][self._environment]
+        return self.model_config['datasets_config']
 
     @property
     def azure_managed_endpoint_config(self):
         """Get azure managed endpoint deployment configuration."""
-        return self._raw_config['deployment_configs']['azure_managed_endpoint'][self._environment]
+        return self.model_config['deployment_configs']['azure_managed_endpoint']
     
     @property
     def kubernetes_endpoint_config(self):
         """Get kubernetes endpoint deployment configuration."""
-        return self._raw_config['deployment_configs']['kubernetes_endpoint'][self._environment]
+        return self.model_config['deployment_configs']['kubernetes_endpoint']
     
     @property
     def webapp_endpoint_config(self):
         """Get webapp endpoint deployment configuration."""
-        return self._raw_config['deployment_configs']['webapp_endpoint'][self._environment]
+        return self.model_config['deployment_configs']['webapp_endpoint']
+    
 
 
 if __name__ == "__main__":

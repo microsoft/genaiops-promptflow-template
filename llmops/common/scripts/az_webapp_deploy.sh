@@ -14,8 +14,8 @@ set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
-config="./$flow_to_execute/configs/config.yaml"
-con_object=$(yq ".deployment_configs.webapp_endpoint.'$env_name'" "$config")
+config="./$flow_to_execute/configs/llmops_config.yaml"
+con_object=$(yq ".llmops_config.'$env_name'.deployment_configs.webapp_endpoint" "$config")
 REGISTRY_NAME=$(echo "$con_object" | yq -r '.REGISTRY_NAME')
 rgname=$(echo "$con_object" | yq -r '.WEB_APP_RG_NAME')
 udmid=$(echo "$con_object" | yq -r '.USER_MANAGED_ID')

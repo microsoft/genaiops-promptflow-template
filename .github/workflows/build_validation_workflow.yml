@@ -29,6 +29,11 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r .github/requirements/build_validation_requirements.txt
           az version
+      - name: Export Secrets 
+        uses: oNaiPs/secrets-to-env-action@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+          convert: upper
       - name: Azure login
         uses: azure/login@v1
         with:
