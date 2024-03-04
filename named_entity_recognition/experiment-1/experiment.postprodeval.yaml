@@ -1,0 +1,13 @@
+name: named_entity_recognition
+flow: flows/post-production-evaluation
+
+datasets:
+- name: named_entity_recognition_pp_eval
+  source: data/production_log.jsonl
+  description: "This dataset is for post production evaluation."
+
+runtime: "runtime_name"
+evaluators: 
+
+# In this case the overlay is complicated, we are overriding all values including the standard flow path. 
+# Does overlay make any sense in this case? Should we require all experiment.xxx.yaml files to include all parameters (no longer overlays, but full replacements)?
