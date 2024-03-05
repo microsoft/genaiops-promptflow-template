@@ -30,17 +30,15 @@ class Dataset:
         self.source = source
         self.description = description
         self.reference = reference
-        if self.source.startswith("azureml:") and description:
-            raise ValueError(
-                f"In dataset '{name}' definition, `description` parameter only required for local data source,"
-                f"not Azure ML data source '{source}'"
-            )
 
     def with_mappings(self, mappings: dict[str, str]) -> "MappedDataset":
         return MappedDataset(mappings, self)
 
     def is_eval(self):
         return self.reference is not None
+
+    def is_remote(self):
+        return self.source.startswith("azureml:")
 
     # Define equality operation
     def __eq__(self, other):
@@ -243,13 +241,19 @@ def _create_datasets_and_default_mappings(
         _raise_error_if_missing_keys(
             ["name", "source", "mappings"],
             ds,
-            message=f"Dataset '{ds.get("name")}' config missing parameter",
+            message=f"Dataset '{ds.get('name')}' config missing parameter",
+        )
+        # Raise error if unexpected dataset configuration found
+        _raise_error_if_existing_keys(
+            ["reference"],
+            ds,
+            message=f"Unexpected parameter found in dataset '{ds.get('name')}' description",
         )
         dataset = Dataset(
             ds["name"], ds["source"], ds.get("description"), ds.get("reference")
         )
         datasets[dataset.name] = dataset
-        mappings.append(dataset.with_mappings(ds["mappings"]))
+        mappings.append(dataset.with_mappings(ds["mappings"] or {}))
 
     return datasets, mappings
 
@@ -281,7 +285,7 @@ def _create_eval_datasets_and_default_mappings(
         _raise_error_if_missing_keys(
             ["name", "mappings"],
             ds,
-            message=f"Dataset '{ds.get("name")}' config missing parameter",
+            message=f"Dataset '{ds.get('name')}' config missing parameter",
         )
         ds_name = ds["name"]
 
@@ -311,7 +315,7 @@ def _create_eval_datasets_and_default_mappings(
                 )
 
         # Collect mappings
-        mappings.append(dataset.with_mappings(ds["mappings"]))
+        mappings.append(dataset.with_mappings(ds["mappings"] or {}))
 
     return mappings
 
@@ -339,7 +343,7 @@ def _create_evaluators(
         _raise_error_if_missing_keys(
             ["name", "datasets"],
             raw_evaluator,
-            message=f"Evaluator '{raw_evaluator.get("name")}' config missing parameter",
+            message=f"Evaluator '{raw_evaluator.get('name')}' config missing parameter",
         )
         evaluator_datasets = _create_eval_datasets_and_default_mappings(
             raw_evaluator["datasets"], datasets
@@ -376,6 +380,68 @@ def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
     return os.path.join(safe_base_path, _DEFAULT_FLOWS_DIR, flow)
 
 
+def _load_base_experiment(exp_file_path: str, base_path: Optional[str]) -> Experiment:
+    exp_config: dict
+    with open(exp_file_path, "r") as yaml_file:
+        exp_config = yaml.safe_load(yaml_file)
+
+    # Read base raw datasets and create base datasets and mappings
+    raw_datasets: list[dict] = exp_config.get("datasets")
+    if not raw_datasets:
+        raise ValueError("No datasets configured for experiment")
+    datasets, mappings = _create_datasets_and_default_mappings(raw_datasets)
+
+    # Read base raw evaluators and create base evaluators
+    raw_evaluators: list[dict] = exp_config["evaluators"]
+    evaluators: list[Evaluator] = []
+    if raw_evaluators is not None and len(raw_evaluators) > 0:
+        evaluators = _create_evaluators(raw_evaluators, datasets, base_path)
+
+    # Create experiment
+    return Experiment(
+        base_path=base_path,
+        name=exp_config["name"],
+        flow=exp_config.get("flow"),
+        datasets=mappings,
+        evaluators=evaluators,
+    )
+
+
+def _apply_overlay(
+    experiment: Experiment, overlay_file_path: str, base_path: Optional[str]
+):
+    overlay_config: dict
+    with open(overlay_file_path, "r") as yaml_file:
+        overlay_config = yaml.safe_load(yaml_file)
+
+    experiment_dataset_map: dict[str, Dataset] = {
+        ds.dataset.name: ds.dataset for ds in experiment.datasets
+    }
+    # Read env raw datasets and create env datasets and mappings
+    if "datasets" in overlay_config:
+        overlay_raw_datasets: list[dict] = overlay_config["datasets"]
+        if overlay_raw_datasets:
+            overlay_datasets, overlay_mappings = _create_datasets_and_default_mappings(
+                overlay_raw_datasets
+            )
+            # Override experiment datasets
+            experiment.datasets = overlay_mappings
+            experiment_dataset_map = overlay_datasets
+        else:
+            experiment.datasets = []
+
+    # Read env raw evaluators and create env evaluators
+
+    if "evaluators" in overlay_config:
+        overlay_raw_evaluators: list[dict] = overlay_config["evaluators"]
+        if overlay_raw_evaluators:
+            experiment.evaluators = _create_evaluators(
+                overlay_raw_evaluators, experiment_dataset_map, base_path
+            )
+        else:
+            experiment.evaluators = []
+
+
 def load_experiment(
     filename: Optional[str] = None,
     base_path: Optional[str] = None,
@@ -393,98 +459,24 @@ def load_experiment(
     :type env: Optional[str]
     """
 
-    experiment_file_name = filename or "experiment.yaml"
     safe_base_path = base_path or ""
+    experiment_file_name = filename or "experiment.yaml"
 
-    exp_file_path = os.path.join(safe_base_path, experiment_file_name)
-    exp_config: dict
-    with open(exp_file_path, "r") as yaml_file:
-        exp_config = yaml.safe_load(yaml_file)
-
-    # Read raw datasets
-    raw_datasets: list[dict] = exp_config["datasets"]
-    if not raw_datasets:
-        raise ValueError("No datasets configured for experiment")
-
-    # Read raw environment
-    raw_environment: dict = exp_config.get("environment", {})
-
-    # Override from environment specific overlay file <experiment_name>.<env>.yaml
-    if env:
-        _apply_env_overlays(
-            env, experiment_file_name, safe_base_path, raw_datasets, raw_environment
-        )
-
-    # Create datasets and mappings
-    datasets, mappings = _create_datasets_and_default_mappings(raw_datasets)
-
-    # Read raw evaluators and create evaluator list
-    raw_evaluators: list[dict] = exp_config["evaluators"]
-    evaluators: list[Evaluator] = []
-    if raw_evaluators is not None and len(raw_evaluators) > 0:
-        evaluators = _create_evaluators(raw_evaluators, datasets, base_path)
-
-    # Create experiment
-    return Experiment(
-        base_path=base_path,
-        name=exp_config["name"],
-        flow=exp_config.get("flow"),
-        datasets=mappings,
-        evaluators=evaluators,
-    )
-
-
-def _apply_env_overlays(  # noqa: C901
-    env: str,
-    experiment_file_name: str,
-    safe_bath_path: str,
-    raw_datasets: list[dict],
-    raw_environment: dict,
-):
-    """
-    Apply environment overlays if a file with the name <experiment_name>.<env>.yaml exists.
-
-    :param experiment_file_name: The base experiment filename.
-    :type experiment_file_name: str
-    :param safe_base_path: The path to the directory containing the environment specific experiment overlay yaml file.
-    :type safe_base_path: str
-    :param raw_datasets: The raw description of the datasets from the base experiment yaml file.
-    :type raw_datasets: list[dict]
-    :param raw_environment: The raw runtime environment from the base experiment yaml file.
-    :type raw_environment: dict
-    :raises ValueError: If attempted override variable is not supported.
-    """
+    # Validate the experiment file name
     file_parts = os.path.splitext(experiment_file_name)
     if len(file_parts) != 2:  # noqa: PLR2004
         raise ValueError(f"Invalid experiment filename '{experiment_file_name}'")
+    env_experiment_file_name = f"{file_parts[0]}.{env}{file_parts[1]}"
 
-    env_exp_file_path = os.path.join(
-        safe_bath_path, f"{file_parts[0]}.{env}{file_parts[1]}"
-    )
-    if not os.path.exists(env_exp_file_path):
-        return
+    # Create base experiment
+    exp_file_path = os.path.join(safe_base_path, experiment_file_name)
+    if not os.path.exists(exp_file_path):
+        raise ValueError(f"Could not open experiment file in path {exp_file_path}")
+    experiment = _load_base_experiment(exp_file_path, safe_base_path)
 
-    env_overrides: dict
-    with open(env_exp_file_path, "r") as yaml_file:
-        env_overrides = yaml.safe_load(yaml_file)
+    # Apply environment overlay
+    env_exp_file_path = os.path.join(safe_base_path, env_experiment_file_name)
+    if os.path.exists(env_exp_file_path):
+        _apply_overlay(experiment, env_exp_file_path, base_path)
 
-    if "datasets" in env_overrides:
-        env_datasets = env_overrides["datasets"]
-        for env_ds in env_datasets:
-            if "mapping" in env_ds:
-                raise ValueError("Can not override dataset mappings")
-
-            # If the dataset is available in the raw datasets, override the source
-            for raw_ds in raw_datasets:
-                if raw_ds["name"] == env_ds["name"]:
-                    raw_ds["source"] = env_ds["source"]
-                    break
-
-    if "evaluators" in env_overrides:
-        raise ValueError("Can not override evaluators")
-
-    if "metrics" in env_overrides:
-        raise ValueError("Can not override metrics")
-
-    if "environment" in env_overrides:
-        raw_environment.update(env_overrides["environment"])
+    return experiment

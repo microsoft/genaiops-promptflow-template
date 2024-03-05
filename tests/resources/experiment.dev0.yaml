@@ -1,0 +1,16 @@
+datasets:
+- name: dsx
+  source: "dsx_source"
+  mappings: 
+    dsx_input: "dsx_mapping"
+
+evaluators:
+- name: evalx
+  datasets:
+  - name: dsx
+    mappings:
+      dsx_diff_input: "dsx_diff_mapping"
+  - name: dsy
+    source: dsy_source
+    reference: dsx
+    mappings:
