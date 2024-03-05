@@ -10,7 +10,7 @@ llmops_config:
     STANDARD_FLOW_PATH: flows/math_standard_flow
     EVALUATION_FLOW_PATH: flows/math_evaluation_flow
 
-    dataets_config:
+    datasets_config:
       - dataset : math_coding_pr
         PROMPT_FLOW_CONFIG_NAME: math_coding
         ENV_NAME: pr
