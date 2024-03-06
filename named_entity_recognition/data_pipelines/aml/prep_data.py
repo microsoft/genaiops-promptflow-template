@@ -1,10 +1,4 @@
 import argparse
-from pathlib import Path
-from typing_extensions import Concatenate
-from uuid import uuid4
-from datetime import datetime
-import os
-import pandas as pd
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
@@ -13,10 +7,10 @@ from azure.storage.blob import BlobServiceClient
 # 2. Change the file from csv to jsonl
 # 3. Save it as the jsonl file in the target account as eval and exp blob
 def main(source_blob_service_client, source_blob, target_blob_service_client, eval_blob, exp_blob):
-    print('data processing component')
     # df = pd.read_csv(os.path.join(raw_data_dir, 'data.txt'), sep='\t')
     # df.to_json("data.jsonl", orient="records", lines=True)
     # shutil.copyfile("data.jsonl", os.path.join(target_dir, 'data.jsonl'))
+    print('data processing component')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -29,6 +23,16 @@ if __name__ == "__main__":
         "--target_storage_account",
         type=str,
         help="target storage account",
+    )
+    parser.add_argument(
+        "--source_container_name",
+        type=str,
+        help="source container name",
+    )
+    parser.add_argument(
+        "--target_container_name",
+        type=str,
+        help="target container name",
     )
     parser.add_argument(
         "--source_blob",
@@ -49,6 +53,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     source_storage_account = args.source_storage_account
     target_storage_account = args.target_storage_account
+    source_container_name = args.source_container_name
+    target_container_name = args.target_container_name
     source_blob = args.source_blob
     eval_blob = args.eval_blob
     exp_blob = args.exp_blob
