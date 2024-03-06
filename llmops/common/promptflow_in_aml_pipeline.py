@@ -1,14 +1,14 @@
+import argparse
 import json
 import os
 import subprocess
 
 import yaml
-from azure.ai.ml import Input, MLClient, Output, load_component, command
+from azure.ai.ml import Input, MLClient, Output, command, load_component
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
-import argparse
 
 AML_EXPERIMENT_NAME = "pf_in_pipeline_experiment"
 AML_PIPELINE_NAME = "my_pipeline"
@@ -23,6 +23,7 @@ pipeline_components = []
 
 def create_dynamic_evaluation_pipeline(
     pipeline_name,
+    input_data_path,
 ):
     """
     Construct evaluation pipeline definition dynamically for a specific app and evaluator.
@@ -33,11 +34,12 @@ def create_dynamic_evaluation_pipeline(
 
     @pipeline(
         name=pipeline_name,
+        input_data_path=input_data_path,
     )
-    def evaluation_pipeline(name: str):
+    def evaluation_pipeline(name: str, input_data_path: str):
 
         pf_input_path = Input(
-            path=(AML_DATASTORE_PATH_PREFIX + AML_DATASTORE_PREPROCESS_FILE_NAME),
+            path=input_data_path,
             type=AssetTypes.URI_FILE,
         )
         preprocess_output_path = Output(
@@ -67,7 +69,7 @@ def create_dynamic_evaluation_pipeline(
     return evaluation_pipeline
 
 
-def build_pipeline(pipeline_name: str, promptflow_component_path: str):
+def build_pipeline(pipeline_name: str, flow_path: str, input_data_path: str):
     """
     Constructs an Azure Machine Learning pipeline. It encapsulates the process of defining pipeline inputs,
     loading pipeline components from YAMLs, configuring component environments settings, configuring pipeline settings etc.
@@ -86,7 +88,7 @@ def build_pipeline(pipeline_name: str, promptflow_component_path: str):
             "input_data_path": Input(type="uri_folder"),
             "max_records": Input(type="number"),
         },
-        outputs = {
+        outputs={
             "output_data_path": Output(type="uri_folder", mode="rw_mount"),
         },
         # The source folder of the component
@@ -100,7 +102,7 @@ def build_pipeline(pipeline_name: str, promptflow_component_path: str):
     )
     # This step loads the promptflow in the pipeline as a component
     evaluation_promptflow_component = load_component(
-        promptflow_component_path
+        flow_path,
     )
     postprocess_component = command(
         name="postprocess",
@@ -122,18 +124,15 @@ def build_pipeline(pipeline_name: str, promptflow_component_path: str):
     pipeline_components.append(postprocess_component)
 
     pipeline_definition = create_dynamic_evaluation_pipeline(
-        pipeline_name=pipeline_name
+        pipeline_name=pipeline_name,
+        input_data_path=input_data_path,
     )
 
     return pipeline_definition
 
 
 def prepare_and_execute(
-    subscription_id,
-    build_id, stage,
-    run_id,
-    data_purpose,
-    flow_to_execute
+    subscription_id, build_id, stage, run_id, data_purpose, flow_to_execute
 ):
     """
     Run the evaluation loop by executing evaluation flows.
@@ -159,29 +158,41 @@ def prepare_and_execute(
     data_mapping_config = f"{flow_to_execute}/configs/mapping_config.json"
     standard_flow_path = config["STANDARD_FLOW_PATH"]
     data_config_path = f"{flow_to_execute}/configs/data_config.json"
+    config_file = open(data_config_path)
+    data_config = json.load(config_file)
 
-    runtime = config["RUNTIME_NAME"]
+    dataset_name = []
+    for elem in data_config["datasets"]:
+        if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
+            if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
+                data_name = elem["DATASET_NAME"]
+                data = ml_client.data.get(name=data_name, label="latest")
+                # data_id = f"azureml:{data.name}:{data.version}"
+                dataset_name.append(data)
+
+    # get one data_id for now
+    data_path = dataset_name[0].path
+    # runtime = config["RUNTIME_NAME"] #TODO runtime not needed
     experiment_name = f"{flow_to_execute}_{stage}"
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        subscription_id,
-        resource_group_name,
-        workspace_name
+        DefaultAzureCredential(), subscription_id, resource_group_name, workspace_name
     )
-    
-    #logger.info(data_mapping_config)
+
+    # logger.info(data_mapping_config)
     # TODO data path how to take input in the promptflow
 
     flow_path = f"{flow_to_execute}/{standard_flow_path}/flow.dag.yaml"
     build_pipeline("TODO_PipelineName", flow_path)
-    
+
     pipeline_definition = build_pipeline(
         pipeline_name="TODO_PipelineName",
+        flow_path=flow_path,
+        input_data_path=data_path,
     )
-    
+
     pipeline_job = pipeline_definition(name="TODO_PipelineName")
-   # pipeline_job.settings.default_compute = compute_target # TODO compute
+    # pipeline_job.settings.default_compute = compute_target # TODO compute
 
     # Execute the ML Pipeline
     job = ml_client.jobs.create_or_update(
@@ -191,8 +202,7 @@ def prepare_and_execute(
 
     ml_client.jobs.stream(name=job.name)
 
-    
-    
+
 if __name__ == "__main__":
     """
     Run the main evaluation loop by executing evaluation flows.
@@ -220,16 +230,9 @@ if __name__ == "__main__":
         required=True,
     )
     parser.add_argument(
-        "--data_purpose",
-        type=str,
-        help="data identified by purpose",
-        required=True
+        "--data_purpose", type=str, help="data identified by purpose", required=True
     )
-    parser.add_argument(
-        "--run_id",
-        type=str,
-        required=True,
-        help="bulk run ids")
+    parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
 
     parser.add_argument(
         "--flow_to_execute", type=str, help="flow use case name", required=True
