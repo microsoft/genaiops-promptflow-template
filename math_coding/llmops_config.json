@@ -2,7 +2,7 @@
     "envs":[ 
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "aischool-pf01",
+                "RUNTIME_NAME": "aishool-pf-sp",
                 "KEYVAULT_NAME": "aischoolaml6363852430",
                 "RESOURCE_GROUP_NAME": "reactor-ai-school",
                 "WORKSPACE_NAME": "ai-school-aml",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "aischool-pf01",
+                "RUNTIME_NAME": "aishool-pf-sp",
                 "KEYVAULT_NAME": "aischoolaml6363852430",
                 "RESOURCE_GROUP_NAME": "reactor-ai-school",
                 "WORKSPACE_NAME": "ai-school-aml",
