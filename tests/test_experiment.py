@@ -401,7 +401,7 @@ def test_experiment_creation():
     }
 
     # Check outputs
-    experiment = Experiment(base_path, name, flow, [], [])
+    experiment = Experiment(base_path, name, flow, [], [], None)
     flow_detail = experiment.get_flow_detail()
 
     assert flow_detail.flow_path == os.path.join(base_path, "flows", flow)
@@ -521,6 +521,7 @@ def test_load_base_experiment(prepare_expected_experiment):
     # Prepare expected outputs
     expected_name = "exp"
     expected_flow = "exp_flow"
+    expected_runtime = "runtime_name"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_experiment
 
@@ -533,6 +534,7 @@ def test_load_base_experiment(prepare_expected_experiment):
     assert experiment.flow == expected_flow
     assert experiment.datasets == expected_mapped_datasets
     assert experiment.evaluators == expected_evaluators
+    assert experiment.runtime == expected_runtime
 
 
 def test_apply_overlay(
@@ -562,6 +564,7 @@ def test_apply_overlay(
     assert dev_experiment.flow == expected_flow
     assert dev_experiment.datasets == overlay_mapped_datasets
     assert dev_experiment.evaluators == overlay_evaluators
+    assert dev_experiment.runtime == "overridden_runtime"
 
     # Test dev1
     overlay_path = os.path.join(base_path, "experiment.dev1.yaml")
@@ -574,6 +577,7 @@ def test_apply_overlay(
     assert dev_experiment.flow == expected_flow
     assert dev_experiment.datasets == overlay_mapped_datasets
     assert dev_experiment.evaluators == base_evaluators
+    assert dev_experiment.runtime == "runtime_name"
 
     # Test dev2
     overlay_path = os.path.join(base_path, "experiment.dev2.yaml")
@@ -586,6 +590,7 @@ def test_apply_overlay(
     assert dev_experiment.flow == expected_flow
     assert dev_experiment.datasets == base_mapped_datasets
     assert dev_experiment.evaluators == prepare_special_overlay_evaluators
+    assert dev_experiment.runtime is None
 
     # Test dev3
     overlay_path = os.path.join(base_path, "experiment.dev3.yaml")
@@ -598,6 +603,7 @@ def test_apply_overlay(
     assert dev_experiment.flow == expected_flow
     assert dev_experiment.datasets == []
     assert dev_experiment.evaluators == []
+    assert dev_experiment.runtime == "runtime_name"
 
 
 def test_load_experiment(prepare_expected_experiment):
@@ -619,6 +625,7 @@ def test_load_experiment(prepare_expected_experiment):
     assert experiment.flow == expected_flow
     assert experiment.datasets == expected_mapped_datasets
     assert experiment.evaluators == expected_evaluators
+    assert experiment.runtime == "runtime_name"
 
 
 def test_load_experiment_with_overlay(prepare_expected_overlay):
@@ -640,3 +647,4 @@ def test_load_experiment_with_overlay(prepare_expected_overlay):
     assert experiment.flow == expected_flow
     assert experiment.datasets == expected_mapped_datasets
     assert experiment.evaluators == expected_evaluators
+    assert experiment.runtime == "overridden_runtime"
