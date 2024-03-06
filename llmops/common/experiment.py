@@ -156,6 +156,8 @@ class Experiment:
     :type datasets: List[Dataset]
     :param evaluators: List of evaluators.
     :type evaluators: List[Evaluator]
+    :param runtime: Name of the Prompt flow runtime to use in Azure ML. If not provided, use automatic runtime.
+    :type runtime: str
     """
 
     def __init__(
@@ -165,12 +167,14 @@ class Experiment:
         flow: Optional[str],
         datasets: list[MappedDataset],
         evaluators: list[Evaluator],
+        runtime: Optional[str],
     ):
         self.base_path = base_path
         self.name = name
         self.flow = flow or name
         self.datasets = datasets
         self.evaluators = evaluators
+        self.runtime = runtime
         self._flow_detail: Optional[FlowDetail] = None
 
     def get_flow_detail(self) -> FlowDetail:
@@ -392,10 +396,12 @@ def _load_base_experiment(exp_file_path: str, base_path: Optional[str]) -> Exper
     datasets, mappings = _create_datasets_and_default_mappings(raw_datasets)
 
     # Read base raw evaluators and create base evaluators
-    raw_evaluators: list[dict] = exp_config["evaluators"]
+    raw_evaluators: list[dict] = exp_config.get("evaluators")
     evaluators: list[Evaluator] = []
     if raw_evaluators is not None and len(raw_evaluators) > 0:
         evaluators = _create_evaluators(raw_evaluators, datasets, base_path)
+
+    runtime = exp_config.get("runtime")
 
     # Create experiment
     return Experiment(
@@ -404,6 +410,7 @@ def _load_base_experiment(exp_file_path: str, base_path: Optional[str]) -> Exper
         flow=exp_config.get("flow"),
         datasets=mappings,
         evaluators=evaluators,
+        runtime=runtime,
     )
 
 
@@ -440,6 +447,9 @@ def _apply_overlay(
             )
         else:
             experiment.evaluators = []
+
+    if "runtime" in overlay_config:
+        experiment.runtime = overlay_config["runtime"]
 
 
 def load_experiment(

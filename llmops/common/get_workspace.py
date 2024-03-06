@@ -17,9 +17,7 @@ import argparse
 logger = llmops_logger("get_workspace")
 
 
-def get_workspace(subscription_id: str,
-                  resource_group_name: str,
-                  workspace_name: str):
+def get_workspace(subscription_id: str, resource_group_name: str, workspace_name: str):
     """
     Run to get workspace object.
 
@@ -62,27 +60,20 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Azure subscription id"
-        )
+        help="Subscription ID, overwrites the SUBSCRIPTION_ID environment variable",
+        default=None,
+    )
 
     parser.add_argument(
-        "--resource_group_name",
-        type=str,
-        help="Azure Machine learning resource group"
+        "--resource_group_name", type=str, help="Azure Machine learning resource group"
     )
     parser.add_argument(
-        "--workspace_name",
-        type=str,
-        help="Azure Machine learning Workspace name"
+        "--workspace_name", type=str, help="Azure Machine learning Workspace name"
     )
 
     args = parser.parse_args()
 
-    get_workspace(
-        args.subscription_id,
-        args.resource_group_name,
-        args.workspace_name
-        )
+    get_workspace(args.subscription_id, args.resource_group_name, args.workspace_name)
 
 
 if __name__ == "__main__":
