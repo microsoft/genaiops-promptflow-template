@@ -20,6 +20,21 @@ def _try_get_env_var(variable_name: str) -> str:
     return value
 
 
+def _get_optional_env_var(variable_name: str) -> str:
+    """
+    Read environment variable. Return None if the variable doesn't exist or is empty.
+
+    :param variable_name: Environment variable name.
+    :type variable_name: str
+    :return: Value of the environment variable or None.
+    :rtype: str
+    """
+    value = os.environ.get(variable_name)
+    if value is None or value == "":
+        return None
+    return value
+
+
 class ExperimentCloudConfig:
     """
     Configuration for running an experiment in the cloud.
@@ -37,9 +52,11 @@ class ExperimentCloudConfig:
         subscription_id: Optional[str] = None,
         resource_group_name: Optional[str] = None,
         workspace_name: Optional[str] = None,
+        env_name: Optional[str] = None,
     ):
         self.subscription_id = subscription_id or _try_get_env_var("SUBSCRIPTION_ID")
         self.resource_group_name = resource_group_name or _try_get_env_var(
             "RESOURCE_GROUP_NAME"
         )
         self.workspace_name = workspace_name or _try_get_env_var("WORKSPACE_NAME")
+        self.environment_name = env_name or _get_optional_env_var("ENV_NAME")
