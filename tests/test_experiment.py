@@ -62,10 +62,13 @@ def test_create_datasets_and_default_mappings():
     assert datasets == expected_datasets
     check_lists_equal(mapped_datasets, expected_mapped_datasets)
 
-    assert datasets[g_name].is_remote()
     assert not datasets[g_name].is_eval()
-    assert not datasets[r_name].is_remote()
+    assert not datasets[g_name].get_local_source()
+    assert datasets[g_name].get_remote_name() == g_source
+
     assert not datasets[r_name].is_eval()
+    assert datasets[r_name].get_local_source() == os.path.join("data", r_source)
+    assert datasets[r_name].get_remote_name() == f"azureml:{r_name}:latest"
 
 
 @pytest.mark.parametrize(
@@ -178,14 +181,21 @@ def test_create_eval_datasets_and_default_mappings():
     )
     check_lists_equal(mapped_datasets, expected_mapped_datasets)
 
-    assert mapped_datasets[0].dataset.is_remote()
     assert mapped_datasets[0].dataset.is_eval()
+    assert mapped_datasets[0].dataset.get_remote_name() == g_source
+    assert not mapped_datasets[0].dataset.get_local_source()
 
-    assert not mapped_datasets[1].dataset.is_remote()
     assert mapped_datasets[1].dataset.is_eval()
+    assert mapped_datasets[1].dataset.get_remote_name() == f"azureml:{r_name}:latest"
+    assert mapped_datasets[1].dataset.get_local_source() == os.path.join(
+        "data", r_source
+    )
 
-    assert not mapped_datasets[2].dataset.is_remote()
     assert not mapped_datasets[2].dataset.is_eval()
+    assert mapped_datasets[2].dataset.get_remote_name() == f"azureml:{a_name}:latest"
+    assert mapped_datasets[2].dataset.get_local_source(
+        base_path="path"
+    ) == os.path.join("path", "data", a_source)
 
 
 @pytest.mark.parametrize(
@@ -336,6 +346,8 @@ def test_create_evaluators():
     # Check outputs
     evaluators = _create_evaluators(raw_evaluators, existing_datasets, base_path)
     assert evaluators == expected_evaluators
+
+    # TODO
     # assert evaluators[0].find_dataset_with_reference(g_name) is None
 
     # Test without base_path
