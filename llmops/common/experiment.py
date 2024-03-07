@@ -1,5 +1,6 @@
 import os
 from typing import Any, List, Optional, Tuple
+from azure.ai.ml import MLClient
 
 import yaml
 
@@ -39,18 +40,26 @@ class Dataset:
     def is_eval(self):
         return self.reference is not None
 
-    def get_remote_name(self):
+    def get_remote_name(self, ml_client: MLClient):
         if self.remote_source:
+            parts = self.source.split(":")
+            name = parts[1]
+            version = parts[2]
+            try:
+                ml_client.data.get(name=name, version=version)
+            except Exception:
+                raise ValueError(
+                    f"Azure ML dataset {name} not found in workspace {ml_client.workspace_name}"
+                )
             return self.source
-        return f"azureml:{self.name}:latest"
 
-    # def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
-    #     # Check if the flow path can be deducted from base path
-    #
-    #     if os.path.isfile(os.path.join(safe_base_path, flow, _FLOW_DAG_FILENAME)):
-    #         return os.path.abspath(os.path.join(safe_base_path, flow))
-
-    #     return os.path.join(safe_base_path, _DEFAULT_FLOWS_DIR, flow)
+        try:
+            ds = ml_client.data.get(name=self.name, label="latest")
+        except Exception:
+            raise ValueError(
+                f"Azure ML dataset {self.name} not found in workspace {ml_client.workspace_name}"
+            )
+        return f"azureml:{self.name}:{ds.version}"
 
     def get_local_source(self, base_path: Optional[str] = None):
         if self.remote_source:
