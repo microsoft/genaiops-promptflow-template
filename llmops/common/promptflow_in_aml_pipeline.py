@@ -98,7 +98,7 @@ def build_pipeline(pipeline_name: str, flow_path: str, input_data_path: str):
                 --max_records "${{inputs.max_records}}" \
                 --output_data_path "${{outputs.output_data_path}}" \
                 """,
-        environment="TODO",
+        environment="azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1", #TODO FIXME
     )
     # This step loads the promptflow in the pipeline as a component
     evaluation_promptflow_component = load_component(
@@ -116,7 +116,7 @@ def build_pipeline(pipeline_name: str, flow_path: str, input_data_path: str):
         command="""python postprocess.py  \
                 --input_data_path "${{inputs.input_data_path}}" \
                 """,
-        environment="TODO",
+        environment="azureml:AzureML-sklearn-1.0-ubuntu20.04-py38-cpu:1",
     )
     pipeline_components.append(preprocess_component)
     pipeline_components.append(evaluation_promptflow_component)
@@ -165,19 +165,19 @@ def prepare_and_execute(
     )
 
     dataset_name = []
-    # for elem in data_config["datasets"]:
-    #     if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
-    #         if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
-    #             data_name = elem["DATASET_NAME"]
-    #             print("Sugandh data name is", data_name)
-    #             data = ml_client.data.get(name=data_name, label="1")
-    #             # data_id = f"azureml:{data.name}:{data.version}"
-    #             dataset_name.append(data)
-    #             break
+    for elem in data_config["datasets"]:
+        if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
+            if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
+                data_name = elem["DATASET_NAME"]
+                data = ml_client.data.get(name=data_name, label="latest")
+                # data_id = f"azureml:{data.name}:{data.version}"
+                dataset_name.append(data)
+                break
 
     # get one data_id for now
-    #data_path = dataset_name[0].path
-    data_path = "azureml://subscriptions/5c03a417-1523-4af4-b354-884eaf49f687/resourcegroups/oasis-setup-sugandh/workspaces/fk-spike-ml-pf-batch-pipeline/datastores/workspaceblobstore/paths/UI/2024-03-07_083853_UTC/data.jsonl"
+    data_path = dataset_name[0].path
+    print(" data_path = ", data_path)
+    #data_path = "azureml://subscriptions/5c03a417-1523-4af4-b354-884eaf49f687/resourcegroups/oasis-setup-sugandh/workspaces/fk-spike-ml-pf-batch-pipeline/datastores/workspaceblobstore/paths/UI/2024-03-07_083853_UTC/data.jsonl"
     # runtime = config["RUNTIME_NAME"] #TODO runtime not needed
     experiment_name = f"{flow_to_execute}_{stage}"
 
