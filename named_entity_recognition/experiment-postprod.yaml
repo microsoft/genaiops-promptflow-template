@@ -8,8 +8,5 @@ datasets:
   mappings:
     text: "${data.text}"
     entity_type: "${data.entity_type}"
-  conditions:
-    - prod
 
-runtime: "runtime_name"
 evaluators: 
