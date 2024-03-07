@@ -92,9 +92,9 @@ def prepare_and_execute(
     all_df = []
     all_metrics = []
 
-    logger.info("Running experiment %s", experiment.name)
+    logger.info(f"Running experiment {experiment.name}")
     for mapped_dataset in experiment.datasets:
-        logger.info("Using dataset %s", mapped_dataset.dataset.source)
+        logger.info(f"Using dataset {mapped_dataset.dataset.source}")
         dataset = mapped_dataset.dataset
         column_mapping = mapped_dataset.mappings
 
@@ -107,7 +107,7 @@ def prepare_and_execute(
             for variant in flow_detail.all_variants:
                 for variant_id, node_id in variant.items():
                     logger.info(
-                        "Creating run for node '%s' variant '%s'", node_id, variant_id
+                        f"Creating run for node '{node_id}' variant '{variant_id}'"
                     )
                     variant_string = f"${{{node_id}.{variant_id}}}"
                     get_current_defaults = {
@@ -129,8 +129,7 @@ def prepare_and_execute(
                             )
                         else:
                             logger.info(
-                                "Using runtime '%s' for the prompt flow run",
-                                experiment.runtime,
+                                f"Using runtime '{experiment.runtime}' for the prompt flow run"
                             )
 
                         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -158,8 +157,7 @@ def prepare_and_execute(
 
                         # Execute the run
                         logger.info(
-                            "Starting prompt flow run '%s' in Azure ML. This can take a few minutes.",
-                            run.name,
+                            f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
                         )
                         job = pf.runs.create_or_update(run, stream=True)
                         run_ids.append(job.name)
@@ -167,9 +165,9 @@ def prepare_and_execute(
 
                         df_result = pf.get_details(job)
                         logger.info(
-                            "Run %s completed with status %s", job.name, job.status
+                            f"Run {job.name} completed with status {job.status}",
                         )
-                        logger.info("Results:\n%s", df_result.head(10))
+                        logger.info(f"Results:\n{df_result.head(10)}")
                         logger.info("Finished processing default variant\n")
 
                         if save_output:
@@ -190,7 +188,7 @@ def prepare_and_execute(
                 )
             else:
                 logger.info(
-                    "Using runtime '%s' for the prompt flow run", experiment.runtime
+                    f"Using runtime '{experiment.runtime}' for the prompt flow run"
                 )
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -213,16 +211,17 @@ def prepare_and_execute(
 
             # Execute the run
             logger.info(
-                "Starting prompt flow run '%s' in Azure ML. This can take a few minutes.",
-                run.name,
+                f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
             )
             pf.ml_client
             job = pf.runs.create_or_update(run, stream=True)
             run_ids.append(job.name)
             wait_job_finish(job, logger)
             df_result = pf.get_details(job)
-            logger.info("Run %s completed with status %s", job.name, job.status)
-            logger.info("Results:\n%s", df_result.head(10))
+            logger.info(f"Run {job.name} completed with status {job.status}")
+            logger.info(
+                f"Results:\n{df_result.head(10)}",
+            )
             logger.info("Finished processing default variant\n")
 
             if save_output:

@@ -27,6 +27,11 @@ def check_lists_equal(actual: List[Any], expected: List[Any]):
     assert all(any(a == e for e in expected) for a in actual)
 
 
+# TODO test Evaluator::find_dataset_with_reference(g_name)
+# TODO test Experiment::get_dataset
+# TODO test Dataset::get_remote_name
+
+
 def test_create_datasets_and_default_mappings():
     # Prepare inputs
     g_name = "groundedness"
@@ -341,9 +346,6 @@ def test_create_evaluators():
     # Check outputs
     evaluators = _create_evaluators(raw_evaluators, existing_datasets, base_path)
     assert evaluators == expected_evaluators
-
-    # TODO
-    # assert evaluators[0].find_dataset_with_reference(g_name) is None
 
     # Test without base_path
     base_path = None

@@ -126,11 +126,15 @@ class Evaluator:
         self.path = path or os.path.join("flows", name)
         self.datasets = datasets
 
-    def find_dataset_with_reference(self, dataset_name: str) -> Optional[MappedDataset]:
+    def find_dataset_with_reference(self, dataset_name: str) -> List[MappedDataset]:
+        matching_datasets = []
         for dataset in self.datasets:
-            if dataset.dataset.reference == dataset_name:
-                return dataset
-        return None
+            if (
+                dataset.dataset.reference == dataset_name
+                or dataset.dataset.name == dataset_name
+            ):
+                matching_datasets.append(dataset)
+        return matching_datasets
 
     # Define equality operation
     def __eq__(self, other):
@@ -206,6 +210,12 @@ class Experiment:
         self.evaluators = evaluators
         self.runtime = runtime
         self._flow_detail: Optional[FlowDetail] = None
+
+    def get_dataset(self, name: str):
+        for mapped_ds in self.datasets:
+            ds = mapped_ds.dataset
+            if ds.name == name:
+                return ds
 
     def get_flow_detail(self) -> FlowDetail:
         self._flow_detail = self._flow_detail or self._load_flow_detail()
