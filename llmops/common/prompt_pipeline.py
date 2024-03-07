@@ -226,10 +226,8 @@ def prepare_and_execute(
             logger.info("Finished processing default variant\n")
 
             if save_output:
-                print("save_output")
                 dataframes.append(df_result)
             if save_metric:
-                print("same_metric")
                 metric_variant = df_result
                 metric_variant["dataset"] = dataset.name
                 metrics.append(metric_variant)
