@@ -2,18 +2,17 @@
 This module evaluates bulk-runs using evaluation flows.
 
 Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
+--file: The name of the experiment file. Default is 'experiment.yaml'.
+--base_path: Base path of the use case. Where flows, data,
+and experiment.yaml are expected to be found.
+--subscription_id: The Azure subscription ID. If this argument is not
+specified, the SUBSCRIPTION_ID environment variable is expected to be provided.
 --build_id: The unique identifier for build execution.
-This argument is required to identify the specific build execution.
---env_name: The environment name for execution/deployment.
-This argument is required to specify the environment (dev, test, prod)
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---run_id: The bulk run IDs.
-This argument is required to specify the bulk run IDs for execution.
---flow_to_execute: The name of the flow use case.
-This argument is required to specify the name of the flow for execution.
+This argument is not required but will be added as a run tag if specified.
+--env_name: The environment name for execution and deployment. This argument
+is not required but will be used to read experiment overlay files if specified.
+--run_id: Run ids of runs to be evaluated (File or comma separated string)
+--report_dir: The directory where the outputs and metrics will be stored.
 """
 
 import argparse
