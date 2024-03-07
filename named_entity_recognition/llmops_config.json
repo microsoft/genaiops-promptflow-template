@@ -2,7 +2,6 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "buildairuntime1",
                 "KEYVAULT_NAME": "aiserviceaustr3066108404",
                 "RESOURCE_GROUP_NAME": "AI-Services",
                 "WORKSPACE_NAME": "BuildAI",
@@ -11,7 +10,6 @@
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "buildairuntime1",
                 "KEYVAULT_NAME": "aiserviceaustr3066108404",
                 "RESOURCE_GROUP_NAME": "AI-Services",
                 "WORKSPACE_NAME": "BuildAI",
@@ -20,7 +18,6 @@
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "buildairuntime1",
                 "KEYVAULT_NAME": "aiserviceaustr3066108404",
                 "RESOURCE_GROUP_NAME": "AI-Services",
                 "WORKSPACE_NAME": "BuildAI",
