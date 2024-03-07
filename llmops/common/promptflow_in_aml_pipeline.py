@@ -4,7 +4,7 @@ import os
 import subprocess
 
 import yaml
-from azure.ai.ml import Input, MLClient, Output, command, load_component
+from azure.ai.ml import dsl, Input, MLClient, Output, command, load_component
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
@@ -32,7 +32,7 @@ def create_dynamic_evaluation_pipeline(
         pipeline_name (str): Name of the pipeline.
     """
 
-    @pipeline(
+    @dsl.pipeline(
         name=pipeline_name,
         input_data_path=input_data_path,
     )
@@ -92,7 +92,7 @@ def build_pipeline(pipeline_name: str, flow_path: str, input_data_path: str):
             "output_data_path": Output(type="uri_folder", mode="rw_mount"),
         },
         # The source folder of the component
-        code="components/src",
+        code="./components/",
         command="""python preprocess.py \
                 --input_data_path "${{inputs.input_data_path}}" \
                 --max_records "${{inputs.max_records}}" \
@@ -110,10 +110,9 @@ def build_pipeline(pipeline_name: str, flow_path: str, input_data_path: str):
         description="Reads the output of the Promptflow experiment and does some post processing.",
         inputs={
             "input_data_path": Input(type="uri_folder"),
-            "max_records": Input(type="number"),
         },
         # The source folder of the component
-        code="components/src",
+        code="./components/",
         command="""python postprocess.py  \
                 --input_data_path "${{inputs.input_data_path}}" \
                 """,
@@ -161,38 +160,41 @@ def prepare_and_execute(
     config_file = open(data_config_path)
     data_config = json.load(config_file)
 
-    dataset_name = []
-    for elem in data_config["datasets"]:
-        if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
-            if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
-                data_name = elem["DATASET_NAME"]
-                data = ml_client.data.get(name=data_name, label="latest")
-                # data_id = f"azureml:{data.name}:{data.version}"
-                dataset_name.append(data)
-
-    # get one data_id for now
-    data_path = dataset_name[0].path
-    # runtime = config["RUNTIME_NAME"] #TODO runtime not needed
-    experiment_name = f"{flow_to_execute}_{stage}"
-
     ml_client = MLClient(
         DefaultAzureCredential(), subscription_id, resource_group_name, workspace_name
     )
+
+    dataset_name = []
+    # for elem in data_config["datasets"]:
+    #     if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
+    #         if stage == elem["ENV_NAME"] and data_purpose == elem["DATA_PURPOSE"]:
+    #             data_name = elem["DATASET_NAME"]
+    #             print("Sugandh data name is", data_name)
+    #             data = ml_client.data.get(name=data_name, label="1")
+    #             # data_id = f"azureml:{data.name}:{data.version}"
+    #             dataset_name.append(data)
+    #             break
+
+    # get one data_id for now
+    #data_path = dataset_name[0].path
+    data_path = "azureml://subscriptions/5c03a417-1523-4af4-b354-884eaf49f687/resourcegroups/oasis-setup-sugandh/workspaces/fk-spike-ml-pf-batch-pipeline/datastores/workspaceblobstore/paths/UI/2024-03-07_083853_UTC/data.jsonl"
+    # runtime = config["RUNTIME_NAME"] #TODO runtime not needed
+    experiment_name = f"{flow_to_execute}_{stage}"
 
     # logger.info(data_mapping_config)
     # TODO data path how to take input in the promptflow
 
     flow_path = f"{flow_to_execute}/{standard_flow_path}/flow.dag.yaml"
-    build_pipeline("TODO_PipelineName", flow_path)
+    build_pipeline("mypipeline", flow_path, data_path)
 
     pipeline_definition = build_pipeline(
-        pipeline_name="TODO_PipelineName",
+        pipeline_name="mypipeline",
         flow_path=flow_path,
         input_data_path=data_path,
     )
 
-    pipeline_job = pipeline_definition(name="TODO_PipelineName")
-    # pipeline_job.settings.default_compute = compute_target # TODO compute
+    pipeline_job = pipeline_definition(name="mypipeline", input_data_path=data_path)
+    pipeline_job.settings.default_compute = "sugmishra1" # TODO compute
 
     # Execute the ML Pipeline
     job = ml_client.jobs.create_or_update(
@@ -232,7 +234,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data_purpose", type=str, help="data identified by purpose", required=True
     )
-    parser.add_argument("--run_id", type=str, required=True, help="bulk run ids")
+    parser.add_argument("--compute_target", type=str, required=True, help="Compute target name")
 
     parser.add_argument(
         "--flow_to_execute", type=str, help="flow use case name", required=True
@@ -243,7 +245,7 @@ if __name__ == "__main__":
         args.subscription_id,
         args.build_id,
         args.env_name,
-        args.run_id,
+        args.compute_target,
         args.data_purpose,
         args.flow_to_execute,
     )
