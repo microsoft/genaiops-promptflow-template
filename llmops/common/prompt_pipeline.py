@@ -140,11 +140,11 @@ def prepare_and_execute(
                         runtime_resources = (
                             None
                             if experiment.runtime
-                            else {"instance_type": config.serverless_instance_type}
+                            else {"instance_type": "Standard_E4ds_v4"}
                         )
                         run = Run(
                             flow=flow_detail.flow_path,
-                            data=dataset.get_remote_name(),
+                            data=dataset.get_remote_name(pf.ml_client),
                             variant=variant_string,
                             name=run_name,
                             display_name=run_name,
@@ -163,7 +163,7 @@ def prepare_and_execute(
                         )
                         job = pf.runs.create_or_update(run, stream=True)
                         run_ids.append(job.name)
-                        wait_job_finish(job)
+                        wait_job_finish(job, logger)
 
                         df_result = pf.get_details(job)
                         logger.info(
@@ -184,25 +184,23 @@ def prepare_and_execute(
             logger.info("Start processing default variant")
 
             # Create run object
-            if not config.runtime:
+            if not experiment.runtime:
                 logger.info(
                     "Using automatic runtime and serverless compute for the prompt flow run"
                 )
             else:
                 logger.info(
-                    "Using runtime '%s' for the prompt flow run", config.runtime
+                    "Using runtime '%s' for the prompt flow run", experiment.runtime
                 )
 
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             run_name = f"{experiment.name}_{timestamp}_{dataset.name}"
             runtime_resources = (
-                None
-                if experiment.runtime
-                else {"instance_type": config.serverless_instance_type},
+                None if experiment.runtime else {"instance_type": "Standard_E4ds_v4"}
             )
             run = Run(
                 flow=flow_detail.flow_path,
-                data=dataset.get_remote_name(),
+                data=dataset.get_remote_name(pf.ml_client),
                 name=run_name,
                 display_name=run_name,
                 environment_variables=env_vars,
@@ -218,17 +216,20 @@ def prepare_and_execute(
                 "Starting prompt flow run '%s' in Azure ML. This can take a few minutes.",
                 run.name,
             )
+            pf.ml_client
             job = pf.runs.create_or_update(run, stream=True)
             run_ids.append(job.name)
-            wait_job_finish(job)
+            wait_job_finish(job, logger)
             df_result = pf.get_details(job)
             logger.info("Run %s completed with status %s", job.name, job.status)
             logger.info("Results:\n%s", df_result.head(10))
             logger.info("Finished processing default variant\n")
 
             if save_output:
+                print("save_output")
                 dataframes.append(df_result)
             if save_metric:
+                print("same_metric")
                 metric_variant = df_result
                 metric_variant["dataset"] = dataset.name
                 metrics.append(metric_variant)
@@ -324,7 +325,7 @@ def main():
     parser.add_argument(
         "--report_dir",
         type=str,
-        default=None,
+        default="./reports",
         help="A folder to save evaluation results and metrics",
     )
     parser.add_argument(
@@ -334,13 +335,13 @@ def main():
         "--save_output",
         help="Save the outputs to report dir",
         required=False,
-        action="store_false",
+        action="store_true",
     )
     parser.add_argument(
         "--save_metric",
         help="Save the metrics to report dir",
         required=False,
-        action="store_false",
+        action="store_true",
     )
     args = parser.parse_args()
 
