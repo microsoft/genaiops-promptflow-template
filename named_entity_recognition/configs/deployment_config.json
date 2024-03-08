@@ -3,13 +3,13 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "endpointmanaged",
+            "ENDPOINT_NAME": "name-entities-endpoint",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
-            "PRIOR_DEPLOYMENT_NAME": "endpointmanaged",
+            "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
-            "CURRENT_DEPLOYMENT_NAME": "endpointmanaged",
-            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "20",
+            "CURRENT_DEPLOYMENT_NAME": "name-entities-end-dep",
+            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
