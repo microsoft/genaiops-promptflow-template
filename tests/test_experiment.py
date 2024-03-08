@@ -1,3 +1,5 @@
+from unittest.mock import Mock
+
 import os
 from pathlib import Path
 from typing import Any, List
@@ -27,15 +29,11 @@ def check_lists_equal(actual: List[Any], expected: List[Any]):
     assert all(any(a == e for e in expected) for a in actual)
 
 
-# TODO test Evaluator::find_dataset_with_reference(g_name)
-# TODO test Experiment::get_dataset
-# TODO test Dataset::get_remote_name
-
-
 def test_create_datasets_and_default_mappings():
     # Prepare inputs
     g_name = "groundedness"
-    g_source = "azureml:groundedness:1"
+    g_version = "9"
+    g_source = f"azureml:groundedness:{g_version}"
     g_mappings = {"claim": "claim_mapping"}
     g_dataset = Dataset(g_name, g_source, None, None)
 
@@ -72,6 +70,29 @@ def test_create_datasets_and_default_mappings():
 
     assert not datasets[r_name].is_eval()
     assert datasets[r_name].get_local_source() == os.path.join("data", r_source)
+
+    # Test get_remote_name
+
+    g_latest_remote_version = "7"
+
+    def mock_data_get(name: str, version: str = None, label: str = None):
+        if name == g_name:
+            if version == g_version:
+                return Mock()
+            raise Exception()
+        if name == r_name:
+            if label == "latest":
+                g_remote_ds = Mock()
+                g_remote_ds.version = g_latest_remote_version
+                return g_remote_ds
+            raise Exception()
+        raise Exception()
+
+    mock_ml_client = Mock()
+    mock_ml_client.data.get.side_effect = mock_data_get
+
+    assert datasets[g_name].get_remote_name(mock_ml_client) == g_source
+    assert datasets[r_name].get_remote_name(mock_ml_client) == f"azureml:{r_name}:7"
 
 
 @pytest.mark.parametrize(
@@ -289,7 +310,7 @@ def test_create_evaluators():
     g_ds_name = "groundedness"
     g_ds_source = "groundedness_source"
     g_ds_mappings = {"claim": "claim_mapping"}
-    g_ds_reference = "g_ref_mappings"
+    g_ds_reference = "groundedness_reference"
     g_ds_dataset = Dataset(g_ds_name, g_ds_source, None, g_ds_reference)
 
     g_ds_ref_source = "groundedness_ref_source"
@@ -367,6 +388,17 @@ def test_create_evaluators():
     # Check outputs
     evaluators = _create_evaluators(raw_evaluators, existing_datasets, base_path)
     assert evaluators == expected_evaluators
+
+    # Asset that the groundedness evaluator can match the standard dataset (g_ds_reference) to the evaluation dataset (g_ds_dataset)
+    assert (
+        evaluators[0].find_dataset_with_reference(g_ds_reference)
+        == evaluators[0].datasets
+    )
+
+    # Asset that the recall evaluator can match the standard dataset (r_ds_name) to the standard/evaluation dataset (r_ds_dataset)
+    assert (
+        evaluators[1].find_dataset_with_reference(r_ds_name) == evaluators[1].datasets
+    )
 
 
 @pytest.mark.parametrize(
