@@ -27,6 +27,7 @@ jobs:
       azure_credentials: ${{ secrets.azure_credentials }}
   run_unit_tests:
     runs-on: ubuntu-latest
+    needs: pr_code_validation
     steps:
       - name: Run llmops unit tests
         run: python -m pytest tests/
