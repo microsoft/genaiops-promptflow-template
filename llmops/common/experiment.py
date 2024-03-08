@@ -466,6 +466,9 @@ def _apply_overlay(
     with open(overlay_file_path, "r") as yaml_file:
         overlay_config = yaml.safe_load(yaml_file)
 
+    if not overlay_config:
+        return
+
     experiment_dataset_map: dict[str, Dataset] = {
         ds.dataset.name: ds.dataset for ds in experiment.datasets
     }

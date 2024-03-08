@@ -24,7 +24,10 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+
+logger = llmops_logger("provision_endpoint")
 
 
 def create_endpoint(
@@ -47,6 +50,7 @@ def create_endpoint(
 
     config_file = open(real_config)
     endpoint_config = json.load(config_file)
+
     for elem in endpoint_config["azure_managed_endpoint"]:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
@@ -56,13 +60,15 @@ def create_endpoint(
                     name=endpoint_name,
                     description=endpoint_desc,
                     auth_mode="key",
-                    tags={"build_id": build_id},
+                    tags={"build_id": build_id} if build_id else {},
                 )
 
+                logger.info(f"Creating endpoint {endpoint.name}")
                 ml_client.online_endpoints.begin_create_or_update(
                     endpoint=endpoint
                 ).result()
 
+                logger.info(f"Obtaining endpoint {endpoint.name} identity")
                 principal_id = ml_client.online_endpoints.get(
                     endpoint_name
                 ).identity.principal_id
