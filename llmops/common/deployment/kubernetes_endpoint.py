@@ -24,7 +24,10 @@ from azure.ai.ml import MLClient
 from azure.ai.ml.entities import KubernetesOnlineEndpoint
 from azure.identity import DefaultAzureCredential
 
+from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+
+logger = llmops_logger("provision_endpoint")
 
 
 def create_kubernetes_endpoint(
@@ -60,17 +63,18 @@ def create_kubernetes_endpoint(
                     description=endpoint_desc,
                     compute=compute_name,
                     auth_mode="key",
-                    tags={"build_id": build_id},
+                    tags={"build_id": build_id} if build_id else {},
                 )
 
+                logger.info(f"Creating endpoint {endpoint.name}")
                 ml_client.online_endpoints.begin_create_or_update(
                     endpoint=endpoint
                 ).result()
 
+                logger.info(f"Obtaining endpoint {endpoint.name} identity")
                 principal_id = ml_client.online_endpoints.get(
                     endpoint_name
                 ).identity.principal_id
-
                 if output_file is not None:
                     with open(output_file, "w") as out_file:
                         out_file.write(str(principal_id))

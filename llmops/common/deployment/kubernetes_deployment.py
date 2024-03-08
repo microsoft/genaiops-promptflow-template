@@ -144,7 +144,7 @@ def create_kubernetes_deployment(
                     instance_type=deployment_vm_size,
                     instance_count=deployment_instance_count,
                     environment_variables=dict(environment_variables),
-                    tags={"build_id": build_id},
+                    tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
                     request_settings=OnlineRequestSettings(request_timeout_ms=90000),
                     resources=ResourceRequirementsSettings(
