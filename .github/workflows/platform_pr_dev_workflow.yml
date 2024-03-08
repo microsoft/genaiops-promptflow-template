@@ -25,6 +25,11 @@ jobs:
       flow_type: ${{ inputs.flow_type }}
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}
+  run_unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run llmops unit tests
+        run: python -m pytest tests/
   pr_flow_validation:
     runs-on: ubuntu-latest
     needs: pr_code_validation

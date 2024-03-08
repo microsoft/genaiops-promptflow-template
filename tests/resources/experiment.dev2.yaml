@@ -1,0 +1,8 @@
+evaluators:
+- name: evalx
+  datasets:
+  - name: ds1
+    mappings:
+      ds1_diff_input: "ds1_diff_mapping"
+
+runtime:
