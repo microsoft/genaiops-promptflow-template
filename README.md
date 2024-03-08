@@ -59,6 +59,7 @@ Each use case (set of Prompt flow standard and evaluation flows) should follow t
 - environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps.
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
+- data-pipelines   : It contains the data pipelines to generate the datasets (experimentation, evaluation etc.) necessary for the flows. This folder will have sub-folders specific to the data engineering tool - Microsoft Fabric, Azure ML etc.
 
 Additionally, there is a llmops_config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
 
@@ -69,6 +70,8 @@ Additionally, there is a llmops_config.json file that refers to important infras
 - The 'docs' folder contains documentation for step-by-step guides for both Azure DevOps and Github Workflow related configuration.
 
 - The 'llmops' folder contains all the code related to flow execution, evaluation and deployment.
+
+- The 'dataops' folder contains all the code related to data pipeline deployment.
 
 - The 'local_execution' folder contains python scripts for executing both the standard and evaluation flow locally.
 
@@ -131,6 +134,12 @@ python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptfl
 4. Bring or write your flows into the template based on documentation [here](./docs/how_to_onboard_new_flows.md).
 
 5. Write python scripts similar to the provided examples in local_execution folder.
+
+# DataOps
+
+DataOps combines aspects of DevOps, agile methodologies, and data management practices to streamline the process of collecting, processing, and analyzing data. DataOps can help to bring discipline in building the datasets (training, experimentation, evaluation etc.) necessary for LLM app development.
+
+The data pipelines are kept seperate from the prompt engineering flows. Data pipelines create the datasets and the datasets are registered as data assets in Azure ML for the flows to consume. This approach helps to scale and troubleshoot independently different parts of the system.
 
 ## Contributing
 
