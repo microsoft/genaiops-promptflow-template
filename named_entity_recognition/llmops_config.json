@@ -2,10 +2,10 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "aml-llmops-pf-runtime",
+                "KEYVAULT_NAME": "amlllmopsdemo4110736129",
+                "RESOURCE_GROUP_NAME": "rg-llmops-demo",
+                "WORKSPACE_NAME": "aml-llmops-demo",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
