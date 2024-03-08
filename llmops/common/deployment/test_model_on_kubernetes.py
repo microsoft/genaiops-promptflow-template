@@ -16,7 +16,7 @@ import json
 from azure.ai.ml import MLClient
 
 from azure.identity import DefaultAzureCredential
-
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.logger import llmops_logger
 logger = llmops_logger("test_model_on_kubernetes")
 
@@ -48,17 +48,11 @@ args = parser.parse_args()
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
 
-main_config = open(f"{flow_to_execute}/llmops_config.json")
-model_config = json.load(main_config)
-
-for obj in model_config["envs"]:
-    if obj.get("ENV_NAME") == stage:
-        config = obj
-        break
+main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+config = main_config.model_config
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
-real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 ml_client = MLClient(
     DefaultAzureCredential(),
@@ -67,26 +61,24 @@ ml_client = MLClient(
     workspace_name
 )
 
-config_file = open(real_config)
-endpoint_config = json.load(config_file)
-for elem in endpoint_config["kubernetes_endpoint"]:
-    if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
-        if stage == elem["ENV_NAME"]:
-            endpoint_name = elem["ENDPOINT_NAME"]
-            deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
-            test_model_file = elem["TEST_FILE_PATH"]
+endpoint_config = main_config.kubernetes_endpoint_config
+if "ENDPOINT_NAME" in endpoint_config and "ENV_NAME" in endpoint_config:
+    if stage == endpoint_config["ENV_NAME"]:
+        endpoint_name = endpoint_config["ENDPOINT_NAME"]
+        deployment_name = endpoint_config["CURRENT_DEPLOYMENT_NAME"]
+        test_model_file = endpoint_config["TEST_FILE_PATH"]
 
-            endpoint_url = ml_client.online_endpoints.get(
-                name=endpoint_name
-            ).scoring_uri
-            api_key = ml_client.online_endpoints.get_keys(
-                name=endpoint_name
-            ).primary_key
+        endpoint_url = ml_client.online_endpoints.get(
+            name=endpoint_name
+        ).scoring_uri
+        api_key = ml_client.online_endpoints.get_keys(
+            name=endpoint_name
+        ).primary_key
 
-            request_result = ml_client.online_endpoints.invoke(
-                endpoint_name=endpoint_name,
-                deployment_name=deployment_name,
-                request_file=f"{flow_to_execute}/{test_model_file}",
-            )
+        request_result = ml_client.online_endpoints.invoke(
+            endpoint_name=endpoint_name,
+            deployment_name=deployment_name,
+            request_file=f"{flow_to_execute}/{test_model_file}",
+        )
 
-            logger.info(request_result)
+        logger.info(request_result)

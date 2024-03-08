@@ -43,15 +43,15 @@ runs:
     - name: Assign Azure resource permissions
       shell: bash
       run: |
-        file_path="./${{ inputs.flow_to_execute }}/llmops_config.json"
+        file_path=".//${{ parameters.flow_to_execute }}/configs/llmops_config.yaml"
         desired_type=${{ inputs.DEPLOY_ENVIRONMENT }}
-        selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+        selected_object=$(yq ".llmops_config.'$desired_type'" "$file_path")
 
         if [[ -n "$selected_object" ]]; then
           echo "$selected_object"
-          KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
-          RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
-          WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
+          KEY_VAULT_NAME=$(echo "$selected_object" | yq -r '.KEYVAULT_NAME')
+          RESOURCE_GROUP_NAME=$(echo "$selected_object" | yq -r '.RESOURCE_GROUP_NAME')
+          WORKSPACE_NAME=$(echo "$selected_object" | yq -r '.WORKSPACE_NAME')
         else
           echo "Object not found"
         fi

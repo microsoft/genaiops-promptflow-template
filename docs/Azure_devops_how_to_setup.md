@@ -210,7 +210,7 @@ curl --request GET \
 
 The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime. 
 
-The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (Search for COMPUTE_RUNTIME in code for such changes.The comments in code provides additional information and context for required changes.) and also remove any value in `llmops_config.json` for each use-case example for `RUNTIME_NAME`.
+The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (Search for COMPUTE_RUNTIME in code for such changes.The comments in code provides additional information and context for required changes.) and also remove any value in `llmops_config.yaml` for each use-case example for `RUNTIME_NAME`.
 
 ## Create new Azure DevOps project
 
@@ -377,11 +377,11 @@ From local machine, create a new git branch `featurebranch` from `development` b
 git checkout -b featurebranch
 ```
 
- Update the `llmops_config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file  for deployment to Azure Machine Learning compute. Update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`,  and `USER_MANAGED_ID` in `configs/deployment_config.json` file  for deployment to Azure Web App.
+ Update the `llmops_config.yaml` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario configs folder and update the `llmops_config.yaml` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME`   for deployment to Azure Machine Learning compute. Update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`,  and `USER_MANAGED_ID` for deployment to Azure Web App.
 
-### Update llmops_config.json
+### Update llmops_config.yaml
 
-Modify the configuration values in `llmops_config.json` file available for each example based on description. Update the `KEYVAULT_NAME`, `RESOURCE_GROUP_NAME` and Azure Machine Learning `WORKSPACE_NAME`.
+Modify the configuration values in `llmops_config.yaml` file available for each example based on description. Update the `KEYVAULT_NAME`, `RESOURCE_GROUP_NAME` and Azure Machine Learning `WORKSPACE_NAME`.
 
 - `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
 - `RUNTIME_NAME`:  This is name of a Prompt flow runtime environment, used for executing the prompt flows. Add value to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.

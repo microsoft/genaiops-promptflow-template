@@ -10,6 +10,7 @@ import argparse
 import json
 import requests
 import time
+
 from llmops.common.logger import llmops_logger
 logger = llmops_logger("test local container endpoint")
 

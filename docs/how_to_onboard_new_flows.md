@@ -20,11 +20,11 @@ Follow these steps to onboard new Flows to your LLMOps template:
 
 **New Folder for new Flows** Similar to `named_entity_recognition` flow, a new folder should be created with the same sub-folder structure as `named_entity_recognition`.
 
-**Flow Configuration:** The `llmops_config.json` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
+**Flow Configuration:** The `llmops_config.yaml` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
 
 You can start by copying an existing config file and modify it with relevant values. Provide valid values for all the configuration elements for your flow.
 
-**Flows** Bring both the `standard and evaluation flows` within the `flows` sub-folder under a scenario folder. Files for both these type of flows should be under their own folder. The `llmops_config.json` should be updated with the path of these flows. The name of these folders are very important and used within multiple other configuration files - these are used in `llmops_config.json` and `mapping_config.json` files.
+**Flows** Bring both the `standard and evaluation flows` within the `flows` sub-folder under a scenario folder. Files for both these type of flows should be under their own folder. The `llmops_config.yaml` should be updated with the path of these flows. The name of these folders are very important and used within multiple other configuration files - these are used in `llmops_config.yaml` file.
 
 **Azure DevOps pipelines** The ``.azure-pipelines` folder should contains two yaml files - one for build validation during pull request and another for CI/CD. You can start by copying one of an existing folder under the new scenario folder and modify the files within this new folder. The modification in these files include - `Include
 paths in `trigger and pr section` and the `default value` for `flow_to_execute` parameter in `parameters section`.

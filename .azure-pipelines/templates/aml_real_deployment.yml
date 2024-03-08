@@ -48,15 +48,16 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
+
+      config_path=".//${{ parameters.flow_to_execute }}/configs/llmops_config.yaml"
       env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
-      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+      selected_object=$(yq ".llmops_config.'$env_name'" "$config_path")
 
       if [[ -n "$selected_object" ]]; then
         echo "$selected_object"
-        KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
-        RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
-        WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
+        KEY_VAULT_NAME=$(echo "$selected_object" | yq -r '.KEYVAULT_NAME')
+        RESOURCE_GROUP_NAME=$(echo "$selected_object" | yq -r '.RESOURCE_GROUP_NAME')
+        WORKSPACE_NAME=$(echo "$selected_object" | yq -r '.WORKSPACE_NAME')
       else
         echo "Object in config file not found"
       fi

@@ -53,13 +53,13 @@ LLMOps with Prompt flow provides capabilities for both simple as well as complex
 Each use case (set of Prompt flow standard and evaluation flows) should follow the folder structure as shown here:
 
 - .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
-- configs          : It contains data, deployment, and prompt flow data mapping related configuration files.
+- configs          : It contains llmops_config.yaml for  infrastructure and flow related information, data, deployment, and prompt flow data mapping related configuration files.
 - data             : This folder contains data files related to Prompt flow standard and evaluation flow
 - environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps.
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
-Additionally, there is a llmops_config.json file that refers to important infrastructure and flow related information. There is also a sample-request.json file containing test data for testing endpoints after deployment.
+Additionally, there is a sample-request.json file containing test data for testing endpoints after deployment.
 
 - The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact execution of all the flows.
 

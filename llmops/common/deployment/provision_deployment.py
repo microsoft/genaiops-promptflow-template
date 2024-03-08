@@ -29,7 +29,7 @@ from azure.ai.ml.entities import (
     BuildContext
 )
 from azure.identity import DefaultAzureCredential
-
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.logger import llmops_logger
 logger = llmops_logger("provision_deployment")
 
@@ -73,17 +73,11 @@ build_id = args.build_id
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
 model_name = f"{flow_to_execute}_{stage}"
-main_config = open(f"{flow_to_execute}/llmops_config.json")
-model_config = json.load(main_config)
-
-for obj in model_config["envs"]:
-    if obj.get("ENV_NAME") == stage:
-        config = obj
-        break
+main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+config = main_config.model_config
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
-real_config = f"{flow_to_execute}/configs/deployment_config.json"
 flow_path =  config["STANDARD_FLOW_PATH"]
 
 logger.info(f"Model name: {model_name}")
@@ -97,27 +91,25 @@ ml_client = MLClient(
 
 model = ml_client.models.get(model_name, model_version)
 
-config_file = open(real_config)
-endpoint_config = json.load(config_file)
-for elem in endpoint_config["azure_managed_endpoint"]:
-    if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
-        if stage == elem["ENV_NAME"]:
-            endpoint_name = elem["ENDPOINT_NAME"]
-            deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
-            deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
-            deployment_instance_count = elem["DEPLOYMENT_INSTANCE_COUNT"]
-            deployment_traffic_allocation = elem[
-                "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION"
-            ]
-            prior_deployment_name = elem["PRIOR_DEPLOYMENT_NAME"]
-            prior_deployment_traffic_allocation = elem[
-                "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
-            ]
-            deployment_desc = elem["DEPLOYMENT_DESC"]
-            environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
-            environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
-            environment_variables[
-                "PRT_CONFIG_OVERRIDE"
+endpoint_config = main_config.azure_managed_endpoint_config
+if "ENDPOINT_NAME" in endpoint_config and "ENV_NAME" in endpoint_config:
+    if stage == endpoint_config["ENV_NAME"]:
+        endpoint_name = endpoint_config["ENDPOINT_NAME"]
+        deployment_name = endpoint_config["CURRENT_DEPLOYMENT_NAME"]
+        deployment_vm_size = endpoint_config["DEPLOYMENT_VM_SIZE"]
+        deployment_instance_count = endpoint_config["DEPLOYMENT_INSTANCE_COUNT"]
+        deployment_traffic_allocation = endpoint_config[
+            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION"
+        ]
+        prior_deployment_name = endpoint_config["PRIOR_DEPLOYMENT_NAME"]
+        prior_deployment_traffic_allocation = endpoint_config[
+            "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
+        ]
+        deployment_desc = endpoint_config["DEPLOYMENT_DESC"]
+        environment_variables = dict(endpoint_config["ENVIRONMENT_VARIABLES"])
+        environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
+        environment_variables[
+            "PRT_CONFIG_OVERRIDE"
             ] = (
                 f"deployment.subscription_id={args.subscription_id},"
                 f"deployment.resource_group={resource_group_name},"
@@ -126,65 +118,65 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 f"deployment.deployment_name={deployment_name}"
             )
 
-            traffic_allocation = {}
-            deployments = ml_client.online_deployments.list(
-                endpoint_name,
-                local=False
-                )
+        traffic_allocation = {}
+        deployments = ml_client.online_deployments.list(
+            endpoint_name,
+            local=False
+        )
 
-            deploy_count = sum(1 for _ in deployments)
+        deploy_count = sum(1 for _ in deployments)
 
-            if deploy_count >= 1:
-                traffic_allocation[deployment_name] = \
-                    deployment_traffic_allocation
-                traffic_allocation[prior_deployment_name] = \
-                    100 - int(
-                    deployment_traffic_allocation
-                )
-            else:
-                traffic_allocation[deployment_name] = 100
-
-            env_docker = Environment(
-                build = BuildContext(
-                    path = os.path.join(flow_to_execute,flow_path),
-                    dockerfile_path = "docker/dockerfile"
-                ),
-                name=deployment_name,
-                description="Environment created from a Docker context.",
-                inference_config={
-                    "liveness_route": {"path": "/health", "port": "8080"},
-                    "readiness_route": {"path": "/health", "port": "8080"},
-                    "scoring_route": {"path": "/score", "port": "8080"},
-                }
-
+        if deploy_count >= 1:
+            traffic_allocation[deployment_name] = \
+                deployment_traffic_allocation
+            traffic_allocation[prior_deployment_name] = \
+                100 - int(
+                deployment_traffic_allocation
             )
+        else:
+            traffic_allocation[deployment_name] = 100
 
-            blue_deployment = ManagedOnlineDeployment(
-                name=deployment_name,
-                endpoint_name=endpoint_name,
-                model=model,
-                description=deployment_desc,
-                environment=env_docker,
-                instance_type=deployment_vm_size,
-                instance_count=deployment_instance_count,
-                environment_variables=dict(environment_variables),
-                tags={
-                    "build_id": build_id
-                    },
-                app_insights_enabled=True,
-                request_settings=OnlineRequestSettings(
-                    request_timeout_ms=90000
-                    ),
-            )
+        env_docker = Environment(
+            build = BuildContext(
+                path = os.path.join(flow_to_execute,flow_path),
+                dockerfile_path = "docker/dockerfile"
+            ),
+            name=deployment_name,
+            description="Environment created from a Docker context.",
+            inference_config={
+                "liveness_route": {"path": "/health", "port": "8080"},
+                "readiness_route": {"path": "/health", "port": "8080"},
+                "scoring_route": {"path": "/score", "port": "8080"},
+            }
 
-            ml_client.online_deployments.begin_create_or_update(
-                blue_deployment
-            ).result()
+        )
 
-            endpoint = ml_client.online_endpoints.get(
-                endpoint_name,
-                local=False
-                )
+        blue_deployment = ManagedOnlineDeployment(
+            name=deployment_name,
+            endpoint_name=endpoint_name,
+            model=model,
+            description=deployment_desc,
+            environment=env_docker,
+            instance_type=deployment_vm_size,
+            instance_count=deployment_instance_count,
+            environment_variables=dict(environment_variables),
+            tags={
+                "build_id": build_id
+                },
+            app_insights_enabled=True,
+            request_settings=OnlineRequestSettings(
+                request_timeout_ms=90000
+            ),
+        )
 
-            endpoint.traffic = traffic_allocation
-            ml_client.begin_create_or_update(endpoint).result()
+        ml_client.online_deployments.begin_create_or_update(
+            blue_deployment
+        ).result()
+
+        endpoint = ml_client.online_endpoints.get(
+            endpoint_name,
+            local=False
+        )
+
+        endpoint.traffic = traffic_allocation
+        ml_client.begin_create_or_update(endpoint).result()

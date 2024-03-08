@@ -5,7 +5,7 @@
 
 set -e # fail on error
 
-# read values from llmops_config.json related to given environment
+# read values from llmops_config.yaml related to given environment
 config_path="./$flow_to_execute/configs/llmops_config.yaml"
 env_name=$deploy_environment
 selected_object=$(yq ".llmops_config.'$env_name'" "$config_path")
@@ -29,7 +29,7 @@ if [[ -n "$selected_object" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        api_key=$(echo $CONNECTION_DETAILS | yq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -51,12 +51,12 @@ if [[ -n "$selected_object" ]]; then
     python -m llmops.common.deployment.test_local_flow \
             --flow_to_execute $flow_to_execute
 
-    REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+    REGISTRY_NAME=$(echo "$con_object" | yq -r '.REGISTRY_NAME')
 
-    registry_object=$(echo $REGISTRY_DETAILS | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
-    registry_server=$(echo "$registry_object" | jq -r '.registry_server')
-    registry_username=$(echo "$registry_object" | jq -r '.registry_username')
-    registry_password=$(echo "$registry_object" | jq -r '.registry_password')
+    registry_object=$(echo $REGISTRY_DETAILS | yq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+    registry_server=$(echo "$registry_object" | yq -r '.registry_server')
+    registry_username=$(echo "$registry_object" | yq -r '.registry_username')
+    registry_password=$(echo "$registry_object" | yq -r '.registry_password')
 
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 

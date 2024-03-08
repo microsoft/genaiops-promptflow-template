@@ -22,7 +22,7 @@ import hashlib
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Model
 from azure.identity import DefaultAzureCredential
-
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.logger import llmops_logger
 logger = llmops_logger("register_flow")
 
@@ -89,13 +89,8 @@ model_name = f"{flow_to_execute}_{stage}"
 build_id = args.build_id
 output_file = args.output_file
 
-main_config = open(f"{flow_to_execute}/llmops_config.json")
-model_config = json.load(main_config)
-
-for obj in model_config["envs"]:
-    if obj.get("ENV_NAME") == stage:
-        config = obj
-        break
+main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+config = main_config.model_config
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]

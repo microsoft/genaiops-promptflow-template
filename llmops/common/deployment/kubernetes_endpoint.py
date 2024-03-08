@@ -21,7 +21,7 @@ import argparse
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import KubernetesOnlineEndpoint
 from azure.identity import DefaultAzureCredential
-
+from llmops.common.config_utils import LLMOpsConfig
 
 parser = argparse.ArgumentParser("provision_kubernetes_endpoints")
 parser.add_argument(
@@ -60,17 +60,11 @@ build_id = args.build_id
 output_file = args.output_file
 stage = args.env_name
 flow_to_execute = args.flow_to_execute
-main_config = open(f"{flow_to_execute}/llmops_config.json")
-model_config = json.load(main_config)
-
-for obj in model_config["envs"]:
-    if obj.get("ENV_NAME") == stage:
-        config = obj
-        break
+main_config = LLMOpsConfig(flow_name=flow_to_execute, environment=stage)
+config = main_config.model_config
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
-real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 ml_client = MLClient(
     DefaultAzureCredential(),
@@ -80,34 +74,31 @@ ml_client = MLClient(
 )
 
 
-config_file = open(real_config)
-endpoint_config = json.load(config_file)
+endpoint_config = main_config.kubernetes_endpoint_config
+if "ENDPOINT_NAME" in endpoint_config and "ENV_NAME" in endpoint_config:
+    if stage == endpoint_config["ENV_NAME"]:
+        endpoint_name = endpoint_config["ENDPOINT_NAME"]
+        endpoint_desc = endpoint_config["ENDPOINT_DESC"]
+        compute_name = endpoint_config["COMPUTE_NAME"]
 
-for elem in endpoint_config["kubernetes_endpoint"]:
-    if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
-        if stage == elem["ENV_NAME"]:
-            endpoint_name = elem["ENDPOINT_NAME"]
-            endpoint_desc = elem["ENDPOINT_DESC"]
-            compute_name = elem["COMPUTE_NAME"]
+        endpoint = KubernetesOnlineEndpoint(
+            name=endpoint_name,
+            description=endpoint_desc,
+            compute=compute_name,
+            auth_mode="key",
+            tags={
+                "build_id": build_id
+                },
+        )
 
-            endpoint = KubernetesOnlineEndpoint(
-                name=endpoint_name,
-                description=endpoint_desc,
-                compute=compute_name,
-                auth_mode="key",
-                tags={
-                    "build_id": build_id
-                    },
-            )
+        ml_client.online_endpoints.begin_create_or_update(
+            endpoint=endpoint
+        ).result()
 
-            ml_client.online_endpoints.begin_create_or_update(
-                endpoint=endpoint
-            ).result()
+        principal_id = ml_client.online_endpoints.get(
+            endpoint_name
+        ).identity.principal_id
 
-            principal_id = ml_client.online_endpoints.get(
-                endpoint_name
-            ).identity.principal_id
-
-            if output_file is not None:
-                with open(output_file, "w") as out_file:
-                    out_file.write(str(principal_id))
+        if output_file is not None:
+            with open(output_file, "w") as out_file:
+                out_file.write(str(principal_id))
