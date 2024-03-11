@@ -2,19 +2,19 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "mango-runtime",
+                "KEYVAULT_NAME": "mangokv",
+                "RESOURCE_GROUP_NAME": "mango",
+                "WORKSPACE_NAME": "mango_aml",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "mango-runtime",
+                "KEYVAULT_NAME": "mangokv",
+                "RESOURCE_GROUP_NAME": "mango",
+                "WORKSPACE_NAME": "mango_aml",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
