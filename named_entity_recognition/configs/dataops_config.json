@@ -1,4 +1,6 @@
-{        
+{
+    "DATA_STORE_NAME": "aml_pipeline_data_store",
+    "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
             "COMPONENT_NAME": "prep_data_component",
@@ -18,13 +20,13 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval",
-            "PATH": "eval/eval.jsonl",
+            "NAME": "ner_test_eval",
+            "PATH": "eval_data.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp",
-            "PATH": "exp/exp.jsonl",
+            "NAME": "ner_test_exp",
+            "PATH": "data.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
     ]

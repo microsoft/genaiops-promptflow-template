@@ -189,7 +189,6 @@ def main():
 
     path_config = config['PATH']
     raw_data_dir = path_config['RAW_DATA_DIR']
-    target_data_dir = path_config['TARGET_DATA_DIR']
     data_pipeline_code_dir = path_config['DATA_PIPELINE_CODE_DIR']
 
     schedule_config = config['SCHEDULE']
