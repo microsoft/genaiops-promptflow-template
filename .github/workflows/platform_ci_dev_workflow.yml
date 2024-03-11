@@ -17,7 +17,6 @@ on:
         type: string
         description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
-        default: "webapp"
     secrets:
       azure_credentials:
         description: "service principal authentication to Azure"

@@ -17,6 +17,7 @@ on:
         type: string
         description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
+        default: 'webapp'
   push:
     branches:
       - main
