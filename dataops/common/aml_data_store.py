@@ -8,20 +8,15 @@ This argument is required for identifying the Azure subscription.
 AML workspace.
 --workspace_name: The AML workspace name.
 """
-from azure.ai.ml.dsl import pipeline
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import command
-from azure.ai.ml import Input, Output
-from azure.ai.ml import Input, Output
-from azure.ai.ml.entities import Data
-from azure.ai.ml import MLClient
-from azure.ai.ml.constants import AssetTypes
+from azure.ai.ml.entities import AzureBlobDatastore
 import os
 import argparse
 import json
 
 pipeline_components = []
+
 
 def get_aml_client(
         subscription_id,
@@ -37,26 +32,25 @@ def get_aml_client(
 
     return aml_client
 
-def register_data_asset(
-        name,
+
+def register_data_store(
+        name_datastore,
         description,
-        target_dir,
-        aml_client,
         sa_account_name,
-        sa_container_name
+        sa_container_name,
+        aml_client
 ):
-
-    target_path = f"https://{sa_account_name}.blob.core.windows.net/{sa_container_name}/{target_dir}"
-    aml_dataset = Data(
-        path = target_path,
-        type = AssetTypes.URI_FILE,
-        description = description,
-        name = name
+    store = AzureBlobDatastore(
+        name=name_datastore,
+        description=description,
+        account_name=sa_account_name,
+        container_name=sa_container_name
     )
+    aml_client.create_or_update(store)
 
-    aml_client.data.create_or_update(aml_dataset)
 
 def main():
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--subscription_id",
@@ -86,7 +80,7 @@ def main():
     parser.add_argument(
         "--sa_container_name",
         type=str,
-        help="Storage account's container name",
+        help="Container name",
         required=True,
     )
 
@@ -102,9 +96,9 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    config_path_root_dir = args.config_path_root_dir
     sa_account_name = args.sa_account_name
     sa_container_name = args.sa_container_name
+    config_path_root_dir = args.config_path_root_dir
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -115,20 +109,14 @@ def main():
         workspace_name,
     )
 
-    data_asset_configs = config['DATA_ASSETS']
-    for data_asset_config in data_asset_configs:
-        data_asset_name = data_asset_config['NAME']
-        data_asset_file_path = data_asset_config['PATH']
-        data_asset_description = data_asset_config['DESCRIPTION']
+    register_data_store(
+        name_datastore=config["DATA_STORE_NAME"],
+        description=config["DATA_STORE_DESCRIPTION"],
+        sa_account_name=sa_account_name,
+        sa_container_name=sa_container_name,
+        aml_client=aml_client
+    )
 
-        register_data_asset(
-            name = data_asset_name,
-            description = data_asset_description,
-            target_dir = data_asset_file_path,
-            aml_client = aml_client,
-            sa_account_name=sa_account_name,
-            sa_container_name=sa_container_name
-        )
 
 if __name__ == "__main__":
     main()

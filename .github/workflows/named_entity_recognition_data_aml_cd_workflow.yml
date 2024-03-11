@@ -19,6 +19,16 @@ on:
             description: Environment name
             type: string
             required: true
+      sa_account_name:
+            description: Storage account name for data store
+            type: string
+            required: true
+            default: "sanamedrecognitionwe"
+      sa_container_name:
+            description: Container name for data store
+            type: string
+            required: true
+            default: "data"
       config_path_root_dir:
               description: Root dir for config file
               type: string
@@ -49,15 +59,17 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
+      sa_account_name:
+              description: Storage account name required for creating datastore
+              type: string
+              required: true
+              default: "sanamedrecognitionwe"
+      sa_container_name:
+              description: Storage container name
+              type: string
+              required: true
+              default: "data"
 
-  push:
-    branches:
-      - main
-      - development
-    paths:
-      - '.github/**'
-      - 'dataops/**'
-      - 'named_entity_recognition/**'          
 jobs:
   deploy_aml_data_pipeline:
     runs-on: ubuntu-latest
@@ -98,6 +110,19 @@ jobs:
             --aml_env_name ${{ inputs.aml_env_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
 
+      - name: Create data store
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Create data store"
+          script_parameter: |
+            python -m dataops.common.aml_data_store \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --sa_account_name ${{ inputs.sa_account_name }} \
+            --sa_container_name ${{ inputs.sa_container_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}
+
       - name: Register data asset
         uses: ./.github/actions/execute_script
         with:
@@ -107,4 +132,6 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
+            --sa_account_name ${{ inputs.sa_account_name }} \
+            --sa_container_name ${{ inputs.sa_container_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
