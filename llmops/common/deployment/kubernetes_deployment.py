@@ -87,6 +87,7 @@ for obj in model_config["envs"]:
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
+flow_path = config["STANDARD_FLOW_PATH"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 logger.info(f"Model name: {model_name}")
@@ -105,7 +106,6 @@ endpoint_config = json.load(config_file)
 for elem in endpoint_config["kubernetes_endpoint"]:
     if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
         if stage == elem["ENV_NAME"]:
-            flow_path = elem["STANDARD_FLOW_PATH"]
             endpoint_name = elem["ENDPOINT_NAME"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
             deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
