@@ -17,6 +17,7 @@ on:
         type: string
         description: "Determine type of deployment - aml, aks, docker, webapp"
         required: true
+        default: "webapp"
   push:
     branches:
       - main
@@ -35,7 +36,7 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       flow_type: ${{ inputs.flow_type || 'named_entity_recognition' }}
-      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
+      deployment_type: ${{ inputs.deployment_type|| 'webapp' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
