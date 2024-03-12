@@ -20,12 +20,14 @@ This argument is required to specify the name of the flow for execution.
 
 import json
 import argparse
+import os
 
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     KubernetesOnlineDeployment,
     Environment,
     OnlineRequestSettings,
+    BuildContext
 )
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities._deployment.resource_requirements_settings import (
@@ -103,6 +105,7 @@ endpoint_config = json.load(config_file)
 for elem in endpoint_config["kubernetes_endpoint"]:
     if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
         if stage == elem["ENV_NAME"]:
+            flow_path = elem["STANDARD_FLOW_PATH"]
             endpoint_name = elem["ENDPOINT_NAME"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
             deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
@@ -129,12 +132,17 @@ for elem in endpoint_config["kubernetes_endpoint"]:
                 f"deployment.deployment_name={deployment_name}"
             )
             environment = Environment(
-                image=deployment_base_image,
+                build = BuildContext(
+                    path = os.path.join(flow_to_execute,flow_path),
+                    dockerfile_path = "docker/dockerfile"
+                ),
+                name=deployment_name,
+                description="Environment created from a Docker context.",
                 inference_config={
                     "liveness_route": {"path": "/health", "port": "8080"},
                     "readiness_route": {"path": "/health", "port": "8080"},
                     "scoring_route": {"path": "/score", "port": "8080"},
-                },
+                }
             )
 
             traffic_allocation = {}
