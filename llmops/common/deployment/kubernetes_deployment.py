@@ -20,12 +20,14 @@ This argument is required to specify the name of the flow for execution.
 
 import json
 import argparse
+import os
 
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     KubernetesOnlineDeployment,
     Environment,
     OnlineRequestSettings,
+    BuildContext
 )
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities._deployment.resource_requirements_settings import (
@@ -85,6 +87,7 @@ for obj in model_config["envs"]:
 
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
+flow_path = config["STANDARD_FLOW_PATH"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
 
 logger.info(f"Model name: {model_name}")
@@ -129,12 +132,17 @@ for elem in endpoint_config["kubernetes_endpoint"]:
                 f"deployment.deployment_name={deployment_name}"
             )
             environment = Environment(
-                image=deployment_base_image,
+                build = BuildContext(
+                    path = os.path.join(flow_to_execute, flow_path),
+                    dockerfile_path = "docker/dockerfile"
+                ),
+                name=deployment_name,
+                description="Environment created from a Docker context.",
                 inference_config={
                     "liveness_route": {"path": "/health", "port": "8080"},
                     "readiness_route": {"path": "/health", "port": "8080"},
                     "scoring_route": {"path": "/score", "port": "8080"},
-                },
+                }
             )
 
             traffic_allocation = {}
