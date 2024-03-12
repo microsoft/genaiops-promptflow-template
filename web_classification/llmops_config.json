@@ -6,8 +6,8 @@
                 "KEYVAULT_NAME": "mangokv",
                 "RESOURCE_GROUP_NAME": "mango",
                 "WORKSPACE_NAME": "mango_aml",
-                "STANDARD_FLOW_PATH": "flows/standard",
-                "EVALUATION_FLOW_PATH": "flows/evaluation"
+                "STANDARD_FLOW_PATH": "flows/evaluation",
+                "EVALUATION_FLOW_PATH": "flows/evaluation_adv"
             },
             {
                 "ENV_NAME": "dev",
@@ -15,8 +15,8 @@
                 "KEYVAULT_NAME": "mangokv",
                 "RESOURCE_GROUP_NAME": "mango",
                 "WORKSPACE_NAME": "mango_aml",
-                "STANDARD_FLOW_PATH": "flows/standard",
-                "EVALUATION_FLOW_PATH": "flows/evaluation"
+                 "STANDARD_FLOW_PATH": "flows/evaluation",
+                "EVALUATION_FLOW_PATH": "flows/evaluation_adv"
             },
             {
                 "ENV_NAME": "postprodeval",
