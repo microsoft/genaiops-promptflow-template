@@ -52,29 +52,43 @@ def get_prep_data_component(
         display_name,
         description,
         data_pipeline_code_dir,
-        environment
+        environment,
+        source_storage_account,
+        target_storage_account,
+        source_container_name,
+        target_container_name,
+        source_blob,
+        target_data_assets
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
 
+    for asset in target_data_assets:
+        asset_path = asset["PATH"]
+
     prep_data_component = command(
-        name = name,
-        display_name = display_name,
-        description = description,
+        name=name,
+        display_name=display_name,
+        description=description,
         inputs={
             "raw_data_dir": Input(type="uri_folder")
         },
         outputs=dict(
-            target_dir=Output(type="uri_folder", mode="rw_mount")
+            target_dir=Output(type="uri_folder", mode="rw_mount"),
         ),
         code=data_pipeline_code_dir,
-        command="""python prep_data.py \
-                --raw_data_dir ${{inputs.raw_data_dir}} \
-                --target_dir ${{outputs.target_dir}} \
+        command=f"""python prep_data.py \
+                --source_storage_account {source_storage_account} \
+                --target_storage_account {target_storage_account} \
+                --source_container_name {source_container_name} \
+                --target_container_name {target_container_name} \
+                --source_blob {source_blob} \
+                --asset_path {asset_path}
                 """,
         environment=environment,
     )
 
     return prep_data_component
+
 
 def get_aml_client(
         subscription_id,
@@ -96,7 +110,13 @@ def create_pipeline_job(
         component_description,
         data_pipeline_code_dir,
         raw_data_dir,
-        aml_env_name
+        aml_env_name,
+        source_storage_account,
+        target_storage_account,
+        source_container_name,
+        target_container_name,
+        source_blob,
+        target_data_assets
 ):
     raw_data_dir = os.path.join(os.getcwd(), raw_data_dir)
 
@@ -105,7 +125,13 @@ def create_pipeline_job(
         display_name = component_display_name,
         description = component_description,
         data_pipeline_code_dir = data_pipeline_code_dir,
-        environment = aml_env_name
+        environment = aml_env_name,
+        source_storage_account = source_storage_account,
+        target_storage_account=target_storage_account,
+        source_container_name = source_container_name,
+        target_container_name = target_container_name,
+        source_blob= source_blob,
+        target_data_assets = target_data_assets
     )
 
     pipeline_components.append(prep_data_component)
@@ -126,7 +152,7 @@ def schedule_pipeline_job(
     schedule_start_time = datetime.utcnow()
     cron_trigger = CronTrigger(
         expression = schedule_cron_expression,
-        start_time = schedule_start_time,  
+        start_time = schedule_start_time,
         time_zone = schedule_timezone
     )
 
@@ -137,7 +163,7 @@ def schedule_pipeline_job(
     aml_client.schedules.begin_create_or_update(
         schedule=job_schedule
     ).result()
-        
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -171,6 +197,40 @@ def main():
         required=True,
     )
 
+    parser.add_argument(
+        "--source_storage_account",
+        type=str,
+        help="source storage account",
+        required=True,
+    )
+
+    parser.add_argument(
+        "--target_storage_account",
+        type=str,
+        help="Target storage account",
+        required=True,
+    )
+
+    parser.add_argument(
+        "--source_container_name",
+        type=str,
+        help="source container name",
+        required=True,
+    )
+
+    parser.add_argument(
+        "--target_container_name",
+        type=str,
+        help="target container name",
+        required=True,
+    )
+    parser.add_argument(
+        "--source_blob",
+        type=str,
+        help="Source blob",
+        required=True,
+    )
+
     args = parser.parse_args()
 
     subscription_id = args.subscription_id
@@ -178,6 +238,11 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
+    source_storage_account= args.source_storage_account
+    target_storage_account = args.target_storage_account
+    source_container_name = args.source_container_name
+    target_container_name = args.target_container_name
+    source_blob = args.source_blob
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -196,6 +261,8 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
+    target_data_assets = config['DATA_ASSETS']
+
     aml_client = get_aml_client(
         subscription_id,
         resource_group_name,
@@ -208,7 +275,13 @@ def main():
             component_description,
             data_pipeline_code_dir,
             raw_data_dir,
-            aml_env_name
+            aml_env_name,
+            source_storage_account,
+            target_storage_account,
+            source_container_name,
+            target_container_name,
+            source_blob,
+            target_data_assets
         )
     
     schedule_pipeline_job(

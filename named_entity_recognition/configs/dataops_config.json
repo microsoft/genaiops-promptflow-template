@@ -20,12 +20,12 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_test_eval",
+            "NAME": "ner_testing_eval",
             "PATH": "eval_data.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_test_exp",
+            "NAME": "ner__testing_exp",
             "PATH": "data.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
