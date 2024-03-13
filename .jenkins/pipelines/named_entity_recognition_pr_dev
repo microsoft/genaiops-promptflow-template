@@ -7,7 +7,7 @@ pipeline {
     }
     
     triggers {
-        pullRequest(
+        githubPush(
             branches: ['main', 'development']
         )
     }

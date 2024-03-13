@@ -8,8 +8,9 @@ pipeline {
     }
 
     triggers {
-        scm('main')
-        scm('development')
+        githubPush(
+            branches: ['main', 'development']
+        )
     }
     
     stages {
