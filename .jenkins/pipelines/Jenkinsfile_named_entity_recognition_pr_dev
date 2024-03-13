@@ -1,0 +1,16 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Trigger Other Pipeline') {
+            steps {
+                script {
+                    // Trigger another pipeline by specifying its name
+                    build job: 'Jenkinsfile_platform_pr_dev', parameters: [
+                        string(name: 'test_parameter', value: 'test_value')
+                    ]
+                }
+            }
+        }
+    }
+}
