@@ -8,9 +8,7 @@ pipeline {
     }
 
     triggers {
-        githubPush(
-            branches: ['main', 'development']
-        )
+        githubPush()
     }
     
     stages {
