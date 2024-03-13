@@ -2,9 +2,9 @@ pipeline {
     agent any
     
     parameters {
-        choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment', defaultValue: 'dev')
+        choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment')
         string(name: 'flow_type', description: 'The flow usecase to execute', defaultValue: 'named_entity_recognition')
-        choice(name: 'deployment_type', choices: ['aml', 'aks', 'docker', 'webapp'], description: 'Determine type of deployment', defaultValue: 'aks')
+        choice(name: 'deployment_type', choices: ['aml', 'aks', 'docker', 'webapp'], description: 'Determine type of deployment')
     }
 
     triggers {
