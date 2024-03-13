@@ -61,6 +61,7 @@ def get_prep_data_component(
         target_data_assets
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
+    prep_data_components = []  # Initialize an empty list to store components
 
     for asset in target_data_assets:
         asset_path = asset["PATH"]
@@ -86,8 +87,9 @@ def get_prep_data_component(
                     """,
             environment=environment,
         )
+        prep_data_components.append(prep_data_component)
 
-    return prep_data_component
+    return prep_data_components
 
 
 def get_aml_client(
@@ -134,7 +136,7 @@ def create_pipeline_job(
         target_data_assets = target_data_assets
     )
 
-    pipeline_components.append(prep_data_component)
+    pipeline_components.extend(prep_data_component)
 
     pipeline_job = ner_data_prep_pipeline(
         raw_data_dir = Input(type = "uri_folder", path = raw_data_dir)
