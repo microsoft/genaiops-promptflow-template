@@ -1,0 +1,39 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'versionSpec', description: 'The Python version to use in the environment', defaultValue: '3.9')
+    }
+    
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    
+    stages {
+        stage('Prepare build environment') {
+            description 'Prepares build environment for python and prompt flow related workflow execution.'
+            
+            steps {
+                script {
+                    // Checkout
+                    checkout scm
+                    
+                    // Setup Python
+                    sh "python3 -m venv env"
+                    sh "source env/bin/activate"
+                    sh "pip install --upgrade pip"
+                    sh "pip install setuptools wheel"
+                    sh "pip install -r .github/requirements/execute_job_requirements.txt"
+                    sh "pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]"
+                    
+                    // Print Python version and installed packages
+                    sh "python --version"
+                    sh "pip list"
+                    
+                    // Print Azure CLI version
+                    sh "az version"
+                }
+            }
+        }
+    }
+}

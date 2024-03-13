@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'flow_type', defaultValue: 'named_entity_recognition')
+    }
+    
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'sudo apt-get update && sudo apt-get install -y azure-cli'
+                }
+            }
+        }
+        stage('Verify Azure CLI') {
+            steps {
+                sh 'az --version'
+            }
+        }
+        stage('Login to Azure using Service Principal') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                }
+            }
+        }
+        stage('Print Parameter Value') {
+            steps {
+                echo "Executing Platform PR Pipeline for the following flow: ${params.flow_type}"
+            }
+        }
+    }
+}
