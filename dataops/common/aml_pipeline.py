@@ -65,27 +65,27 @@ def get_prep_data_component(
     for asset in target_data_assets:
         asset_path = asset["PATH"]
 
-    prep_data_component = command(
-        name=name,
-        display_name=display_name,
-        description=description,
-        inputs={
-            "raw_data_dir": Input(type="uri_folder")
-        },
-        outputs=dict(
-            target_dir=Output(type="uri_folder", mode="rw_mount"),
-        ),
-        code=data_pipeline_code_dir,
-        command=f"""python prep_data.py \
-                --source_storage_account {source_storage_account} \
-                --target_storage_account {target_storage_account} \
-                --source_container_name {source_container_name} \
-                --target_container_name {target_container_name} \
-                --source_blob {source_blob} \
-                --asset_path {asset_path}
-                """,
-        environment=environment,
-    )
+        prep_data_component = command(
+            name=name,
+            display_name=display_name,
+            description=description,
+            inputs={
+                "raw_data_dir": Input(type="uri_folder")
+            },
+            outputs=dict(
+                target_dir=Output(type="uri_folder", mode="rw_mount"),
+            ),
+            code=data_pipeline_code_dir,
+            command=f"""python prep_data.py \
+                    --source_storage_account {source_storage_account} \
+                    --target_storage_account {target_storage_account} \
+                    --source_container_name {source_container_name} \
+                    --target_container_name {target_container_name} \
+                    --source_blob {source_blob} \
+                    --asset_path {asset_path}
+                    """,
+            environment=environment,
+        )
 
     return prep_data_component
 
