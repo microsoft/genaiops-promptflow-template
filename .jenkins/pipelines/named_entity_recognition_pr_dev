@@ -16,7 +16,7 @@ pipeline {
                 script {
                     // Trigger another pipeline by specifying its name
                     build job: 'platform_pr_dev', parameters: [
-                        string(name: 'flow_type', value: ${params.test_parameter})
+                        string(name: 'flow_type', value: '${params.flow_type}')
                     ]
                 }
             }

@@ -16,8 +16,8 @@ pipeline {
             steps {
                 script {
                     build job: 'platform_ci_dev', parameters: [
-                        string(name: 'flow_type', value: ${params.flow_type})
-                        string(name: 'deployment_type', value: ${params.deployment_type})
+                        string(name: 'flow_type', value: '${params.flow_type}')
+                        string(name: 'deployment_type', value: '${params.deployment_type}')
                     ]
                 }
             }
