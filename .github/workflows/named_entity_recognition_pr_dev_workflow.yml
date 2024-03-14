@@ -1,4 +1,4 @@
-name: named_entity_recognition_data_aml_pipeline
+name: named_entity_recognition_pr_dev_workflow
 on:
   # workflow_call allows reusable workflow that can be called by other workflows
   workflow_call:
