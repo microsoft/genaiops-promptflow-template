@@ -1,0 +1,70 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'flow_type', defaultValue: 'default', description: 'The flow use-case to validate')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup Python') {
+            steps {
+                sh '''
+                pyenv install 3.9
+                pyenv global 3.9
+                '''
+            }
+        }
+
+        stage('Load Dependencies') {
+            steps {
+                sh '''
+                set -e # fail on error
+                python -m pip install --upgrade pip
+                python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                az version
+                '''
+            }
+        }
+
+        stage('Azure Login') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    az login --service-principal -u $AZURE_CREDENTIALS
+                    '''
+                }
+            }
+        }
+
+        stage('Load Azure Subscription Details') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    export subscriptionId=$(az account show --query id -o tsv)
+                    echo "SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID"
+                    '''
+                }
+            }
+        }
+
+        stage('Execute Unit Tests') {
+            steps {
+                sh '''
+                pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+                '''
+            }
+        }
+
+        stage('Publish Unit Test Results') {
+            steps {
+                archiveArtifacts artifacts: '**/test-*.xml', fingerprint: true
+            }
+        }
+    }
+}

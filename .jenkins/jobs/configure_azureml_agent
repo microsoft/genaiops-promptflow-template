@@ -23,7 +23,7 @@ pipeline {
                     sh "source env/bin/activate"
                     sh "pip install --upgrade pip"
                     sh "pip install setuptools wheel"
-                    sh "pip install -r .github/requirements/execute_job_requirements.txt"
+                    sh "pip install -r .jenkins/requirements/execute_job_requirements.txt"
                     sh "pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]"
                     
                     // Print Python version and installed packages
