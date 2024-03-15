@@ -79,6 +79,11 @@ on:
               type: string
               required: true
               default: "sanamedrecognitionwe"
+      target_container_name:
+              description: SAS
+              type: string
+              required: true
+              default: "data"
       target_sas_name:
               description: Storage container name
               type: string
