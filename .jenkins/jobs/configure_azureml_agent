@@ -14,7 +14,6 @@ pipeline {
             steps {
                 withPythonEnv('/usr/bin/python3.9') {
                     sh '''                    
-                    source env/bin/activate
                     pip install --upgrade pip
                     pip install setuptools wheel
                     pip install -r .jenkins/requirements/execute_job_requirements.txt
