@@ -84,6 +84,11 @@ on:
               type: string
               required: true
               default: "data"
+      target_sa_sas_token:
+              description: SAS token
+              type: string
+              required: true
+              default: ""
       source_account_name:
               description: Source Storage account name
               type: string
