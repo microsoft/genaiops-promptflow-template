@@ -69,10 +69,6 @@ on:
               type: string
               required: true
               default: "data"
-      target_sa_sas_token:
-                description: SAS token for target storage account
-                type: string
-                required: true
       source_account_name:
               description: Source Storage account name
               type: string
@@ -147,7 +143,6 @@ jobs:
             --workspace_name ${{ inputs.workspace_name }} \
             --sa_account_name ${{ inputs.target_account_name }} \
             --sa_container_name ${{ inputs.target_container_name }} \
-            --target_sa_sas_token ${{ inputs.target_sa_sas_token }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
 
       - name: Register data asset
