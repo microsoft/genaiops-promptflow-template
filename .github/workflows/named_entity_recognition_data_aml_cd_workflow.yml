@@ -54,6 +54,11 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
+      source_sa_sas_toekn:
+                description: SAS token for source storage account
+                type: string
+                required: true
+                default: ""
       target_sa_sas_toekn:
               description: SAS token for target storage account
               type: string
@@ -99,27 +104,29 @@ jobs:
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
-
-      - name: Create data store
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Create data store"
-          script_parameter: |
-            python -m dataops.common.aml_data_store \
-            --subscription_id ${{ inputs.subscription_id }} \
-            --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }}
+            --source_sa_sas_toekn ${{ inputs.source_sa_sas_toekn }}
             --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
 
-      - name: Register data asset
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Register data asset"
-          script_parameter: |
-            python -m dataops.common.aml_data_asset \
-            --subscription_id ${{ inputs.subscription_id }} \
-            --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }}
-            --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
+      # - name: Create data store
+      #   uses: ./.github/actions/execute_script
+      #   with:
+      #     step_name: "Create data store"
+      #     script_parameter: |
+      #       python -m dataops.common.aml_data_store \
+      #       --subscription_id ${{ inputs.subscription_id }} \
+      #       --resource_group_name ${{ inputs.resource_group_name }} \
+      #       --workspace_name ${{ inputs.workspace_name }} \
+      #       --config_path_root_dir ${{ inputs.config_path_root_dir }}
+      #       --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
+
+      # - name: Register data asset
+      #   uses: ./.github/actions/execute_script
+      #   with:
+      #     step_name: "Register data asset"
+      #     script_parameter: |
+      #       python -m dataops.common.aml_data_asset \
+      #       --subscription_id ${{ inputs.subscription_id }} \
+      #       --resource_group_name ${{ inputs.resource_group_name }} \
+      #       --workspace_name ${{ inputs.workspace_name }} \
+      #       --config_path_root_dir ${{ inputs.config_path_root_dir }}
+      #       --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}

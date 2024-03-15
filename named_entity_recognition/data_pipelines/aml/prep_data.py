@@ -10,10 +10,12 @@ from azure.storage.blob import BlobServiceClient
 # 1. Read the source blob file
 # 2. Change the file from csv to jsonl
 # 3. Save it as the jsonl file in the target account
-def prep(source_blob_service_client,
-         source_blob,
-         target_data_asset,
-         target_blob_service_client):
+def prep(source_blob_service_client, 
+         target_blob_service_client, 
+         source_container_name, 
+         target_container_name, 
+         source_blob, 
+         target_blob):
     print('Data processing component')
 
     # Get the source blob
@@ -32,7 +34,7 @@ def prep(source_blob_service_client,
 
     # Upload JSONL data to the target container
     target_blob_client = target_blob_service_client.get_blob_client(container=target_container_name,
-                                                                        blob=target_data_asset)
+                                                                        blob=target_blob)
     target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
     print("CSV data converted to JSONL and uploaded successfully!")
@@ -61,12 +63,22 @@ if __name__ == "__main__":
         help="target container name",
     )
     parser.add_argument(
+        "--source_sa_sas_toekn",
+        type=str,
+        help="source container name",
+    )
+    parser.add_argument(
+        "--target_sa_sas_toekn",
+        type=str,
+        help="target container name",
+    )
+    parser.add_argument(
         "--source_blob",
         type=str,
         help="source blob file (csv)",
     )
     parser.add_argument(
-        "--asset_path",
+        "--target_blob",
         type=str,
         help="target asset path"
     )
@@ -77,14 +89,16 @@ if __name__ == "__main__":
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
-    target_data_asset = args.asset_path
+    target_blob = args.target_blob
+    source_sa_sas_toekn = args.source_sa_sas_toekn
+    target_sa_sas_toekn = args.target_sa_sas_toekn
 
     default_credential = DefaultAzureCredential()
 
     source_account_url = f"https://{source_storage_account}.blob.core.windows.net"
-    source_blob_service_client = BlobServiceClient(source_account_url, credential=default_credential)
+    source_blob_service_client = BlobServiceClient(source_account_url, credential=source_sa_sas_toekn)
 
     target_account_url = "https://{target_storage_account}.blob.core.windows.net"
-    target_blob_service_client = BlobServiceClient(target_account_url, credential=default_credential)
+    target_blob_service_client = BlobServiceClient(target_account_url, credential=target_sa_sas_toekn)
 
-    prep(source_blob_service_client, source_blob,target_data_asset, target_blob_service_client)
+    prep(source_blob_service_client, target_blob_service_client, source_container_name, target_container_name, source_blob, target_blob)

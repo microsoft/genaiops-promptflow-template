@@ -7,9 +7,17 @@
             "COMPONENT_DISPLAY_NAME": "Preapre data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
+    "STORAGE":
+        {
+            "SOURCE_STORAGE_ACCOUNT": "sanamedrecognitionwe",
+            "SOURCE_STORAGE_ACCOUNT_CONTAINER": "SOURCE",
+            "SOURCE_BLOB": "source.csv",
+            "TARGET_STORAGE_ACCOUNT": "sanamedrecognitionwe",
+            "TARGET_STORAGE_ACCOUNT_CONTAINER": "data",
+            "TARGET_BLOB": "target.jsonl"
+        },
     "PATH":
         {
-            "RAW_DATA_DIR": "named_entity_recognition/data",
             "DATA_PIPELINE_CODE_DIR": "named_entity_recognition/data_pipelines/aml"
         },
     "SCHEDULE":
