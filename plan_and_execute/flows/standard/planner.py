@@ -28,7 +28,7 @@ def planner_tool(connection: CustomConnection, system_message: str, question: st
         code_execution_config=False,
         llm_config={
             "config_list": config_list_gpt4,
-            "temperature": 0.5,
+            "temperature": 0,
             "timeout": 120,
             "cache_seed": None
         }
