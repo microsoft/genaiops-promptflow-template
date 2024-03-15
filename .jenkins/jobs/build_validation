@@ -12,17 +12,17 @@ pipeline {
             }
         }
 
-        stage('Load Dependencies') {
-            steps {
-                withPythonEnv('python') {
-                    sh '''
-                    python -m pip install --upgrade pip
-                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
-                    az version
-                    '''
-                }
-            }
-        }
+        // stage('Load Dependencies') {
+        //     steps {
+        //         withPythonEnv('python') {
+        //             sh '''
+        //             python -m pip install --upgrade pip
+        //             python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+        //             az version
+        //             '''
+        //         }
+        //     }
+        // }
 
         stage('Azure Login') {
             steps {
