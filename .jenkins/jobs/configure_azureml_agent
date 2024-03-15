@@ -11,23 +11,19 @@ pipeline {
     
     stages {
         stage('Prepare build environment') {
-            description 'Prepares build environment for python and prompt flow related workflow execution.'
-            
             steps {
-                script {
-                    withPythonEnv('/usr/bin/python3.9') {
-                        sh '''                    
-                        source env/bin/activate
-                        pip install --upgrade pip
-                        pip install setuptools wheel
-                        pip install -r .jenkins/requirements/execute_job_requirements.txt
-                        pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
-                        
-                        python --version
-                        pip list
-                        az version
-                        '''
-                    }
+                withPythonEnv('/usr/bin/python3.9') {
+                    sh '''                    
+                    source env/bin/activate
+                    pip install --upgrade pip
+                    pip install setuptools wheel
+                    pip install -r .jenkins/requirements/execute_job_requirements.txt
+                    pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
+                    
+                    python --version
+                    pip list
+                    az version
+                    '''
                 }
             }
         }
