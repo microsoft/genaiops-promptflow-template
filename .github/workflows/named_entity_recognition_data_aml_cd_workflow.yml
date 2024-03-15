@@ -73,7 +73,7 @@ on:
                 description: SAS token for target storage account
                 type: string
                 required: true
-                default: ""
+                default: "-"
       source_account_name:
               description: Source Storage account name
               type: string
