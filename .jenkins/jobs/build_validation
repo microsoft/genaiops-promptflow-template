@@ -52,9 +52,7 @@ pipeline {
         stage('Execute Unit Tests') {
             steps {
                 withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
-                    pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
-                    '''
+                    sh "pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
                 }
             }
         }
