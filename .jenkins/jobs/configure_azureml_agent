@@ -15,7 +15,7 @@ pipeline {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                        sh '''                    
+                        sh """                    
                         pip install --upgrade pip
                         pip install setuptools wheel
                         pip install -r .jenkins/requirements/execute_job_requirements.txt
@@ -29,8 +29,7 @@ pipeline {
                             --data_purpose 'pr_data' \\
                             --flow_to_execute ${params.flow_type} \\
                             --env_name ${params.env_name}
-                        '''
-                        
+                        """
                     }
                 }
             }
