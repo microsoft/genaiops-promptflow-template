@@ -1,0 +1,28 @@
+inputs:
+  question:
+    type: string
+    default: What was the total box office performance of 'Inception' and 'Interstellar' together?
+  generated_answer:
+    type: string
+    default: The total box office performance of 'Inception' and 'Interstellar' together was $1,509,329,092.
+  ground_truth_answer:
+    type: string
+    default: The total box office performance of 'Inception' and 'Interstellar' together was $1,509,329,092.
+outputs:
+  evaluation:
+    type: string
+    reference: ${evaluator.output}
+nodes:
+- name: evaluator
+  type: llm
+  source:
+    type: code
+    path: evaluator.jinja2
+  inputs:
+    deployment_name: gpt-4
+    temperature: 0.5
+    question: ${inputs.question}
+    generated_answer: ${inputs.generated_answer}
+    ground_truth_answer: ${inputs.ground_truth_answer}
+  connection: aoai
+  api: chat
