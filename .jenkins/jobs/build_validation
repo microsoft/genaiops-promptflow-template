@@ -14,7 +14,7 @@ pipeline {
 
         stage('Load Dependencies') {
             steps {
-                withPythonEnv('/usr/bin/python3.9') {
+                withPythonEnv('python') {
                     sh '''
                     set -e # fail on error
                     python -m pip install --upgrade pip
@@ -48,9 +48,11 @@ pipeline {
 
         stage('Execute Unit Tests') {
             steps {
-                sh '''
-                pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
-                '''
+                withPythonEnv('python') {
+                    sh '''
+                    pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+                    '''
+                }
             }
         }
 
