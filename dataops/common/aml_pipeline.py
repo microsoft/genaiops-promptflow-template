@@ -146,6 +146,7 @@ def create_pipeline_job(
     pipeline_components.extend(prep_data_component)
 
     pipeline_job = ner_data_prep_pipeline(
+        raw_data_dir = Input(type = "uri_folder")
         # raw_data_dir = Input(type = "uri_folder", path = source_blob)
     )
 
