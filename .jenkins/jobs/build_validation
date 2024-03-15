@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
     parameters {
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
     }
@@ -8,21 +13,22 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                cleanWs()
                 checkout scm
             }
         }
 
-        // stage('Load Dependencies') {
-        //     steps {
-        //         withPythonEnv('python') {
-        //             sh '''
-        //             python -m pip install --upgrade pip
-        //             python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
-        //             az version
-        //             '''
-        //         }
-        //     }
-        // }
+        stage('Load Dependencies') {
+            steps {
+                withPythonEnv('python') {
+                    sh '''
+                    python -m pip install --upgrade pip
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    az version
+                    '''
+                }
+            }
+        }
 
         stage('Azure Login') {
             steps {
