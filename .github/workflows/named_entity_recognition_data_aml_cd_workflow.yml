@@ -84,14 +84,7 @@ on:
               type: string
               required: true
               default: "source.csv"
-      temp:
-        description: temp
-        type: string
-        required: true
-        default: "dd"
-
-
-
+              
 jobs:
   deploy_aml_data_pipeline:
     runs-on: ubuntu-latest
