@@ -20,7 +20,7 @@ pipeline {
 
         stage('Load Dependencies') {
             steps {
-                withPythonEnv('python') {
+                withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install --upgrade pip
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
@@ -51,7 +51,7 @@ pipeline {
 
         stage('Execute Unit Tests') {
             steps {
-                withPythonEnv('python') {
+                withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
                     '''
