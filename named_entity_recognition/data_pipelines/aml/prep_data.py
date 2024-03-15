@@ -1,4 +1,5 @@
 import argparse
+import io
 import json
 
 import pandas as pd
@@ -23,7 +24,7 @@ def prep(source_blob_service_client,
     source_blob_content = source_blob_client.download_blob().readall()
 
     # Read the CSV content into a Pandas DataFrame (sample data processing)
-    df = pd.read_csv(pd.compat.StringIO(source_blob_content.decode('utf-8')))
+    df = pd.read_csv(io.StringIO(source_blob_content.decode('utf-8')))
 
     # Convert DataFrame rows to JSONL format
     jsonl_list = []
