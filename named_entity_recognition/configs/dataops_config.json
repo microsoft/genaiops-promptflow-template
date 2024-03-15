@@ -22,7 +22,7 @@
         },
     "SCHEDULE":
         {
-            "NAME": "ner_data_pipeline_schedule",
+            "NAME": "ner_data_pipeline_schedule2",
             "CRON_EXPRESSION": "15 10 * * *",
             "TIMEZONE": "Eastern Standard Time"
         },
