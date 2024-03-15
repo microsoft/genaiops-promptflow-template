@@ -15,23 +15,19 @@ pipeline {
             
             steps {
                 script {
-                    // Checkout
-                    checkout scm
-                    
-                    // Setup Python
-                    sh "python3 -m venv env"
-                    sh "source env/bin/activate"
-                    sh "pip install --upgrade pip"
-                    sh "pip install setuptools wheel"
-                    sh "pip install -r .jenkins/requirements/execute_job_requirements.txt"
-                    sh "pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]"
-                    
-                    // Print Python version and installed packages
-                    sh "python --version"
-                    sh "pip list"
-                    
-                    // Print Azure CLI version
-                    sh "az version"
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh '''                    
+                        source env/bin/activate
+                        pip install --upgrade pip
+                        pip install setuptools wheel
+                        pip install -r .jenkins/requirements/execute_job_requirements.txt
+                        pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
+                        
+                        python --version
+                        pip list
+                        az version
+                        '''
+                    }
                 }
             }
         }
