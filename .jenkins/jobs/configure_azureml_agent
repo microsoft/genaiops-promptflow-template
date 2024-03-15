@@ -8,21 +8,29 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
-    
+
     stages {
-        stage('Prepare build environment') {
+        stage('Prepare build environment and register data asset') {
             steps {
-                withPythonEnv('/usr/bin/python3.9') {
-                    sh '''                    
-                    pip install --upgrade pip
-                    pip install setuptools wheel
-                    pip install -r .jenkins/requirements/execute_job_requirements.txt
-                    pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
-                    
-                    python --version
-                    pip list
-                    az version
-                    '''
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh '''                    
+                        pip install --upgrade pip
+                        pip install setuptools wheel
+                        pip install -r .jenkins/requirements/execute_job_requirements.txt
+                        pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
+                        
+                        python --version
+                        pip list
+                        az version
+
+                        python -m llmops.common.register_data_asset \\
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                            --data_purpose "pr_data" \\
+                            --flow_to_execute $flow_type \\
+                            --env_name $env_name
+                        '''
+                    }
                 }
             }
         }
