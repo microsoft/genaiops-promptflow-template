@@ -116,12 +116,10 @@ def create_pipeline_job(
         component_description,
         data_pipeline_code_dir,
         aml_env_name,
-        source_storage_account,
-        target_storage_account,
+        storage_account,
         source_container_name,
         target_container_name,
-        source_sa_sas_token,
-        target_sa_sas_token,
+        sa_sas_token,
         source_blob,
         target_blob
 ):
@@ -133,12 +131,12 @@ def create_pipeline_job(
         description = component_description,
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
-        source_storage_account = source_storage_account,
-        target_storage_account=target_storage_account,
+        source_storage_account = storage_account,
+        target_storage_account=storage_account,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
-        source_sa_sas_toekn = source_sa_sas_token,
-        target_sa_sas_toekn = target_sa_sas_token,
+        source_sa_sas_toekn = sa_sas_token,
+        target_sa_sas_toekn = sa_sas_token,
         source_blob = source_blob,
         target_blob = target_blob
     )
@@ -206,9 +204,9 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--source_sa_sas_token",
+        "--sa_sas_token",
         type=str,
-        help="SAS token for source storage account",
+        help="SAS token for storage account",
         required=True,
     )
     # parser.add_argument(
@@ -225,7 +223,7 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    source_sa_sas_token = args.source_sa_sas_token
+    sa_sas_token = args.sa_sas_token
     # target_sa_sas_token = args.target_sa_sas_token
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
@@ -237,10 +235,11 @@ def main():
     component_description = component_config['COMPONENT_DESCRIPTION']
 
     storage_config = config['STORAGE']
-    source_storage_account = storage_config['SOURCE_STORAGE_ACCOUNT']
+    storage_account = storage_config['STORAGE_ACCOUNT']
+    # source_storage_account = storage_config['SOURCE_STORAGE_ACCOUNT']
     source_container_name = storage_config['SOURCE_STORAGE_ACCOUNT_CONTAINER']
     source_blob = storage_config['SOURCE_BLOB']
-    target_storage_account = storage_config['TARGET_STORAGE_ACCOUNT']
+    # target_storage_account = storage_config['TARGET_STORAGE_ACCOUNT']
     target_container_name = storage_config['TARGET_STORAGE_ACCOUNT_CONTAINER']
     target_blob = storage_config['TARGET_BLOB']
 
@@ -266,12 +265,10 @@ def main():
             component_description,
             data_pipeline_code_dir,
             aml_env_name,
-            source_storage_account,
-            target_storage_account,
+            storage_account,
             source_container_name,
             target_container_name,
-            source_sa_sas_token,
-            source_sa_sas_token,
+            sa_sas_token,
             source_blob,
             target_blob
         )
