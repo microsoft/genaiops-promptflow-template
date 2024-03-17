@@ -109,5 +109,4 @@ jobs:
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --source_sa_sas_token ${{ inputs.source_sa_sas_token }} \
-            --target_sa_sas_token ${{ inputs.target_sa_sas_token }}
+            --source_sa_sas_token ${{ inputs.source_sa_sas_token }}
