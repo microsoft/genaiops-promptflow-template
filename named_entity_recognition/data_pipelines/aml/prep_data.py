@@ -63,12 +63,12 @@ if __name__ == "__main__":
         help="target container name",
     )
     parser.add_argument(
-        "--source_sa_sas_toekn",
+        "--source_sa_sas_token",
         type=str,
         help="source container name",
     )
     parser.add_argument(
-        "--target_sa_sas_toekn",
+        "--target_sa_sas_token",
         type=str,
         help="target container name",
     )
@@ -90,15 +90,15 @@ if __name__ == "__main__":
     target_container_name = args.target_container_name
     source_blob = args.source_blob
     target_blob = args.target_blob
-    source_sa_sas_toekn = args.source_sa_sas_toekn
-    target_sa_sas_toekn = args.target_sa_sas_toekn
+    source_sa_sas_token = args.source_sa_sas_token
+    target_sa_sas_token = args.target_sa_sas_token
 
     default_credential = DefaultAzureCredential()
 
     source_account_url = f"https://{source_storage_account}.blob.core.windows.net"
-    source_blob_service_client = BlobServiceClient(source_account_url, credential=source_sa_sas_toekn)
+    source_blob_service_client = BlobServiceClient(source_account_url, credential=source_sa_sas_token)
 
     target_account_url = "https://{target_storage_account}.blob.core.windows.net"
-    target_blob_service_client = BlobServiceClient(target_account_url, credential=target_sa_sas_toekn)
+    target_blob_service_client = BlobServiceClient(target_account_url, credential=target_sa_sas_token)
 
     prep(source_blob_service_client, target_blob_service_client, source_container_name, target_container_name, source_blob, target_blob)
