@@ -211,12 +211,12 @@ def main():
         help="SAS token for source storage account",
         required=True,
     )
-    parser.add_argument(
-        "--target_sa_sas_token",
-        type=str,
-        help="SAS token for target storage account",
-        required=True,
-    )
+    # parser.add_argument(
+    #     "--target_sa_sas_token",
+    #     type=str,
+    #     help="SAS token for target storage account",
+    #     required=True,
+    # )
 
     args = parser.parse_args()
 
@@ -226,7 +226,7 @@ def main():
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
     source_sa_sas_token = args.source_sa_sas_token
-    target_sa_sas_token = args.target_sa_sas_token
+    # target_sa_sas_token = args.target_sa_sas_token
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -271,7 +271,7 @@ def main():
             source_container_name,
             target_container_name,
             source_sa_sas_token,
-            target_sa_sas_token,
+            source_sa_sas_token,
             source_blob,
             target_blob
         )

@@ -29,11 +29,6 @@ on:
                 type: string
                 required: true
                 default: ""
-      target_sa_sas_token:
-              description: SAS token for target storage account
-              type: string
-              required: true
-              default: ""
 
   # workflow_dispatch allows to run workflow manually from the Actions tab
   workflow_dispatch:
@@ -64,11 +59,6 @@ on:
                 type: string
                 required: true
                 default: ""
-      target_sa_sas_token:
-              description: SAS token for target storage account
-              type: string
-              required: true
-              default: ""
               
 jobs:
   deploy_aml_data_pipeline:
