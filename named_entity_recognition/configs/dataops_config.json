@@ -3,8 +3,8 @@
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
-            "COMPONENT_NAME": "prep_data_component",
-            "COMPONENT_DISPLAY_NAME": "Preapre data component",
+            "COMPONENT_NAME": "prep_data_component2",
+            "COMPONENT_DISPLAY_NAME": "Preapre data component2",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
     "STORAGE":
