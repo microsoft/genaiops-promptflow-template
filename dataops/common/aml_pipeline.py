@@ -84,8 +84,8 @@ def get_prep_data_component(
                 --target_storage_account {target_storage_account} \
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
-                --source_sa_sas_toekn {source_sa_sas_token} \
-                --target_sa_sas_toekn {target_sa_sas_token} \
+                --source_sa_sas_token {source_sa_sas_token} \
+                --target_sa_sas_token {target_sa_sas_token} \
                 --source_blob {source_blob} \
                 --target_blob {target_blob} \
                 """,
@@ -135,8 +135,8 @@ def create_pipeline_job(
         target_storage_account=storage_account,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
-        source_sa_sas_toekn = sa_sas_token,
-        target_sa_sas_toekn = sa_sas_token,
+        source_sa_sas_token = sa_sas_token,
+        target_sa_sas_token = sa_sas_token,
         source_blob = source_blob,
         target_blob = target_blob
     )
