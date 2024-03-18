@@ -91,10 +91,15 @@ def register_data_asset(
                 m_hash = dict(data_info.tags).get("data_hash")
                 if m_hash is not None:
                     if m_hash != data_hash:
+                        logger.info(
+                            f"Updating dataset. Old hash: {m_hash}; New hash: {data_hash}"
+                        )
                         ml_client.data.create_or_update(aml_dataset)
                 else:
+                    logger.info(f"Updating dataset. New hash: {data_hash}")
                     ml_client.data.create_or_update(aml_dataset)
             except Exception:
+                logger.info(f"Updating dataset. New hash: {data_hash}")
                 ml_client.data.create_or_update(aml_dataset)
 
             aml_dataset = ml_client.data.get(name=ds.name, label="latest")
