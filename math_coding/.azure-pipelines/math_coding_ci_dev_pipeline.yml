@@ -34,6 +34,9 @@ parameters:
 stages:
   - template: ../../.azure-pipelines/platform_ci_dev_pipeline.yml
     parameters:
+      RESOURCE_GROUP_NAME: $(rg_name)
+      WORKSPACE_NAME: $(ws_name)
+      KEY_VAULT_NAME: $(kv_name)
       exec_environment: ${{ parameters.env_name }}
       use_case_base_path: ${{ parameters.use_case_base_path }}
       deployment_type: ${{ lower(parameters.deployment_type) }}
