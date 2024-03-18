@@ -104,6 +104,9 @@ jobs:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
           use_case_base_path: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+          WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+          KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
