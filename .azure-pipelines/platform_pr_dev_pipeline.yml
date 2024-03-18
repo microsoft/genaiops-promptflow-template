@@ -5,6 +5,10 @@ parameters:
    default: "dev"
  - name: use_case_base_path
    displayName: "Base path of model to execute"
+ - name: RESOURCE_GROUP_NAME
+   displayName: "Resource group name"
+ - name: WORKSPACE_NAME
+   displayName: "Workspace name"
 
 stages:
     - stage: build_validation
@@ -18,13 +22,18 @@ stages:
       displayName: execute_training_job
       dependsOn: 
       - build_validation
+      variables: 
+      - name: WORKSPACE_NAME
+        value: ${{ parameters.WORKSPACE_NAME }}
+      - name: RESOURCE_GROUP_NAME
+        value: ${{ parameters.RESOURCE_GROUP_NAME }}
       jobs:
       - job: Execute_ml_Job_Pipeline
         steps:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
-        
+
         #=====================================
         # Registers experiment dataset in Azure ML as Data Asset
         # Reads appropriate field values from data_config.json based on environment and data purpose

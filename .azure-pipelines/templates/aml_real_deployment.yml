@@ -7,8 +7,6 @@ parameters:
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
-- name: KEY_VAULT_NAME
-  type: string
 - name: RESOURCE_GROUP_NAME
   type: string
 - name: WORKSPACE_NAME
