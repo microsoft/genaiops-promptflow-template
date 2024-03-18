@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'env_name', defaultValue: 'dev', description: 'env stage e.g. dev, test, prod')
+        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'flow type to be registered and deployed')
+        string(name: 'model_version', description: 'flow version in registry to be deployed')
+        string(name: 'run_id', description: 'run id of the flow to be deployed')
+        
+    }
+
+    stages {
+        stage('Provision AML Online Endpoint') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """                    
+                        python -m llmops.common.deployment.provision_endpoint \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --build_id $run_id \
+                            --output_file "endpoint_principal.txt" \
+                            --env_name $env_name \
+                            --flow_to_execute $flow_type
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Read system managed id information') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh '''
+                        arr=$(cat endpoint_principal.txt)
+                        endpoint_principal="${arr[0]}"
+                        echo $endpoint_principal
+                        echo "ENDPOINT_PRINCIPAL=${endpoint_principal}"
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Assign Azure resource permissions') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh """
+                    file_path='./$flow_type/llmops_config.json'
+                    desired_type=$deploy_env
+                    selected_object=$(jq '.envs[] | select(.ENV_NAME == \'$desired_type\')' '$file_path')
+
+                    if [[ -n '$selected_object' ]]; then
+                    echo '$selected_object'
+                    KEY_VAULT_NAME=$(echo '$selected_object' | jq -r '.KEYVAULT_NAME')
+                    RESOURCE_GROUP_NAME=$(echo '$selected_object' | jq -r '.RESOURCE_GROUP_NAME')
+                    WORKSPACE_NAME=$(echo '$selected_object' | jq -r '.WORKSPACE_NAME')
+                    else
+                    echo 'Object not found'
+                    fi
+                    az role assignment create --assignee $ENDPOINT_PRINCIPAL --role 'AzureML Data Scientist' --scope '/subscriptions/$AZURE_SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME'
+                    auth_type=$(az keyvault show -n $KEY_VAULT_NAME  -g $RESOURCE_GROUP_NAME --query 'properties.enableRbacAuthorization')
+                    if [[ -z '$auth_type' ]]; then
+                        echo 'assigning RBAC permission'
+                        az role assignment create --assignee $ENDPOINT_PRINCIPAL --role 'Key Vault Reader' --scope '/subscriptions/$AZURE_SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.KeyVault/vaults/$KEY_VAULT_NAME'
+                    else
+                        echo 'assigning policy permission'
+                        az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $ENDPOINT_PRINCIPAL --secret-permissions get list
+                    fi
+                    """
+                }
+            }
+        }
+    }
+}
