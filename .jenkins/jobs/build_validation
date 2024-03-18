@@ -1,0 +1,66 @@
+pipeline {
+    agent any
+
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
+    parameters {
+        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        stage('Load Dependencies') {
+            steps {
+                withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m pip install --upgrade pip
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    az version
+                    '''
+                }
+            }
+        }
+
+        stage('Azure Login') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                }
+            }
+        }
+
+        stage('Load Azure Subscription Details') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    export subscriptionId=$(az account show --query id -o tsv)
+                    echo "SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID"
+                    '''
+                }
+            }
+        }
+
+        stage('Execute Unit Tests') {
+            steps {
+                withPythonEnv('/usr/bin/python3.9') {
+                    sh "pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
+                }
+            }
+        }
+
+        stage('Publish Unit Test Results') {
+            steps {
+                archiveArtifacts artifacts: '**/test-*.xml', fingerprint: true
+            }
+        }
+    }
+}

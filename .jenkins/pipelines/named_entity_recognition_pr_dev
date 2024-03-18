@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment')
+        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow usecase to execute')
+    }
+    
+    triggers {
+        githubPush()
+    }
+    
+    stages {
+        stage('Trigger Platform PR Dev Pipeline') {
+            steps {
+                script {
+                    // Trigger another pipeline by specifying its name
+                    build job: 'platform_pr_dev', parameters: [
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'flow_type', value: "${params.flow_type}")
+                    ]
+                }
+            }
+        }
+    }
+}
