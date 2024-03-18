@@ -78,7 +78,7 @@ def register_model(
     model_hash = hash_folder(model_path)
     model_tags = {"model_hash": model_hash}
     if build_id:
-        model_tags["build_id":build_id]
+        model_tags["build_id"] = build_id
     print("Hash of the folder:", model_hash)
 
     model = Model(
