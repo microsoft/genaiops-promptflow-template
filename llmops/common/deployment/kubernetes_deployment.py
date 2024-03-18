@@ -133,7 +133,7 @@ for elem in endpoint_config["kubernetes_endpoint"]:
             )
             environment = Environment(
                 build = BuildContext(
-                    path = os.path.join(flow_to_execute,flow_path),
+                    path = os.path.join(flow_to_execute, flow_path),
                     dockerfile_path = "docker/dockerfile"
                 ),
                 name=deployment_name,
