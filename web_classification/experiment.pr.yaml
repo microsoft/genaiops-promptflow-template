@@ -5,6 +5,6 @@ datasets:
   source: data/data.jsonl
   description: "This dataset is for pr validation only."
   mappings:
-    math_question: "${data.question}"
+    url: "${data.url}"
 
 evaluators:
