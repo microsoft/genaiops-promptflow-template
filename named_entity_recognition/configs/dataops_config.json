@@ -10,10 +10,8 @@
     "STORAGE":
         {
             "STORAGE_ACCOUNT": "sanamedrecognitionwe",
-            "SOURCE_STORAGE_ACCOUNT": "sanamedrecognitionwe",
             "SOURCE_STORAGE_ACCOUNT_CONTAINER": "source",
             "SOURCE_BLOB": "source.csv",
-            "TARGET_STORAGE_ACCOUNT": "sanamedrecognitionwe",
             "TARGET_STORAGE_ACCOUNT_CONTAINER": "data"
         },
     "PATH":

@@ -68,26 +68,11 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_account_name",
-        type=str,
-        help="Storage account name",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--sa_container_name",
-        type=str,
-        help="Container name",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--target_sa_sas_token",
+        "--sa_sas_token",
         type=str,
         help="SAS token for target storage account",
         required=True,
     )
-
     parser.add_argument(
         "--config_path_root_dir",
         type=str,
@@ -100,8 +85,6 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    sa_account_name = args.sa_account_name
-    sa_container_name = args.sa_container_name
     sa_sas_token = args.sa_sas_token
     config_path_root_dir = args.config_path_root_dir
 
@@ -114,11 +97,15 @@ def main():
         workspace_name,
     )
 
+    storage_config = config['STORAGE']
+    storage_account = storage_config['STORAGE_ACCOUNT']
+    target_container_name = storage_config['TARGET_STORAGE_ACCOUNT_CONTAINER']
+
     register_data_store(
         name_datastore=config["DATA_STORE_NAME"],
         description=config["DATA_STORE_DESCRIPTION"],
-        sa_account_name=sa_account_name,
-        sa_container_name=sa_container_name,
+        sa_account_name=storage_account,
+        sa_container_name=target_container_name,
         sa_sas_token=sa_sas_token,
         aml_client=aml_client
     )

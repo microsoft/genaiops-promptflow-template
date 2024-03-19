@@ -110,8 +110,8 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
+            --sa_sas_token ${{ inputs.sa_sas_token }}
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
-            --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
 
       - name: Register data asset
         uses: ./.github/actions/execute_script
@@ -122,6 +122,4 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }}
-            --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
-      
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}      

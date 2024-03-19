@@ -51,7 +51,7 @@ def get_prep_data_component(
         source_container_name,
         target_container_name,
         source_blob,
-        target_blob
+        assets
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
 
@@ -72,7 +72,8 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --target_blob {target_blob} \
+                --exp_blob {assets[0]} \
+                --eval_blob {assets[1]} \
                 --storage_key {storage_key}
                 """,
         environment=environment,
@@ -107,7 +108,7 @@ def create_pipeline_job(
         source_container_name,
         target_container_name,
         source_blob,
-        target_blob
+        assets
 ):
 
     prep_data_component = get_prep_data_component(
@@ -121,7 +122,7 @@ def create_pipeline_job(
         source_container_name = source_container_name,
         target_container_name = target_container_name,
         source_blob = source_blob,
-        target_blob = target_blob
+        assets = assets
     )
 
     pipeline_components.extend(prep_data_component)
@@ -213,7 +214,6 @@ def main():
     source_container_name = storage_config['SOURCE_STORAGE_ACCOUNT_CONTAINER']
     source_blob = storage_config['SOURCE_BLOB']
     target_container_name = storage_config['TARGET_STORAGE_ACCOUNT_CONTAINER']
-    target_blob = storage_config['TARGET_BLOB']
 
     path_config = config['PATH']
     data_pipeline_code_dir = path_config['DATA_PIPELINE_CODE_DIR']
@@ -222,6 +222,11 @@ def main():
     schedule_name = schedule_config['NAME']
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
+
+    data_asset_configs = config['DATA_ASSETS']
+    assets = []
+    for data_asset_config in data_asset_configs:
+        assets.append(data_asset_config['PATH'])
 
     aml_client = get_aml_client(
         subscription_id,
@@ -240,7 +245,7 @@ def main():
             source_container_name,
             target_container_name,
             source_blob,
-            target_blob
+            assets
         )
     
     schedule_pipeline_job(

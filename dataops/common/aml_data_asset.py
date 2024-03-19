@@ -68,20 +68,6 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_account_name",
-        type=str,
-        help="Storage account name",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--sa_container_name",
-        type=str,
-        help="Storage account's container name",
-        required=True,
-    )
-
-    parser.add_argument(
         "--config_path_root_dir",
         type=str,
         help="Root dir for config file",

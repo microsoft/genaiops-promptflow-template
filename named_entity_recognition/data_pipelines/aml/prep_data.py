@@ -13,7 +13,8 @@ def prepare_data(blob_service_client,
          source_container_name, 
          target_container_name, 
          source_blob, 
-         target_blob):
+         exp_blob, 
+         eval_blob):
     print('Data processing component')
 
     source_blob_client = blob_service_client.get_blob_client(container=source_container_name, blob=source_blob)
@@ -25,8 +26,11 @@ def prepare_data(blob_service_client,
     for _, row in df.iterrows():
         jsonl_list.append(json.dumps(row.to_dict()))
 
-    target_blob_client = blob_service_client.get_blob_client(container=target_container_name, blob=target_blob)
-    target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
+    exp_blob_client = blob_service_client.get_blob_client(container=target_container_name, blob=exp_blob)
+    exp_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
+
+    eval_blob_client = blob_service_client.get_blob_client(container=target_container_name, blob=eval_blob)
+    eval_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
     print("CSV data converted to JSONL and uploaded successfully!")
 
@@ -59,9 +63,14 @@ if __name__ == "__main__":
         help="source blob file (csv)",
     )
     parser.add_argument(
-        "--target_blob",
+        "--exp_blob",
         type=str,
-        help="target blob file (jsonl)"
+        help="exp blob file (jsonl)"
+    )
+    parser.add_argument(
+        "--eval_blob",
+        type=str,
+        help="eval blob file (jsonl)"
     )
 
     args = parser.parse_args()
@@ -70,10 +79,11 @@ if __name__ == "__main__":
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
-    target_blob = args.target_blob
+    exp_blob = args.exp_blob
+    eval_blob = args.eval_blob
         
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
     blob_service_client = BlobServiceClient(storage_account_url, credential=storage_key)
 
-    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_blob)
+    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, exp_blob, eval_blob)
