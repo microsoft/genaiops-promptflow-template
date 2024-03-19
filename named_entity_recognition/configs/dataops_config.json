@@ -3,15 +3,15 @@
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
-            "COMPONENT_NAME": "prep_data_component2",
-            "COMPONENT_DISPLAY_NAME": "Preapre data component2",
+            "COMPONENT_NAME": "prep_data_component",
+            "COMPONENT_DISPLAY_NAME": "Preapre data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
     "STORAGE":
         {
             "STORAGE_ACCOUNT": "sanamedrecognitionwe",
             "SOURCE_STORAGE_ACCOUNT": "sanamedrecognitionwe",
-            "SOURCE_STORAGE_ACCOUNT_CONTAINER": "SOURCE",
+            "SOURCE_STORAGE_ACCOUNT_CONTAINER": "source",
             "SOURCE_BLOB": "source.csv",
             "TARGET_STORAGE_ACCOUNT": "sanamedrecognitionwe",
             "TARGET_STORAGE_ACCOUNT_CONTAINER": "data",
@@ -23,7 +23,7 @@
         },
     "SCHEDULE":
         {
-            "NAME": "ner_data_pipeline_schedule2",
+            "NAME": "ner_data_pipeline_schedule",
             "CRON_EXPRESSION": "15 10 * * *",
             "TIMEZONE": "Eastern Standard Time"
         },

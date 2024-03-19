@@ -1,12 +1,5 @@
 """
-This module returns a AML workspace object after authentication.
-
-Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
@@ -37,10 +30,10 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    raw_data_dir
+    # raw_data_dir
 ):
     prep_data_job = pipeline_components[0](
-        raw_data_dir=raw_data_dir
+        # raw_data_dir=raw_data_dir
     )
 
     return {
@@ -53,41 +46,34 @@ def get_prep_data_component(
         description,
         data_pipeline_code_dir,
         environment,
-        source_storage_account,
-        target_storage_account,
+        storage_account,
+        storage_key,
         source_container_name,
         target_container_name,
-        source_sa_sas_token,
-        target_sa_sas_token,
         source_blob,
         target_blob
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-    prep_data_components = []  # Initialize an empty list to store components
 
-    # for asset in target_data_assets:
-    # asset_path = asset["PATH"]
+    # Initialize an empty list to store components
+    prep_data_components = []  
 
     prep_data_component = command(
         name=name,
         display_name=display_name,
         description=description,
-        inputs={
-            "raw_data_dir": Input(type="uri_folder")
-        },
+        inputs={ },
         outputs=dict(
             target_dir=Output(type="uri_folder", mode="rw_mount"),
         ),
         code=data_pipeline_code_dir,
         command=f"""python prep_data.py \
-                --source_storage_account {source_storage_account} \
-                --target_storage_account {target_storage_account} \
+                --storage_account {storage_account} \
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
-                --source_sa_sas_token {source_sa_sas_token} \
-                --target_sa_sas_token {target_sa_sas_token} \
                 --source_blob {source_blob} \
                 --target_blob {target_blob} \
+                --storage_key {storage_key}
                 """,
         environment=environment,
     )
@@ -117,13 +103,12 @@ def create_pipeline_job(
         data_pipeline_code_dir,
         aml_env_name,
         storage_account,
+        storage_key,
         source_container_name,
         target_container_name,
-        sa_sas_token,
         source_blob,
         target_blob
 ):
-    # raw_data_dir = os.path.join(os.getcwd(), raw_data_dir)
 
     prep_data_component = get_prep_data_component(
         name = component_name,
@@ -131,21 +116,17 @@ def create_pipeline_job(
         description = component_description,
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
-        source_storage_account = storage_account,
-        target_storage_account=storage_account,
+        storage_account = storage_account,
+        storage_key = storage_key,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
-        source_sa_sas_token = sa_sas_token,
-        target_sa_sas_token = sa_sas_token,
         source_blob = source_blob,
         target_blob = target_blob
     )
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline(
-        raw_data_dir = Input(type = "uri_folder", path = source_blob)
-    )
+    pipeline_job = ner_data_prep_pipeline( )
 
     return pipeline_job
 
@@ -204,17 +185,11 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_sas_token",
+        "--storage_key",
         type=str,
         help="SAS token for storage account",
         required=True,
     )
-    # parser.add_argument(
-    #     "--target_sa_sas_token",
-    #     type=str,
-    #     help="SAS token for target storage account",
-    #     required=True,
-    # )
 
     args = parser.parse_args()
 
@@ -223,8 +198,7 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    sa_sas_token = args.sa_sas_token
-    # target_sa_sas_token = args.target_sa_sas_token
+    storage_key = args.storage_key
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -236,10 +210,8 @@ def main():
 
     storage_config = config['STORAGE']
     storage_account = storage_config['STORAGE_ACCOUNT']
-    # source_storage_account = storage_config['SOURCE_STORAGE_ACCOUNT']
     source_container_name = storage_config['SOURCE_STORAGE_ACCOUNT_CONTAINER']
     source_blob = storage_config['SOURCE_BLOB']
-    # target_storage_account = storage_config['TARGET_STORAGE_ACCOUNT']
     target_container_name = storage_config['TARGET_STORAGE_ACCOUNT_CONTAINER']
     target_blob = storage_config['TARGET_BLOB']
 
@@ -250,8 +222,6 @@ def main():
     schedule_name = schedule_config['NAME']
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
-
-    target_data_assets = config['DATA_ASSETS']
 
     aml_client = get_aml_client(
         subscription_id,
@@ -266,9 +236,9 @@ def main():
             data_pipeline_code_dir,
             aml_env_name,
             storage_account,
+            storage_key,
             source_container_name,
             target_container_name,
-            sa_sas_token,
             source_blob,
             target_blob
         )

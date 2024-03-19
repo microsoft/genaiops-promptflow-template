@@ -24,8 +24,8 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_sas_token:
-                description: SAS token for storage account
+      storage_key:
+                description: Storage account key
                 type: string
                 required: true
                 default: ""
@@ -54,8 +54,8 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_sas_token:
-                description: SAS token for storage account
+      storage_key:
+                description: Storage account key
                 type: string
                 required: true
                 default: ""
@@ -99,4 +99,29 @@ jobs:
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --sa_sas_token ${{ inputs.sa_sas_token }}
+            --storage_key ${{ inputs.storage_key }}
+
+      - name: Create data store
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Create data store"
+          script_parameter: |
+            python -m dataops.common.aml_data_store \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}
+            --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
+
+      - name: Register data asset
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register data asset"
+          script_parameter: |
+            python -m dataops.common.aml_data_asset \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}
+            --target_sa_sas_toekn ${{ inputs.target_sa_sas_toekn }}
+      

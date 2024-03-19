@@ -1,12 +1,5 @@
 """
-This module returns a AML workspace object after authentication.
-
-Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+This module registers the data store.
 """
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
