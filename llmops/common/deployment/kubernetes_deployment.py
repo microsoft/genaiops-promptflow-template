@@ -49,11 +49,11 @@ logger = llmops_logger("kubernetes_deployment")
 
 def create_kubernetes_deployment(
     model_version: str,
-    exp_filename: Optional[str],
-    base_path: Optional[str],
-    build_id: Optional[str],
-    env_name: Optional[str],
-    subscription_id: Optional[str],
+    exp_filename: Optional[str] = None,
+    base_path: Optional[str] = None,
+    build_id: Optional[str] = None,
+    env_name: Optional[str] = None,
+    subscription_id: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
     experiment = load_experiment(

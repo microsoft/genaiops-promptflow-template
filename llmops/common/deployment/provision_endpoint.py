@@ -31,11 +31,11 @@ logger = llmops_logger("provision_endpoint")
 
 
 def create_endpoint(
-    base_path: Optional[str],
-    build_id: Optional[str],
-    env_name: Optional[str],
-    subscription_id: Optional[str],
-    output_file: Optional[str],
+    env_name: str,
+    base_path: Optional[str] = None,
+    build_id: Optional[str] = None,
+    subscription_id: Optional[str] = None,
+    output_file: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
 
@@ -112,9 +112,9 @@ def main():
     args = parser.parse_args()
 
     create_endpoint(
+        args.env_name,
         args.base_path,
         args.build_id,
-        args.env_name,
         args.subscription_id,
         args.output_file,
     )

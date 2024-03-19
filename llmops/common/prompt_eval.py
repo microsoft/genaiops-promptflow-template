@@ -37,12 +37,12 @@ logger = llmops_logger("prompt_eval")
 
 def prepare_and_execute(
     run_id: str,
-    exp_filename: Optional[str],
-    base_path: Optional[str],
-    subscription_id: Optional[str],
-    build_id: Optional[str],
-    env_name: Optional[str],
-    report_dir: Optional[str],
+    exp_filename: Optional[str] = None,
+    base_path: Optional[str] = None,
+    subscription_id: Optional[str] = None,
+    build_id: Optional[str] = None,
+    env_name: Optional[str] = None,
+    report_dir: Optional[str] = None,
 ):
     """
     Run the evaluation loop by executing evaluation flows.
@@ -227,22 +227,23 @@ def prepare_and_execute(
             all_eval_df.append(combined_results_df)
             all_eval_metrics.append(combined_metrics_df)
 
-    final_results_df = pd.concat(all_eval_df, ignore_index=True)
-    final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
-    final_results_df["stage"] = env_name
-    final_results_df["experiment_name"] = experiment_name
-    final_results_df["build"] = build_id
+    if len(all_eval_df) > 0:
+        final_results_df = pd.concat(all_eval_df, ignore_index=True)
+        final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
+        final_results_df["stage"] = env_name
+        final_results_df["experiment_name"] = experiment_name
+        final_results_df["build"] = build_id
 
-    final_results_df.to_csv(f"{report_dir}/{experiment_name}_result.csv")
-    final_metrics_df.to_csv(f"{report_dir}/{experiment_name}_metrics.csv")
+        final_results_df.to_csv(f"{report_dir}/{experiment_name}_result.csv")
+        final_metrics_df.to_csv(f"{report_dir}/{experiment_name}_metrics.csv")
 
-    styled_df = final_results_df.to_html(index=False)
-    with open(f"{report_dir}/{experiment_name}_result.html", "w") as f_results:
-        f_results.write(styled_df)
+        styled_df = final_results_df.to_html(index=False)
+        with open(f"{report_dir}/{experiment_name}_result.html", "w") as f_results:
+            f_results.write(styled_df)
 
-    html_table_metrics = final_metrics_df.to_html(index=False)
-    with open(f"{report_dir}/{experiment_name}_metrics.html", "w") as f_metrics:
-        f_metrics.write(html_table_metrics)
+        html_table_metrics = final_metrics_df.to_html(index=False)
+        with open(f"{report_dir}/{experiment_name}_metrics.html", "w") as f_metrics:
+            f_metrics.write(html_table_metrics)
 
 
 def main():
