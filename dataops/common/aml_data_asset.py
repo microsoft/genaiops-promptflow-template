@@ -1,12 +1,5 @@
 """
-This module returns a AML workspace object after authentication.
-
-Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+This module creates the data asset.
 """
 from azure.ai.ml.dsl import pipeline
 from azure.ai.ml import MLClient
@@ -40,13 +33,11 @@ def get_aml_client(
 def register_data_asset(
         name,
         description,
-        target_dir,
         aml_client,
-        sa_account_name,
-        sa_container_name
+        data_store,
+        file_path
 ):
-
-    target_path = f"https://{sa_account_name}.blob.core.windows.net/{sa_container_name}/{target_dir}"
+    target_path = f"azureml://datastores/{data_store}/paths/{file_path}"
     aml_dataset = Data(
         path = target_path,
         type = AssetTypes.URI_FILE,
@@ -103,8 +94,6 @@ def main():
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
     config_path_root_dir = args.config_path_root_dir
-    sa_account_name = args.sa_account_name
-    sa_container_name = args.sa_container_name
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -115,6 +104,7 @@ def main():
         workspace_name,
     )
 
+    data_store = config["DATA_STORE_NAME"]
     data_asset_configs = config['DATA_ASSETS']
     for data_asset_config in data_asset_configs:
         data_asset_name = data_asset_config['NAME']
@@ -124,10 +114,9 @@ def main():
         register_data_asset(
             name = data_asset_name,
             description = data_asset_description,
-            target_dir = data_asset_file_path,
             aml_client = aml_client,
-            sa_account_name=sa_account_name,
-            sa_container_name=sa_container_name
+            data_store = data_store,
+            file_path = data_asset_file_path
         )
 
 if __name__ == "__main__":

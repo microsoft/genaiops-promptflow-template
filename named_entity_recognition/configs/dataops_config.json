@@ -1,5 +1,5 @@
 {
-    "DATA_STORE_NAME": "aml_pipeline_data_store",
+    "DATA_STORE_NAME": "ner_data_store",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
@@ -14,8 +14,7 @@
             "SOURCE_STORAGE_ACCOUNT_CONTAINER": "source",
             "SOURCE_BLOB": "source.csv",
             "TARGET_STORAGE_ACCOUNT": "sanamedrecognitionwe",
-            "TARGET_STORAGE_ACCOUNT_CONTAINER": "data",
-            "TARGET_BLOB": "target.jsonl"
+            "TARGET_STORAGE_ACCOUNT_CONTAINER": "data"
         },
     "PATH":
         {
@@ -29,13 +28,13 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_testing_eval",
-            "PATH": "eval_data.jsonl",
+            "NAME": "ner_eval1",
+            "PATH": "eval.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner__testing_exp",
-            "PATH": "data.jsonl",
+            "NAME": "ner_exp",
+            "PATH": "exp.json",
             "DESCRIPTION": "NER experiment data asset"
         }
     ]

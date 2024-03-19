@@ -32,29 +32,22 @@ def register_data_store(
         description,
         sa_account_name,
         sa_container_name,
-        target_sa_sas_token,
+        sa_sas_token,
         aml_client
 ):
     store = AzureBlobDatastore(
         name=name_datastore,
         description=description,
         account_name=sa_account_name,
-        container_name=sa_container_name
-    )
-    store = AzureBlobDatastore(
-        name=name_datastore,
-        description=description,
-        account_name=sa_account_name,
         container_name=sa_container_name,
-        credentials=SasTokenConfiguration(
-            sas_token= target_sa_sas_token
+        credentials= SasTokenConfiguration(
+            sas_token= sa_sas_token
         )
     )
     aml_client.create_or_update(store)
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--subscription_id",
@@ -109,7 +102,7 @@ def main():
     workspace_name = args.workspace_name
     sa_account_name = args.sa_account_name
     sa_container_name = args.sa_container_name
-    target_sa_sas_token = args.target_sa_sas_token
+    sa_sas_token = args.sa_sas_token
     config_path_root_dir = args.config_path_root_dir
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
@@ -126,7 +119,7 @@ def main():
         description=config["DATA_STORE_DESCRIPTION"],
         sa_account_name=sa_account_name,
         sa_container_name=sa_container_name,
-        target_sa_sas_token=target_sa_sas_token,
+        sa_sas_token=sa_sas_token,
         aml_client=aml_client
     )
 
