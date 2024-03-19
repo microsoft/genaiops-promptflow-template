@@ -48,8 +48,8 @@ pipeline {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
-                    file_path="./$flow_type/llmops_config.json"
-                    desired_type=$deploy_env
+                    file_path="./${params.flow_type}/llmops_config.json"
+                    desired_type=${params.deploy_env}
                     echo $desired_type
                     selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
                     echo $selected_object
