@@ -8,10 +8,13 @@ pipeline {
     stages {
         stage('Create Docker Image') {
             steps {
+            withPythonEnv('/usr/bin/python3.9') {
                 sh '''
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     # Your Docker image creation command here
                     /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute "named_entity_recognition" --deploy_environment "dev" --build_id "$BUILD_NUMBER"
                 '''
+            }
             }
         }
     }
