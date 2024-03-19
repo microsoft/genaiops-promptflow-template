@@ -37,7 +37,6 @@ pipeline {
                         arr=$(cat endpoint_principal.txt)
                         endpoint_principal="${arr[0]}"
                         echo $endpoint_principal
-                        echo "ENDPOINT_PRINCIPAL=${endpoint_principal}"
                         '''
                     }
                 }
