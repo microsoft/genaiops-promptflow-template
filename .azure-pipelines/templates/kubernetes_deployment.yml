@@ -13,8 +13,6 @@ parameters:
   type: string
 - name: WORKSPACE_NAME
   type: string
-- name: KEY_VAULT_NAME
-  type: string
 
 steps:
 - template: execute_python_code.yml

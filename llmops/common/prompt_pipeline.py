@@ -6,6 +6,7 @@ predefined standard flows.
 
 Args:
 --file: The name of the experiment file. Default is 'experiment.yaml'.
+--variants: Defines the variants to run. (* for all, defaults for all defaults, or comma separated list)
 --base_path: Base path of the use case. Where flows, data,
 and experiment.yaml are expected to be found.
 --subscription_id: The Azure subscription ID. If this argument is not
@@ -31,6 +32,7 @@ from azure.identity import DefaultAzureCredential
 from promptflow.entities import Run
 from promptflow.azure import PFClient
 from dotenv import load_dotenv
+from enum import Enum
 from typing import Optional
 
 from llmops.common.common import wait_job_finish
@@ -50,7 +52,54 @@ def check_dictionary_contained(ref_dict, dict_list):
     return False
 
 
+class VariantsSelector:
+    """
+    Selects the variants to run. Options are default, all or custom.
+    """
+
+    class VariantSelectionOption(Enum):
+        DEFAULTS_ONLY = 1
+        ALL = 2
+        CUSTOM = 3
+
+    def __init__(
+        self,
+        selector: VariantSelectionOption,
+        selected_variants: Optional[list[str]] = None,
+    ):
+        self._selector = selector
+        self._selected_variants = selected_variants or []
+
+    @property
+    def defaults_only(self) -> bool:
+        return self._selector == self.VariantSelectionOption.DEFAULTS_ONLY
+
+    def is_variant_enabled(self, node: str, variant: str) -> bool:
+        if self._selector in [
+            VariantsSelector.VariantSelectionOption.DEFAULTS_ONLY,
+            VariantsSelector.VariantSelectionOption.ALL,
+        ]:
+            return True
+
+        for selected_variant in self._selected_variants:
+            if selected_variant in (variant, f"{node}.{variant}"):
+                return True
+        return False
+
+    @classmethod
+    def from_args(cls, variants: str):
+        variants = variants.strip().lower()
+        if variants in ["*", "all"]:
+            return cls(cls.VariantSelectionOption.ALL)
+        if variants in ["defaults", "default"]:
+            return cls(cls.VariantSelectionOption.DEFAULTS_ONLY)
+        return cls(
+            cls.VariantSelectionOption.CUSTOM, [v.strip() for v in variants.split(",")]
+        )
+
+
 def prepare_and_execute(
+    variants_selector: VariantsSelector,
     exp_filename: Optional[str],
     base_path: Optional[str],
     subscription_id: Optional[str],
@@ -102,10 +151,12 @@ def prepare_and_execute(
         dataframes = []
         metrics = []
 
-        if len(flow_detail.all_variants) != 0:
+        if len(flow_detail.all_variants) != 0 and not variants_selector.defaults_only:
             logger.info("Start processing %d variants", len(flow_detail.all_variants))
             for variant in flow_detail.all_variants:
                 for variant_id, node_id in variant.items():
+                    if not variants_selector.is_variant_enabled(node_id, variant_id):
+                        continue
                     logger.info(
                         f"Creating run for node '{node_id}' variant '{variant_id}'"
                     )
@@ -296,6 +347,12 @@ def main():
         default="experiment.yaml",
     )
     parser.add_argument(
+        "--variants",
+        type=str,
+        help="Defines the variants to run. (* for all, defaults for all defaults, or comma separated list)",
+        default="*",
+    )
+    parser.add_argument(
         "--subscription_id",
         type=str,
         help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
@@ -343,6 +400,7 @@ def main():
     args = parser.parse_args()
 
     prepare_and_execute(
+        VariantsSelector.from_args(args.variants),
         args.file,
         args.base_path,
         args.subscription_id,
