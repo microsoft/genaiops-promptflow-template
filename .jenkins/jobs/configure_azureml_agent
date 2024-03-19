@@ -1,11 +1,11 @@
 pipeline {
     agent any
-    
+
     parameters {
         string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment')
         string(name: 'flow_type', defaultValue: 'named_entity_recognition')
     }
-    
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
@@ -15,12 +15,13 @@ pipeline {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                        sh """                    
+                        sh """
                         pip install --upgrade pip
                         pip install setuptools wheel
                         pip install -r .jenkins/requirements/execute_job_requirements.txt
                         pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
-                        
+
+
                         python --version
                         pip list
                         az version
@@ -31,3 +32,4 @@ pipeline {
         }
     }
 }
+

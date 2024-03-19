@@ -1,35 +1,134 @@
 pipeline {
     agent any
-    
-    parameters {
-        string(name: 'flow_type', defaultValue: 'named_entity_recognition')
-        string(name: 'deployment_type', defaultValue: 'aks')
+
+    environment {
+        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
     }
-    
+
+    parameters {
+        string(name: 'FLOW_TYPE', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'ENV_NAME', defaultValue: 'dev', description: 'Execution Environment')
+    }
+
     stages {
-        stage('Install Dependencies') {
+        stage('Checkout Actions') {
             steps {
-                script {
-                    sh 'sudo apt-get update && sudo apt-get install -y azure-cli'
-                }
+                checkout scm
             }
         }
-        stage('Verify Azure CLI') {
-            steps {
-                sh 'az --version'
-            }
-        }
-        stage('build') {
+
+         stage('Azure Login') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
             }
         }
-        stage('Print Parameter Value') {
+
+        stage('Load Azure Subscription Details') {
             steps {
-                echo "Running Platform CI Pipeline for the following flow: ${params.flow_type} and deployment type: ${params.deployment_type}"
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    export subscriptionId=$(az account show --query id -o tsv)
+                    echo "SUBSCRIPTION_ID=$subscriptionId"
+                    '''
+                }
+            }
+        }
+
+        stage('Configure Azure ML Agent') {
+            steps {
+                script {
+                    build job: 'configure_azureml_agent', parameters: [
+                        string(name: 'flow_type', value: "${params.flow_type}")
+                    ]
+                }
+            }
+        }
+
+        stage('Register experiment data asset') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --data_purpose "training_data" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --env_name $ENV_NAME
+                    '''
+                }
+            }
+
+            }
+        }
+
+
+        stage('Execute prompt flow bulk run') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    python -m llmops.common.prompt_pipeline \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --data_purpose "training_data" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --build_id $BUILD_NUMBER \\
+                    --env_name $ENV_NAME \\
+                    --output_file run_id.txt
+                    '''
+                }
+            }
+            }
+        }
+
+
+        stage('Register evaluation data asset') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --data_purpose ""test_data"" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --env_name $ENV_NAME
+                    '''
+                }
+            }
+            }
+        }
+
+
+        stage('Read prompt flow runs & Execute bulk run evaluations') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    run_name=$(cat run_id.txt)
+                    echo $run_name
+                    python -m llmops.common.prompt_eval \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --build_id $BUILD_NUMBER \\
+                    --data_purpose ""test_data"" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --env_name $ENV_NAME \\
+                    --run_id $run_name
+                    '''
+                }
+            }
+            }
+        }
+
+        stage('Archive CSV') {
+            steps {
+                script {
+                    archiveArtifacts artifacts: './reports', allowEmptyArchive: true, onlyIfSuccessful: true
+                }
             }
         }
     }
 }
+
