@@ -47,9 +47,9 @@ def generate_file_hash(file_path):
 
 def register_data_asset(
     base_path: str,
-    exp_filename: Optional[str],
-    subscription_id: Optional[str],
-    env_name: Optional[str],
+    exp_filename: Optional[str] = None,
+    subscription_id: Optional[str] = None,
+    env_name: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
     experiment = load_experiment(

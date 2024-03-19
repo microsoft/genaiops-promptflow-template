@@ -100,15 +100,15 @@ class VariantsSelector:
 
 def prepare_and_execute(
     variants_selector: VariantsSelector,
-    exp_filename: Optional[str],
-    base_path: Optional[str],
-    subscription_id: Optional[str],
-    report_dir: Optional[str],
-    build_id: Optional[str],
-    env_name: Optional[str],
-    output_file: Optional[str],
-    save_output: Optional[bool],
-    save_metric: Optional[bool],
+    exp_filename: Optional[str] = None,
+    base_path: Optional[str] = None,
+    subscription_id: Optional[str] = None,
+    report_dir: Optional[str] = None,
+    build_id: Optional[str] = None,
+    env_name: Optional[str] = None,
+    output_file: Optional[str] = None,
+    save_output: Optional[bool] = None,
+    save_metric: Optional[bool] = None,
 ):
     """
     Run the experimentation loop by executing standard flows.
