@@ -1,8 +1,8 @@
 pipeline {
     agent any
     parameters {
-        string(name: 'FLOW_TO_EXECUTE', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
-        string(name: 'DEPLOY_ENVIRONMENT', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'flow_to_execute', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
     }
 
     stages {
@@ -10,7 +10,7 @@ pipeline {
             steps {
                 sh '''
                     # Your Docker image creation command here
-                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute "${FLOW_TO_EXECUTE}" --deploy_environment "${DEPLOY_ENVIRONMENT}" --build_id "$BUILD_NUMBER"
+                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute "$flow_to_execute" --deploy_environment "$deploy_environment" --build_id "$BUILD_NUMBER"
                 '''
             }
         }
