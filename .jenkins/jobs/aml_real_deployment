@@ -45,11 +45,11 @@ pipeline {
         stage('Assign Azure resource permissions') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh '''
+                    sh """
                     file_path="./$flow_type/llmops_config.json"
                     echo $file_path
                     echo $env_name
-                    selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$file_path")
+                    selected_object=$(jq '.envs[] | select(.ENV_NAME == \"$env_name\")' "$file_path")
                     echo $selected_object
                     if [[ -n "$selected_object" ]]; then
                         echo "$selected_object"
@@ -68,7 +68,7 @@ pipeline {
                         echo "assigning policy permission"
                         az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $ENDPOINT_PRINCIPAL --secret-permissions get list
                     fi
-                    '''
+                    """
                 }
             }
         }
