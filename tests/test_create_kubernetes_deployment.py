@@ -31,7 +31,6 @@ def test_create_kubernetes_deployment():
     deployment_instance_count = 1
     deployment_cpu = "0.5"
     deployment_mem = "500Mi"
-    deployment_image = "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest"
     deployment_config = {
         "liveness_route": {"path": "/health", "port": "8080"},
         "readiness_route": {"path": "/health", "port": "8080"},
@@ -91,7 +90,12 @@ def test_create_kubernetes_deployment():
         assert created_deployment.instance_count == deployment_instance_count
         assert created_deployment.app_insights_enabled is True
 
-        assert created_deployment.environment.image == deployment_image
+        assert created_deployment.environment.build.path == str(
+            RESOURCE_PATH / "flows/exp_flow"
+        )
+        assert (
+            created_deployment.environment.build.dockerfile_path == "docker/dockerfile"
+        )
         assert created_deployment.environment.inference_config == deployment_config
 
         assert created_deployment.request_settings.request_timeout_ms == 90000
