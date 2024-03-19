@@ -6,6 +6,8 @@
 set -e # fail on error
 
 # read values from llmops_config.json related to given environment
+echo "Flow below"
+echo $flow_to_execute
 config_path="./$flow_to_execute/llmops_config.json"
 env_name=$deploy_environment
 selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
