@@ -50,8 +50,9 @@ pipeline {
                     sh '''
                     file_path="./$flow_type/llmops_config.json"
                     desired_type=$deploy_env
+                    echo $desired_type
                     selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
-
+                    echo $selected_object
                     if [[ -n "$selected_object" ]]; then
                         echo "$selected_object"
                         KEY_VAULT_NAME=$(echo "$selected_object" | jq -r ".KEYVAULT_NAME")
