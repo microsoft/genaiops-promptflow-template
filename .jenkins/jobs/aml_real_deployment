@@ -48,8 +48,9 @@ pipeline {
                     sh '''
                     file_path="./$flow_type/llmops_config.json"
                     echo $file_path
-                    echo $env_name
-                    selected_object=$(jq ".envs[] | select(.ENV_NAME == \"dev\")" "$file_path")
+                    echo $
+                    env_type="$env_name"
+                    selected_object=\$(jq ".envs[] | select(.ENV_NAME == \"$env_type\")" "\$file_path")
                     echo $selected_object
                     if [[ -n "$selected_object" ]]; then
                         echo "$selected_object"
