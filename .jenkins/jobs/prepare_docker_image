@@ -1,20 +1,21 @@
 pipeline {
     agent any
-    environment {
-        FLOW_TO_EXECUTE = "${params.FLOW_TO_EXECUTE}"
-        DEPLOY_ENVIRONMENT = "${params.DEPLOY_ENVIRONMENT}"
-        BUILD_ID = "${currentBuild.number}"
+
+    parameters {
+        string(name: 'FLOW_TO_EXECUTE', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'DEPLOY_ENVIRONMENT', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'BUILD_ID', defaultValue: '${currentBuild.number}', description: 'Execution Environment')
     }
     stages {
         stage('Create Docker Image') {
             steps {
-                script {
+                sh """
                     # Your Docker image creation command here
                     /bin/bash ./llmops/common/scripts/gen_docker_image.sh \\
-                        --flow_to_execute "$FLOW_TO_EXECUTE" \\
-                        --deploy_environment "$DEPLOY_ENVIRONMENT" \\
-                        --build_id "$BUILD_ID"
-                }
+                        --flow_to_execute $FLOW_TO_EXECUTE \\
+                        --deploy_environment $DEPLOY_ENVIRONMENT \\
+                        --build_id $BUILD_ID
+                """
             }
         }
     }
