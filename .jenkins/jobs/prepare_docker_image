@@ -11,9 +11,9 @@ pipeline {
                 sh '''
                     # Your Docker image creation command here
                     ./llmops/common/scripts/gen_docker_image.sh \\
-                        --flow_to_execute "${FLOW_TO_EXECUTE}" \\
-                        --deploy_environment "${DEPLOY_ENVIRONMENT}" \\
-                        --build_id "${BUILD_ID}"
+                        --flow_to_execute env.FLOW_TO_EXECUTE} \\
+                        --deploy_environment env.DEPLOY_ENVIRONMENT \\
+                        --build_id env.BUILD_ID
                 '''
             }
         }
