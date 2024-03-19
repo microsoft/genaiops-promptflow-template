@@ -50,7 +50,7 @@ pipeline {
                     echo $file_path
                     desired_type=$deploy_env
                     echo $desired_type
-                    selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+                    selected_object=$(jq ".envs[] | select(.ENV_NAME == $desired_type)" "$file_path")
                     echo $selected_object
                     if [[ -n "$selected_object" ]]; then
                         echo "$selected_object"
