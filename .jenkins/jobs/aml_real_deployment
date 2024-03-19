@@ -34,9 +34,7 @@ pipeline {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh '''
-                        arr=$(cat endpoint_principal.txt)
-                        echo "endpoint is read from txt file"
-                        endpoint_principal=${arr[0]}
+                        endpoint_principal=$(cat endpoint_principal.txt)
                         echo "endpoint_principal is assigned"
                         '''
                     }
