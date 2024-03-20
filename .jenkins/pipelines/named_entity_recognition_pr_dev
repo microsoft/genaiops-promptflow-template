@@ -14,7 +14,6 @@ pipeline {
         stage('Trigger Platform PR Dev Pipeline') {
             steps {
                 script {
-                    // Trigger another pipeline by specifying its name
                     build job: 'platform_pr_dev', parameters: [
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'flow_type', value: "${params.flow_type}")
