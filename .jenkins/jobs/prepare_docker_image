@@ -16,7 +16,7 @@ pipeline {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
-                    python -m pip install -r .jenkins/requirements/build_valiation_requirements.txt
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     python -m llmops.common.prompt_local_connections \\
                     --env_name $deploy_environment \\
                     --connection_details $dev_connections \\
