@@ -32,18 +32,36 @@ pipeline {
             }
         }
 
+        stage('Get llmops config object') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                        endpoint_principal=$(cat endpoint_principal.txt)
+                        echo $endpoint_principal
+                        file_path="./$flow_type/llmops_config.json"
+                        echo $file_path
+
+                        selected_object=$(python -c "
+                        import json
+
+                        with open('$file_path', 'r') as f:
+                            data = json.load(f)
+
+                        selected = next((item for item in data['envs'] if item['ENV_NAME'] == '$env_name'), None)
+                        print(json.dumps(selected))
+                        ")
+                        echo $selected_object
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Assign Azure resource permissions') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
-                    endpoint_principal=$(cat endpoint_principal.txt)
-                    echo $endpoint_principal
-                    file_path="./$flow_type/llmops_config.json"
-                    echo $file_path
-
-                    selected_object=$(jq '.envs[] | select(.ENV_NAME == '\"${env_name}\"'))' "$file_path")
-                    echo $selected_object
-
                     key_vault_name=$(echo "$selected_object" | jq -r ".KEYVAULT_NAME")
                     resource_group_name=$(echo "$selected_object" | jq -r ".RESOURCE_GROUP_NAME")
                     workspace_name=$(echo "$selected_object" | jq -r ".WORKSPACE_NAME")
