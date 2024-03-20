@@ -5,7 +5,7 @@ parameters {
         string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
         string(name: 'flow_type', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
         string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, docker, webapp', defaultValue: 'aml')
-        string(name: 'run_id', description: 'run id of the flow to be deployed')
+        string(name: 'run_id', description: 'run id of the flow to be deployed', defaultValue: 'named_entity_recognition_dev_20240318_162626_named_entity_recognition_train')
     }
 
     stages {
@@ -51,7 +51,12 @@ parameters {
                 }
             }
             steps {
-                sh "echo $deployment_type"
+                script {
+                    build job: 'jobs/aml_real_deployment', parameters: [
+                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'env_name', value: "${params.env_name}")
+                    ]
+                }
             }
         }
     }
