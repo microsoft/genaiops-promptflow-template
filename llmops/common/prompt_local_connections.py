@@ -112,7 +112,8 @@ def main():
     )
 
     args = parser.parse_args()
-
+    print("connection details")
+    print(args.connection_details)
     prepare_and_execute(
         args.flow_to_execute,
         args.env_name,
