@@ -39,7 +39,7 @@ pipeline {
         stage('Configure Azure ML Agent') {
             steps {
                 script {
-                    build job: 'configure_azureml_agent', parameters: [
+                    build job: 'jobs/configure_azureml_agent', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}")
                     ]
                 }
