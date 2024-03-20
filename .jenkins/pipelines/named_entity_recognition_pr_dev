@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     parameters {
-        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment: pr, dev or test')
+        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment: pr - dev - test')
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow usecase to execute')
     }
     
