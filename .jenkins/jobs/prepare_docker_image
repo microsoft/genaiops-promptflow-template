@@ -20,7 +20,7 @@ pipeline {
                     python -m llmops.common.prompt_local_connections \\
                     --flow_to_execute ${flow_to_execute} \\
                     --env_name ${deploy_environment} \\
-                    --connection_details $dev_connections
+                    --connection_details "$dev_connections"
                     '''
                 }
             }
