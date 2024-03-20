@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'flow_to_execute', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
+    }
+
+    stages {
+        stage('Configure Azure ML Agent') {
+            steps {
+                script {
+                    build job: 'prepare_docker_image', parameters: [
+                        string(name: '$flow_to_execute', value: "${params.$flow_to_execute}")
+                        string(name: '$deploy_environment', value: "${params.$deploy_environment}")
+                    ]
+                }
+            }
+        }
+        stage('Create Webapp') {
+            steps {
+                sh '''
+                    flow_to_execute=$flow_to_execute
+                    deploy_environment=$deploy_environment
+                    build_id=$BUILD_NUMBER
+                    /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh
+                '''
+            }
+        }
+    }
+}
