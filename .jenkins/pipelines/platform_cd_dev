@@ -1,0 +1,103 @@
+pipeline {
+    agent any
+
+parameters {
+        string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
+        string(name: 'flow_type', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
+        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, docker, webapp', defaultValue: '')
+        string(name: 'run_id', description: 'run id of the flow to be deployed')
+    }
+
+    stages {
+        stage('Checkout Actions') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Register flow as model in AzureML') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh """
+                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
+                    python -m llmops.common.deployment.register_model \
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \
+                    --flow_to_execute $flow_type \
+                    --output_file "model_version.txt" \
+                    --build_id $run_id \
+                    --env_name $env_name \
+                    """
+                    }
+                }
+            }
+        }
+
+
+        stage('Execute prompt flow bulk run') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    python -m llmops.common.prompt_pipeline \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --data_purpose "training_data" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --build_id $BUILD_NUMBER \\
+                    --env_name $ENV_NAME \\
+                    --output_file run_id.txt
+                    '''
+                }
+            }
+            }
+        }
+
+
+        stage('Register evaluation data asset') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --data_purpose ""test_data"" \\
+                    --flow_to_execute $FLOW_TYPE \\
+                    --env_name $ENV_NAME
+                    '''
+                }
+            }
+            }
+        }
+
+
+        stage('Read registered flow latest version') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    model_version=$(cat model_version.txt)
+                    echo $model_version
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to AML real-time online endpoint') {
+            when {
+                expression {
+                    params.deployment_type == 'aml'
+                }
+            }
+            steps {
+                script {
+                    build job: 'jobs/aml_real_deployment', parameters: [
+                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'model_version', value: "${model_version}")
+                    ]
+                }
+            }
+        }
+    }
+}
+
