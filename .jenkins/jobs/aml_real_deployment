@@ -36,7 +36,7 @@ pipeline {
                     echo $endpoint_principal
                     file_path="./$flow_type/llmops_config.json"
                     echo $file_path
-                    env_type=\"$env_name\"
+                    env_type="\\\"$env_name\\\""
 
                     selected_object=$(jq '.envs[] | select(.ENV_NAME == $env_type)' "$file_path")
                     echo $selected_object
