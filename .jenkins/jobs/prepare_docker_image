@@ -41,5 +41,16 @@ pipeline {
             }
             }
         }
+
+        stage('Create Webapp') {
+         steps {
+         sh '''
+                flow_to_execute=$flow_to_execute
+                deploy_environment=$deploy_environment
+                build_id=$BUILD_NUMBER
+                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh
+            '''
+         }
+        }
     }
 }

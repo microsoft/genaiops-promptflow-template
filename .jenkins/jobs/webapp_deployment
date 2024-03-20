@@ -10,7 +10,8 @@ pipeline {
     }
 
     stages {
-        stage('Create local promptflow connections') {
+
+    stage('Create local promptflow connections') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
@@ -40,16 +41,16 @@ pipeline {
             }
             }
         }
-    }
+
         stage('Create Webapp') {
-            steps {
-                sh '''
-                    flow_to_execute=$flow_to_execute
-                    deploy_environment=$deploy_environment
-                    build_id=$BUILD_NUMBER
-                    /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh
-                '''
-            }
+         steps {
+         sh '''
+                flow_to_execute=$flow_to_execute
+                deploy_environment=$deploy_environment
+                build_id=$BUILD_NUMBER
+                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh
+            '''
+         }
         }
     }
 }
