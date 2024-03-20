@@ -6,10 +6,6 @@ pipeline {
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow usecase to execute')
     }
     
-    triggers {
-        githubPush()
-    }
-    
     stages {
         stage('Trigger Platform PR Dev Pipeline') {
             steps {
