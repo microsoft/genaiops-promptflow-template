@@ -5,29 +5,24 @@ pipeline {
         string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
     }
 
+    environment {
+        dev_connections = credentials('COMMON_DEV_CONNECTIONS ')
+    }
+
     stages {
-    stage('Azure Login') {
-            steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-                }
-            }
-        }
 
     stage('Create local promptflow connections') {
             steps {
-            withCredentials(['COMMON_DEV_CONNECTIONS']) {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
                     python -m llmops.common.prompt_local_connections \\
                     --env_name $deploy_environment \\
-                    --connection_details $COMMON_DEV_CONNECTIONS \\
+                    --connection_details $dev_connections \\
                     --flow_to_execute $flow_to_execute
                     '''
                 }
-            }
             }
             }
         }
