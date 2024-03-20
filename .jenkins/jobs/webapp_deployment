@@ -5,17 +5,42 @@ pipeline {
         string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
     }
 
+    environment {
+        dev_connections = credentials('COMMON_DEV_CONNECTIONS ')
+    }
+
     stages {
-        stage('Configure Azure ML Agent') {
+        stage('Create local promptflow connections') {
             steps {
-                script {
-                    build job: 'prepare_docker_image', parameters: [
-                        string(name: 'flow_to_execute', value: "${params.flow_to_execute}")
-                        string(name: 'deploy_environment', value: "${params.deploy_environment}")
-                    ]
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    python -m llmops.common.prompt_local_connections \\
+                    --flow_to_execute ${flow_to_execute} \\
+                    --env_name ${deploy_environment} \\
+                    --connection_details "$dev_connections"
+                    '''
                 }
             }
+            }
         }
+
+    stage('Create Docker Image') {
+            steps {
+            withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+            withPythonEnv('/usr/bin/python3.9') {
+                sh '''
+                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
+                    # Your Docker image creation command here
+                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id "$BUILD_NUMBER"
+                '''
+            }
+            }
+            }
+        }
+    }
         stage('Create Webapp') {
             steps {
                 sh '''
