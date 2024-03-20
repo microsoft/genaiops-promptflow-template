@@ -16,7 +16,7 @@ pipeline {
 
     stage('Create local promptflow connections') {
             steps {
-            withCredentials('COMMON_DEV_CONNECTIONS') {
+            withCredentials(['COMMON_DEV_CONNECTIONS']) {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
