@@ -10,8 +10,8 @@ pipeline {
             steps {
                 script {
                     build job: 'prepare_docker_image', parameters: [
-                        string(name: '$flow_to_execute', value: "${params.flow_to_execute}")
-                        string(name: '$deploy_environment', value: "${params.deploy_environment}")
+                        string(name: 'flow_to_execute', value: "${params.flow_to_execute}")
+                        string(name: 'deploy_environment', value: "${params.deploy_environment}")
                     ]
                 }
             }
