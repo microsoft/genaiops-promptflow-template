@@ -24,8 +24,8 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      storage_key:
-                description: Storage account key
+      sa_sas_token:
+                description: Storage account SAS
                 type: string
                 required: true
                 default: ""
@@ -54,8 +54,8 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      storage_key:
-                description: Storage account key
+      sa_sas_token:
+                description: Storage account SAS
                 type: string
                 required: true
                 default: ""
@@ -99,7 +99,7 @@ jobs:
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --storage_key ${{ inputs.storage_key }}
+            --sa_sas_token ${{ inputs.sa_sas_token }}
 
       - name: Create data store
         uses: ./.github/actions/execute_script

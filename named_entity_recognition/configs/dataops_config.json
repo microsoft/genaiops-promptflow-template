@@ -10,9 +10,9 @@
     "STORAGE":
         {
             "STORAGE_ACCOUNT": "sanamedrecognitionwe",
-            "SOURCE_STORAGE_ACCOUNT_CONTAINER": "source",
+            "SOURCE_CONTAINER": "source",
             "SOURCE_BLOB": "source.csv",
-            "TARGET_STORAGE_ACCOUNT_CONTAINER": "data"
+            "TARGET_CONTAINER": "data"
         },
     "PATH":
         {
@@ -26,13 +26,13 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval1",
+            "NAME": "ner_eval",
             "PATH": "eval.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
             "NAME": "ner_exp",
-            "PATH": "exp.json",
+            "PATH": "exp.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
     ]

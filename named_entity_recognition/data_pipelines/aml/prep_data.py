@@ -43,7 +43,7 @@ if __name__ == "__main__":
         help="storage account",
     )
     parser.add_argument(
-        "--storage_key",
+        "--sa_sas_token",
         type=str,
         help="sas token",
     )
@@ -75,7 +75,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     storage_account = args.storage_account
-    storage_key = args.storage_key
+    sa_sas_token = args.sa_sas_token
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
@@ -84,6 +84,6 @@ if __name__ == "__main__":
         
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
-    blob_service_client = BlobServiceClient(storage_account_url, credential=storage_key)
+    blob_service_client = BlobServiceClient(storage_account_url, credential=sa_sas_token)
 
     prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, exp_blob, eval_blob)

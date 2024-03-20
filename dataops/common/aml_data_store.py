@@ -99,7 +99,7 @@ def main():
 
     storage_config = config['STORAGE']
     storage_account = storage_config['STORAGE_ACCOUNT']
-    target_container_name = storage_config['TARGET_STORAGE_ACCOUNT_CONTAINER']
+    target_container_name = storage_config['TARGET_CONTAINER']
 
     register_data_store(
         name_datastore=config["DATA_STORE_NAME"],
