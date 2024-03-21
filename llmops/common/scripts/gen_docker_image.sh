@@ -30,9 +30,9 @@ if [[ -n "$selected_object" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-        echo "api_key"
-        eco api_key
+        api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        echo "api_key of aoai connection"
+        echo api_key
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -68,6 +68,7 @@ if [[ -n "$selected_object" ]]; then
     registry_object=$(echo $registry_details | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
     registry_server=$(echo "$registry_object" | jq -r '.registry_server')
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
+    registry_password=$(echo "$registry_object" | jq -r '.registry_password')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
     echo "docker push details"
