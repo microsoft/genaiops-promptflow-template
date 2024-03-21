@@ -54,7 +54,7 @@ parameters {
                 script {
                     build job: 'jobs/aml_real_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
-                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'env_name', value: \""${params.env_name}\""),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
