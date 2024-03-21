@@ -36,10 +36,8 @@ parameters {
         stage('Read registered flow latest version') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh '''
-                    model_version=$(cat model_version.txt)
-                    echo $model_version
-                    '''
+                    env.model_version = sh(script: 'cat model_version.txt', returnStdout: true).trim()
+                    echo env.model_version
                 }
             }
         }
@@ -75,7 +73,7 @@ parameters {
                     build job: 'jobs/kubernetes_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: env_name_quoted),
-                        string(name: 'model_version', value: "${model_version}"),
+                        string(name: 'model_version', value: "${env.model_version}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
