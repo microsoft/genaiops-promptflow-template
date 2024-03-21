@@ -36,8 +36,10 @@ parameters {
         stage('Read registered flow latest version') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    env.model_version = sh(script: 'cat model_version.txt', returnStdout: true).trim()
-                    echo env.model_version
+                    script {
+                        env.model_version = sh(script: 'cat model_version.txt', returnStdout: true).trim()
+                        echo env.model_version
+                    }
                 }
             }
         }
