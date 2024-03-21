@@ -56,7 +56,7 @@ parameters {
                     build job: 'jobs/aml_real_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: env_name_quoted),
-                        string(name: 'model_version', value: "${model_version}")
+                        string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
@@ -75,7 +75,7 @@ parameters {
                     build job: 'jobs/kubernetes_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: env_name_quoted),
-                        string(name: 'model_version', value: "${model_version}")
+                        string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
