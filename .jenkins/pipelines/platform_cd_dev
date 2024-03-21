@@ -52,10 +52,10 @@ parameters {
             }
             steps {
                 script {
-                    params.env_name = "\"${params.env_name}\""
+                    def env_name_quoted = "\"${params.env_name}\""
                     build job: 'jobs/aml_real_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
-                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'env_name', value: env_name_quoted),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
