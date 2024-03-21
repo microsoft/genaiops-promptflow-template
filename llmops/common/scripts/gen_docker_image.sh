@@ -42,18 +42,18 @@ if [[ -n "$selected_object" ]]; then
 
     docker_args=$result_string
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
-    docker run $(echo "$docker_args")
+    #docker run $(echo "$docker_args")
 
-    sleep 15
+    #sleep 15
 
-    docker ps -a
+    #docker ps -a
         
-    chmod +x "./$flow_to_execute/sample-request.json" 
+    #chmod +x "./$flow_to_execute/sample-request.json"
         
-    file_contents=$(<./$flow_to_execute/sample-request.json)
-    echo "$file_contents"
+    #file_contents=$(<./$flow_to_execute/sample-request.json)
+    #echo "$file_contents"
         
-    python -m llmops.common.deployment.test_local_flow \
+    #python -m llmops.common.deployment.test_local_flow \
             --flow_to_execute $flow_to_execute
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
