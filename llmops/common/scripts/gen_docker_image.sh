@@ -54,7 +54,7 @@ if [[ -n "$selected_object" ]]; then
     #echo "$file_contents"
         
     #python -m llmops.common.deployment.test_local_flow \
-            --flow_to_execute $flow_to_execute
+            #--flow_to_execute $flow_to_execute
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
