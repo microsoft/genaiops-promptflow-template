@@ -56,6 +56,13 @@ if [[ -n "$selected_object" ]]; then
     #python -m llmops.common.deployment.test_local_flow \
             #--flow_to_execute $flow_to_execute
 
+    #echo
+    echo "registry details"
+    echo "$con_object" | jq -r '.REGISTRY_NAME'
+    echo "$registry_object" | jq -r '.registry_server'
+    echo "$registry_object" | jq -r '.registry_username'
+
+
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
     registry_object=$(echo $REGISTRY_DETAILS | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
