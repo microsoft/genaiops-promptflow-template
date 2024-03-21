@@ -56,12 +56,12 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
-    echo $REGISTRY_DETAILS
+    echo $registry_details
 
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 
-    registry_object=$(echo $REGISTRY_DETAILS | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
+    registry_object=$(echo $registry_details | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
     registry_server=$(echo "$registry_object" | jq -r '.registry_server')
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
