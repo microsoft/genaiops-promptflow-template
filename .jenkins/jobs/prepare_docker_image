@@ -8,7 +8,7 @@ pipeline {
     environment {
         dev_connections = credentials('COMMON_DEV_CONNECTIONS')
         registry_details = credentials('DOCKER_IMAGE_REGISTRY')
-        build_id = $BUILD_NUMBER
+        build_id = "${env.BUILD_NUMBER}"
     }
 
     stages {
