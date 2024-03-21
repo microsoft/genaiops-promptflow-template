@@ -37,8 +37,7 @@ parameters {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     script {
-                        env.model_version = sh(script: 'cat model_version.txt', returnStdout: true).trim()
-                        echo env.model_version
+                        env.model_version = sh(script: 'cat model_version.txt')
                     }
                 }
             }
