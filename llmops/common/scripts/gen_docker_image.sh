@@ -6,10 +6,6 @@
 set -e # fail on error
 
 # read values from llmops_config.json related to given environment
-echo "Flow details below:"
-echo $flow_to_execute
-echo $deploy_environment
-echo $build_id
 config_path="./$flow_to_execute/llmops_config.json"
 env_name=$deploy_environment
 selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
@@ -60,7 +56,7 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
-    echo "$REGISTRY_NAME"
+    echo "$registry_object"
     echo "$con_object" | jq -r '.REGISTRY_NAME'
     echo "$registry_object" | jq -r '.registry_server'
     echo "$registry_object" | jq -r '.registry_username'
@@ -74,7 +70,8 @@ if [[ -n "$selected_object" ]]; then
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
      echo "docker push details"
-    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+     echo "$registry_server : $registry_username"
+    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
     docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
     docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
         
