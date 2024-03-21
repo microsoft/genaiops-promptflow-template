@@ -41,7 +41,7 @@ if [[ -n "$selected_object" ]]; then
     done
 
     docker_args=$result_string
-    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8081:8081 localpf:latest"
+    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8082:8082 localpf:latest"
     docker run $(echo "$docker_args")
 
     sleep 15
