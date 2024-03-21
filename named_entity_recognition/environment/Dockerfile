@@ -19,7 +19,6 @@ RUN conda create -n promptflow-serve python=3.9.16 pip=23.0.1 -q -y && \
 COPY ./flow /flow
 
 EXPOSE 8080
-EXPOSE 8082
 
 COPY ./connections/* /connections/
 
