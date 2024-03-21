@@ -8,7 +8,7 @@ pipeline {
     environment {
         dev_connections = credentials('COMMON_DEV_CONNECTIONS')
         registry_details = credentials('DOCKER_IMAGE_REGISTRY')
-        build_id = "${BUILD_NUMBER}"
+        BUILD_NUM = ''
     }
 
     stages {
@@ -38,8 +38,9 @@ pipeline {
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     # Your Docker image creation command here
                     echo "build no script:"
-                    echo ${build_id}
-                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${build_id} --REGISTRY_DETAILS "${registry_details}"
+                    BUILD_NUM = "${BUILD_NUMBER}"
+                    echo BUILD_NUM
+                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id $BUILD_NUM --REGISTRY_DETAILS "${registry_details}"
                 '''
             }
             }
