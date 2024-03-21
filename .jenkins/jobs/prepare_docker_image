@@ -30,16 +30,16 @@ pipeline {
         }
 
     stage('Create Docker Image') {
+            def BUILD_NUMBER = "$BUILD_NUMBER"
             steps {
             withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details')]) {
             withPythonEnv('/usr/bin/python3.9') {
-            def buildNumber = $BUILD_NUMBER
                 sh '''
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     # Your Docker image creation command here
                     echo "build no script:"
                     echo $BUILD_NUMBER
-                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id $buildNumber --REGISTRY_DETAILS "${registry_details}"
+                    /bin/bash ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${env.BUILD_NUMBER} --REGISTRY_DETAILS "${registry_details}"
                 '''
             }
             }
