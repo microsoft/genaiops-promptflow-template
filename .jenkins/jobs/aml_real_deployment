@@ -7,10 +7,6 @@ pipeline {
         string(name: 'model_version', description: 'flow version in registry to be deployed')
         string(name: 'run_id', description: 'run id of the flow to be deployed')
         }
-    
-    environment {
-        env_type = "\"${params.env_name}\""
-    }
 
     stages {
         stage('Provision AML Online Endpoint') {
