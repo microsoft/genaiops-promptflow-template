@@ -1,4 +1,6 @@
 $schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
+environment:
+  python_requirements_txt: requirements.txt
 inputs:
   entity_type:
     type: string
@@ -33,5 +35,3 @@ nodes:
     path: cleansing.py
   inputs:
     entities_str: ${NER_LLM.output}
-environment:
-  python_requirements_txt: requirements.txt
