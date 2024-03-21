@@ -56,10 +56,7 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
-    echo "$registry_object"
-    echo "$con_object" | jq -r '.REGISTRY_NAME'
-    echo "$registry_object" | jq -r '.registry_server'
-    echo "$registry_object" | jq -r '.registry_username'
+    echo "$REGISTRY_DETAILS"
 
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
