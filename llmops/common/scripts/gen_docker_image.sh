@@ -72,8 +72,8 @@ if [[ -n "$selected_object" ]]; then
     echo $registry_server
     echo $registry_username
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"latest"
+    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"latest"
         
     else
         echo "Object in config file not found"

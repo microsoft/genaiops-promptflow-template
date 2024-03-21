@@ -46,7 +46,7 @@ az appservice plan create --name $appserviceplan --resource-group $rgname --is-l
 
 # create/update Web App
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":$build_id
+    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":"latest"
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
