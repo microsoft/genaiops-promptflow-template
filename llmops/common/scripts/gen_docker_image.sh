@@ -42,6 +42,8 @@ if [[ -n "$selected_object" ]]; then
 
     docker_args=$result_string
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+
+    ##uncomment
     #docker run $(echo "$docker_args")
 
     #sleep 15
@@ -58,6 +60,7 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
+    echo "$REGISTRY_NAME"
     echo "$con_object" | jq -r '.REGISTRY_NAME'
     echo "$registry_object" | jq -r '.registry_server'
     echo "$registry_object" | jq -r '.registry_username'
@@ -70,7 +73,7 @@ if [[ -n "$selected_object" ]]; then
     registry_username=$(echo "$registry_object" | jq -r '.registry_username')
     registry_password=$(echo "$registry_object" | jq -r '.registry_password')
 
-
+     echo "docker push details"
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
     docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
     docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
