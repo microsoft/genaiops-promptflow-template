@@ -79,6 +79,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 - Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
 - Full documentation on using this repo using Jenkins can be found [here](./docs/jenkins_how_to_setup.md)
 - Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
+- New experiment.yaml configuration [here](./docs/experiment.yaml)
 
 # Deployment
 
