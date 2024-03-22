@@ -6,6 +6,7 @@ parameters {
         string(name: 'flow_type', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
         string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, docker, webapp', defaultValue: 'aml')
         string(name: 'run_id', description: 'run id of the flow to be deployed', defaultValue: 'named_entity_recognition_dev_20240318_162626_named_entity_recognition_train')
+        string(name: 'custom_var', defaultValue: '')
     }
 
     stages {
@@ -33,6 +34,19 @@ parameters {
             }
         }
 
+        stage("make param global") {
+            steps {
+               tmp_param =  sh (script: 'cat model_version.txt', returnStdout: true).trim()
+               env.custom_var = tmp_param
+              }
+        }
+
+        stage("test if param was saved") {
+            steps {
+              echo "${env.custom_var}"
+            }
+        }
+
         stage('Print model_version') {
             environment { 
                     model_version = sh (returnStdout: true, script: 'cat model_version.txt').trim()
@@ -50,12 +64,11 @@ parameters {
             }
             steps {
                 script {
-                    def model_version = ${model_version}
                     def env_name_quoted = "\"${params.env_name}\""
                     build job: 'jobs/aml_real_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: env_name_quoted),
-                        string(name: 'model_version', value: model_version),
+                        string(name: 'model_version', value: "${env.custom_var}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
@@ -70,12 +83,11 @@ parameters {
             }
             steps {
                 script {
-                    def model_version = ${model_version}
                     def env_name_quoted = "\"${params.env_name}\""
                     build job: 'jobs/kubernetes_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: env_name_quoted),
-                        string(name: 'model_version', value: model_version),
+                        string(name: 'model_version', value: "${env.custom_var}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
                 }
