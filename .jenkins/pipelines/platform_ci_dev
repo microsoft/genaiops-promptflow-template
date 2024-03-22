@@ -102,6 +102,17 @@ pipeline {
             }
         }
 
+        stage('Export run_id as environment variable') {
+            steps {
+                script {
+                    def run_id = sh (returnStdout: true, script: 'cat run_id.txt').trim()
+                    env.run_id = run_id
+                    sh 'echo $run_id'
+
+                }    
+            }
+        }
+
 
         stage('Read prompt flow runs & Execute bulk run evaluations') {
             steps {
