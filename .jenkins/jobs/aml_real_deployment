@@ -18,6 +18,7 @@ pipeline {
                         pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]                 
                         python -m llmops.common.deployment.provision_endpoint \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --model_version $model_version \
                             --build_id $run_id \
                             --output_file "endpoint_principal.txt" \
                             --env_name $env_name \
@@ -56,6 +57,38 @@ pipeline {
                         az keyvault set-policy --name $key_vault_name --resource-group $resource_group_name --object-id $endpoint_principal --secret-permissions get list
                     fi
                     '''
+                }
+            }
+        }
+
+        stage('Provision AML Online Deployment') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                        python -m llmops.common.deployment.provision_deployment \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --model_version $model_version \
+                            --build_id $run_id \
+                            --env_name $env_name \
+                            --flow_to_execute $flow_type
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Test AML Deployment') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                        python -m llmops.common.deployment.test_model_on_aml \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --env_name $env_name \
+                            --flow_to_execute $flow_type
+                        """
+                    }
                 }
             }
         }

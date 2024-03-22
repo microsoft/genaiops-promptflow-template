@@ -10,14 +10,14 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'sudo apt-get update && sudo apt-get install -y azure-cli'
+                    sh 'sudo apt-get install -y azure-cli'
                 }
             }
         }
         stage('PR Code Validation') {
             steps {
                 script {
-                    build job: 'build_validation', parameters: [
+                    build job: 'jobs/build_validation', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}")
                     ]
                 }
@@ -29,7 +29,7 @@ pipeline {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
                 script {
-                    build job: 'configure_azureml_agent', parameters: [
+                    build job: 'jobs/configure_azureml_agent', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}")
                     ]
                 }

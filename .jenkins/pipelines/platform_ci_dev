@@ -6,13 +6,15 @@ pipeline {
     }
 
     parameters {
-        string(name: 'FLOW_TYPE', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
-        string(name: 'ENV_NAME', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, docker, webapp')
     }
 
     stages {
         stage('Checkout Actions') {
             steps {
+                cleanWs()
                 checkout scm
             }
         }
@@ -25,21 +27,10 @@ pipeline {
             }
         }
 
-        stage('Load Azure Subscription Details') {
-            steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh '''
-                    export subscriptionId=$(az account show --query id -o tsv)
-                    echo "SUBSCRIPTION_ID=$subscriptionId"
-                    '''
-                }
-            }
-        }
-
         stage('Configure Azure ML Agent') {
             steps {
                 script {
-                    build job: 'configure_azureml_agent', parameters: [
+                    build job: 'jobs/configure_azureml_agent', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}")
                     ]
                 }
@@ -55,8 +46,8 @@ pipeline {
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose "training_data" \\
-                    --flow_to_execute $FLOW_TYPE \\
-                    --env_name $ENV_NAME
+                    --flow_to_execute $flow_type \\
+                    --env_name $env_name
                     '''
                 }
             }
@@ -74,9 +65,9 @@ pipeline {
                     python -m llmops.common.prompt_pipeline \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose "training_data" \\
-                    --flow_to_execute $FLOW_TYPE \\
+                    --flow_to_execute $flow_type \\
                     --build_id $BUILD_NUMBER \\
-                    --env_name $ENV_NAME \\
+                    --env_name $env_name \\
                     --output_file run_id.txt
                     '''
                 }
@@ -93,11 +84,22 @@ pipeline {
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose ""test_data"" \\
-                    --flow_to_execute $FLOW_TYPE \\
-                    --env_name $ENV_NAME
+                    --flow_to_execute $flow_type \\
+                    --env_name $env_name
                     '''
                 }
             }
+            }
+        }
+
+        stage('Export run_id as environment variable') {
+            steps {
+                script {
+                    def run_id = sh (returnStdout: true, script: 'cat run_id.txt').trim()
+                    env.run_id = run_id
+                    sh 'echo $run_id'
+
+                }    
             }
         }
 
@@ -107,15 +109,15 @@ pipeline {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
-                    run_name=$(cat run_id.txt)
-                    echo $run_name
+                    run_id=$(cat run_id.txt)
+                    echo $run_id
                     python -m llmops.common.prompt_eval \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --build_id $BUILD_NUMBER \\
                     --data_purpose ""test_data"" \\
-                    --flow_to_execute $FLOW_TYPE \\
-                    --env_name $ENV_NAME \\
-                    --run_id $run_name
+                    --flow_to_execute $flow_type \\
+                    --env_name $env_name \\
+                    --run_id $run_id
                     '''
                 }
             }
@@ -126,6 +128,19 @@ pipeline {
             steps {
                 script {
                     archiveArtifacts artifacts: './reports', allowEmptyArchive: true, onlyIfSuccessful: true
+                }
+            }
+        }
+
+        stage('Execute Platform CD Pipeline to deploy flow') {
+            steps {
+                script {
+                    build job: 'platform_cd_dev', parameters: [
+                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'deployment_type', value: "${params.deployment_type}"),
+                        string(name: 'run_id', value: "${run_id}")
+                    ]
                 }
             }
         }
