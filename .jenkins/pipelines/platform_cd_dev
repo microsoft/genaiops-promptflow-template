@@ -36,14 +36,14 @@ parameters {
 
         stage("make param global") {
             steps {
-               tmp_param =  sh (script: 'cat model_version.txt', returnStdout: true).trim()
-               env.custom_var = tmp_param
-              }
+                tmp_param =  sh (script: 'cat model_version.txt', returnStdout: true).trim()
+                env.custom_var = tmp_param
+            }
         }
 
         stage("test if param was saved") {
             steps {
-              echo "${env.custom_var}"
+                echo "${env.custom_var}"
             }
         }
 
