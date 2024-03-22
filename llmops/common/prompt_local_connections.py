@@ -112,6 +112,7 @@ def main():
     )
 
     args = parser.parse_args()
+
     prepare_and_execute(
         args.flow_to_execute,
         args.env_name,
