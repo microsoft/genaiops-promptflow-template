@@ -150,7 +150,7 @@ pipeline {
                         string(name: 'flow_type', value: "${params.flow_type}"),
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
-                        string(name: 'run_id': value: "${run_id}")
+                        string(name: 'run_id', value: "${run_id}")
                     ]
                 }
             }
