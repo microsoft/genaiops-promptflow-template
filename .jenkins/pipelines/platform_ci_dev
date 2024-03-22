@@ -27,17 +27,6 @@ pipeline {
             }
         }
 
-        stage('Load Azure Subscription Details') {
-            steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh '''
-                    export subscriptionId=$(az account show --query id -o tsv)
-                    echo "SUBSCRIPTION_ID=$subscriptionId"
-                    '''
-                }
-            }
-        }
-
         stage('Configure Azure ML Agent') {
             steps {
                 script {
@@ -57,7 +46,7 @@ pipeline {
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose "training_data" \\
-                    --flow_to_execute $FLOW_TYPE \\
+                    --flow_to_execute $flow_type \\
                     --env_name $env_name
                     '''
                 }
