@@ -31,7 +31,7 @@ if [[ -n "$selected_object" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -57,11 +57,11 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
-    echo $REGISTRY_DETAILS
+    echo $registry_details
     echo "build no"
     echo $build_id
     echo "connection details"
-    echo $CONNECTION_DETAILS
+    echo $connection_details
 
 
     REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
