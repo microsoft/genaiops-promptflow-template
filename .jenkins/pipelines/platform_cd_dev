@@ -33,12 +33,15 @@ parameters {
             }
         }
 
-        stage('Print model_version') {
+        stage('Export model_version and env_name_quoted as environment variable') {
             steps {
                 script {
+                    def env_name_quoted = "\"${params.env_name}\""
+                    env.env_name_quoted = env_name_quoted
                     def model_version = sh (returnStdout: true, script: 'cat model_version.txt').trim()
                     env.model_version = model_version
                     sh 'echo $model_version'
+
                 }    
             }
         }
@@ -51,10 +54,9 @@ parameters {
             }
             steps {
                 script {
-                    def env_name_quoted = "\"${params.env_name}\""
                     build job: 'jobs/aml_real_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
-                        string(name: 'env_name', value: env_name_quoted),
+                        string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
@@ -70,10 +72,9 @@ parameters {
             }
             steps {
                 script {
-                    def env_name_quoted = "\"${params.env_name}\""
                     build job: 'jobs/kubernetes_deployment', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}"),
-                        string(name: 'env_name', value: env_name_quoted),
+                        string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}")
                     ]
