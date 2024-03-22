@@ -31,7 +31,8 @@ pipeline {
 
     stage('Create Docker Image') {
             steps {
-            withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details')]) {
+            withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
+            string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
             withPythonEnv('/usr/bin/python3.9') {
                 sh """
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
@@ -39,7 +40,7 @@ pipeline {
                     echo "build no script:"
                     echo ${BUILD_NUMBER}
                     #!/bin/bash
-                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${dev_connections}'
+                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${connection_details}'
                 """
             }
             }
@@ -48,9 +49,11 @@ pipeline {
 
         stage('Create Webapp') {
          steps {
+         withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
          sh """
-                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${dev_connections}'
+                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${connection_details}'
             """
+         }
          }
         }
     }

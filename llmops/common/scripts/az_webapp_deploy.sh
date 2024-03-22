@@ -55,7 +55,7 @@ az webapp config appsettings set --resource-group $rgname --name $appserviceweb 
 for name in "${connection_names[@]}"; do
     api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
-     echo "api_key of aoai connection"
+     echo "webapp api_key of aoai connection"
      echo $connection_details
      echo "$api_key"
 
