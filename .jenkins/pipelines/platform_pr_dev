@@ -10,7 +10,7 @@ pipeline {
         stage('Install Dependencies') {
             steps {
                 script {
-                    sh 'sudo apt-get update && sudo apt-get install -y azure-cli'
+                    sh 'sudo apt-get install -y azure-cli'
                 }
             }
         }
