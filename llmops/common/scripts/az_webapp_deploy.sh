@@ -58,7 +58,6 @@ for name in "${connection_names[@]}"; do
      echo "webapp aoai connection"
      #echo $connection_details
 
-
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
