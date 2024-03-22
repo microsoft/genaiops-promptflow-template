@@ -31,8 +31,8 @@ pipeline {
 
     stage('Create Docker Image') {
             steps {
-            withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
-            string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+            withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'REGISTRY_DETAILS'),
+            string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'CONNECTION_DETAILS')]) {
             withPythonEnv('/usr/bin/python3.9') {
                 sh """
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
@@ -40,7 +40,7 @@ pipeline {
                     echo "build no script:"
                     echo ${BUILD_NUMBER}
                     #!/bin/bash
-                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${connection_details}'
+                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${REGISTRY_DETAILS}' --CONNECTION_DETAILS '${CONNECTION_DETAILS}'
                 """
             }
             }
@@ -49,9 +49,9 @@ pipeline {
 
         stage('Create Webapp') {
          steps {
-         withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+         withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'CONNECTION_DETAILS')]) {
          sh """
-                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${connection_details}'
+                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${CONNECTION_DETAILS}'
             """
          }
          }
