@@ -2,9 +2,10 @@
 
 # Description: 
 # This script generates docker image for Prompt flow deployment
-
 set -e # fail on error
 
+echo "Arguments"
+echo $@
 # read values from llmops_config.json related to given environment
 config_path="./$flow_to_execute/llmops_config.json"
 env_name=$deploy_environment
@@ -43,9 +44,6 @@ if [[ -n "$selected_object" ]]; then
 
     ##uncomment
     #docker run $(echo "$docker_args")
-
-    #sleep 15
-
     #docker ps -a
         
     #chmod +x "./$flow_to_execute/sample-request.json"
