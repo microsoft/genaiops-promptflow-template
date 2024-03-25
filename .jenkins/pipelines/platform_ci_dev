@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
+        AZURE_CREDENTIALS = credentials('UNICREDIT_PVT_AZURE_CREDENTIALS')
     }
 
     parameters {
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
-        string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, docker, webapp')
+        string(name: 'deployment_type', defaultValue: 'webapp', description: 'Determine type of deployment - aml, aks, webapp')
     }
 
     stages {
@@ -21,7 +21,7 @@ pipeline {
 
          stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
 
         stage('Register experiment data asset') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
@@ -58,7 +58,7 @@ pipeline {
 
         stage('Execute prompt flow bulk run') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
@@ -78,7 +78,7 @@ pipeline {
 
         stage('Register evaluation data asset') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m llmops.common.register_data_asset \\
@@ -106,7 +106,7 @@ pipeline {
 
         stage('Read prompt flow runs & Execute bulk run evaluations') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     run_id=$(cat run_id.txt)

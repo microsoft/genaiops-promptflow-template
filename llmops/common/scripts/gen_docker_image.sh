@@ -1,5 +1,43 @@
 #!/bin/bash
 
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --flow_to_execute)
+            flow_to_execute="$2"
+            shift 2
+            ;;
+        --deploy_environment)
+            deploy_environment="$2"
+            shift 2
+            ;;
+        --build_id)
+            build_id="$2"
+            shift 2
+            ;;
+        --REGISTRY_DETAILS)
+            registry_details="$2"
+            shift 2
+            ;;
+        --CONNECTION_DETAILS)
+            connection_details="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Use the assigned variables as needed
+echo "Flow to execute: $flow_to_execute"
+echo "Deploy environment: $deploy_environment"
+echo "Build ID: $build_id"
+echo "Registry details: $registry_details"
+echo "Connection details: $connection_details"
+
 # Description: 
 # This script generates docker image for Prompt flow deployment
 set -e # fail on error
@@ -25,13 +63,10 @@ if [[ -n "$selected_object" ]]; then
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
-    echo $connection_names
     result_string=""
 
     for name in "${connection_names[@]}"; do
         api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-        #echo "aoai connection"
-        #echo $connection_details
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -54,27 +89,27 @@ if [[ -n "$selected_object" ]]; then
 
     #echo
     echo "registry details"
-    #echo $registry_details
+    echo "$registry_details"
     echo "build no"
-    echo $build_id
+    echo "$build_id"
     echo "connection details"
-    #echo $connection_details
+    echo "$connection_details"
 
+    #Extract individual fields
+    registry_name=$(echo "$registry_details" | jq -r '.[0].registry_name')
+    registry_server=$(echo "$registry_details" | jq -r '.[0].registry_server')
+    registry_username=$(echo "$registry_details" | jq -r '.[0].registry_username')
+    registry_password=$(echo "$registry_details" | jq -r '.[0].registry_password')
 
-    REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+    #Print extracted values
+    echo "Registry Name: $registry_name"
+    echo "Registry Server: $registry_server"
+    echo "Registry Username: $registry_username"
+    echo "Registry Password: $registry_password"
 
-    registry_object=$(echo $registry_details | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
-    registry_server=$(echo "$registry_object" | jq -r '.registry_server')
-    registry_username=$(echo "$registry_object" | jq -r '.registry_username')
-    registry_password=$(echo "$registry_object" | jq -r '.registry_password')
-    registry_password=$(echo "$registry_object" | jq -r '.registry_password')
-
-    echo "docker push details"
-    echo $registry_server
-    echo $registry_username
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"latest"
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"latest"
+    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
+    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
         
     else
         echo "Object in config file not found"

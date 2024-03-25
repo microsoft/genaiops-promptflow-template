@@ -10,6 +10,34 @@
 # private networks and/or use different means of provisioning
 # using Terraform, Bicep or any other way.
 
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --flow_to_execute)
+            flow_to_execute="$2"
+            shift 2
+            ;;
+        --deploy_environment)
+            deploy_environment="$2"
+            shift 2
+            ;;
+        --build_id)
+            build_id="$2"
+            shift 2
+            ;;
+        --CONNECTION_DETAILS)
+            connection_details="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+echo "Connection details: $connection_details"
+
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
@@ -28,7 +56,7 @@ read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES
 echo $connection_names
 
 # create a resource group
-az group create --name $rgname --location westeurope
+az group create --name $rgname --location eastus
 
 # create a user managed identifier      
 az identity create --name $udmid --resource-group $rgname
@@ -46,7 +74,7 @@ az appservice plan create --name $appserviceplan --resource-group $rgname --is-l
 
 # create/update Web App
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":"latest"
+    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":"$build_id"
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
@@ -55,8 +83,9 @@ az webapp config appsettings set --resource-group $rgname --name $appserviceweb 
 for name in "${connection_names[@]}"; do
     api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
-     echo "webapp aoai connection"
-     #echo $connection_details
+     echo "webapp aoai connection details"
+     echo $connection_details
+     echo api_key
 
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     modified_name="${uppercase_name}_API_KEY"

@@ -11,14 +11,13 @@ pipeline {
     stages {
         stage('Provision AML Online Endpoint') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         pip install -r .jenkins/requirements/execute_job_requirements.txt
                         pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]                 
                         python -m llmops.common.deployment.provision_endpoint \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
-                            --model_version $model_version \
                             --build_id $run_id \
                             --output_file "endpoint_principal.txt" \
                             --env_name $env_name \
@@ -29,9 +28,18 @@ pipeline {
             }
         }
 
+        stage('Azure Login') {
+            steps {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                    sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
+                }
+            }
+        }
+
         stage('Assign Azure resource permissions') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     sh '''
                     endpoint_principal=$(cat endpoint_principal.txt)
                     echo $endpoint_principal
@@ -63,7 +71,7 @@ pipeline {
 
         stage('Provision AML Online Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.provision_deployment \
@@ -80,7 +88,7 @@ pipeline {
 
         stage('Test AML Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.test_model_on_aml \
