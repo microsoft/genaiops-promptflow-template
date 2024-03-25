@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Prepare build environment') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         pip install --upgrade pip
