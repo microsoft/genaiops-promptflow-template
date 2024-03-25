@@ -1,6 +1,4 @@
 $schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
-environment:
-  python_requirements_txt: requirements.txt
 inputs:
   entity_type:
     type: string
@@ -15,7 +13,19 @@ outputs:
     reference: ${cleansing.output}
 nodes:
 - name: NER_LLM
-  use_variants: true
+  type: llm
+  source:
+    type: code
+    path: NER_LLM.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo
+    max_tokens: 64
+    text: ${inputs.text}
+    entity_type: ${inputs.entity_type}
+  provider: AzureOpenAI
+  connection: aoai
+  api: chat
+  module: promptflow.tools.aoai
 - name: cleansing
   type: python
   source:
@@ -23,37 +33,5 @@ nodes:
     path: cleansing.py
   inputs:
     entities_str: ${NER_LLM.output}
-node_variants:
-  NER_LLM:
-    default_variant_id: variant_0
-    variants:
-      variant_0:
-        node:
-          type: llm
-          source:
-            type: code
-            path: NER_LLM.jinja2
-          inputs:
-            deployment_name: gpt-35-turbo
-            max_tokens: 64
-            text: ${inputs.text}
-            entity_type: ${inputs.entity_type}
-          provider: AzureOpenAI
-          connection: aoai
-          api: chat
-          module: promptflow.tools.aoai
-      variant_1:
-        node:
-          type: llm
-          source:
-            type: code
-            path: NER_LLM_v2.jinja2
-          inputs:
-            deployment_name: gpt-35-turbo
-            max_tokens: 64
-            text: ${inputs.text}
-            entity_type: ${inputs.entity_type}
-          provider: AzureOpenAI
-          connection: aoai
-          api: chat
-          module: promptflow.tools.aoai
+environment:
+  python_requirements_txt: requirements.txt
