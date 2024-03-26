@@ -20,12 +20,13 @@ This argument is required to specify the name of the flow for execution.
 
 import json
 import argparse
-
+import os
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     ManagedOnlineDeployment,
     Environment,
     OnlineRequestSettings,
+    BuildContext
 )
 from azure.identity import DefaultAzureCredential
 
@@ -83,6 +84,7 @@ for obj in model_config["envs"]:
 resource_group_name = config["RESOURCE_GROUP_NAME"]
 workspace_name = config["WORKSPACE_NAME"]
 real_config = f"{flow_to_execute}/configs/deployment_config.json"
+flow_path =  config["STANDARD_FLOW_PATH"]
 
 logger.info(f"Model name: {model_name}")
 
@@ -102,8 +104,6 @@ for elem in endpoint_config["azure_managed_endpoint"]:
         if stage == elem["ENV_NAME"]:
             endpoint_name = elem["ENDPOINT_NAME"]
             deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
-            deployment_conda_path = elem["DEPLOYMENT_CONDA_PATH"]
-            deployment_base_image = elem["DEPLOYMENT_BASE_IMAGE_NAME"]
             deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
             deployment_instance_count = elem["DEPLOYMENT_INSTANCE_COUNT"]
             deployment_traffic_allocation = elem[
@@ -125,14 +125,6 @@ for elem in endpoint_config["azure_managed_endpoint"]:
                 f"deployment.endpoint_name={endpoint_name},"
                 f"deployment.deployment_name={deployment_name}"
             )
-            environment = Environment(
-                image=deployment_base_image,
-                inference_config={
-                    "liveness_route": {"path": "/health", "port": "8080"},
-                    "readiness_route": {"path": "/health", "port": "8080"},
-                    "scoring_route": {"path": "/score", "port": "8080"},
-                },
-            )
 
             traffic_allocation = {}
             deployments = ml_client.online_deployments.list(
@@ -152,12 +144,27 @@ for elem in endpoint_config["azure_managed_endpoint"]:
             else:
                 traffic_allocation[deployment_name] = 100
 
+            env_docker = Environment(
+                build = BuildContext(
+                    path = os.path.join(flow_to_execute,flow_path),
+                    dockerfile_path = "docker/dockerfile"
+                ),
+                name=deployment_name,
+                description="Environment created from a Docker context.",
+                inference_config={
+                    "liveness_route": {"path": "/health", "port": "8080"},
+                    "readiness_route": {"path": "/health", "port": "8080"},
+                    "scoring_route": {"path": "/score", "port": "8080"},
+                }
+
+            )
+
             blue_deployment = ManagedOnlineDeployment(
                 name=deployment_name,
                 endpoint_name=endpoint_name,
                 model=model,
                 description=deployment_desc,
-                environment=environment,
+                environment=env_docker,
                 instance_type=deployment_vm_size,
                 instance_count=deployment_instance_count,
                 environment_variables=dict(environment_variables),

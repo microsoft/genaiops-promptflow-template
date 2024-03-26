@@ -1,12 +1,5 @@
 """
-This module returns a AML workspace object after authentication.
-
-Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
@@ -37,10 +30,10 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    raw_data_dir
+    # raw_data_dir
 ):
     prep_data_job = pipeline_components[0](
-        raw_data_dir=raw_data_dir
+        # raw_data_dir=raw_data_dir
     )
 
     return {
@@ -53,37 +46,35 @@ def get_prep_data_component(
         description,
         data_pipeline_code_dir,
         environment,
-        source_storage_account,
-        target_storage_account,
+        storage_account,
+        sa_sas_token,
         source_container_name,
         target_container_name,
         source_blob,
-        target_data_assets
+        assets
 ):
+    data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     prep_data_components = []  # Initialize an empty list to store components
 
-    for asset in target_data_assets:
-        asset_path = asset["PATH"]
+    for asset in assets:
 
         prep_data_component = command(
             name=name,
             display_name=display_name,
             description=description,
-            inputs={
-                "raw_data_dir": Input(type="uri_folder")
-            },
+            inputs={},
             outputs=dict(
                 target_dir=Output(type="uri_folder", mode="rw_mount"),
             ),
             code=data_pipeline_code_dir,
             command=f"""python prep_data.py \
-                    --source_storage_account {source_storage_account} \
-                    --target_storage_account {target_storage_account} \
+                    --storage_account {storage_account} \
                     --source_container_name {source_container_name} \
                     --target_container_name {target_container_name} \
                     --source_blob {source_blob} \
-                    --asset_path {asset_path}
+                    --asset_path {asset} \
+                    --sa_sas_token {sa_sas_token}
                     """,
             environment=environment,
         )
@@ -111,16 +102,14 @@ def create_pipeline_job(
         component_display_name,
         component_description,
         data_pipeline_code_dir,
-        raw_data_dir,
         aml_env_name,
-        source_storage_account,
-        target_storage_account,
+        storage_account,
+        sa_sas_token,
         source_container_name,
         target_container_name,
         source_blob,
-        target_data_assets
+        assets
 ):
-    raw_data_dir = os.path.join(os.getcwd(), raw_data_dir)
 
     prep_data_component = get_prep_data_component(
         name = component_name,
@@ -128,19 +117,17 @@ def create_pipeline_job(
         description = component_description,
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
-        source_storage_account = source_storage_account,
-        target_storage_account=target_storage_account,
+        storage_account = storage_account,
+        sa_sas_token = sa_sas_token,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
-        source_blob= source_blob,
-        target_data_assets = target_data_assets
+        source_blob = source_blob,
+        assets = assets
     )
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline(
-        raw_data_dir = Input(type = "uri_folder", path = raw_data_dir)
-    )
+    pipeline_job = ner_data_prep_pipeline( )
 
     return pipeline_job
 
@@ -198,38 +185,10 @@ def main():
         help="Root dir for config file",
         required=True,
     )
-
     parser.add_argument(
-        "--source_storage_account",
+        "--sa_sas_token",
         type=str,
-        help="source storage account",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--target_storage_account",
-        type=str,
-        help="Target storage account",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--source_container_name",
-        type=str,
-        help="source container name",
-        required=True,
-    )
-
-    parser.add_argument(
-        "--target_container_name",
-        type=str,
-        help="target container name",
-        required=True,
-    )
-    parser.add_argument(
-        "--source_blob",
-        type=str,
-        help="Source blob",
+        help="SAS token for storage account",
         required=True,
     )
 
@@ -240,11 +199,7 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    source_storage_account= args.source_storage_account
-    target_storage_account = args.target_storage_account
-    source_container_name = args.source_container_name
-    target_container_name = args.target_container_name
-    source_blob = args.source_blob
+    sa_sas_token = args.sa_sas_token
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -254,8 +209,13 @@ def main():
     component_display_name = component_config['COMPONENT_DISPLAY_NAME']
     component_description = component_config['COMPONENT_DESCRIPTION']
 
+    storage_config = config['STORAGE']
+    storage_account = storage_config['STORAGE_ACCOUNT']
+    source_container_name = storage_config['SOURCE_CONTAINER']
+    source_blob = storage_config['SOURCE_BLOB']
+    target_container_name = storage_config['TARGET_CONTAINER']
+
     path_config = config['PATH']
-    raw_data_dir = path_config['RAW_DATA_DIR']
     data_pipeline_code_dir = path_config['DATA_PIPELINE_CODE_DIR']
 
     schedule_config = config['SCHEDULE']
@@ -263,7 +223,10 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
-    target_data_assets = config['DATA_ASSETS']
+    data_asset_configs = config['DATA_ASSETS']
+    assets = []
+    for data_asset_config in data_asset_configs:
+        assets.append(data_asset_config['PATH'])
 
     aml_client = get_aml_client(
         subscription_id,
@@ -276,14 +239,13 @@ def main():
             component_display_name,
             component_description,
             data_pipeline_code_dir,
-            raw_data_dir,
             aml_env_name,
-            source_storage_account,
-            target_storage_account,
+            storage_account,
+            sa_sas_token,
             source_container_name,
             target_container_name,
             source_blob,
-            target_data_assets
+            assets
         )
     
     schedule_pipeline_job(

@@ -1,16 +1,10 @@
 """
-This module returns a AML workspace object after authentication.
-
-Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+This module registers the data store.
 """
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml.entities import AzureBlobDatastore
+from azure.ai.ml.entities import SasTokenConfiguration
 import os
 import argparse
 import json
@@ -38,19 +32,22 @@ def register_data_store(
         description,
         sa_account_name,
         sa_container_name,
+        sa_sas_token,
         aml_client
 ):
     store = AzureBlobDatastore(
         name=name_datastore,
         description=description,
         account_name=sa_account_name,
-        container_name=sa_container_name
+        container_name=sa_container_name,
+        credentials= SasTokenConfiguration(
+            sas_token= sa_sas_token
+        )
     )
     aml_client.create_or_update(store)
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--subscription_id",
@@ -71,19 +68,11 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_account_name",
+        "--sa_sas_token",
         type=str,
-        help="Storage account name",
+        help="SAS token for target storage account",
         required=True,
     )
-
-    parser.add_argument(
-        "--sa_container_name",
-        type=str,
-        help="Container name",
-        required=True,
-    )
-
     parser.add_argument(
         "--config_path_root_dir",
         type=str,
@@ -96,8 +85,7 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    sa_account_name = args.sa_account_name
-    sa_container_name = args.sa_container_name
+    sa_sas_token = args.sa_sas_token
     config_path_root_dir = args.config_path_root_dir
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
@@ -109,11 +97,16 @@ def main():
         workspace_name,
     )
 
+    storage_config = config['STORAGE']
+    storage_account = storage_config['STORAGE_ACCOUNT']
+    target_container_name = storage_config['TARGET_CONTAINER']
+
     register_data_store(
         name_datastore=config["DATA_STORE_NAME"],
         description=config["DATA_STORE_DESCRIPTION"],
-        sa_account_name=sa_account_name,
-        sa_container_name=sa_container_name,
+        sa_account_name=storage_account,
+        sa_container_name=target_container_name,
+        sa_sas_token=sa_sas_token,
         aml_client=aml_client
     )
 

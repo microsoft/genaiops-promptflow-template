@@ -1,38 +1,32 @@
 import argparse
-import io
 import json
+import os
 
 import pandas as pd
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+import io
 
+# Replace the following code with the real data transformation code. This is just a placeholder data pipeline.
 
-# Steps
-# 1. Read the source blob file
-# 2. Change the file from csv to jsonl
-# 3. Save it as the jsonl file in the target account
-def prep(source_blob_service_client,
-         source_blob,
-         target_data_asset,
-         target_blob_service_client):
+def prepare_data(blob_service_client, 
+         source_container_name, 
+         target_container_name, 
+         source_blob, 
+         target_data_asset):
     print('Data processing component')
 
-    # Get the source blob
-    source_blob_client = source_blob_service_client.get_blob_client(container=source_container_name,
-                                                                        blob=source_blob)
-    # Read the content of the source blob
+    source_blob_client = blob_service_client.get_blob_client(container=source_container_name, blob=source_blob)
     source_blob_content = source_blob_client.download_blob().readall()
 
-    # Read the CSV content into a Pandas DataFrame (sample data processing)
     df = pd.read_csv(io.StringIO(source_blob_content.decode('utf-8')))
 
-    # Convert DataFrame rows to JSONL format
     jsonl_list = []
     for _, row in df.iterrows():
         jsonl_list.append(json.dumps(row.to_dict()))
 
     # Upload JSONL data to the target container
-    target_blob_client = target_blob_service_client.get_blob_client(container=target_container_name,
+    target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
                                                                         blob=target_data_asset)
     target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
@@ -42,14 +36,14 @@ def prep(source_blob_service_client,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--source_storage_account",
+        "--storage_account",
         type=str,
-        help="source storage account",
+        help="storage account",
     )
     parser.add_argument(
-        "--target_storage_account",
+        "--sa_sas_token",
         type=str,
-        help="target storage account",
+        help="sas token",
     )
     parser.add_argument(
         "--source_container_name",
@@ -73,19 +67,15 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    source_storage_account = args.source_storage_account
-    target_storage_account = args.target_storage_account
+    storage_account = args.storage_account
+    sa_sas_token = args.sa_sas_token
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
     target_data_asset = args.asset_path
+        
+    storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
-    default_credential = DefaultAzureCredential()
+    blob_service_client = BlobServiceClient(storage_account_url, credential=sa_sas_token)
 
-    source_account_url = f"https://{source_storage_account}.blob.core.windows.net"
-    source_blob_service_client = BlobServiceClient(source_account_url, credential=default_credential)
-
-    target_account_url = "https://{target_storage_account}.blob.core.windows.net"
-    target_blob_service_client = BlobServiceClient(target_account_url, credential=default_credential)
-
-    prep(source_blob_service_client, source_blob,target_data_asset, target_blob_service_client)
+    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_asset)
