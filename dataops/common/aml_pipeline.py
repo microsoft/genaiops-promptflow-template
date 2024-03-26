@@ -121,7 +121,7 @@ def create_pipeline_job(
         asset = asset
     )
 
-    pipeline_components.add(prep_data_component)
+    pipeline_components.append(prep_data_component)
 
     pipeline_job = ner_data_prep_pipeline()
 
