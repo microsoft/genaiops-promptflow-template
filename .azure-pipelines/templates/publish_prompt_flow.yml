@@ -1,0 +1,37 @@
+parameters:
+- name: SUBSCRIPTION_ID
+  type: string
+- name: flow_to_execute
+  type: string
+- name: DEPLOY_ENVIRONMENT
+  type: string
+- name: BUILD_ID
+  type: string
+
+steps:
+- task: AzureCLI@2
+  displayName: Publish Prompt Flow 
+  continueOnError: false
+  inputs: 
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    scriptLocation: inlineScript
+    inlineScript: |
+      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
+      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
+      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+
+      if [[ -n "$selected_object" ]]; then
+        echo "$selected_object"
+        RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
+        WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
+        STANDARD_FLOW_PATH=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
+        FLOW_TYPE=$(echo "$selected_object" | jq -r '.FLOW_TYPE')
+        if [[ ! -n "$FLOW_TYPE" ]]; then
+          FLOW_TYPE=standard
+        fi
+      else
+        echo "Object in config file not found"
+      fi
+      pfazure flow create --flow ./${{ parameters.flow_to_execute }}/$STANDARD_FLOW_PATH --set display_name=${{ parameters.flow_to_execute }}:${{ parameters.BUILD_ID }} --set type=$FLOW_TYPE --subscription ${{ parameters.SUBSCRIPTION_ID }} --resource-group $RESOURCE_GROUP_NAME --workspace-name $WORKSPACE_NAME

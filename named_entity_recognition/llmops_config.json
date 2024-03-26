@@ -6,6 +6,7 @@
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
+                "FLOW_TYPE": "standard",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
@@ -15,6 +16,7 @@
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
+                "FLOW_TYPE": "standard",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
@@ -24,6 +26,7 @@
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
+                "FLOW_TYPE": "standard",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]

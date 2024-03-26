@@ -154,7 +154,22 @@ stages:
               replace@youremail.com
             instructions: "$(run_id_from_submit_job)"
             onTimeout: 'reject'
-      
+        #=====================================
+        # Publish the flow in promptflow blade
+        #===================================== 
+      - job: publish_flow
+        dependsOn: 
+        - ApproveDeployment
+        steps:
+        - template: templates/get_connection_details.yml
+        - template: templates/configure_azureml_agent.yml
+        - template: templates/publish_prompt_flow.yml
+          parameters:
+              SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              flow_to_execute: ${{ parameters.flow_to_execute }}
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
+              BUILD_ID: $(Build.Buildid)
+
       - job: deploy_flow
         dependsOn: 
         - ApproveDeployment
@@ -195,7 +210,7 @@ stages:
               readarray arr <"model_version.txt"
               model_version=${arr[0]}
               echo $model_version
-              echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version" 
+              echo "##vso[task.setvariable variable=MODEL_VERSION;isOutput=true;]$model_version"
 
         #=====================================
         # Executes Kubernetes deployment when parameter deployment_type == 'aks'

@@ -6,6 +6,7 @@
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
+                "FLOW_TYPE": "chat",
                 "STANDARD_FLOW_PATH": "flows/math_standard_flow",
                 "EVALUATION_FLOW_PATH": "flows/math_evaluation_flow"
             },
@@ -15,6 +16,7 @@
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
+                "FLOW_TYPE": "chat",
                 "STANDARD_FLOW_PATH": "flows/math_standard_flow",
                 "EVALUATION_FLOW_PATH": "flows/math_evaluation_flow"
             }

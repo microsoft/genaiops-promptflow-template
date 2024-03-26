@@ -388,6 +388,7 @@ Modify the configuration values in `llmops_config.json` file available for each 
 - `KEYVAULT_NAME`:  This points to an Azure Key Vault, a service for securely storing and managing secrets, keys, and certificates.
 - `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
 - `WORKSPACE_NAME`:  This is name of Azure ML workspace.
+- `FLOW_TYPE`:  Flow type. Default to be “standard” if not specified. Available types are: “standard”, “chat”.
 - `STANDARD_FLOW_PATH`:  This is relative folder path to files related to a standard flow. e.g. "flows/standard"
 - `EVALUATION_FLOW_PATH`:  This is a string value referring to evaluation flow folders. It can have one or more comma separated values - one for each evaluation flow. e.g. "flows/eval_flow_1,flows/eval_flow_2"
 
