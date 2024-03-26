@@ -51,7 +51,7 @@ def get_prep_data_component(
         source_container_name,
         target_container_name,
         source_blob,
-        asset
+        assets
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
@@ -71,7 +71,7 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --asset_path {asset} \
+                --assets {assets} \
                 --sa_acc_key {sa_acc_key}
                 """,
         environment=environment,
@@ -104,7 +104,7 @@ def create_pipeline_job(
         source_container_name,
         target_container_name,
         source_blob,
-        asset
+        assets
 ):
 
     prep_data_component = get_prep_data_component(
@@ -118,7 +118,7 @@ def create_pipeline_job(
         source_container_name = source_container_name,
         target_container_name = target_container_name,
         source_blob = source_blob,
-        asset = asset
+        assets = assets
     )
 
     pipeline_components.append(prep_data_component)
@@ -226,34 +226,28 @@ def main():
         resource_group_name,
         workspace_name,
     )
-    for data_asset_config in data_asset_configs:
-        asset = data_asset_config['PATH']
-        asset_name = data_asset_config['NAME']
-        asset_component_name = f"{component_name}_{asset_name}"
-        asset_component_display_name = f"{component_display_name}_{asset_name}"
-        asset_component_description = f"{component_description} for {asset_name}"
 
-        job = create_pipeline_job(
-                asset_component_name,
-                asset_component_display_name,
-                asset_component_description,
-                data_pipeline_code_dir,
-                aml_env_name,
-                storage_account,
-                sa_acc_key,
-                source_container_name,
-                target_container_name,
-                source_blob,
-                asset
+    job = create_pipeline_job(
+            component_name,
+            component_display_name,
+            component_description,
+            data_pipeline_code_dir,
+            aml_env_name,
+            storage_account,
+            sa_acc_key,
+            source_container_name,
+            target_container_name,
+            source_blob,
+            data_asset_configs
             )
         
-        schedule_pipeline_job(
-                schedule_name,
-                schedule_cron_expression,
-                schedule_timezone,
-                job,
-                aml_client
-            )
+    schedule_pipeline_job(
+            schedule_name,
+            schedule_cron_expression,
+            schedule_timezone,
+            job,
+            aml_client
+        )
 
 if __name__ == "__main__":
     main()
