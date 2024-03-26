@@ -1,6 +1,5 @@
 import argparse
 import json
-import os
 
 import pandas as pd
 from azure.storage.blob import BlobServiceClient
@@ -25,12 +24,14 @@ def prepare_data(blob_service_client,
         jsonl_list.append(json.dumps(row.to_dict()))
 
     # Upload JSONL data to the target container
-    for target_data_asset in list(target_data_assets):
+    target_data_assets_list = json.loads(target_data_assets)
+    for target_data_asset in target_data_assets_list:
+        file_name = target_data_asset['PATH']
         target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
-                                                                            blob=target_data_asset)
+                                                                            blob=file_name)
         target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
-        print(f"CSV data converted to JSONL and uploaded successfully!: {target_data_asset}")
+        print(f"CSV data converted to JSONL and uploaded successfully!: {file_name}")
 
 
 if __name__ == "__main__":
@@ -62,7 +63,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--assets",
-        type=list,
+        type=str,
         help="target assets to be created"
     )
 
