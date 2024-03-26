@@ -26,12 +26,12 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval-testing-mohana2",
+            "NAME": "ner_eval-testing-mohana3",
             "PATH": "eval-testing-mohana.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp-testing-mohana2",
+            "NAME": "ner_exp-testing-mohana3",
             "PATH": "exp-testing-mohana.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
