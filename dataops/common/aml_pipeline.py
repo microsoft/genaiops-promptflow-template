@@ -47,40 +47,36 @@ def get_prep_data_component(
         data_pipeline_code_dir,
         environment,
         storage_account,
-        sa_sas_token,
+        sa_acc_key,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        asset
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-    prep_data_components = []  # Initialize an empty list to store components
+  
 
-    for asset in assets:
-
-        prep_data_component = command(
-            name=name,
-            display_name=display_name,
-            description=description,
-            inputs={},
-            outputs=dict(
-                target_dir=Output(type="uri_folder", mode="rw_mount"),
-            ),
-            code=data_pipeline_code_dir,
-            command=f"""python prep_data.py \
-                    --storage_account {storage_account} \
-                    --source_container_name {source_container_name} \
-                    --target_container_name {target_container_name} \
-                    --source_blob {source_blob} \
-                    --asset_path {asset} \
-                    --sa_sas_token {sa_sas_token}
-                    """,
-            environment=environment,
+    prep_data_component = command(
+        name=name,
+        display_name=display_name,
+        description=description,
+        inputs={},
+        outputs=dict(
+            target_dir=Output(type="uri_folder", mode="rw_mount"),
+        ),
+        code=data_pipeline_code_dir,
+        command=f"""python prep_data.py \
+                --storage_account {storage_account} \
+                --source_container_name {source_container_name} \
+                --target_container_name {target_container_name} \
+                --source_blob {source_blob} \
+                --asset_path {asset} \
+                --sa_acc_key {sa_acc_key}
+                """,
+        environment=environment,
         )
-        prep_data_components.append(prep_data_component)
-
-    return prep_data_components
+    return prep_data_component
 
 
 def get_aml_client(
@@ -104,11 +100,11 @@ def create_pipeline_job(
         data_pipeline_code_dir,
         aml_env_name,
         storage_account,
-        sa_sas_token,
+        sa_acc_key,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        asset
 ):
 
     prep_data_component = get_prep_data_component(
@@ -118,16 +114,16 @@ def create_pipeline_job(
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
         storage_account = storage_account,
-        sa_sas_token = sa_sas_token,
+        sa_acc_key = sa_acc_key,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
         source_blob = source_blob,
-        assets = assets
+        asset = asset
     )
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline( )
+    pipeline_job = ner_data_prep_pipeline()
 
     return pipeline_job
 
@@ -186,9 +182,9 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_sas_token",
+        "--sa_acc_key",
         type=str,
-        help="SAS token for storage account",
+        help="Account key for storage account",
         required=True,
     )
 
@@ -199,7 +195,7 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    sa_sas_token = args.sa_sas_token
+    sa_acc_key = args.sa_acc_key
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -224,37 +220,40 @@ def main():
     schedule_timezone = schedule_config['TIMEZONE']
 
     data_asset_configs = config['DATA_ASSETS']
-    assets = []
-    for data_asset_config in data_asset_configs:
-        assets.append(data_asset_config['PATH'])
 
     aml_client = get_aml_client(
         subscription_id,
         resource_group_name,
         workspace_name,
     )
+    for data_asset_config in data_asset_configs:
+        asset = data_asset_config['PATH']
+        asset_name = data_asset_config['NAME']
+        asset_component_name = f"{component_name}_{asset_name}"
+        asset_component_display_name = f"{component_display_name}_{asset_name}"
+        asset_component_description = f"{component_description} for {asset_name}"
 
-    job = create_pipeline_job(
-            component_name,
-            component_display_name,
-            component_description,
-            data_pipeline_code_dir,
-            aml_env_name,
-            storage_account,
-            sa_sas_token,
-            source_container_name,
-            target_container_name,
-            source_blob,
-            assets
-        )
-    
-    schedule_pipeline_job(
-            schedule_name,
-            schedule_cron_expression,
-            schedule_timezone,
-            job,
-            aml_client
-        )
+        job = create_pipeline_job(
+                asset_component_name,
+                asset_component_display_name,
+                asset_component_description,
+                data_pipeline_code_dir,
+                aml_env_name,
+                storage_account,
+                sa_acc_key,
+                source_container_name,
+                target_container_name,
+                source_blob,
+                asset
+            )
+        
+        schedule_pipeline_job(
+                schedule_name,
+                schedule_cron_expression,
+                schedule_timezone,
+                job,
+                aml_client
+            )
 
 if __name__ == "__main__":
     main()

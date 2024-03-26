@@ -4,7 +4,7 @@
     "DATA_PREP_COMPONENT":
         {
             "COMPONENT_NAME": "prep_data_component",
-            "COMPONENT_DISPLAY_NAME": "Preapre data component",
+            "COMPONENT_DISPLAY_NAME": "Prepare data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
     "STORAGE":
@@ -26,12 +26,12 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval-testing-mohana",
+            "NAME": "ner_eval-testing-mohana1",
             "PATH": "eval-testing-mohana.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp-testing-mohana",
+            "NAME": "ner_exp-testing-mohana1",
             "PATH": "exp-testing-mohana.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }

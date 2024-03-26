@@ -30,7 +30,7 @@ def prepare_data(blob_service_client,
                                                                         blob=target_data_asset)
     target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
-    print("CSV data converted to JSONL and uploaded successfully!")
+    print(f"CSV data converted to JSONL and uploaded successfully!: {target_data_asset}")
 
 
 if __name__ == "__main__":
@@ -41,9 +41,9 @@ if __name__ == "__main__":
         help="storage account",
     )
     parser.add_argument(
-        "--sa_sas_token",
+        "--sa_acc_key",
         type=str,
-        help="sas token",
+        help="sa account key",
     )
     parser.add_argument(
         "--source_container_name",
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     storage_account = args.storage_account
-    sa_sas_token = args.sa_sas_token
+    sa_acc_key = args.sa_acc_key
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
@@ -76,6 +76,6 @@ if __name__ == "__main__":
         
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
-    blob_service_client = BlobServiceClient(storage_account_url, credential=sa_sas_token)
+    blob_service_client = BlobServiceClient(storage_account_url, credential=sa_acc_key)
 
     prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_asset)
