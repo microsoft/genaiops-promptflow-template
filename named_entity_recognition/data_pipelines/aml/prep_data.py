@@ -26,12 +26,11 @@ def prepare_data(blob_service_client,
 
     # Upload JSONL data to the target container
     for target_data_asset in list(target_data_assets):
-        target_data_asset_path = target_data_asset['PATH']
         target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
-                                                                            blob=target_data_asset_path)
+                                                                            blob=target_data_asset)
         target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
 
-        print(f"CSV data converted to JSONL and uploaded successfully!: {target_data_asset_path}")
+        print(f"CSV data converted to JSONL and uploaded successfully!: {target_data_asset}")
 
 
 if __name__ == "__main__":

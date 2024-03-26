@@ -71,7 +71,7 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --assets {assets} \
+                --assets {str(assets)} \
                 --sa_acc_key {sa_acc_key}
                 """,
         environment=environment,
@@ -219,7 +219,7 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
-    data_asset_configs = config['DATA_ASSETS']
+    assets = [asset['PATH'] for asset in config['DATA_ASSETS']]
 
     aml_client = get_aml_client(
         subscription_id,
@@ -238,7 +238,7 @@ def main():
             source_container_name,
             target_container_name,
             source_blob,
-            data_asset_configs
+            assets
             )
         
     schedule_pipeline_job(
