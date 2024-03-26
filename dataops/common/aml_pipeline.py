@@ -3,19 +3,14 @@ This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
-from azure.ai.ml import MLClient
+
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import command
 from azure.ai.ml import Input, Output
-from azure.ai.ml import Input, Output
-from azure.ai.ml.entities import Data
 from azure.ai.ml import MLClient
-from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import (
     JobSchedule,
-    CronTrigger,
-    RecurrenceTrigger,
-    RecurrencePattern,
+    CronTrigger
 )
 import os
 import argparse
@@ -71,7 +66,7 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --assets {str(assets)} \
+                --assets {assets} \
                 --sa_acc_key {sa_acc_key}
                 """,
         environment=environment,
@@ -219,7 +214,7 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
-    assets = [asset['PATH'] for asset in config['DATA_ASSETS']]
+    assets = json.dumps(config['DATA_ASSETS'])
 
     aml_client = get_aml_client(
         subscription_id,
