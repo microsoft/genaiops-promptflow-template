@@ -110,7 +110,7 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
-            --sa_sas_token ${{ inputs.sa_sas_token }} \
+            --sa_sas_token ${{ inputs.sa_sas_token }}
             --config_path_root_dir ${{ inputs.config_path_root_dir }}
 
       - name: Register data asset
