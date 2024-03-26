@@ -54,31 +54,31 @@ def get_prep_data_component(
         assets
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
+    data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
+    prep_data_components = []  # Initialize an empty list to store components
 
-    # Initialize an empty list to store components
-    prep_data_components = []  
+    for asset in assets:
 
-    prep_data_component = command(
-        name=name,
-        display_name=display_name,
-        description=description,
-        inputs={ },
-        outputs=dict(
-            target_dir=Output(type="uri_folder", mode="rw_mount"),
-        ),
-        code=data_pipeline_code_dir,
-        command=f"""python prep_data.py \
-                --storage_account {storage_account} \
-                --source_container_name {source_container_name} \
-                --target_container_name {target_container_name} \
-                --source_blob {source_blob} \
-                --exp_blob {assets[0]} \
-                --eval_blob {assets[1]} \   
-                --sa_sas_token {sa_sas_token}
-                """,
-        environment=environment,
-    )
-    prep_data_components.append(prep_data_component)
+        prep_data_component = command(
+            name=name,
+            display_name=display_name,
+            description=description,
+            inputs={},
+            outputs=dict(
+                target_dir=Output(type="uri_folder", mode="rw_mount"),
+            ),
+            code=data_pipeline_code_dir,
+            command=f"""python prep_data.py \
+                    --storage_account {storage_account} \
+                    --source_container_name {source_container_name} \
+                    --target_container_name {target_container_name} \
+                    --source_blob {source_blob} \
+                    --asset_path {asset} \
+                    --sa_sas_token {sa_sas_token}
+                    """,
+            environment=environment,
+        )
+        prep_data_components.append(prep_data_component)
 
     return prep_data_components
 
