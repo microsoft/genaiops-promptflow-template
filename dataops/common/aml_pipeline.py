@@ -27,13 +27,14 @@ pipeline_components = []
 def ner_data_prep_pipeline(
     # raw_data_dir
 ):
-    prep_data_job = pipeline_components[0](
-        # raw_data_dir=raw_data_dir
-    )
+    pipeline_items = []
+    for pipeline_component in pipeline_components:
+        prep_data_job = pipeline_component()
 
-    return {
-        "target_dir": prep_data_job.outputs.target_dir
-    }
+        pipeline_items.append({
+            "target_dir": prep_data_job.outputs.target_dir
+        })
+    return pipeline_items
 
 def get_prep_data_component(
         name,
@@ -50,28 +51,31 @@ def get_prep_data_component(
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
+    prep_data_components = []
   
-
-    prep_data_component = command(
-        name=name,
-        display_name=display_name,
-        description=description,
-        inputs={},
-        outputs=dict(
-            target_dir=Output(type="uri_folder", mode="rw_mount"),
-        ),
-        code=data_pipeline_code_dir,
-        command=f"""python prep_data.py \
-                --storage_account {storage_account} \
-                --source_container_name {source_container_name} \
-                --target_container_name {target_container_name} \
-                --source_blob {source_blob} \
-                --assets {assets} \
-                --sa_acc_key {sa_acc_key}
-                """,
-        environment=environment,
-        )
-    return prep_data_component
+    for asset in assets:
+        asset_name = asset['PATH']
+        prep_data_component = command(
+            name=name,
+            display_name=display_name,
+            description=description,
+            inputs={},
+            outputs=dict(
+                target_dir=Output(type="uri_folder", mode="rw_mount"),
+            ),
+            code=data_pipeline_code_dir,
+            command=f"""python prep_data.py \
+                    --storage_account {storage_account} \
+                    --source_container_name {source_container_name} \
+                    --target_container_name {target_container_name} \
+                    --source_blob {source_blob} \
+                    --asset {asset_name} \
+                    --sa_acc_key {sa_acc_key}
+                    """,
+            environment=environment,
+            )
+        prep_data_components.append(prep_data_component)
+    return prep_data_components
 
 
 def get_aml_client(
@@ -102,7 +106,7 @@ def create_pipeline_job(
         assets
 ):
 
-    prep_data_component = get_prep_data_component(
+    prep_data_components = get_prep_data_component(
         name = component_name,
         display_name = component_display_name,
         description = component_description,
@@ -116,7 +120,8 @@ def create_pipeline_job(
         assets = assets
     )
 
-    pipeline_components.append(prep_data_component)
+    for prep_data_component in prep_data_components:
+        pipeline_components.append(prep_data_component)
 
     pipeline_job = ner_data_prep_pipeline()
 
