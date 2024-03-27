@@ -24,8 +24,10 @@ pipeline_components = []
     compute="serverless",
     description="data prep pipeline",
 )
-def ner_data_prep_pipeline(pipeline_component):
-    prep_data_job = pipeline_component()
+def ner_data_prep_pipeline(
+    index
+):
+    prep_data_job = pipeline_components[index]()
 
     return {
         "target_dir": prep_data_job.outputs.target_dir
@@ -116,9 +118,9 @@ def create_pipeline_job(
         assets = assets
     )
 
-    for prep_data_component in prep_data_components:
+    for index, prep_data_component in enumerate(prep_data_components):
         pipeline_components.append(prep_data_component)
-        pipeline_jobs.append(ner_data_prep_pipeline(prep_data_component))
+        pipeline_jobs.append(ner_data_prep_pipeline(index))
 
     return pipeline_jobs
 
