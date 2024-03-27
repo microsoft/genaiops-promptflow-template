@@ -21,7 +21,6 @@ import os
 import argparse
 import json
 
-pipeline_components = []
 
 ()
 @pipeline(
@@ -30,10 +29,11 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    index
+    index,
+    prep_data_components
 ):
     print(f"index: {index}")
-    prep_data_job = pipeline_components[index](
+    prep_data_job = prep_data_components[index](
         # raw_data_dir=raw_data_dir
     )
 
@@ -128,7 +128,7 @@ def create_pipeline_job(
     )
 
     for job, index in enumerate(prep_data_component):
-        pipeline_jobs.append(ner_data_prep_pipeline(index))
+        pipeline_jobs.append(ner_data_prep_pipeline(index, prep_data_component))
 
     return pipeline_jobs
 
