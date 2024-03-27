@@ -25,9 +25,8 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    index
+    prep_data_job
 ):
-    prep_data_job = pipeline_components[index]()
 
     return {
         "target_dir": prep_data_job.outputs.target_dir
@@ -120,8 +119,7 @@ def create_pipeline_job(
 
     for prep_data_component in prep_data_components:
         pipeline_jobs.append(prep_data_component)
-    for index, job in enumerate(pipeline_jobs):
-        pipeline_jobs.append(ner_data_prep_pipeline(index))
+        pipeline_jobs.append(ner_data_prep_pipeline(prep_data_component))
 
     return pipeline_jobs
 
