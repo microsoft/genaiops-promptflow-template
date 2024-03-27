@@ -192,13 +192,13 @@ def prepare_and_execute(
                         run = Run(
                             flow=flow,
                             data=data_id,
-                            #runtime=runtime,
+                            runtime=runtime,
                             # un-comment the resources parameter assignment
                             # and update the size of the compute and also
                             # comment the runtime parameter assignment to
                             # enable automatic runtime.
                             # Reference: COMPUTE_RUNTIME
-                            resources={"instance_type": "Standard_E4ds_v4"},
+                            # resources={"instance_type": "Standard_E4ds_v4"},
                             variant=variant_string,
                             name=(
                                 f"{experiment_name}_{variant_id}"
@@ -246,13 +246,13 @@ def prepare_and_execute(
             run = Run(
                 flow=flow,
                 data=data_id,
-                #runtime=runtime,
+                runtime=runtime,
                 # un-comment the resources parameter assignment
                 # and update the size of the compute and also
                 # comment the runtime parameter assignment to
                 # enable automatic runtime.
                 # Reference: COMPUTE_RUNTIME
-                resources={"instance_type": "Standard_E4ds_v4"},
+                # resources={"instance_type": "Standard_E4ds_v4"},
                 name=f"{experiment_name}_{timestamp}_{data_ref}",
                 display_name=f"{experiment_name}_{timestamp}_{data_ref}",
                 environment_variables={
