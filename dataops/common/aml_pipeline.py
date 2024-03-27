@@ -3,14 +3,19 @@ This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
-
+from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import command
 from azure.ai.ml import Input, Output
+from azure.ai.ml import Input, Output
+from azure.ai.ml.entities import Data
 from azure.ai.ml import MLClient
+from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import (
     JobSchedule,
-    CronTrigger
+    CronTrigger,
+    RecurrenceTrigger,
+    RecurrencePattern,
 )
 import os
 import argparse
@@ -25,8 +30,11 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    prep_data_job
+    index
 ):
+    prep_data_job = pipeline_components[index](
+        # raw_data_dir=raw_data_dir
+    )
 
     return {
         "target_dir": prep_data_job.outputs.target_dir
@@ -47,10 +55,10 @@ def get_prep_data_component(
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-    prep_data_components = []
-  
+    prep_data_components = []  # Initialize an empty list to store components
+
     for asset in assets:
-        asset_name = asset['PATH']
+
         prep_data_component = command(
             name=name,
             display_name=display_name,
@@ -65,12 +73,13 @@ def get_prep_data_component(
                     --source_container_name {source_container_name} \
                     --target_container_name {target_container_name} \
                     --source_blob {source_blob} \
-                    --asset {asset_name} \
+                    --asset {asset} \
                     --sa_acc_key {sa_acc_key}
                     """,
             environment=environment,
-            )
+        )
         prep_data_components.append(prep_data_component)
+
     return prep_data_components
 
 
@@ -103,7 +112,7 @@ def create_pipeline_job(
 ):
     pipeline_jobs = []
 
-    prep_data_components = get_prep_data_component(
+    prep_data_component = get_prep_data_component(
         name = component_name,
         display_name = component_display_name,
         description = component_description,
@@ -117,8 +126,9 @@ def create_pipeline_job(
         assets = assets
     )
 
-    for prep_data_component in prep_data_components:
-        pipeline_jobs.append(ner_data_prep_pipeline(prep_data_component))
+    pipeline_components.extend(prep_data_component)
+    for index, job in enumerate(pipeline_components):
+        pipeline_jobs.append(ner_data_prep_pipeline(index))
 
     return pipeline_jobs
 
@@ -179,7 +189,7 @@ def main():
     parser.add_argument(
         "--sa_acc_key",
         type=str,
-        help="Account key for storage account",
+        help="SA Account key for storage account",
         required=True,
     )
 
@@ -214,7 +224,10 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
-    assets = config['DATA_ASSETS']
+    data_asset_configs = config['DATA_ASSETS']
+    assets = []
+    for data_asset_config in data_asset_configs:
+        assets.append(data_asset_config['PATH'])
 
     aml_client = get_aml_client(
         subscription_id,
@@ -222,7 +235,7 @@ def main():
         workspace_name,
     )
 
-    jobs = create_pipeline_job(
+    job = create_pipeline_job(
             component_name,
             component_display_name,
             component_description,
@@ -234,15 +247,15 @@ def main():
             target_container_name,
             source_blob,
             assets
-            )
-    for job in jobs:
-        schedule_pipeline_job(
-                schedule_name,
-                schedule_cron_expression,
-                schedule_timezone,
-                job,
-                aml_client
-            )
+        )
+    
+    schedule_pipeline_job(
+            schedule_name,
+            schedule_cron_expression,
+            schedule_timezone,
+            job,
+            aml_client
+        )
 
 if __name__ == "__main__":
     main()
