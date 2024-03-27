@@ -21,6 +21,7 @@ import os
 import argparse
 import json
 
+pipeline_components = []
 
 ()
 @pipeline(
@@ -29,11 +30,9 @@ import json
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    index,
-    prep_data_components
+    # raw_data_dir
 ):
-    print(f"index: {index}")
-    prep_data_job = prep_data_components[index](
+    prep_data_job = pipeline_components[0](
         # raw_data_dir=raw_data_dir
     )
 
@@ -58,9 +57,9 @@ def get_prep_data_component(
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     prep_data_components = []  # Initialize an empty list to store components
 
-    for asset in assets:
+    asset_str = " ".join(map(str,assets))
 
-        prep_data_component = command(
+    prep_data_component = command(
             name=name,
             display_name=display_name,
             description=description,
@@ -74,12 +73,12 @@ def get_prep_data_component(
                     --source_container_name {source_container_name} \
                     --target_container_name {target_container_name} \
                     --source_blob {source_blob} \
-                    --asset {asset} \
+                    --assets_str {asset_str} \
                     --sa_acc_key {sa_acc_key}
                     """,
             environment=environment,
         )
-        prep_data_components.append(prep_data_component)
+    prep_data_components.append(prep_data_component)
 
     return prep_data_components
 
@@ -111,7 +110,6 @@ def create_pipeline_job(
         source_blob,
         assets
 ):
-    pipeline_jobs = []
 
     prep_data_component = get_prep_data_component(
         name = component_name,
@@ -127,10 +125,11 @@ def create_pipeline_job(
         assets = assets
     )
 
-    for job, index in enumerate(prep_data_component):
-        pipeline_jobs.append(ner_data_prep_pipeline(index, prep_data_component))
+    pipeline_components.extend(prep_data_component)
 
-    return pipeline_jobs
+    pipeline_job = ner_data_prep_pipeline( )
+
+    return pipeline_job
 
 def schedule_pipeline_job(
         schedule_name,

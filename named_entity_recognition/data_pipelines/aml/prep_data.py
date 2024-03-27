@@ -11,11 +11,13 @@ def prepare_data(blob_service_client,
          source_container_name, 
          target_container_name, 
          source_blob, 
-         target_data_asset):
+         target_data_assets):
     print('Data processing component')
 
     source_blob_client = blob_service_client.get_blob_client(container=source_container_name, blob=source_blob)
     source_blob_content = source_blob_client.download_blob().readall()
+
+    assets  = [char for _, char in enumerate(target_data_assets)]
 
     df = pd.read_csv(io.StringIO(source_blob_content.decode('utf-8')))
 
@@ -24,10 +26,11 @@ def prepare_data(blob_service_client,
         jsonl_list.append(json.dumps(row.to_dict()))
 
     # Upload JSONL data to the target container
-    target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
-                                                                            blob=target_data_asset)
-    target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
-    print(f"CSV data converted to JSONL and uploaded successfully!: {target_data_asset}")
+    for asset in assets:
+        target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
+                                                                                blob=asset)
+        target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
+        print(f"CSV data converted to JSONL and uploaded successfully!: {asset}")
 
 
 if __name__ == "__main__":
@@ -58,9 +61,9 @@ if __name__ == "__main__":
         help="source blob file (csv)",
     )
     parser.add_argument(
-        "--asset",
+        "--assets_str",
         type=str,
-        help="target asset to be created"
+        help="target assets to be created as a string"
     )
 
     args = parser.parse_args()
@@ -69,10 +72,10 @@ if __name__ == "__main__":
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
-    target_data_asset = args.asset
+    target_data_assets = args.assets_str
         
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
     blob_service_client = BlobServiceClient(storage_account_url, credential=sa_acc_key)
 
-    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_asset)
+    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_assets)
