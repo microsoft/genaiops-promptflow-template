@@ -32,6 +32,7 @@ pipeline_components = []
 def ner_data_prep_pipeline(
     index
 ):
+    print(f"index: {index}")
     prep_data_job = pipeline_components[index](
         # raw_data_dir=raw_data_dir
     )
