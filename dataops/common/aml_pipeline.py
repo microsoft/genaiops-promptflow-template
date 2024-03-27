@@ -219,7 +219,7 @@ def main():
     schedule_cron_expression = schedule_config['CRON_EXPRESSION']
     schedule_timezone = schedule_config['TIMEZONE']
 
-    assets = json.dumps(config['DATA_ASSETS'])
+    assets = config['DATA_ASSETS']
 
     aml_client = get_aml_client(
         subscription_id,
