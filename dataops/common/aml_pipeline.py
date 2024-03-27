@@ -127,8 +127,7 @@ def create_pipeline_job(
         assets = assets
     )
 
-    pipeline_components.extend(prep_data_component)
-    for job, index in enumerate(pipeline_components):
+    for job, index in enumerate(prep_data_component):
         pipeline_jobs.append(ner_data_prep_pipeline(index))
 
     return pipeline_jobs
