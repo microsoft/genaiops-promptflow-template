@@ -118,7 +118,6 @@ def create_pipeline_job(
     )
 
     for prep_data_component in prep_data_components:
-        pipeline_jobs.append(prep_data_component)
         pipeline_jobs.append(ner_data_prep_pipeline(prep_data_component))
 
     return pipeline_jobs
