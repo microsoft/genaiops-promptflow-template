@@ -119,7 +119,7 @@ def create_pipeline_job(
     )
 
     for prep_data_component in prep_data_components:
-        pipeline_components.append(prep_data_component)
+        pipeline_jobs.append(prep_data_component)
     for index, job in enumerate(pipeline_jobs):
         pipeline_jobs.append(ner_data_prep_pipeline(index))
 
