@@ -24,17 +24,12 @@ pipeline_components = []
     compute="serverless",
     description="data prep pipeline",
 )
-def ner_data_prep_pipeline(
-    # raw_data_dir
-):
-    pipeline_items = []
-    for pipeline_component in pipeline_components:
-        prep_data_job = pipeline_component()
+def ner_data_prep_pipeline(pipeline_component):
+    prep_data_job = pipeline_component()
 
-        pipeline_items.append({
-            "target_dir": prep_data_job.outputs.target_dir
-        })
-    return pipeline_items
+    return {
+        "target_dir": prep_data_job.outputs.target_dir
+    }
 
 def get_prep_data_component(
         name,
@@ -105,6 +100,7 @@ def create_pipeline_job(
         source_blob,
         assets
 ):
+    pipeline_jobs = []
 
     prep_data_components = get_prep_data_component(
         name = component_name,
@@ -122,10 +118,9 @@ def create_pipeline_job(
 
     for prep_data_component in prep_data_components:
         pipeline_components.append(prep_data_component)
+        pipeline_jobs.append(ner_data_prep_pipeline(prep_data_component))
 
-    pipeline_job = ner_data_prep_pipeline()
-
-    return pipeline_job
+    return pipeline_jobs
 
 def schedule_pipeline_job(
         schedule_name,
@@ -227,7 +222,7 @@ def main():
         workspace_name,
     )
 
-    job = create_pipeline_job(
+    jobs = create_pipeline_job(
             component_name,
             component_display_name,
             component_description,
@@ -240,14 +235,14 @@ def main():
             source_blob,
             assets
             )
-        
-    schedule_pipeline_job(
-            schedule_name,
-            schedule_cron_expression,
-            schedule_timezone,
-            job,
-            aml_client
-        )
+    for job in jobs:
+        schedule_pipeline_job(
+                schedule_name,
+                schedule_cron_expression,
+                schedule_timezone,
+                job,
+                aml_client
+            )
 
 if __name__ == "__main__":
     main()
