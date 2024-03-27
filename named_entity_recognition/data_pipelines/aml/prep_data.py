@@ -17,7 +17,7 @@ def prepare_data(blob_service_client,
     source_blob_client = blob_service_client.get_blob_client(container=source_container_name, blob=source_blob)
     source_blob_content = source_blob_client.download_blob().readall()
 
-    assets  = [char for _, char in enumerate(target_data_assets)]
+    assets  = [item.strip() for item in target_data_assets.split(":")]
 
     df = pd.read_csv(io.StringIO(source_blob_content.decode('utf-8')))
 

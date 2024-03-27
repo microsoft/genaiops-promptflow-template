@@ -57,7 +57,7 @@ def get_prep_data_component(
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     prep_data_components = []  # Initialize an empty list to store components
 
-    asset_str = " ".join(map(str,assets))
+    asset_str = ":".join(map(str,assets))
 
     prep_data_component = command(
             name=name,
