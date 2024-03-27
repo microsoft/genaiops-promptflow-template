@@ -10,6 +10,23 @@ pipeline {
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
     }
 
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'ref', value: '$.ref']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on $action',
+                token: 'JENKINS_URL',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$ref',
+                regexpFilterExpression: 'refs/heads/feature/*'
+         )
+    }
+
     stages {
         stage('Checkout') {
             steps {

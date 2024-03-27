@@ -6,6 +6,23 @@ pipeline {
         string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow usecase to execute')
     }
     
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'action', value: '$.action']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on $action',
+                token: 'JENKINS_URL',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$action',
+                regexpFilterExpression: '^(opened|reopened|synchronize)$'
+         )
+    }
+
     stages {
         stage('Trigger Platform PR Dev Pipeline') {
             steps {
