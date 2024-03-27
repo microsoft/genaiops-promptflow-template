@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -35,8 +34,6 @@ done
 echo "Flow to execute: $flow_to_execute"
 echo "Deploy environment: $deploy_environment"
 echo "Build ID: $build_id"
-echo "Registry details: $registry_details"
-echo "Connection details: $connection_details"
 
 # Description: 
 # This script generates docker image for Prompt flow deployment
@@ -74,38 +71,24 @@ if [[ -n "$selected_object" ]]; then
 
     docker_args=$result_string
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    docker run $(echo "$docker_args")
 
-    ##uncomment
-    #docker run $(echo "$docker_args")
-    #docker ps -a
-        
-    #chmod +x "./$flow_to_execute/sample-request.json"
-        
-    #file_contents=$(<./$flow_to_execute/sample-request.json)
-    #echo "$file_contents"
-        
-    #python -m llmops.common.deployment.test_local_flow \
-            #--flow_to_execute $flow_to_execute
+    sleep 15
 
-    #echo
-    echo "registry details"
-    echo "$registry_details"
-    echo "build no"
-    echo "$build_id"
-    echo "connection details"
-    echo "$connection_details"
+    docker ps -a
+        
+    chmod +x "./$flow_to_execute/sample-request.json"
+        
+    file_contents=$(<./$flow_to_execute/sample-request.json)
+    echo "$file_contents"
+        
+    python -m llmops.common.deployment.test_local_flow \
+            --flow_to_execute $flow_to_execute
 
-    #Extract individual fields
     registry_name=$(echo "$registry_details" | jq -r '.[0].registry_name')
     registry_server=$(echo "$registry_details" | jq -r '.[0].registry_server')
     registry_username=$(echo "$registry_details" | jq -r '.[0].registry_username')
     registry_password=$(echo "$registry_details" | jq -r '.[0].registry_password')
-
-    #Print extracted values
-    echo "Registry Name: $registry_name"
-    echo "Registry Server: $registry_server"
-    echo "Registry Username: $registry_username"
-    echo "Registry Password: $registry_password"
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
     docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"

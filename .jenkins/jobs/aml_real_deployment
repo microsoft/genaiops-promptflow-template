@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Provision AML Online Endpoint') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         pip install -r .jenkins/requirements/execute_job_requirements.txt
@@ -30,7 +30,7 @@ pipeline {
 
         stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                     sh 'az account set -s $AZURE_SUBSCRIPTION_ID'
                 }
@@ -39,7 +39,7 @@ pipeline {
 
         stage('Assign Azure resource permissions') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
                     endpoint_principal=$(cat endpoint_principal.txt)
                     echo $endpoint_principal
@@ -71,7 +71,7 @@ pipeline {
 
         stage('Provision AML Online Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.provision_deployment \
@@ -88,7 +88,7 @@ pipeline {
 
         stage('Test AML Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.test_model_on_aml \

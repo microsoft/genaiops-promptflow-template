@@ -49,7 +49,7 @@ pipeline {
 
         stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
             }
@@ -57,7 +57,7 @@ pipeline {
 
         stage('Load Azure Subscription Details') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
                     export subscriptionId=$(az account show --query id -o tsv)
                     echo "SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID"

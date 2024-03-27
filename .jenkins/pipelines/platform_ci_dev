@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        AZURE_CREDENTIALS = credentials('UNICREDIT_PVT_AZURE_CREDENTIALS')
+        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
     }
 
     parameters {
@@ -21,7 +21,7 @@ pipeline {
 
          stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
             }
@@ -39,7 +39,7 @@ pipeline {
 
         stage('Register experiment data asset') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
@@ -58,7 +58,7 @@ pipeline {
 
         stage('Execute prompt flow bulk run') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
@@ -78,7 +78,7 @@ pipeline {
 
         stage('Register evaluation data asset') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m llmops.common.register_data_asset \\
@@ -106,7 +106,7 @@ pipeline {
 
         stage('Read prompt flow runs & Execute bulk run evaluations') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     run_id=$(cat run_id.txt)
@@ -127,7 +127,7 @@ pipeline {
         stage('Archive CSV') {
             steps {
                 script {
-                    archiveArtifacts artifacts: './reports', allowEmptyArchive: true, onlyIfSuccessful: true
+                    archiveArtifacts artifacts: 'reports', allowEmptyArchive: true, onlyIfSuccessful: true
                 }
             }
         }

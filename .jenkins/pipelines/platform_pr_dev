@@ -25,7 +25,7 @@ pipeline {
         }
         stage('PR Flow Validation') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
                 }
                 script {
@@ -38,7 +38,7 @@ pipeline {
 
         stage('Register experiment data asset') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh """
                     pip install setuptools wheel

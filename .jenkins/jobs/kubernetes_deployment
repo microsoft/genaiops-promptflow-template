@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Provision Kubernetes Online Endpoint') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         pip install -r .jenkins/requirements/execute_job_requirements.txt
@@ -29,7 +29,7 @@ pipeline {
 
         stage('Assign Azure resource permissions') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     sh '''
                     endpoint_principal=$(cat endpoint_principal.txt)
                     echo $endpoint_principal
@@ -61,7 +61,7 @@ pipeline {
 
         stage('Provision Kubernetes Online Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.kubernetes_deployment \
@@ -78,7 +78,7 @@ pipeline {
 
         stage('Test Kubernetes Deployment') {
             steps {
-                withCredentials([azureServicePrincipal('UNICREDIT_PVT_AZURE_CREDENTIALS')]) {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.test_model_on_kubernetes \
