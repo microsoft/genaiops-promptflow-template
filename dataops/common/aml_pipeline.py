@@ -15,14 +15,12 @@ import os
 import argparse
 import json
 
-compute_name: str = "serverless"
 
 pipeline_components = []
 
 ()
 @pipeline(
     name="ner_data_prep",
-    compute=compute_name,
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
@@ -43,11 +41,11 @@ def get_prep_data_component(
         data_pipeline_code_dir,
         environment,
         storage_account,
-        sa_acc_key,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        assets,
+        custom_compute
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
@@ -71,6 +69,7 @@ def get_prep_data_component(
                     --source_blob {source_blob} \
                     --assets_str {asset_str} 
                     """,
+            compute=custom_compute,
             environment=environment,
             identity=UserIdentityConfiguration(),
         )
@@ -100,7 +99,7 @@ def create_pipeline_job(
         data_pipeline_code_dir,
         aml_env_name,
         storage_account,
-        sa_acc_key,
+        custom_compute,
         source_container_name,
         target_container_name,
         source_blob,
@@ -114,11 +113,11 @@ def create_pipeline_job(
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
         storage_account = storage_account,
-        sa_acc_key = sa_acc_key,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
         source_blob = source_blob,
-        assets = assets
+        assets = assets,
+        custom_compute=custom_compute
     )
 
     pipeline_components.extend(prep_data_component)
@@ -225,8 +224,7 @@ def main():
         assets.append(data_asset_config['PATH'])
 
     # setup compute_name
-    global compute_name
-    compute_name = config["COMPUTE_NAME"]
+    custom_compute_name = config["COMPUTE_NAME"]
 
     aml_client = get_aml_client(
         subscription_id,
@@ -241,7 +239,7 @@ def main():
             data_pipeline_code_dir,
             aml_env_name,
             storage_account,
-            sa_acc_key,
+            custom_compute_name,
             source_container_name,
             target_container_name,
             source_blob,
