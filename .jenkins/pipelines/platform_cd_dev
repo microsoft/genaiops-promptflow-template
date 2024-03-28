@@ -4,8 +4,8 @@ pipeline {
 parameters {
         string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
         string(name: 'flow_type', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
-        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'webapp')
-        string(name: 'run_id', description: 'run id of the flow to be deployed', defaultValue: 'named_entity_recognition_dev_20240318_162626_named_entity_recognition_train')
+        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'aml')
+        string(name: 'run_id', description: 'run id of the flow to be deployed')
     }
 
     stages {

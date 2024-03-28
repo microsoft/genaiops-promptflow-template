@@ -3,7 +3,7 @@ pipeline {
     
     parameters {
         choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment')
-        string(name: 'flow_type', description: 'The flow usecase to execute', defaultValue: 'named_entity_recognition')
+        string(name: 'flow_type', description: 'The flow usecase to execute', defaultValue: 'web_classification')
         choice(name: 'deployment_type', choices: ['aml', 'aks', 'webapp'],  description: 'Determine type of deployment')
     }
 
