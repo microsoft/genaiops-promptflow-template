@@ -1,6 +1,6 @@
 {
     "DATA_STORE_NAME": "ner_data_store",
-    "COMPUTE_NAME": "mango-compute",
+    "COMPUTE_NAME": "mangocompute",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
