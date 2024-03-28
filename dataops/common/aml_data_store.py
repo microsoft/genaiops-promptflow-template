@@ -40,9 +40,7 @@ def register_data_store(
         description=description,
         account_name=sa_account_name,
         container_name=sa_container_name,
-        credentials= SasTokenConfiguration(
-            sas_token= sa_acc_key
-        )
+        credentials= sa_acc_key
     )
     aml_client.create_or_update(store)
 
