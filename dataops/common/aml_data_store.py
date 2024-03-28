@@ -3,7 +3,7 @@ This module registers the data store.
 """
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml.entities import AzureBlobDatastore
+from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration
 from azure.ai.ml.entities import SasTokenConfiguration
 import os
 import argparse
@@ -40,7 +40,7 @@ def register_data_store(
         description=description,
         account_name=sa_account_name,
         container_name=sa_container_name,
-        credentials= sa_acc_key
+        credentials= AccountKeyConfiguration(account_key=sa_acc_key)
     )
     aml_client.create_or_update(store)
 
