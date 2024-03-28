@@ -98,8 +98,7 @@ jobs:
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --sa_acc_key ${{ inputs.sa_acc_key }}
+            --config_path_root_dir ${{ inputs.config_path_root_dir }} 
 
       - name: Create data store
         uses: ./.github/actions/execute_script

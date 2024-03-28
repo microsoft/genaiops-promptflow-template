@@ -68,7 +68,7 @@ def main():
     parser.add_argument(
         "--sa_acc_key",
         type=str,
-        help="SAS token for target storage account",
+        help="SA acc key for target storage account",
         required=True,
     )
     parser.add_argument(
