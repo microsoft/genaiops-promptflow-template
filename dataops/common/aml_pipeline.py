@@ -4,7 +4,7 @@ This module creates a AML job and schedule it for the data pipeline.
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import command
+from azure.ai.ml import command, UserIdentityConfiguration, ManagedIdentityConfiguration
 from azure.ai.ml import Output
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
@@ -72,6 +72,7 @@ def get_prep_data_component(
                     --assets_str {asset_str} 
                     """,
             environment=environment,
+            identity=ManagedIdentityConfiguration(),
         )
     prep_data_components.append(prep_data_component)
 
