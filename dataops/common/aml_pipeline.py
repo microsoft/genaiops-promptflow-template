@@ -180,12 +180,6 @@ def main():
         help="Root dir for config file",
         required=True,
     )
-    parser.add_argument(
-        "--sa_acc_key",
-        type=str,
-        help="SA Account key for storage account",
-        required=True,
-    )
 
     args = parser.parse_args()
 
