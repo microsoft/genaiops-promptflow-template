@@ -4,8 +4,8 @@ This module creates a AML job and schedule it for the data pipeline.
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import command, UserIdentityConfiguration, ManagedIdentityConfiguration
-from azure.ai.ml import Output
+from azure.ai.ml import command, UserIdentityConfiguration
+from azure.ai.ml import Input, Output
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     JobSchedule,
@@ -15,12 +15,11 @@ import os
 import argparse
 import json
 
-
 pipeline_components = []
 
 ()
 @pipeline(
-    name="ner_data_prep",
+    name="ner_data_prep_test",
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
@@ -48,31 +47,31 @@ def get_prep_data_component(
         custom_compute
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-    data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
-    prep_data_components = []  # Initialize an empty list to store components
 
-    asset_str = ":".join(map(str,assets))
+    # Initialize an empty list to store components
+    prep_data_components = []
+    asset_str = ":".join(map(str, assets))
 
     prep_data_component = command(
-            name=name,
-            display_name=display_name,
-            description=description,
-            inputs={},
-            outputs=dict(
-                target_dir=Output(type="uri_folder", mode="rw_mount"),
-            ),
-            code=data_pipeline_code_dir,
-            command=f"""python prep_data.py \
-                    --storage_account {storage_account} \
-                    --source_container_name {source_container_name} \
-                    --target_container_name {target_container_name} \
-                    --source_blob {source_blob} \
-                    --assets_str {asset_str} 
-                    """,
-            compute=custom_compute,
-            environment=environment,
-            identity=UserIdentityConfiguration(),
-        )
+        name=name,
+        display_name=display_name,
+        description=description,
+        inputs={ },
+        outputs=dict(
+            target_dir=Output(type="uri_folder", mode="rw_mount"),
+        ),
+        code=data_pipeline_code_dir,
+        command=f"""python prep_data.py \
+                --storage_account {storage_account} \
+                --source_container_name {source_container_name} \
+                --target_container_name {target_container_name} \
+                --source_blob {source_blob} \
+                --assets_str {asset_str} 
+                """,
+        environment=environment,
+        compute=custom_compute,
+        identity=UserIdentityConfiguration()
+    )
     prep_data_components.append(prep_data_component)
 
     return prep_data_components
@@ -99,11 +98,11 @@ def create_pipeline_job(
         data_pipeline_code_dir,
         aml_env_name,
         storage_account,
-        custom_compute,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        assets,
+        custom_compute
 ):
 
     prep_data_component = get_prep_data_component(
@@ -122,7 +121,7 @@ def create_pipeline_job(
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline()
+    pipeline_job = ner_data_prep_pipeline( )
 
     return pipeline_job
 
@@ -217,7 +216,7 @@ def main():
         assets.append(data_asset_config['PATH'])
 
     # setup compute_name
-    custom_compute_name = config["COMPUTE_NAME"]
+    custom_compute = config["COMPUTE_NAME"]
 
     aml_client = get_aml_client(
         subscription_id,
@@ -232,11 +231,11 @@ def main():
             data_pipeline_code_dir,
             aml_env_name,
             storage_account,
-            custom_compute_name,
             source_container_name,
             target_container_name,
             source_blob,
-            assets
+            assets,
+            custom_compute
         )
     
     schedule_pipeline_job(
