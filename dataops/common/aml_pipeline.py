@@ -3,30 +3,26 @@ This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
-from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import command
-from azure.ai.ml import Input, Output
-from azure.ai.ml import Input, Output
-from azure.ai.ml.entities import Data
+from azure.ai.ml import Output
 from azure.ai.ml import MLClient
-from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import (
     JobSchedule,
-    CronTrigger,
-    RecurrenceTrigger,
-    RecurrencePattern,
+    CronTrigger
 )
 import os
 import argparse
 import json
+
+compute_name: str = "serverless"
 
 pipeline_components = []
 
 ()
 @pipeline(
     name="ner_data_prep",
-    compute="serverless",
+    compute=compute_name,
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
@@ -73,8 +69,7 @@ def get_prep_data_component(
                     --source_container_name {source_container_name} \
                     --target_container_name {target_container_name} \
                     --source_blob {source_blob} \
-                    --assets_str {asset_str} \
-                    --sa_acc_key {sa_acc_key}
+                    --assets_str {asset_str} 
                     """,
             environment=environment,
         )
@@ -127,7 +122,7 @@ def create_pipeline_job(
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline( )
+    pipeline_job = ner_data_prep_pipeline()
 
     return pipeline_job
 
@@ -227,6 +222,10 @@ def main():
     assets = []
     for data_asset_config in data_asset_configs:
         assets.append(data_asset_config['PATH'])
+
+    # setup compute_name
+    global compute_name
+    compute_name = config["COMPUTE_NAME"]
 
     aml_client = get_aml_client(
         subscription_id,

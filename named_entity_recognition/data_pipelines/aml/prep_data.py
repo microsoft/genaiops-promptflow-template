@@ -2,6 +2,7 @@ import argparse
 import json
 
 import pandas as pd
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 import io
 
@@ -41,11 +42,6 @@ if __name__ == "__main__":
         help="storage account",
     )
     parser.add_argument(
-        "--sa_acc_key",
-        type=str,
-        help="sa account key",
-    )
-    parser.add_argument(
         "--source_container_name",
         type=str,
         help="source container name",
@@ -68,7 +64,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     storage_account = args.storage_account
-    sa_acc_key = args.sa_acc_key
     source_container_name = args.source_container_name
     target_container_name = args.target_container_name
     source_blob = args.source_blob
@@ -76,6 +71,6 @@ if __name__ == "__main__":
         
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
-    blob_service_client = BlobServiceClient(storage_account_url, credential=sa_acc_key)
+    blob_service_client = BlobServiceClient(storage_account_url, credential=DefaultAzureCredential())
 
     prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_assets)
