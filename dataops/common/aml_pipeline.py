@@ -72,7 +72,7 @@ def get_prep_data_component(
                     --assets_str {asset_str} 
                     """,
             environment=environment,
-            identity=ManagedIdentityConfiguration(),
+            identity=UserIdentityConfiguration(),
         )
     prep_data_components.append(prep_data_component)
 
