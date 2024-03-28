@@ -180,12 +180,6 @@ def main():
         help="Root dir for config file",
         required=True,
     )
-    parser.add_argument(
-        "--sa_acc_key",
-        type=str,
-        help="SA Account key for storage account",
-        required=True,
-    )
 
     args = parser.parse_args()
 
@@ -194,7 +188,6 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    sa_acc_key = args.sa_acc_key
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
