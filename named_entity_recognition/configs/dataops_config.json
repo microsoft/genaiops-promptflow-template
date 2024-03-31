@@ -1,10 +1,11 @@
 {
     "DATA_STORE_NAME": "ner_data_store",
+    "COMPUTE_NAME": "mohanab2",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
             "COMPONENT_NAME": "prep_data_component",
-            "COMPONENT_DISPLAY_NAME": "Preapre data component",
+            "COMPONENT_DISPLAY_NAME": "Prepare data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
     "STORAGE":
@@ -26,13 +27,13 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval",
-            "PATH": "eval.jsonl",
+            "NAME": "ner_eval-testing-mohana8",
+            "PATH": "eval-testing-mohana.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp",
-            "PATH": "exp.jsonl",
+            "NAME": "ner_exp-testing-mohana8",
+            "PATH": "exp-testing-mohana.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
     ]

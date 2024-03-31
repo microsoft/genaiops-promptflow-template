@@ -24,7 +24,7 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_sas_token:
+      sa_acc_key:
                 description: Storage account SAS
                 type: string
                 required: true
@@ -54,8 +54,8 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_sas_token:
-                description: Storage account SAS
+      sa_acc_key:
+                description: Storage account key
                 type: string
                 required: true
                 default: ""
@@ -98,8 +98,7 @@ jobs:
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
             --aml_env_name ${{ inputs.aml_env_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --sa_sas_token ${{ inputs.sa_sas_token }}
+            --config_path_root_dir ${{ inputs.config_path_root_dir }} 
 
       - name: Create data store
         uses: ./.github/actions/execute_script
@@ -110,8 +109,8 @@ jobs:
             --subscription_id ${{ inputs.subscription_id }} \
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
-            --sa_sas_token ${{ inputs.sa_sas_token }}
-            --config_path_root_dir ${{ inputs.config_path_root_dir }}
+            --config_path_root_dir ${{ inputs.config_path_root_dir }} \
+            --sa_acc_key ${{ inputs.sa_acc_key }} 
 
       - name: Register data asset
         uses: ./.github/actions/execute_script

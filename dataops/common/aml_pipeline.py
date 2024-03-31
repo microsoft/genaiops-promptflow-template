@@ -3,19 +3,13 @@ This module creates a AML job and schedule it for the data pipeline.
 """
 from datetime import datetime
 from azure.ai.ml.dsl import pipeline
-from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import command
+from azure.ai.ml import command, UserIdentityConfiguration
 from azure.ai.ml import Input, Output
-from azure.ai.ml import Input, Output
-from azure.ai.ml.entities import Data
 from azure.ai.ml import MLClient
-from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.entities import (
     JobSchedule,
-    CronTrigger,
-    RecurrenceTrigger,
-    RecurrencePattern,
+    CronTrigger
 )
 import os
 import argparse
@@ -25,8 +19,7 @@ pipeline_components = []
 
 ()
 @pipeline(
-    name="ner_data_prep",
-    compute="serverless",
+    name="ner_data_prep_test",
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
@@ -47,16 +40,17 @@ def get_prep_data_component(
         data_pipeline_code_dir,
         environment,
         storage_account,
-        sa_sas_token,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        assets,
+        custom_compute
 ):
     data_pipeline_code_dir = os.path.join(os.getcwd(), data_pipeline_code_dir)
 
     # Initialize an empty list to store components
-    prep_data_components = []  
+    prep_data_components = []
+    asset_str = ":".join(map(str, assets))
 
     prep_data_component = command(
         name=name,
@@ -72,11 +66,11 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --exp_blob {assets[0]} \
-                --eval_blob {assets[1]} \   
-                --sa_sas_token {sa_sas_token}
+                --assets_str {asset_str} 
                 """,
         environment=environment,
+        compute=custom_compute,
+        identity=UserIdentityConfiguration()
     )
     prep_data_components.append(prep_data_component)
 
@@ -104,11 +98,11 @@ def create_pipeline_job(
         data_pipeline_code_dir,
         aml_env_name,
         storage_account,
-        sa_sas_token,
         source_container_name,
         target_container_name,
         source_blob,
-        assets
+        assets,
+        custom_compute
 ):
 
     prep_data_component = get_prep_data_component(
@@ -118,11 +112,11 @@ def create_pipeline_job(
         data_pipeline_code_dir = data_pipeline_code_dir,
         environment = aml_env_name,
         storage_account = storage_account,
-        sa_sas_token = sa_sas_token,
         source_container_name = source_container_name,
         target_container_name = target_container_name,
         source_blob = source_blob,
-        assets = assets
+        assets = assets,
+        custom_compute=custom_compute
     )
 
     pipeline_components.extend(prep_data_component)
@@ -185,12 +179,6 @@ def main():
         help="Root dir for config file",
         required=True,
     )
-    parser.add_argument(
-        "--sa_sas_token",
-        type=str,
-        help="SAS token for storage account",
-        required=True,
-    )
 
     args = parser.parse_args()
 
@@ -199,7 +187,6 @@ def main():
     workspace_name = args.workspace_name
     aml_env_name = args.aml_env_name
     config_path_root_dir = args.config_path_root_dir
-    sa_sas_token = args.sa_sas_token
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
@@ -228,6 +215,9 @@ def main():
     for data_asset_config in data_asset_configs:
         assets.append(data_asset_config['PATH'])
 
+    # setup compute_name
+    custom_compute = config["COMPUTE_NAME"]
+
     aml_client = get_aml_client(
         subscription_id,
         resource_group_name,
@@ -241,11 +231,11 @@ def main():
             data_pipeline_code_dir,
             aml_env_name,
             storage_account,
-            sa_sas_token,
             source_container_name,
             target_container_name,
             source_blob,
-            assets
+            assets,
+            custom_compute
         )
     
     schedule_pipeline_job(

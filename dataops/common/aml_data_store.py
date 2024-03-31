@@ -3,7 +3,7 @@ This module registers the data store.
 """
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml.entities import AzureBlobDatastore
+from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration
 from azure.ai.ml.entities import SasTokenConfiguration
 import os
 import argparse
@@ -32,7 +32,7 @@ def register_data_store(
         description,
         sa_account_name,
         sa_container_name,
-        sa_sas_token,
+        sa_acc_key,
         aml_client
 ):
     store = AzureBlobDatastore(
@@ -40,9 +40,7 @@ def register_data_store(
         description=description,
         account_name=sa_account_name,
         container_name=sa_container_name,
-        credentials= SasTokenConfiguration(
-            sas_token= sa_sas_token
-        )
+        credentials= AccountKeyConfiguration(account_key=sa_acc_key)
     )
     aml_client.create_or_update(store)
 
@@ -68,9 +66,9 @@ def main():
         required=True,
     )
     parser.add_argument(
-        "--sa_sas_token",
+        "--sa_acc_key",
         type=str,
-        help="SAS token for target storage account",
+        help="SA acc key for target storage account",
         required=True,
     )
     parser.add_argument(
@@ -85,7 +83,7 @@ def main():
     subscription_id = args.subscription_id
     resource_group_name = args.resource_group_name
     workspace_name = args.workspace_name
-    sa_sas_token = args.sa_sas_token
+    sa_acc_key = args.sa_acc_key
     config_path_root_dir = args.config_path_root_dir
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
@@ -106,7 +104,7 @@ def main():
         description=config["DATA_STORE_DESCRIPTION"],
         sa_account_name=storage_account,
         sa_container_name=target_container_name,
-        sa_sas_token=sa_sas_token,
+        sa_acc_key=sa_acc_key,
         aml_client=aml_client
     )
 
