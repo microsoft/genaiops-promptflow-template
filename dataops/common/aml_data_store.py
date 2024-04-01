@@ -104,7 +104,7 @@ def main():
         description=config["DATA_STORE_DESCRIPTION"],
         sa_account_name=storage_account,
         sa_container_name=target_container_name,
-        sa_acc_key=sa_sas_key,
+        sa_sas_key=sa_sas_key,
         aml_client=aml_client
     )
 
