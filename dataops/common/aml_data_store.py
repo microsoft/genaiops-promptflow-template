@@ -46,51 +46,45 @@ def register_data_store(
 
 
 def main():
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument(
-    #     "--subscription_id",
-    #     type=str,
-    #     help="Azure subscription id",
-    #     required=True,
-    # )
-    # parser.add_argument(
-    #     "--resource_group_name",
-    #     type=str,
-    #     help="Azure resource group",
-    #     required=True,
-    # )
-    # parser.add_argument(
-    #     "--workspace_name",
-    #     type=str,
-    #     help="Azure ML workspace",
-    #     required=True,
-    # )
-    # parser.add_argument(
-    #     "--sa_sas_key",
-    #     type=str,
-    #     help="SAS key for target storage account",
-    #     required=True,
-    # )
-    # parser.add_argument(
-    #     "--config_path_root_dir",
-    #     type=str,
-    #     help="Root dir for config file",
-    #     required=True,
-    # )
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--subscription_id",
+        type=str,
+        help="Azure subscription id",
+        required=True,
+    )
+    parser.add_argument(
+        "--resource_group_name",
+        type=str,
+        help="Azure resource group",
+        required=True,
+    )
+    parser.add_argument(
+        "--workspace_name",
+        type=str,
+        help="Azure ML workspace",
+        required=True,
+    )
+    parser.add_argument(
+        "--sa_sas_key",
+        type=str,
+        help="SAS key for target storage account",
+        required=True,
+    )
+    parser.add_argument(
+        "--config_path_root_dir",
+        type=str,
+        help="Root dir for config file",
+        required=True,
+    )
 
-    # args = parser.parse_args()
+    args = parser.parse_args()
 
-    # subscription_id = args.subscription_id
-    # resource_group_name = args.resource_group_name
-    # workspace_name = args.workspace_name
-    # sa_sas_key = args.sa_sas_key
-    # config_path_root_dir = args.config_path_root_dir
-
-    subscription_id = '9f78c329-7a1a-4e35-9161-edacc8a67712'
-    resource_group_name = 'mango'
-    workspace_name = 'mango_aml'
-    sa_sas_key = 'sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2024-06-30T12:12:37Z&st=2024-04-01T03:12:37Z&spr=https&sig=4OuflU0YUgzRNSLHcVo9VVukYH8Ao8p1r9ULGFjxN%2FU%3D'
-    config_path_root_dir = 'named_entity_recognition'
+    subscription_id = args.subscription_id
+    resource_group_name = args.resource_group_name
+    workspace_name = args.workspace_name
+    sa_sas_key = args.sa_sas_key
+    config_path_root_dir = args.config_path_root_dir
 
     config_path = os.path.join(os.getcwd(), f"{config_path_root_dir}/configs/dataops_config.json")
     config = json.load(open(config_path))
