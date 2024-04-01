@@ -1,10 +1,10 @@
 {
-    "DATA_STORE_NAME": "ner_data_store6",
-    "COMPUTE_NAME": "mohanab2",
+    "DATA_STORE_NAME": "ner_data_store_ra",
+    "COMPUTE_NAME": "raihanalam1",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
-            "COMPONENT_NAME": "prep_data_component",
+            "COMPONENT_NAME": "prep_data_component_ra",
             "COMPONENT_DISPLAY_NAME": "Prepare data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
@@ -21,7 +21,7 @@
         },
     "SCHEDULE":
         {
-            "NAME": "ner_data_pipeline_schedule",
+            "NAME": "ner_data_pipeline_schedule_ra",
             "CRON_EXPRESSION": "15 10 * * *",
             "TIMEZONE": "Eastern Standard Time"
         },
