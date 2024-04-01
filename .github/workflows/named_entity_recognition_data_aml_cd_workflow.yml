@@ -24,11 +24,6 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_acc_key:
-                description: Storage account SAS
-                type: string
-                required: true
-                default: ""
 
   # workflow_dispatch allows to run workflow manually from the Actions tab
   workflow_dispatch:
@@ -54,11 +49,6 @@ on:
               type: string
               required: true
               default: "named_entity_recognition"
-      sa_acc_key:
-                description: Storage account key
-                type: string
-                required: true
-                default: ""
               
 jobs:
   deploy_aml_data_pipeline:
@@ -88,17 +78,17 @@ jobs:
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
-      - name: Deploy data pipeline
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Deploy data pipeline"
-          script_parameter: |
-            python -m dataops.common.aml_pipeline \
-            --subscription_id ${{ inputs.subscription_id }} \
-            --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }} \
-            --aml_env_name ${{ inputs.aml_env_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }} 
+      # - name: Deploy data pipeline
+      #   uses: ./.github/actions/execute_script
+      #   with:
+      #     step_name: "Deploy data pipeline"
+      #     script_parameter: |
+      #       python -m dataops.common.aml_pipeline \
+      #       --subscription_id ${{ inputs.subscription_id }} \
+      #       --resource_group_name ${{ inputs.resource_group_name }} \
+      #       --workspace_name ${{ inputs.workspace_name }} \
+      #       --aml_env_name ${{ inputs.aml_env_name }} \
+      #       --config_path_root_dir ${{ inputs.config_path_root_dir }} 
 
       - name: Create data store
         uses: ./.github/actions/execute_script
@@ -110,15 +100,15 @@ jobs:
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --sa_acc_key ${{ inputs.sa_acc_key }} 
+            --sa_sas_key ${{ secrets.SA_SAS_KEY }} 
 
-      - name: Register data asset
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Register data asset"
-          script_parameter: |
-            python -m dataops.common.aml_data_asset \
-            --subscription_id ${{ inputs.subscription_id }} \
-            --resource_group_name ${{ inputs.resource_group_name }} \
-            --workspace_name ${{ inputs.workspace_name }} \
-            --config_path_root_dir ${{ inputs.config_path_root_dir }}      
+      # - name: Register data asset
+      #   uses: ./.github/actions/execute_script
+      #   with:
+      #     step_name: "Register data asset"
+      #     script_parameter: |
+      #       python -m dataops.common.aml_data_asset \
+      #       --subscription_id ${{ inputs.subscription_id }} \
+      #       --resource_group_name ${{ inputs.resource_group_name }} \
+      #       --workspace_name ${{ inputs.workspace_name }} \
+      #       --config_path_root_dir ${{ inputs.config_path_root_dir }}      
