@@ -23,10 +23,8 @@ pipeline_components = []
     description="data prep pipeline",
 )
 def ner_data_prep_pipeline(
-    # raw_data_dir
 ):
     prep_data_job = pipeline_components[0](
-        # raw_data_dir=raw_data_dir
     )
 
     return {
@@ -75,7 +73,6 @@ def get_prep_data_component(
     prep_data_components.append(prep_data_component)
 
     return prep_data_components
-
 
 def get_aml_client(
         subscription_id,
@@ -215,7 +212,6 @@ def main():
     for data_asset_config in data_asset_configs:
         assets.append(data_asset_config['PATH'])
 
-    # setup compute_name
     custom_compute = config["COMPUTE_NAME"]
 
     aml_client = get_aml_client(

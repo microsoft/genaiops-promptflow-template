@@ -1,16 +1,16 @@
 {
-    "DATA_STORE_NAME": "ner_data_store_ra",
-    "COMPUTE_NAME": "raihanalam1",
+    "DATA_STORE_NAME": "ner_data_store",
+    "COMPUTE_NAME": "REPLACE_WITH_AML_COMPUTE_NAME",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
-            "COMPONENT_NAME": "prep_data_component_ra",
+            "COMPONENT_NAME": "prep_data_component",
             "COMPONENT_DISPLAY_NAME": "Prepare data component",
             "COMPONENT_DESCRIPTION": "Loading and processing data for prompt engineering"
         },
     "STORAGE":
         {
-            "STORAGE_ACCOUNT": "sanamedrecognitionwe",
+            "STORAGE_ACCOUNT": "REPLACE_WITH_STORAGE_ACCOUNT_NAME",
             "SOURCE_CONTAINER": "source",
             "SOURCE_BLOB": "source.csv",
             "TARGET_CONTAINER": "data"
@@ -21,19 +21,19 @@
         },
     "SCHEDULE":
         {
-            "NAME": "ner_data_pipeline_schedule_ra",
-            "CRON_EXPRESSION": "*/5  * * * *",
+            "NAME": "ner_data_pipeline_schedule",
+            "CRON_EXPRESSION": "10 14 * * 1",
             "TIMEZONE": "Eastern Standard Time"
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval-testing-ra",
-            "PATH": "eval-testing-ra.jsonl",
+            "NAME": "ner_eval-testing",
+            "PATH": "eval.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp-testing-ra",
-            "PATH": "exp-testing-ra.jsonl",
+            "NAME": "ner_exp-testing",
+            "PATH": "exp.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
     ]

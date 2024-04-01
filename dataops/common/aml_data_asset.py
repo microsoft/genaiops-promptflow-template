@@ -1,5 +1,5 @@
 """
-This module creates the data asset.
+This module creates the data assets.
 """
 from azure.ai.ml.dsl import pipeline
 from azure.ai.ml import MLClient

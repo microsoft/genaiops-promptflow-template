@@ -11,7 +11,6 @@ import json
 
 pipeline_components = []
 
-
 def get_aml_client(
         subscription_id,
         resource_group_name,
@@ -25,7 +24,6 @@ def get_aml_client(
     )
 
     return aml_client
-
 
 def register_data_store(
         name_datastore,
@@ -43,7 +41,6 @@ def register_data_store(
         credentials= AccountKeyConfiguration(account_key=sa_key)
     )
     aml_client.create_or_update(store)
-
 
 def main():
     parser = argparse.ArgumentParser()
@@ -107,7 +104,6 @@ def main():
         sa_key=sa_key,
         aml_client=aml_client
     )
-
 
 if __name__ == "__main__":
     main()
