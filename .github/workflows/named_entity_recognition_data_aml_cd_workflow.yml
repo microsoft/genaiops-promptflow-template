@@ -78,17 +78,17 @@ jobs:
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
-      # - name: Deploy data pipeline
-      #   uses: ./.github/actions/execute_script
-      #   with:
-      #     step_name: "Deploy data pipeline"
-      #     script_parameter: |
-      #       python -m dataops.common.aml_pipeline \
-      #       --subscription_id ${{ inputs.subscription_id }} \
-      #       --resource_group_name ${{ inputs.resource_group_name }} \
-      #       --workspace_name ${{ inputs.workspace_name }} \
-      #       --aml_env_name ${{ inputs.aml_env_name }} \
-      #       --config_path_root_dir ${{ inputs.config_path_root_dir }} 
+      - name: Deploy data pipeline
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Deploy data pipeline"
+          script_parameter: |
+            python -m dataops.common.aml_pipeline \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --aml_env_name ${{ inputs.aml_env_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }} 
 
       - name: Create data store
         uses: ./.github/actions/execute_script
