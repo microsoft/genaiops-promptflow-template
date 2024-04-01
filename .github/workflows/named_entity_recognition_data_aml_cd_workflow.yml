@@ -100,15 +100,15 @@ jobs:
             --resource_group_name ${{ inputs.resource_group_name }} \
             --workspace_name ${{ inputs.workspace_name }} \
             --config_path_root_dir ${{ inputs.config_path_root_dir }} \
-            --sa_sas_key ${{ secrets.SA_SAS_KEY }} 
+            --sa_key ${{ secrets.SA_KEY }} 
 
-      # - name: Register data asset
-      #   uses: ./.github/actions/execute_script
-      #   with:
-      #     step_name: "Register data asset"
-      #     script_parameter: |
-      #       python -m dataops.common.aml_data_asset \
-      #       --subscription_id ${{ inputs.subscription_id }} \
-      #       --resource_group_name ${{ inputs.resource_group_name }} \
-      #       --workspace_name ${{ inputs.workspace_name }} \
-      #       --config_path_root_dir ${{ inputs.config_path_root_dir }}      
+      - name: Register data asset
+        uses: ./.github/actions/execute_script
+        with:
+          step_name: "Register data asset"
+          script_parameter: |
+            python -m dataops.common.aml_data_asset \
+            --subscription_id ${{ inputs.subscription_id }} \
+            --resource_group_name ${{ inputs.resource_group_name }} \
+            --workspace_name ${{ inputs.workspace_name }} \
+            --config_path_root_dir ${{ inputs.config_path_root_dir }}      
