@@ -3,7 +3,7 @@ This module registers the data store.
 """
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration
+from azure.ai.ml.entities import AzureBlobDatastore, AccountKeyConfiguration, SasTokenConfiguration
 from azure.ai.ml.entities import SasTokenConfiguration
 import os
 import argparse

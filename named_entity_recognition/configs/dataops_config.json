@@ -1,5 +1,5 @@
 {
-    "DATA_STORE_NAME": "ner_data_store4",
+    "DATA_STORE_NAME": "ner_data_store5",
     "COMPUTE_NAME": "mohanab2",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
