@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
     parameters {
@@ -6,55 +7,54 @@ pipeline {
     }
 
     environment {
-        dev_connections = credentials('UNICREDIT_PVT_COMMON_DEV_CONNECTIONS')
-        registry_details = credentials('UNICREDIT_PVT_DOCKER_IMAGE_REGISTRY')
+        dev_connections = credentials('COMMON_DEV_CONNECTIONS')
+        registry_details = credentials('DOCKER_IMAGE_REGISTRY')
     }
 
     stages {
-
-    stage('Create local promptflow connections') {
+        stage('Create local promptflow connections') {
             steps {
+                installRequirements('execute_job_requirements')
+                installRequirements('build_validation_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
-                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
-                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     python -m llmops.common.prompt_local_connections \\
                     --flow_to_execute ${flow_to_execute} \\
                     --env_name ${deploy_environment} \\
                     --connection_details "$dev_connections"
                     '''
+                    }
                 }
             }
-            }
         }
 
-    stage('Create Docker Image') {
-            steps {
-            withCredentials([string(credentialsId: 'UNICREDIT_PVT_DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
-            string(credentialsId: 'UNICREDIT_PVT_COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
-            withPythonEnv('/usr/bin/python3.9') {
-                sh """
-                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
-                    # Your Docker image creation command here
-                    echo "build no script:"
-                    echo ${BUILD_NUMBER}
-                    #!/bin/bash
-                    ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${connection_details}'
-                """
+        stage('Create Docker Image') {
+                steps {
+                    installRequirements('build_validation_requirements')
+                    withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
+                    string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                            # Your Docker image creation command here
+                            echo "build no script:"
+                            echo ${BUILD_NUMBER}
+                            #!/bin/bash
+                            ./llmops/common/scripts/gen_docker_image.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${connection_details}'
+                        """
+                        }
+                    }
+                }
             }
-            }
-            }
-        }
 
         stage('Create Webapp') {
-         steps {
-         withCredentials([string(credentialsId: 'UNICREDIT_PVT_COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
-         sh """
-                /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${connection_details}'
-            """
-         }
-         }
+            steps {
+                withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+                    sh """
+                    /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --flow_to_execute $flow_to_execute --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${connection_details}'
+                    """
+                }
+            }
         }
     }
 }

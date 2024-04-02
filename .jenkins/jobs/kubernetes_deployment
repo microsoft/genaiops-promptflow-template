@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
     
@@ -11,10 +12,10 @@ pipeline {
     stages {
         stage('Provision Kubernetes Online Endpoint') {
             steps {
+                installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
-                        pip install -r .jenkins/requirements/execute_job_requirements.txt
                         python -m llmops.common.deployment.kubernetes_endpoint \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
                             --build_id $run_id \

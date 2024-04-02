@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
 
@@ -13,15 +14,10 @@ pipeline {
     stages {
         stage('Prepare build environment') {
             steps {
+                installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh """
-                        pip install --upgrade pip
-                        pip install setuptools wheel
-                        pip install -r .jenkins/requirements/execute_job_requirements.txt
-                        pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
-
-
                         python --version
                         pip list
                         az version

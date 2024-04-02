@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
 
@@ -37,23 +38,16 @@ pipeline {
 
         stage('Load Dependencies') {
             steps {
-                withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
-                    python -m pip install --upgrade pip
-                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
-                    az version
-                    '''
-                }
+                installRequirements('build_validation_requirements')
+                sh 'az version'
             }
         }
 
         stage('Azure Login') {
             steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
+                azureLogin()
                 }
             }
-        }
 
         stage('Load Azure Subscription Details') {
             steps {

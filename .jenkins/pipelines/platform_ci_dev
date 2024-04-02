@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
 
@@ -19,16 +20,9 @@ pipeline {
             }
         }
 
-         stage('Azure Login') {
-            steps {
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    sh 'az login --service-principal -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID'
-                }
-            }
-        }
-
         stage('Configure Azure ML Agent') {
             steps {
+                azureLogin()
                 script {
                     build job: 'jobs/configure_azureml_agent', parameters: [
                         string(name: 'flow_type', value: "${params.flow_type}")
@@ -39,10 +33,10 @@ pipeline {
 
         stage('Register experiment data asset') {
             steps {
+                installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
-                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose "training_data" \\
@@ -58,10 +52,10 @@ pipeline {
 
         stage('Execute prompt flow bulk run') {
             steps {
+                installRequirements('build_validation_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
-                    python -m pip install -r .jenkins/requirements/build_validation_requirements.txt
                     python -m llmops.common.prompt_pipeline \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --data_purpose "training_data" \\

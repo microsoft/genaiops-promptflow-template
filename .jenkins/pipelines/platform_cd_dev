@@ -1,3 +1,4 @@
+@Library('shared-library@feature/add-shared-library') _
 pipeline {
     agent any
 
@@ -17,10 +18,10 @@ parameters {
 
         stage('Register flow as model in AzureML') {
             steps {
+                installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh """
-                    python -m pip install -r .jenkins/requirements/execute_job_requirements.txt
                     python -m llmops.common.deployment.register_model \
                     --subscription_id $AZURE_SUBSCRIPTION_ID \
                     --flow_to_execute $flow_type \
