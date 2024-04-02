@@ -12,6 +12,9 @@ Before you begin the onboarding process, ensure you have the following prerequis
 
 **Experience with Prompt flow and examples in this template:** New Flows should be on-boarded only after you get comfortable with the example flows in this repo and are able to execute them successfully either through Azure DevOps or Github workflows.
 
+**(Optional) Data Pipeline Environment:** The data pipeline loads data from the source system and preapres it for the promptflow flow. The data pipeline outputs jsonl files so that it can be registered as data asset. This repository supports two tools for data pipeline development - AML and Microsoft Fabric. 
+![dataops llmops](images/dataops_llmops.png)
+
 ## Steps to Onboard new Flows
 
 Follow these steps to onboard new Flows to your LLMOps template:
@@ -20,9 +23,15 @@ Follow these steps to onboard new Flows to your LLMOps template:
 
 **New Folder for new Flows** Similar to `named_entity_recognition` flow, a new folder should be created with the same sub-folder structure as `named_entity_recognition`.
 
+**AML or Fabric:** Decide which tool to use for data pipeline. There are seperate folders for AML and Fabric.
+
 **Flow Configuration:** The `llmops_config.json` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
 
 You can start by copying an existing config file and modify it with relevant values. Provide valid values for all the configuration elements for your flow.
+
+**Data Pipeline Configuration:** The `dataops_config.json` file contains configurations for the data pipeline.
+
+You can start by copying an existing config file and modify it with relevant values. Provide valid values for all the configuration elements.
 
 **Flows** Bring both the `standard and evaluation flows` within the `flows` sub-folder under a scenario folder. Files for both these type of flows should be under their own folder. The `llmops_config.json` should be updated with the path of these flows. The name of these folders are very important and used within multiple other configuration files - these are used in `llmops_config.json` and `mapping_config.json` files.
 
