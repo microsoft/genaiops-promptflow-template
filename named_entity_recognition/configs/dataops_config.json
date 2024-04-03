@@ -1,6 +1,6 @@
 {
     "DATA_STORE_NAME": "ner_data_store",
-    "COMPUTE_NAME": "REPLACE_WITH_AML_COMPUTE_NAME",
+    "COMPUTE_NAME": "ner_compute",
     "DATA_STORE_DESCRIPTION": "pipeline data store description for evaluation",
     "DATA_PREP_COMPONENT":
         {
@@ -10,9 +10,9 @@
         },
     "STORAGE":
         {
-            "STORAGE_ACCOUNT": "REPLACE_WITH_STORAGE_ACCOUNT_NAME",
+            "STORAGE_ACCOUNT": "saner",
             "SOURCE_CONTAINER": "source",
-            "SOURCE_BLOB": "source.csv",
+            "SOURCE_BLOB": "ner_source.csv",
             "TARGET_CONTAINER": "data"
         },
     "PATH":
@@ -27,12 +27,12 @@
         },
     "DATA_ASSETS":[
         {
-            "NAME": "ner_eval-testing",
+            "NAME": "ner_eval",
             "PATH": "eval.jsonl",
             "DESCRIPTION": "NER eval data asset"
         },
         {
-            "NAME": "ner_exp-testing",
+            "NAME": "ner_exp",
             "PATH": "exp.jsonl",
             "DESCRIPTION": "NER experiment data asset"
         }
