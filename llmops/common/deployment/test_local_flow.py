@@ -28,7 +28,7 @@ flow_name = args.flow_to_execute
 with open(f"./{flow_name}/sample-request.json", 'r') as file:
     json_data = json.load(file)
 
-url = "http://0.0.0.0:8080/score"
+url = "http://0.0.0.0:8081/score"
 
 headers = {'Content-Type': 'application/json'}
 
