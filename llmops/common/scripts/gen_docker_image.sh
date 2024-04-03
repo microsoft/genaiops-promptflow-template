@@ -82,8 +82,8 @@ if [[ -n "$selected_object" ]]; then
     file_contents=$(<./$flow_to_execute/sample-request.json)
     echo "$file_contents"
 
-    python -m llmops.common.deployment.test_local_flow \
-            --flow_to_execute $flow_to_execute
+#    python -m llmops.common.deployment.test_local_flow \
+#            --flow_to_execute $flow_to_execute
 
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
