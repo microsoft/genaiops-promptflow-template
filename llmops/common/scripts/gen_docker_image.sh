@@ -85,6 +85,8 @@ if [[ -n "$selected_object" ]]; then
 #    python -m llmops.common.deployment.test_local_flow \
 #            --flow_to_execute $flow_to_execute
 
+    echo "registry details below:"
+    echo "${REGISTRY_DETAILS}"
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
     registry_username=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_username')
