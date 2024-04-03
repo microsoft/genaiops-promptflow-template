@@ -63,7 +63,7 @@ if [[ -n "$selected_object" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo $connection_details | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -76,24 +76,24 @@ if [[ -n "$selected_object" ]]; then
     sleep 15
 
     docker ps -a
-        
+
     chmod +x "./$flow_to_execute/sample-request.json"
-        
+
     file_contents=$(<./$flow_to_execute/sample-request.json)
     echo "$file_contents"
-        
+
     python -m llmops.common.deployment.test_local_flow \
             --flow_to_execute $flow_to_execute
 
-    registry_name=$(echo "$registry_details" | jq -r '.[0].registry_name')
-    registry_server=$(echo "$registry_details" | jq -r '.[0].registry_server')
-    registry_username=$(echo "$registry_details" | jq -r '.[0].registry_username')
-    registry_password=$(echo "$registry_details" | jq -r '.[0].registry_password')
+    registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
+    registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
+    registry_username=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_username')
+    registry_password=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_password')
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
     docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
     docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
-        
+
     else
         echo "Object in config file not found"
     fi
