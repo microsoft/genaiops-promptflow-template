@@ -12,8 +12,11 @@ Before you begin the onboarding process, ensure you have the following prerequis
 
 **Experience with Prompt flow and examples in this template:** New Flows should be on-boarded only after you get comfortable with the example flows in this repo and are able to execute them successfully either through Azure DevOps or Github workflows.
 
-**(Optional) Data Pipeline Environment:** The data pipeline loads data from the source system and preapres it for the promptflow flow. The data pipeline outputs jsonl files so that it can be registered as data asset. This repository supports two tools for data pipeline development - AML and Microsoft Fabric. 
+**(Optional) Data Pipeline Environment:** The data pipeline loads data from the source system and preapres it for the promptflow flow. The data pipeline outputs jsonl files which can be registered as data assets. This repository supports two tools for data pipeline development - AML and Microsoft Fabric.
+
 ![dataops llmops](images/dataops_llmops.png)
+
+If you are not using data pipelines to create the data assets, the promptflow Flows will use the jsonl files inside the `data` folder to create the data assets.
 
 ## Steps to Onboard new Flows
 
@@ -21,9 +24,9 @@ Follow these steps to onboard new Flows to your LLMOps template:
 
 **Azure DevOps or Github Workflow or both:** Decide early on whether the LLMOps will use Azure DevOps or Github Workflows for Orchestration. Depending on this configuration either both or any one of these pipelines will be required.
 
-**New Folder for new Flows** Similar to `named_entity_recognition` flow, a new folder should be created with the same sub-folder structure as `named_entity_recognition`.
+**AML or Fabric:** Decide which tool to use for data pipeline. There are seperate folders for AML and Fabric under the `data_pipelines` folder.
 
-**AML or Fabric:** Decide which tool to use for data pipeline. There are seperate folders for AML and Fabric.
+**New Folder for new Flows** Similar to `named_entity_recognition` flow, a new folder should be created with the same sub-folder structure as `named_entity_recognition`.
 
 **Flow Configuration:** The `llmops_config.json` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
 
@@ -43,6 +46,8 @@ paths in `trigger and pr section` and the `default value` for `flow_to_execute` 
 **Configuration for flows**  The `configs` folder contains the `deployment and data configuration` for the flows. The `data_config.json` file contains one element for each type of dataset required for an environment. For example, a flow needs 3 datasets - "pr_data", "training_data" and "test_data" represented by the "data_purpose" element. Update the `deployment_config.json` for deployment related configuration. Modify the values in these configuration files to reflect your flow deployment. Update the `mapping_config.json` for data mapping related configuration. Modify the values in these configuration files to reflect your flow execution.
 
 **Bring Data**  The `data` folder contains data that would be uploaded to AzureML data assets and used for both bulk run and evaluation purpose. You can copy the data in this folder in `jsonl` format.
+
+Alternatively, the data pipelines can populate the data assets.
 
 **Update Environment dependencies** The `environment` folder contains the `dockerfile` file needed during flow deployment to Azure web apps as Docker containers.
 
