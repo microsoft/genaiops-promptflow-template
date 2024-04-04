@@ -70,8 +70,8 @@ if [[ -n "$selected_object" ]]; then
     done
 
     docker_args=$result_string
-    #docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8081:8081 localpf:latest"
-    #docker run $(echo "$docker_args")
+    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    docker run $(echo "$docker_args")
 
     sleep 15
 
@@ -82,13 +82,9 @@ if [[ -n "$selected_object" ]]; then
     file_contents=$(<./$flow_to_execute/sample-request.json)
     echo "$file_contents"
 
-#    python -m llmops.common.deployment.test_local_flow \
-#            --flow_to_execute $flow_to_execute
+    python -m llmops.common.deployment.test_local_flow \
+            --flow_to_execute $flow_to_execute
 
-    echo "connection details below:"
-    echo "${CONNECTION_DETAILS}"
-    echo "registry details below:"
-    echo "${REGISTRY_DETAILS}"
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
     registry_username=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_username')

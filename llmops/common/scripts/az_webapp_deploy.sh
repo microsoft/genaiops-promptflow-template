@@ -54,7 +54,7 @@ read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES
 echo $connection_names
 
 # create a resource group
-az group create --name $rgname --location eastus
+az group create --name $rgname --location westeurope
 
 # create a user managed identifier      
 az identity create --name $udmid --resource-group $rgname
@@ -78,8 +78,6 @@ az webapp create --resource-group $rgname --plan $appserviceplan --name $appserv
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
     --settings WEBSITES_PORT=8080
 
-echo "connection in webapp deploy:"
-echo "${CONNECTION_DETAILS}"
 for name in "${connection_names[@]}"; do
     api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
