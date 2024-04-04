@@ -5,7 +5,7 @@ inputs:
     default: job title
   text:
     type: string
-    default: Alessio Rosatelli is a data scientist at Auto Dataset, and his wife is a finance
+    default: Maxime is a data scientist at Auto Dataset, and his wife is a finance
       manager in the same company.
 outputs:
   entities:
