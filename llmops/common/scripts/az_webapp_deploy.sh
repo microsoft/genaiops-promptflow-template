@@ -54,7 +54,7 @@ read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES
 echo $connection_names
 
 # create a resource group
-az group create --name $rgname --location westeurope
+az group create --name $rgname --location eastus
 
 # create a user managed identifier      
 az identity create --name $udmid --resource-group $rgname
