@@ -14,7 +14,7 @@ pipeline {
                 genericHeaderVariables: [
                 ],
                 causeString: 'Triggered on $action',
-                token: 'JENKINS_URL',
+                tokenCredentialId: 'WEBHOOK-TOKEN-SECRET',
                 printContributedVariables: true,
                 printPostContent: false,
                 silentResponse: false,

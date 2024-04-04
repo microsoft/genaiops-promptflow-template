@@ -390,36 +390,67 @@ git push -u origin featurebranch
 
 In this example, all pipelines will be created for the **Named Entity Recognition Flow**, feel free to use instead one of the other supported flows (Math Coding or Web Classification) for your setup.
 
-In your Jenkins environment create a new **Pipeline** with the name `named_entity_recognition_pr_dev` and select the option to define the **Pipeline Script from SCM**. Select **Git** as the Source Control option, and provide the **Repository URL** for your forked repository. In the **Branch Specifier** field, provide `*/feature/*`. For the **Script Path** field, provide the path to the Jenkinsfile for the pipeline you're creating, which is `.jenkins/pipelines/named_entity_recognition_pr_dev`, and press **Save**.
+In your Jenkins environment create a new **Pipeline** with the name `named_entity_recognition_pr_dev` and select the option to define the **Pipeline Script from SCM**. Select **Git** as the Source Control option, and provide the **Repository URL** for your forked repository. In the **Branch Specifier** field, provide `*/<your-featurebranch>`. For the **Script Path** field, provide the path to the Jenkinsfile for the pipeline you're creating, which is `.jenkins/pipelines/named_entity_recognition_pr_dev`, and press **Save**.
 
 These steps shoud be repeated for all pipelines which are required to run the PR and CI/CD pipelines for the NER flow. In the table below you can find the list of pipeline names, branches and script paths required for each pipeline.
 
 | Pipeline Name |  Branch Specifier | Script Path |
 | ------------- | ----------- | ----------- |
-| named_entity_recognition_pr_dev    | `*/feature/*` |  `.jenkins/pipelines/named_entity_recognition_pr_dev` |
-| platform_pr_dev    | `*/feature/*` | `.jenkins/pipelines/platform_pr_dev` |
+| named_entity_recognition_pr_dev    | `*/<your-featurebranch>` |  `.jenkins/pipelines/named_entity_recognition_pr_dev` |
+| platform_pr_dev    | `*/<your-featurebranch>` | `.jenkins/pipelines/platform_pr_dev` |
 | named_entity_recognition_ci_dev    | `*/development` | `.jenkins/pipelines/named_entity_recognition_ci_dev` |
 | platform_ci_dev   | `*/development` |`.jenkins/pipelines/platform_ci_dev` |
 | platform_cd_dev   | `*/development` |`.jenkins/pipelines/platform_cd_dev` |
 
 ## Configure actions in Jenkins
 
-Many of the Jenkins pipelines trigger specific actions which are stored in the `.jenkins/actions/*` directory. Therefore it is necessary to configure another pipeline in Jenkins for each of the individual actions.
+Many of the Jenkins pipelines trigger specific actions which are stored in the [.jenkins/jobs/](../.jenkins/jobs/) directory. Therefore it is necessary to configure Jenkins pipelines for each of the individual actions.
 
 First, create a **+ New Item** of the type **Folder** and call it `jobs`. Inside the `jobs` folder, create pipelines for each action file in the same way you did for the pipelines, using the **Pipeline Script from SCM** option. The details for which branch and script path to use are in the table below:
 
 | Pipeline Name |  Branch Specifier | Script Path |
 | ------------- | ----------- | ----------- |
 | aml_real_deployment    | `*/development*` |  `.jenkins/jobs/aml_real_deployment` |
-| build_validation    | `*/feature/*` | `.jenkins/jobs/build_validation` |
-| configure_azureml_agent    | `*/development` and `*/feature/*` | `.jenkins/jobs/configure_azureml_agent` |
+| build_validation    | `*/<your-featurebranch>` | `.jenkins/jobs/build_validation` |
 | kubernetes_deployment   | `*/development` | `.jenkins/jobs/kubernetes_deployment` |
 | prepare_docker_image   | `*/development` | `.jenkins/jobs/prepare_docker_image` |
 | webapp_deployment   | `*/development` | `.jenkins/jobs/webapp_deployment` |
 
 ## Set up Trigger Webhook
 
-< add details here >
+Both the PR and CI pipelines for each use case will be triggered by different events. The PR pipeline will be triggered whenever a PR is opened on a `feature branch`, and the CI pipeline will be triggered once a merge is done on the `development` branch. To send these events from the GitHub repository to Jenkins it's necessary to define a `Webhook`. This can be done in the **Settings** tab of your GitHub repository, then going to the **Webhooks** tab and press **Add webhook**.
+
+In the **payload** section, provide the following url:
+`http://<your Jenkins ip address>:<the port on which Jenkins is running>/generic-webhook-trigger/invoke?token=`.
+In the **secret** section, provide a random string with high entropy to be used as a token by Jenkins.
+Select **Send me everything** from the options on which events to send through this webhook. Then press **Add Webhook**.
+
+![Create a GitHub webhook](images/jenkins-webhook-gh.png)
+
+## Create Jenkins Credentials for Webhook Token Secret
+
+Create another set of **Jenkins Credentials** of type **Secret Text** with the name `WEBHOOK-TOKEN-SECRET`, to store the value of the GitHub Webhook secret, such that it can be used inside the pipeline.
+
+Inside the Jenkins pipelines, the `GenericTrigger` block is already set up to define the regular expressions which ensure that the pipeline is triggered only when certain events are part of the webhook request, such as the PR being `opened`, `reopened` or `synchronized` as can be seen in this example:
+
+```groovy
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'action', value: '$.action']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on $action',
+                tokenCredentialId: 'WEBHOOK-TOKEN-SECRET',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$action',
+                regexpFilterExpression: '^(opened|reopened|synchronize)$'
+        )
+    }
+```
 
 ## Raise PR to trigger pipeline
 

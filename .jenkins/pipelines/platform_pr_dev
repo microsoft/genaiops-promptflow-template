@@ -24,16 +24,6 @@ pipeline {
                 }
             }
         }
-        stage('PR Flow Validation') {
-            steps {
-                azureLogin()
-                script {
-                    build job: 'jobs/configure_azureml_agent', parameters: [
-                        string(name: 'flow_type', value: "${params.flow_type}")
-                    ]
-                }
-            }
-        }
 
         stage('Register experiment data asset') {
             steps {
