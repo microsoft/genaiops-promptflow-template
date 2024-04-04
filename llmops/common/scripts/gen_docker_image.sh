@@ -16,11 +16,11 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --REGISTRY_DETAILS)
-            registry_details="$2"
+            REGISTRY_DETAILS="$2"
             shift 2
             ;;
         --CONNECTION_DETAILS)
-            connection_details="$2"
+            CONNECTION_DETAILS="$2"
             shift 2
             ;;
         *)
@@ -85,6 +85,8 @@ if [[ -n "$selected_object" ]]; then
 #    python -m llmops.common.deployment.test_local_flow \
 #            --flow_to_execute $flow_to_execute
 
+    echo "connection details below:"
+    echo "${CONNECTION_DETAILS}"
     echo "registry details below:"
     echo "${REGISTRY_DETAILS}"
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
