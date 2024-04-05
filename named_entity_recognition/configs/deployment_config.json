@@ -3,12 +3,12 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "aml-endpoint-llmops-demo",
+            "ENDPOINT_NAME": "",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "aml-deployment-001",
+            "CURRENT_DEPLOYMENT_NAME": "",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
@@ -21,18 +21,18 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "aks-endpoint-llmops-demo",
+            "ENDPOINT_NAME": "",
             "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for named entity",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "aks-deployment-004",
+            "CURRENT_DEPLOYMENT_NAME": "",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": 100,
-            "COMPUTE_NAME": "k8s-compute",
-            "DEPLOYMENT_VM_SIZE": "defaultinstancetype",
+            "COMPUTE_NAME": "",
+            "DEPLOYMENT_VM_SIZE": "",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
-            "CPU_ALLOCATION": "100m",
-            "MEMORY_ALLOCATION": "2Gi",
+            "CPU_ALLOCATION": "",
+            "MEMORY_ALLOCATION": "",
             "ENVIRONMENT_VARIABLES": {
                 "example-name": "example-value"
             }
@@ -43,13 +43,14 @@
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "CONNECTION_NAMES": ["aoai"],
-            "REGISTRY_NAME": "acrllmopsdemo",
-            "REGISTRY_RG_NAME": "rg-llmops-demo",
-            "APP_PLAN_NAME": "app-plan-llmops-demo",
-            "WEB_APP_NAME": "web-app-llmops-demo",
-            "WEB_APP_RG_NAME": "rg-llmops-demo",
+            "REGISTRY_NAME": "",
+            "REGISTRY_RG_NAME": "",
+            "APP_PLAN_NAME": "",
+            "WEB_APP_NAME": "",
+            "WEB_APP_RG_NAME": "",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "uami-webapp-llmops-demo"  
+            "USER_MANAGED_ID": ""
+            
         }
     ]
 }
