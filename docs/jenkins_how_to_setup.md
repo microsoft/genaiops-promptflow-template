@@ -30,7 +30,7 @@ The template deploys real-time online endpoints for flows. These endpoints have 
 
 Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
-1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
+1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for Jenkins to properly use resources in that subscription.
 
     ``` bash
     spname="<provide a name to create a new sp name>"
@@ -48,7 +48,7 @@ Create one Azure service principal for the purpose of understanding this reposit
 
 1. Copy your edited commands into the Azure Shell and run them (**Ctrl** + **Shift** + **v**). If executing the commands on local machine, ensure Azure CLI is installed and successfully able to access after executing `az login` command. Azure CLI can be installed using information available [here](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)
 
-1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure GitHub.
+1. After running these commands, you'll be presented with information related to the service principal. Save this information to a safe location, you'll use it later in the demo to configure Jenkins.
 
 `NOTE: The below information should never be part of your repository and its branches. These are important secrets and should never be pushed to any branch in any repository.`
 
@@ -74,7 +74,7 @@ Create one Azure service principal for the purpose of understanding this reposit
 
 ## Setup runtime for Prompt flow
 
-Prompt flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal.
+Prompt flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from Azure DevOps pipelines, Github workflows and Jenkins. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal.
 
 Compute Instances and Prompt flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
 
@@ -201,7 +201,7 @@ Fork this repository [LLMOps Prompt flow Template Repo](https://github.com/micro
 
 ![fork the repository](images/fork.png)
 
-Create a *development* branch from *main* branch and also make it as default one to make sure that all PRs should go towards it. This template assumes that the team works at a *development* branch as a primary source for coding and improving the prompt quality. Later, you can implement Github workflows that move code from the *development* branch into qa/main or execute a release process right away. Release management is not in part of this template.
+Create a *development* branch from *main* branch and also make it as default one to make sure that all PRs should go towards it. This template assumes that the team works at a *development* branch as a primary source for coding and improving the prompt quality. Later, you can implement Jenkins pipelines that move code from the *development* branch into qa/main or execute a release process right away. Release management is not in part of this template.
 
 ![create a new development branch](images/new-branch.png)
 
@@ -221,17 +221,9 @@ Eventually, the default branch in github repo should show `development` as the d
 
 ![make development branch as default branch](images/default-branch.png)
 
-The template comes with a few Github workflow related to Prompt flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 primary workflows and 1 optional workflow. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt flow job can be completed fast enough.
+The template comes with a few declarative Jenkins pipelines related to Prompt flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 primary workflows and 1 optional workflow. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev](../.jenkins/pipelines/named_entity_recognition_pr_dev), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt flow job can be completed fast enough.
 
-The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
-
-The optional third Github workflow [named_entity_recognition_post_prod_eval.yml](../.github/workflows/named_entity_recognition_post_prod_eval.yml) need to be executed manually after the deployment of the Prompt flow flow to production and collecting production logs (example log file - [production_log.jsonl](../named_entity_recognition/data/production_log.jsonl)). This workflow is used to evaluate the Prompt flow flow performance in production.
-
-More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
-
-- Another important step in this section is to enable workflows in the new repository just created after forking.
-
-![enable githhub workflows](images/enable-workflows.png)
+The second Jenkins pipelines [named_entity_recognition_ci_dev](../.jenkins/pipelines/named_entity_recognition_ci_dev) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
 
 ## Set up Jenkins Credentials for Azure
 
@@ -507,9 +499,7 @@ The `sample-request.json` file contains a single test data used for testing the 
 
 There are three examples in this template. While `named_entity_recognition` and `math_coding` have the same functionality, `web_classification` has multiple evaluation flows and datasets for the dev environment. This is a flow in general across all examples.
 
-![Githib workflow execution](./images/github-execution.png)
-
-This Github CI workflow contains the following steps:
+This Jenkins CI workflow contains the following steps:
 
 **Run Prompts in Flow**
 - Upload bulk run dataset
@@ -550,4 +540,4 @@ This Github CI workflow contains the following steps:
 
 The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
 
-The sample Prompt flow run & evaluation and GitHub workflows can be used as a starting point to adapt your own prompt engineering code and data.
+The sample Prompt flow run & evaluation and Jenkins pipelines can be used as a starting point to adapt your own prompt engineering code and data.
