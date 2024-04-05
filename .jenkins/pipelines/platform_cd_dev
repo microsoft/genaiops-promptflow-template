@@ -16,6 +16,7 @@ parameters {
             }
         }
 
+        // Installs requirements and registers the flow as a model in AzureML
         stage('Register flow as model in AzureML') {
             steps {
                 installRequirements('execute_job_requirements')
@@ -34,6 +35,7 @@ parameters {
             }
         }
 
+        // Export model_version and env_name_quoted as env var to be used in downstream jobs
         stage('Export model_version and env_name_quoted as environment variable') {
             steps {
                 script {
@@ -47,6 +49,7 @@ parameters {
             }
         }
 
+        // Based on the deployment type one of the stages below will deploy the model
         stage('Deploy to AML real-time online endpoint') {
             when {
                 expression {

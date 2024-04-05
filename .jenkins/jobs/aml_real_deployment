@@ -9,6 +9,7 @@ pipeline {
         string(name: 'run_id', description: 'run id of the flow to be deployed')
         }
 
+    // Install requirements and provision AML Managed Online Endpoint
     stages {
         stage('Provision AML Online Endpoint') {
             steps {
@@ -27,7 +28,8 @@ pipeline {
                 }
             }
         }
-
+        
+        // Assign Azure resource permissions to endpoint principal
         stage('Assign Azure resource permissions') {
             steps {
                 azureLogin()
@@ -61,6 +63,7 @@ pipeline {
             }
         }
 
+        // Provision AML Online Deployment for given model version and run id
         stage('Provision AML Online Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
@@ -78,6 +81,7 @@ pipeline {
             }
         }
 
+        // Test Online AML Deployment
         stage('Test AML Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {

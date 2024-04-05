@@ -20,6 +20,7 @@ pipeline {
             }
         }
 
+        // Install requirements for job execution and register the training data asset in AzureML
         stage('Register experiment data asset') {
             steps {
                 installRequirements('execute_job_requirements')
@@ -38,7 +39,7 @@ pipeline {
             }
         }
 
-
+        // Install requirements for build validation and execute prompt flow bulk run
         stage('Execute prompt flow bulk run') {
             steps {
                 installRequirements('build_validation_requirements')
@@ -58,7 +59,7 @@ pipeline {
             }
         }
 
-
+        // Register test data set in AzureML
         stage('Register evaluation data asset') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
@@ -75,6 +76,7 @@ pipeline {
             }
         }
 
+        // Export run_id as environment variable to be used in downstream jobs
         stage('Export run_id as environment variable') {
             steps {
                 script {
@@ -86,7 +88,7 @@ pipeline {
             }
         }
 
-
+        // Read last prompt flow run id and execute bulk run evaluations
         stage('Read prompt flow runs & Execute bulk run evaluations') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
@@ -107,6 +109,7 @@ pipeline {
             }
         }
 
+        // Save evaluation results CSV reports as artifacts
         stage('Archive CSV') {
             steps {
                 script {
@@ -115,6 +118,7 @@ pipeline {
             }
         }
 
+        // Execute Platform CD Pipeline to deploy flow to specified deployment type
         stage('Execute Platform CD Pipeline to deploy flow') {
             steps {
                 script {

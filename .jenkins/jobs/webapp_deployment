@@ -12,7 +12,8 @@ pipeline {
     }
 
     stages {
-
+    
+    // Create local promptflow connections
     stage('Create local promptflow connections') {
             steps {
                 installRequirements('execute_job_requirements')
@@ -30,6 +31,7 @@ pipeline {
             }
         }
 
+    // Create Docker image and push to Azure Container Registry
     stage('Create Docker Image') {
             steps {
                 installRequirements('build_validation_requirements')
@@ -48,6 +50,7 @@ pipeline {
             }
         }
 
+        // Deploy Docker image to Azure Webapp
         stage('Create Webapp') {
             steps {
                 withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {

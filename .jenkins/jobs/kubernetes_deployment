@@ -9,6 +9,7 @@ pipeline {
         string(name: 'run_id', description: 'run id of the flow to be deployed')
         }
 
+    // Install requirements and provision Kubernetes Online Endpoint
     stages {
         stage('Provision Kubernetes Online Endpoint') {
             steps {
@@ -28,6 +29,7 @@ pipeline {
             }
         }
 
+        // Assign Azure resource permissions to endpoint principal
         stage('Assign Azure resource permissions') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
@@ -60,6 +62,7 @@ pipeline {
             }
         }
 
+        // Provision Kubernetes Online Deployment
         stage('Provision Kubernetes Online Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
@@ -77,6 +80,7 @@ pipeline {
             }
         }
 
+        // Test Kubernetes Deployment
         stage('Test Kubernetes Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {

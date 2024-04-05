@@ -7,6 +7,7 @@ pipeline {
         choice(name: 'deployment_type', choices: ['aml', 'aks', 'webapp'],  description: 'Determine type of deployment')
     }
 
+    // Trigger the pipeline on push to development branch
     triggers {
         GenericTrigger(
                 genericVariables: [
@@ -24,6 +25,7 @@ pipeline {
          )
     }
 
+    // Trigger Platform CI Dev Pipeline
     stages {
         stage('Trigger Platform CI Dev Pipeline') {
             steps {

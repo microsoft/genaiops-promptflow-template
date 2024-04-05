@@ -534,7 +534,7 @@ This Jenkins CI workflow contains the following steps:
 
 2. Once pipeline execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
 
-     ![online endpoint test in pipeline](./images/pipeline-test.png)
+     ![online endpoint test in pipeline](./images/jenkins-pipeline-test.png)
 
 ## Moving to production
 

@@ -19,6 +19,7 @@ pipeline {
             }
         }
 
+        // Load dependencies, login to Azure and load subscription details
         stage('Load Dependencies') {
             steps {
                 installRequirements('build_validation_requirements')
@@ -43,6 +44,7 @@ pipeline {
             }
         }
 
+        // Execute unit tests and publish results
         stage('Execute Unit Tests') {
             steps {
                 withPythonEnv('/usr/bin/python3.9') {

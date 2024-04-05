@@ -11,6 +11,7 @@ pipeline {
         registry_details = credentials('DOCKER_IMAGE_REGISTRY')
     }
 
+    // Install requirements for job execution and build validation and create local promptflow connections
     stages {
         stage('Create local promptflow connections') {
             steps {
@@ -29,6 +30,7 @@ pipeline {
             }
         }
 
+        // Create Docker image and push to Azure Container Registry
         stage('Create Docker Image') {
                 steps {
                     installRequirements('build_validation_requirements')
@@ -47,6 +49,7 @@ pipeline {
                 }
             }
 
+        // Deploy Docker image to Azure Webapp
         stage('Create Webapp') {
             steps {
                 withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {

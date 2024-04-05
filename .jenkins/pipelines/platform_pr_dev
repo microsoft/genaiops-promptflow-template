@@ -15,6 +15,8 @@ pipeline {
                 }
             }
         }
+
+        // Run PR code validation
         stage('PR Code Validation') {
             steps {
                 script {
@@ -25,6 +27,7 @@ pipeline {
             }
         }
 
+        // Register PR data asset in AzureML
         stage('Register experiment data asset') {
             steps {
                 installRequirements('execute_job_requirements')

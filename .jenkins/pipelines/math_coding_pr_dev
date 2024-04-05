@@ -6,6 +6,7 @@ pipeline {
         string(name: 'flow_type', defaultValue: 'math_coding', description: 'The flow usecase to execute')
     }
     
+    // Trigger the pipeline on PR opened, reopened or synchronized
     triggers {
         GenericTrigger(
                 genericVariables: [
@@ -23,6 +24,7 @@ pipeline {
          )
     }
 
+    // Trigger Platform PR Dev Pipeline
     stages {
         stage('Trigger Platform PR Dev Pipeline') {
             steps {
