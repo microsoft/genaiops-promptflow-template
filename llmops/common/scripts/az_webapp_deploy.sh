@@ -10,6 +10,32 @@
 # private networks and/or use different means of provisioning
 # using Terraform, Bicep or any other way.
 
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --flow_to_execute)
+            flow_to_execute="$2"
+            shift 2
+            ;;
+        --deploy_environment)
+            deploy_environment="$2"
+            shift 2
+            ;;
+        --build_id)
+            build_id="$2"
+            shift 2
+            ;;
+        --CONNECTION_DETAILS)
+            CONNECTION_DETAILS="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
@@ -46,14 +72,14 @@ az appservice plan create --name $appserviceplan --resource-group $rgname --is-l
 
 # create/update Web App
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":$build_id
+    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":"$build_id"
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
     --settings WEBSITES_PORT=8080
 
 for name in "${connection_names[@]}"; do
-    api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+    api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     modified_name="${uppercase_name}_API_KEY"
