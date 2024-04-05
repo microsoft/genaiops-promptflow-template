@@ -65,7 +65,9 @@ Additionally, there is a llmops_config.json file that refers to important infras
 
 - The '.github' folder contains the Github workflows for the platform as well as the use-cases. This is bit different than Azure DevOps because all Github workflows should be within this single folder for execution.
 
-- The 'docs' folder contains documentation for step-by-step guides for both Azure DevOps and Github Workflow related configuration.
+- The '.jenkins' folder contains the Jenkins declarative pipelines for the platform as well as the use-cases and individual jobs.
+
+- The 'docs' folder contains documentation for step-by-step guides for both Azure DevOps, Github Workflow and Jenkins related configuration.
 
 - The 'llmops' folder contains all the code related to flow execution, evaluation and deployment.
 
@@ -75,6 +77,7 @@ Additionally, there is a llmops_config.json file that refers to important infras
 
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
 - Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
+- Full documentation on using this repo using Jenkins can be found [here](./docs/jenkins_how_to_setup.md)
 - Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
 
 # Deployment
