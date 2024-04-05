@@ -402,7 +402,7 @@ First, create a **+ New Item** of the type **Folder** and call it `jobs`. Inside
 
 | Pipeline Name |  Branch Specifier | Script Path |
 | ------------- | ----------- | ----------- |
-| aml_real_deployment    | `*/development*` |  `.jenkins/jobs/aml_real_deployment` |
+| aml_real_deployment    | `*/development` |  `.jenkins/jobs/aml_real_deployment` |
 | build_validation    | `*/<your-featurebranch>` | `.jenkins/jobs/build_validation` |
 | kubernetes_deployment   | `*/development` | `.jenkins/jobs/kubernetes_deployment` |
 | prepare_docker_image   | `*/development` | `.jenkins/jobs/prepare_docker_image` |
