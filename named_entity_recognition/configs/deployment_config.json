@@ -43,11 +43,11 @@
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "CONNECTION_NAMES": ["aoai"],
-            "REGISTRY_NAME": "acrunicredit",
-            "REGISTRY_RG_NAME": "UniCredit",
+            "REGISTRY_NAME": "acrllmopsdemo",
+            "REGISTRY_RG_NAME": "rg-llmops-demo",
             "APP_PLAN_NAME": "app-plan-llmops-demo",
-            "WEB_APP_NAME": "web-app-llmops-demo-pvt-env",
-            "WEB_APP_RG_NAME": "UniCredit",
+            "WEB_APP_NAME": "web-app-llmops-demo",
+            "WEB_APP_RG_NAME": "rg-llmops-demo",
             "WEB_APP_SKU": "B3",
             "USER_MANAGED_ID": "uami-webapp-llmops-demo"  
         }
