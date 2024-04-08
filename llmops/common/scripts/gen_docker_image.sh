@@ -3,8 +3,8 @@
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --flow_to_execute)
-            flow_to_execute="$2"
+        --use_case_base_path)
+            use_case_base_path="$2"
             shift 2
             ;;
         --deploy_environment)
@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Use the assigned variables as needed
-echo "Flow to execute: $flow_to_execute"
+echo "Flow to execute: $use_case_base_path"
 echo "Deploy environment: $deploy_environment"
 echo "Build ID: $build_id"
 
