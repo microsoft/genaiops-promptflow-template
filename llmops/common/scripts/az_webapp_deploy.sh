@@ -13,8 +13,8 @@
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --flow_to_execute)
-            flow_to_execute="$2"
+        --use_case_base_path)
+            use_case_base_path="$2"
             shift 2
             ;;
         --deploy_environment)
