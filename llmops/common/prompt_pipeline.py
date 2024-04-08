@@ -152,7 +152,7 @@ def prepare_and_execute(
         metrics = []
 
         if len(flow_detail.all_variants) != 0 and not variants_selector.defaults_only:
-            logger.info("Start processing %d variants", len(flow_detail.all_variants))
+            logger.info(f"Start processing {len(flow_detail.all_variants)} variants")
             for variant in flow_detail.all_variants:
                 for variant_id, node_id in variant.items():
                     if not variants_selector.is_variant_enabled(node_id, variant_id):
@@ -194,7 +194,7 @@ def prepare_and_execute(
                         )
                         run = Run(
                             flow=flow_detail.flow_path,
-                            data=dataset.get_remote_name(pf.ml_client),
+                            data=dataset.get_remote_source(pf.ml_client),
                             variant=variant_string,
                             name=run_name,
                             display_name=run_name,
@@ -249,7 +249,7 @@ def prepare_and_execute(
             )
             run = Run(
                 flow=flow_detail.flow_path,
-                data=dataset.get_remote_name(pf.ml_client),
+                data=dataset.get_remote_source(pf.ml_client),
                 name=run_name,
                 display_name=run_name,
                 environment_variables=env_vars,

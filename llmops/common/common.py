@@ -12,6 +12,8 @@ def wait_job_finish(job: Run, logger: logging.Logger):
 
     :param job: The prompt flow run object.
     :type job: Run
+    :param logger: The used logger.
+    :type logger: logging.Logger
     :raises Exception: If job not finished after 3 attempts with 5 second wait.
     """
     max_tries = 3

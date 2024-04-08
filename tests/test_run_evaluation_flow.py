@@ -50,20 +50,21 @@ def test_run_multiple_evaluation_flows():
 
         # Mock the standard run
         run_names = ["run_id_0", "run_id_1"]
-        standard_run_instance_0 = Mock(data=standard_run_source_0)
+        standard_run_instance_0 = Mock()
+        standard_run_instance_0.data = standard_run_source_0
         standard_run_instance_0.name = run_names[0]
         standard_run_instance_0.tags = []
         standard_run_instance_0.properties.get.return_value = None
-        standard_run_instance_1 = Mock(data=standard_run_source_1)
+        standard_run_instance_1 = Mock()
+        standard_run_instance_1.data = standard_run_source_1
         standard_run_instance_1.name = run_names[1]
         standard_run_instance_1.tags = {}
         standard_run_instance_1.properties.get.return_value = None
-        run_dict = {
+
+        pf_client_instance.runs.get.side_effect = lambda run_id: {
             run_names[0]: standard_run_instance_0,
             run_names[1]: standard_run_instance_1,
-        }
-
-        pf_client_instance.runs.get.side_effect = lambda run_id: run_dict[run_id]
+        }.get(run_id)
 
         # Mock the run details and metrics
         pf_client_instance.get_metrics.return_value = {}
@@ -79,8 +80,8 @@ def test_run_multiple_evaluation_flows():
         created_runs = pf_client_instance.runs.create_or_update
 
         # Expect 4 created runs
-        # Two for the "eval1" evaluator, one using ds1_source and one using for ds3_source
-        # Two for the "eval2" evaluator, one using ds4_source and one using for ds2_source
+        # Two for the "eval1" evaluator, one using ds1_source and one using ds3_source
+        # Two for the "eval2" evaluator, one using ds4_source and one using ds2_source
 
         # Expected run arguments
         expected_run = [
@@ -138,12 +139,14 @@ def test_run_single_evaluation_flow():
 
         # Mock the standard run
         run_names = ["run_id_0"]
-        standard_run_instance_0 = Mock(data=standard_run_source_0)
+        standard_run_instance_0 = Mock()
+        standard_run_instance_0.data = standard_run_source_0
         standard_run_instance_0.name = run_names[0]
         standard_run_instance_0.properties.get.return_value = None
-        run_dict = {run_names[0]: standard_run_instance_0}
 
-        pf_client_instance.runs.get.side_effect = lambda run_id: run_dict[run_id]
+        pf_client_instance.runs.get.side_effect = lambda run_id: {
+            run_names[0]: standard_run_instance_0
+        }.get(run_id)
 
         # Mock the run details and metrics
         pf_client_instance.get_metrics.return_value = {}

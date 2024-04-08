@@ -74,9 +74,6 @@ def create_kubernetes_deployment(
     )
 
     model = ml_client.models.get(model_name, model_version)
-    deployment_base_image = (
-        "mcr.microsoft.com/azureml/promptflow/promptflow-runtime:latest"
-    )
 
     config_file = open(real_config)
     endpoint_config = json.load(config_file)
