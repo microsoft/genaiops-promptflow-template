@@ -24,7 +24,7 @@ steps:
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --base_path ${{ parameters.use_case_base_path }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 
 - task: AzureCLI@2
@@ -83,7 +83,7 @@ steps:
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --base_path ${{ parameters.use_case_base_path }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 - template: execute_python_code.yml
   parameters:
@@ -92,7 +92,7 @@ steps:
       python -m llmops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --base_path ${{ parameters.use_case_base_path }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 
 

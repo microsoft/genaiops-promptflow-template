@@ -27,7 +27,7 @@ def test_create_provision_endpoint():
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
 
-        # Create the compute
+        # Create the endpoint
         create_endpoint(env_name, str(RESOURCE_PATH))
 
         # Assert that ml_client.online_endpoints.begin_create_or_update is called once

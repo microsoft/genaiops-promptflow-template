@@ -99,7 +99,7 @@ def prepare_and_execute(
 
         # Iterate over standard flow runs
         for flow_run in run_ids:
-            logger.info(f"Preparing run '{flow_run}'")
+            logger.info(f"Preparing evaluation of run '{flow_run}'")
 
             # Get the evaluator mapping of the dataset used in the standard run
             # Skip the evaluation of this run if not found
@@ -112,7 +112,9 @@ def prepare_and_execute(
             run_data_name = run_data_id.split(":")[1]
             run_dataset = experiment.get_dataset(run_data_name)
             if not run_dataset:
-                raise ValueError(f"Run {flow_run} dataset {run_data_name} not found.")
+                raise ValueError(
+                    f"Run {flow_run} dataset {run_data_name} not found in experiment description."
+                )
             dataset_mapping_list = evaluator.find_dataset_with_reference(
                 run_dataset.name
             )
@@ -121,11 +123,11 @@ def prepare_and_execute(
 
             for dataset_mapping in dataset_mapping_list:
                 logger.info(
-                    f"Preparing run {flow_run} using dataset {dataset_mapping.dataset.name}"
+                    f"Preparing evaluation of run {flow_run} using dataset {dataset_mapping.dataset.name}"
                 )
                 column_mapping = dataset_mapping.mappings
                 dataset = dataset_mapping.dataset
-                data_id = dataset.get_remote_name(pf.ml_client)
+                data_id = dataset.get_remote_source(pf.ml_client)
 
                 evaluator_executed = True
                 # Create run object

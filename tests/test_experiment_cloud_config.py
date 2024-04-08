@@ -91,7 +91,7 @@ def test_experiment_cloud_config(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("RESOURCE_GROUP_NAME", rg_name)
     monkeypatch.setenv("WORKSPACE_NAME", ws_name)
     monkeypatch.setenv("ENV_NAME", env_name)
-    config = ExperimentCloudConfig(subscription_id, rg_name, ws_name, env_name)
+    config = ExperimentCloudConfig()
     assert config.subscription_id == subscription_id
     assert config.resource_group_name == rg_name
     assert config.workspace_name == ws_name

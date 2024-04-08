@@ -18,7 +18,9 @@ class Dataset:
     :param source: Azure ML name and version (example: azureml:<dataset_name_in_azureml>:<version>) or path to file.
     :type source: str
     :param description: Description of the Azure ML dataset (only required if source is a path to file).
-    :type source: str
+    :type description: str
+    :param reference: Reference to a related dataset (for linking evaluation datasets to standard datasets).
+    :type reference: str
     """
 
     def __init__(
@@ -32,7 +34,7 @@ class Dataset:
         self.source = source
         self.description = description
         self.reference = reference
-        self.remote_source = self.source.startswith("azureml:")
+        self._is_remote_source = self.source.startswith("azureml:")
 
     def with_mappings(self, mappings: dict[str, str]) -> "MappedDataset":
         return MappedDataset(mappings, self)
@@ -40,8 +42,8 @@ class Dataset:
     def is_eval(self):
         return self.reference is not None
 
-    def get_remote_name(self, ml_client: MLClient):
-        if self.remote_source:
+    def get_remote_source(self, ml_client: MLClient):
+        if self._is_remote_source:
             parts = self.source.split(":")
             name = parts[1]
             version = parts[2]
@@ -62,7 +64,7 @@ class Dataset:
         return f"azureml:{self.name}:{ds.version}"
 
     def get_local_source(self, base_path: Optional[str] = None):
-        if self.remote_source:
+        if self._is_remote_source:
             return None
         safe_base_path = base_path or ""
         data_path = os.path.join(safe_base_path, self.source)

@@ -30,7 +30,7 @@ parameters:
 stages:
   - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
     parameters:
-      RESOURCE_GROUP_NAME: $(rg_name)
-      WORKSPACE_NAME: $(ws_name)
+      RESOURCE_GROUP_NAME: $(rg_name) # Expected in llmops_platform_dev_vg
+      WORKSPACE_NAME: $(ws_name)      # Expected in llmops_platform_dev_vg
       exec_environment: ${{ parameters.env_name }}
       use_case_base_path: ${{ parameters.use_case_base_path }}

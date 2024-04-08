@@ -47,7 +47,7 @@ def test_create_kubernetes_deployment():
         # Mock model get
         ml_client_instance.models.get.return_value = Mock()
 
-        # Mock endpoint update
+        # Mock deployment list
         mock_deployment = Mock()
         mock_old_deployment = Mock()
         mock_deployment.name = deployment_name
@@ -57,7 +57,7 @@ def test_create_kubernetes_deployment():
             mock_old_deployment,
         ]
 
-        # Create the compute
+        # Create the deployment
         create_kubernetes_deployment(
             model_version, base_path=str(RESOURCE_PATH), env_name="dev"
         )

@@ -23,4 +23,4 @@ runs:
 
     - name: create webapp
       shell: bash
-      run: USE_CASE_BASE_PATH=${{ inputs.USE_CASE_BASE_PATH }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/az_webapp_deploy.sh 
+      run: use_case_base_path=${{ inputs.USE_CASE_BASE_PATH }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/az_webapp_deploy.sh

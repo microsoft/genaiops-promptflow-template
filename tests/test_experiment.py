@@ -71,8 +71,7 @@ def test_create_datasets_and_default_mappings():
     assert not datasets[r_name].is_eval()
     assert datasets[r_name].get_local_source() == os.path.join("data", r_source)
 
-    # Test get_remote_name
-
+    # Test get_remote_source
     g_latest_remote_version = "7"
 
     def mock_data_get(name: str, version: str = None, label: str = None):
@@ -91,8 +90,8 @@ def test_create_datasets_and_default_mappings():
     mock_ml_client = Mock()
     mock_ml_client.data.get.side_effect = mock_data_get
 
-    assert datasets[g_name].get_remote_name(mock_ml_client) == g_source
-    assert datasets[r_name].get_remote_name(mock_ml_client) == f"azureml:{r_name}:7"
+    assert datasets[g_name].get_remote_source(mock_ml_client) == g_source
+    assert datasets[r_name].get_remote_source(mock_ml_client) == f"azureml:{r_name}:7"
 
 
 @pytest.mark.parametrize(
