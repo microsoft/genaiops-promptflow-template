@@ -39,14 +39,12 @@ echo "Build ID: $build_id"
 # This script generates docker image for Prompt flow deployment
 set -e # fail on error
 
-# read values from llmops_config.json related to given environment
-config_path="./$flow_to_execute/llmops_config.json"
-env_name=$deploy_environment
-selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+flow_to_execute=named_entity_recognition
+# read values from experiment.yaml related to given environment
+config_path="./$flow_to_execute/experiment.yaml"
 
-if [[ -n "$selected_object" ]]; then
-    STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
-        
+if [[ -e "$config_path" ]]; then
+    STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
     pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
 
     cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
@@ -94,6 +92,11 @@ if [[ -n "$selected_object" ]]; then
     docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
     docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
 
-    else
-        echo "Object in config file not found"
-    fi
+
+    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
+    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+        
+else
+    echo $config_path "not found"
+fi
