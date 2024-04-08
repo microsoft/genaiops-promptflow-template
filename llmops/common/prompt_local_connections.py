@@ -2,18 +2,11 @@
 This module evaluates bulk-runs using evaluation flows.
 
 Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---build_id: The unique identifier for build execution.
-This argument is required to identify the specific build execution.
 --env_name: The environment name for execution/deployment.
 This argument is required to specify the environment (dev, test, prod)
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---run_id: The bulk run IDs.
-This argument is required to specify the bulk run IDs for execution.
---flow_to_execute: The name of the flow use case.
+--base_path: The base path of the flow use case.
 This argument is required to specify the name of the flow for execution.
+--connection_details: JSON string describing the details of local pf connection.
 """
 
 import argparse
