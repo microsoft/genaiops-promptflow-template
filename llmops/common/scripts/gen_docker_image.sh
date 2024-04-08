@@ -73,9 +73,9 @@ if [[ -e "$config_path" ]]; then
     sleep 15
 
     docker ps -a
-        
-    chmod +x "./$use_case_base_path/sample-request.json" 
-        
+
+    chmod +x "./$use_case_base_path/sample-request.json"
+
     file_contents=$(<./$use_case_base_path/sample-request.json)
     echo "$file_contents"
 
@@ -88,14 +88,9 @@ if [[ -e "$config_path" ]]; then
     registry_password=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_password')
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
+    docker tag localpf "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
+    docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
 
-
-    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-    docker tag localpf "$registry_server"/"$use_case_base_path"_"$deploy_environment":$build_id
-    docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":$build_id
-        
 else
     echo $config_path "not found"
 fi
