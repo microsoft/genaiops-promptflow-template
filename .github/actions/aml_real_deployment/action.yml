@@ -52,13 +52,13 @@ runs:
     - name: Assign Azure resource permissions
       shell: bash
       run: |
-        KEY_VAULT_NAME = ${{ inputs.KEY_VAULT_NAME }}
+        KEY_VAULT_NAME=${{ inputs.KEY_VAULT_NAME }}
         echo $KEY_VAULT_NAME
 
-        RESOURCE_GROUP_NAME = ${{ inputs.RESOURCE_GROUP_NAME }}
+        RESOURCE_GROUP_NAME=${{ inputs.RESOURCE_GROUP_NAME }}
         echo $RESOURCE_GROUP_NAME
 
-        WORKSPACE_NAME = ${{ inputs.WORKSPACE_NAME }}
+        WORKSPACE_NAME=${{ inputs.WORKSPACE_NAME }}
         echo $WORKSPACE_NAME
 
         az role assignment create --assignee $ENDPOINT_PRINCIPAL --role "AzureML Data Scientist" --scope "/subscriptions/${{ inputs.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"

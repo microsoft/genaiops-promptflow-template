@@ -2,7 +2,7 @@ parameters:
  - name: exec_environment
    displayName: "Execution Environment"
    default: "dev"
- - name: flow_to_execute
+ - name: use_case_base_path
    displayName: "type of model to execute"
  - name: deployment_type
    displayName: "determine type of deployment - aks, aml, docker, webapp"
@@ -29,8 +29,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "training_data" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --env_name ${{ parameters.exec_environment }}
 
         #=====================================
@@ -51,8 +50,7 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
                 --env_name ${{ parameters.exec_environment }} \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "training_data" \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --output_file run_id.txt
 
         #=====================================
@@ -83,8 +81,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "test_data" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --env_name ${{ parameters.exec_environment }}
 
         #=====================================
@@ -104,8 +101,7 @@ stages:
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --build_id $(BUILD.BUILDID) \
                 --env_name "${{ parameters.exec_environment }}" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "test_data" \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --run_id "$(read_run_id.RUN_NAME)"
 
         #=====================================
@@ -174,7 +170,7 @@ stages:
             script_parameter: |
               python -m llmops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
                 --env_name ${{ parameters.exec_environment }}
@@ -205,7 +201,7 @@ stages:
           - template: templates/kubernetes_deployment.yml  
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              flow_to_execute: ${{ parameters.flow_to_execute }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
@@ -218,7 +214,7 @@ stages:
           - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              flow_to_execute: ${{ parameters.flow_to_execute }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
               KEY_VAULT_NAME: $(KEYVAULT_NAME)
@@ -231,7 +227,7 @@ stages:
         - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
           - template: templates/webapp_deployment.yml 
             parameters:
-              FLOW_TO_EXECUTE: ${{ parameters.flow_to_execute }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}

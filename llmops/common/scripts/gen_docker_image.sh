@@ -39,22 +39,21 @@ echo "Build ID: $build_id"
 # This script generates docker image for Prompt flow deployment
 set -e # fail on error
 
-flow_to_execute=named_entity_recognition
 # read values from experiment.yaml related to given environment
-config_path="./$flow_to_execute/experiment.yaml"
+config_path="./$use_case_base_path/experiment.yaml"
 
 if [[ -e "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
-    pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
+    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
-    cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
+    cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
 
     # docker build the prompt flow based image
-    docker build -t localpf "./$flow_to_execute/docker" --no-cache
+    docker build -t localpf "./$use_case_base_path/docker" --no-cache
         
     docker images
 
-    deploy_config="./$flow_to_execute/configs/deployment_config.json"
+    deploy_config="./$use_case_base_path/configs/deployment_config.json"
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
@@ -74,14 +73,14 @@ if [[ -e "$config_path" ]]; then
     sleep 15
 
     docker ps -a
-
-    chmod +x "./$flow_to_execute/sample-request.json"
-
-    file_contents=$(<./$flow_to_execute/sample-request.json)
+        
+    chmod +x "./$use_case_base_path/sample-request.json" 
+        
+    file_contents=$(<./$use_case_base_path/sample-request.json)
     echo "$file_contents"
 
     python -m llmops.common.deployment.test_local_flow \
-            --flow_to_execute $flow_to_execute
+            --base_path $use_case_base_path
 
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
@@ -94,8 +93,8 @@ if [[ -e "$config_path" ]]; then
 
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
+    docker tag localpf "$registry_server"/"$use_case_base_path"_"$deploy_environment":$build_id
+    docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":$build_id
         
 else
     echo $config_path "not found"

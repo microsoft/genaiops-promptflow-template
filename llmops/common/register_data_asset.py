@@ -4,10 +4,9 @@ This module executes experiment jobs/bulk-runs using standard flows.
 Args:
 --subscription_id: The Azure subscription ID.
 This argument is required for identifying the Azure subscription.
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---flow_to_execute: The name of the flow use case.
-This argument is required to specify the name of the flow for execution.
+--file: The name of the experiment file. Default is 'experiment.yaml'.
+--base_path: Base path of the use case. Where flows, data,
+and experiment.yaml are expected to be found.
 --env_name: The environment name for execution and deployment.
 This argument is required to specify the environment (dev, test, prod)
 for execution or deployment.

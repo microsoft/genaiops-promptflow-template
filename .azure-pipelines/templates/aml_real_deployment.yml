@@ -1,7 +1,7 @@
 parameters:
 - name: SUBSCRIPTION_ID
   type: string
-- name: flow_to_execute
+- name: USE_CASE_BASE_PATH
   type: string
 - name: MODEL_VERSION
   type: string
@@ -26,7 +26,7 @@ steps:
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.use_case_base_path }}
 
 
 - task: AzureCLI@2
@@ -54,13 +54,13 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      KEY_VAULT_NAME = ${{ parameters.KEY_VAULT_NAME }}
+      KEY_VAULT_NAME=${{ parameters.KEY_VAULT_NAME }}
       echo $KEY_VAULT_NAME
 
-      RESOURCE_GROUP_NAME = ${{ parameters.RESOURCE_GROUP_NAME }}
+      RESOURCE_GROUP_NAME=${{ parameters.RESOURCE_GROUP_NAME }}
       echo $RESOURCE_GROUP_NAME
 
-      WORKSPACE_NAME = ${{ parameters.WORKSPACE_NAME }}
+      WORKSPACE_NAME=${{ parameters.WORKSPACE_NAME }}
       echo $WORKSPACE_NAME
 
       echo "assigning permissions to Principal to AzureML workspace.."
@@ -85,7 +85,7 @@ steps:
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.use_case_base_path }}
 
 - template: execute_python_code.yml
   parameters:
@@ -94,7 +94,7 @@ steps:
       python -m llmops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.use_case_base_path }}
 
 
 
