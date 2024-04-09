@@ -5,11 +5,13 @@ pipeline {
     parameters {
         string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment')
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition')
+        string(name: 'resource_group_name', description: 'Azure Resource Group Name')
+        string(name: 'workspace_name', description: 'AzureML Workspace Name')
     }
     
     environment {
-        RESOURCE_GROUP_NAME = "${RESOURCE_GROUP_NAME}"
-        WORKSPACE_NAME = "${WORKSPACE_NAME}"
+        RESOURCE_GROUP_NAME = "${params.resource_group_name}"
+        WORKSPACE_NAME = "${params.workspace_name}"
     }
 
     stages {
