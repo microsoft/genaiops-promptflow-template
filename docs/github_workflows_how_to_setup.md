@@ -243,9 +243,9 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 ## Set up GitHub variables for each environment
 
-There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values environment specific, so we will utilize the `Environments` feature in GitHub. 
+There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. 
 
-From your GitHub project, select **Settings** -> **Environments** and select "New environment" and call it `dev`
+From your GitHub project, select **Settings** -> **Environments**, select "New environment" and call it `dev`
 ![Screenshot of GitHub environments.](images/github-environments-new-env.png)
 
 Add a new variable for each of `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` with the corresponding values from the `dev` environment. 
