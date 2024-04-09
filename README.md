@@ -58,7 +58,7 @@ Each use case (set of Prompt flow standard and evaluation flows) should follow t
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 
-Additionally, there is a `experiment.yaml` file that configures the use case (see file [description](./docs/the_experiment_file.md) and [specs](./docs/experiment.yaml) for more details). There is also a sample-request.json file containing test data for testing endpoints after deployment.
+Additionally, there is a `experiment.yaml` file that configures the use-case (see file [description](./docs/the_experiment_file.md) and [specs](./docs/experiment.yaml) for more details). There is also a sample-request.json file containing test data for testing endpoints after deployment.
 
 - The '.azure-pipelines' folder contains the common Azure DevOps pipelines for the platform and any changes to them will impact execution of all the flows.
 
@@ -78,7 +78,7 @@ Additionally, there is a `experiment.yaml` file that configures the use case (se
 - Full documentation on using this repo using Github Workflows can be found [here](./docs/github_workflows_how_to_setup.md)
 - Full documentation on using this repo using Jenkins can be found [here](./docs/jenkins_how_to_setup.md)
 - Documentation about adding a new flow is available [here](./docs/how_to_onboard_new_flows.md)
-- New experiment.yaml configuration [here](./docs/experiment.yaml)
+- New experiment.yaml configuration [here](./docs/the_experiment_file.md)
 
 # Deployment
 
