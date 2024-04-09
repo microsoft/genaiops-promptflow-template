@@ -91,5 +91,5 @@ evaluators:
       flow_input_1_name: "${run.outputs.<output_name>}"
 
 # <runtime>
-# Defines the name of the Prompt Flow runtime to be used. If not specified, automatic runtime & serverless compute is used.
+# Defines the name of the Prompt Flow runtime to be used. If not specified, automatic runtime and serverless compute is used.
 runtime: <runtime_name> 
