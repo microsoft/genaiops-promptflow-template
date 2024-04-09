@@ -127,7 +127,7 @@ pipeline {
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
-                        string(name: 'run_id', value: "${run_id}")
+                        string(name: 'run_id', value: "${run_id}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}")
