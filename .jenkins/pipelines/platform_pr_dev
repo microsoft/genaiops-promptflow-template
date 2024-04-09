@@ -10,8 +10,8 @@ pipeline {
     }
     
     environment {
-        RESOURCE_GROUP_NAME = "${params.rg_name}"
-        WORKSPACE_NAME = "${params.ws_name}"
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
     }
 
     stages {
