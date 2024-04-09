@@ -4,14 +4,17 @@ pipeline {
 
     environment {
         AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
-        RESOURCE_GROUP_NAME = "${RESOURCE_GROUP_NAME}"
-        WORKSPACE_NAME = "${WORKSPACE_NAME}"
+        RESOURCE_GROUP_NAME = "${params.resource_group_name}"
+        WORKSPACE_NAME = "${params.workspace_name}"
     }
 
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
         string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, webapp')
+        string(name: 'resource_group_name', description: 'Azure Resource Group Name')
+        string(name: 'workspace_name', description: 'AzureML Workspace Name')
+        string(name: 'key_vault_name', description: 'Azure Key Vault Name')
     }
 
     stages {
@@ -125,6 +128,9 @@ pipeline {
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
                         string(name: 'run_id', value: "${run_id}")
+                        string(name: 'resource_group_name', value: "${params.resource_group_name}"),
+                        string(name: 'workspace_name', value: "${params.workspace_name}"),
+                        string(name: 'key_vault_name', value: "${params.key_vault_name}")
                     ]
                 }
             }

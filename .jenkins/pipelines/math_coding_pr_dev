@@ -31,7 +31,9 @@ pipeline {
                 script {
                     build job: 'platform_pr_dev', parameters: [
                         string(name: 'env_name', value: "${params.env_name}"),
-                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'resource_group_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'workspace_name', value: "${WORKSPACE_NAME_dev}")
                     ]
                 }
             }
