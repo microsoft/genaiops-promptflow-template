@@ -4,8 +4,8 @@ pipeline {
 
     environment {
         AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
-        RESOURCE_GROUP_NAME = "${params.rg_name}"
-        WORKSPACE_NAME = "${params.ws_name}"
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
     }
 
     parameters {
