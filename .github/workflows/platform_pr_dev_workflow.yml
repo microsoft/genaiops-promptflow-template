@@ -28,6 +28,7 @@ jobs:
   pr_flow_validation:
     runs-on: ubuntu-latest
     needs: pr_code_validation
+    environment: ${{ inputs.env_name }}
     env:
       RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
       WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}

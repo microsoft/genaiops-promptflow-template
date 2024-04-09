@@ -45,6 +45,8 @@ jobs:
   flow-deployment:
     name: prompt flow deployment job
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env_name }}
     env:
       RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
       WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
