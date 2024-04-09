@@ -22,6 +22,22 @@ but will be used to save the run IDs to file if specified.
 If provided, the outputs will be saved in files.
 --save_metric: Flag to save the metrics in files.
 If provided, the metrics will be saved in files.
+
+Example for running the script with variants (using web_classification experiment):
+
+# Run only the default variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants defaults
+
+# Run all variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants all
+OR
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants *
+
+# Run specific variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants variant_0,variant_1
+OR
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants summarize_text_content.variant_0,summarize_text_content.variant_1
+
 """
 
 import argparse
