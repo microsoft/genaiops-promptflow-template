@@ -34,9 +34,9 @@ pipeline {
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
-                        string(name: 'resource_group_name', value: "${RESOURCE_GROUP_NAME_dev}"),
-                        string(name: 'workspace_name', value: "${WORKSPACE_NAME_dev}"),
-                        string(name: 'key_vault_name', value: "${KEY_VAULT_NAME_dev}")
+                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}"),
+                        string(name: 'kv_name', value: "${KEY_VAULT_NAME_dev}")
                     ]
                 }
             }
