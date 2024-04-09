@@ -1,12 +1,14 @@
+# <name>
 # Defines the experiment name which is: 
 #   1. Used as the experiment name of Azure ML jobs.
 #   2. Used as the name of the model when it is registered in Azure ML.
 
 name: <experiment_name>
 
+# <flow>
 # Defines the standard flow of the experiment. 
 # If the variable is not set, the experiment name is used. 
-# If it is set, it is the path to the folder containing the Prompt Flow files
+# If it is set, it should be the path to the folder containing the Prompt Flow files
 # (including flow.dag.yaml).
 #
 # Note: It is recommended to keep all flow folders (standard and evaluators) in a 
@@ -17,6 +19,7 @@ name: <experiment_name>
 
 flow: <flow_name>
 
+# <datasets>
 # Defines the datasets used for the standard flow in this experiment.
 # Each dataset listed will be used to run the standard flow; it can also be used
 # to run one or more of the evaluation flows (see below). 
@@ -24,7 +27,7 @@ flow: <flow_name>
 #
 # Properties of a dataset. 
 # - name: the unique name used to reference the dataset.
-#   source: reference to an existing dataset in Azure ML <azureml:$name:$version> or path to local dataset
+#   source: reference to an existing dataset in Azure ML <azureml:$name:$version> or path to local dataset.
 #   description: description used for the dataset when uploaded to Azure ML. Optional, only 
 #         used when source is set to a path of a local file.
 #   mappings: the mapping from the input of the standard Prompt Flow flow, to the column
@@ -42,6 +45,7 @@ datasets:
   mappings:
     <flow_input_name>: "${data.<column_name>}"
 
+# <evaluators>
 # Defines the evaluators used in the experiment. Each evaluator is a Prompt Flow flow. 
 # Each evaluator requires a dataset. The dataset must already be defined above (meaning 
 # it was used to run the standard flow) OR it must contain a reference to a dataset from
@@ -73,15 +77,19 @@ datasets:
 evaluators:
 - name: <evaluator_0_name>
   datasets:
-  - name: <dataset_0_name>
+  - name: <dataset_0_name> # Note that "dataset_0_name" was already defined in the "datasets" block
     mappings:
       flow_input_0_name: "${data.<column_name>}"
       flow_input_1_name: "${run.outputs.<output_name>}"
 - name: <evaluator_1_name>
   datasets:
-  - name: <dataset_x_name>
+  - name: <dataset_x_name> # Note that "dataset_x_name" is a new dataset
     source: azureml:<dataset_name>:<dataset_version> # or ./path/to/data.jsonl
-    reference: <dataset_0_name>
+    reference: <dataset_0_name> # Note that new datasets in the evaluation block must reference an already existing dataset
     mappings:
       flow_input_0_name: "${data.<column_name>}"
       flow_input_1_name: "${run.outputs.<output_name>}"
+
+# <runtime>
+# Defines the name of the Prompt Flow runtime to be used. If not specified, automatic runtime & serverless compute is used.
+runtime: <runtime_name> 
