@@ -7,11 +7,14 @@ pipeline {
         string(name: 'use_case_base_path', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
         string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'aml')
         string(name: 'run_id', description: 'run id of the flow to be deployed')
+        string(name: 'resource_group_name', description: 'Azure Resource Group Name')
+        string(name: 'workspace_name', description: 'AzureML Workspace Name')
+        string(name: 'key_vault_name', description: 'Azure Key Vault Name')
     }
 
     environment {
-        RESOURCE_GROUP_NAME = "${RESOURCE_GROUP_NAME}"
-        WORKSPACE_NAME = "${WORKSPACE_NAME}"
+        RESOURCE_GROUP_NAME = "${params.resource_group_name}"
+        WORKSPACE_NAME = "${params.workspace_name}"
     }
 
     stages {
@@ -68,9 +71,9 @@ pipeline {
                         string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}"),
-                        string(name: 'workspace_name', value: "${WORKSPACE_NAME}"),
-                        string(name: 'resource_group_name', value: "${RESOURCE_GROUP_NAME}"),
-                        string(name: 'key_vault_name', value: "${KEY_VAULT_NAME}")
+                        string(name: 'workspace_name', value: "${params.workspace_name}"),
+                        string(name: 'resource_group_name', value: "${params.resource_group_name}"),
+                        string(name: 'key_vault_name', value: "${params.key_vault_name}")
                     ]
                 }
             }
@@ -89,9 +92,9 @@ pipeline {
                         string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
                         string(name: 'run_id', value: "${params.run_id}"),
-                        string(name: 'workspace_name', value: "${WORKSPACE_NAME}"),
-                        string(name: 'resource_group_name', value: "${RESOURCE_GROUP_NAME}"),
-                        string(name: 'key_vault_name', value: "${KEY_VAULT_NAME}")
+                        string(name: 'workspace_name', value: "${params.workspace_name}"),
+                        string(name: 'resource_group_name', value: "${params.resource_group_name}"),
+                        string(name: 'key_vault_name', value: "${params.key_vault_name}")
                     ]
                 }
             }
