@@ -32,6 +32,8 @@ jobs:
   flow-experiment-and_evaluation:
     name: prompt flow experiment and evaluation job
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env_name }}
     env:
       RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
       WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
