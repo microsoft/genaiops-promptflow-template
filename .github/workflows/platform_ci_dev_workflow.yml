@@ -58,7 +58,7 @@ jobs:
 
       #=====================================
       # Registers experiment dataset in Azure ML as Data Asset
-      # Reads appropriate field values from data_config.json based on environment and data purpose
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       #=====================================      
       - name: Register experiment data asset
         uses: ./.github/actions/execute_script
@@ -75,7 +75,7 @@ jobs:
       # Generates Reports for each RUN as well as consolidated one
       # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
       # Loads appropriate experiment data from Azure ML data asset
-      # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       # Prompt Flow connections should pre-exist 
       # used automatic (serverless) runtime by default
       # writes the RUN ID in run_id.txt file. Used in next step
@@ -107,7 +107,7 @@ jobs:
 
       #=====================================
       # Registers evaluation dataset in Azure ML as Data Asset
-      # Reads appropriate field values from data_config.json based on environment and data purpose
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       #=====================================
       - name: Register evaluation data asset
         uses: ./.github/actions/execute_script
@@ -124,7 +124,7 @@ jobs:
       # Generates Reports for each RUN as well as consolidated one
       # Uses each RUN ID as input to run evaluation against
       # Loads appropriate evaluation data from Azure ML data asset
-      # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       # Prompt Flow connections should pre-exist 
       # used automatic (serverless) runtime by default
       #=====================================
