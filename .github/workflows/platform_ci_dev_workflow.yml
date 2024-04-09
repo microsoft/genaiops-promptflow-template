@@ -53,6 +53,7 @@ jobs:
         id: subscription_details
         shell: bash
         run: |
+          env
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
