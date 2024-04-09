@@ -7,15 +7,15 @@ pipeline {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'flow type to be registered and deployed')
         string(name: 'model_version', description: 'flow version in registry to be deployed')
         string(name: 'run_id', description: 'run id of the flow to be deployed')
-        string(name: 'key_vault_name', description: 'Key Vault name')
-        string(name: 'workspace_name', description: 'Workspace name')
-        string(name: 'resource_group_name', description: 'Resource group name')
+        string(name: 'kv_name', description: 'Key Vault name')
+        string(name: 'ws_name', description: 'Workspace name')
+        string(name: 'rg_name', description: 'Resource group name')
     }
 
     environment {
-        RESOURCE_GROUP_NAME = "${resource_group_name}"
-        WORKSPACE_NAME = "${workspace_name}"
-        KEY_VAULT_NAME = "${key_vault_name}"
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
+        KEY_VAULT_NAME = "${kv_name}"
     }
 
     // Install requirements and provision AML Managed Online Endpoint
