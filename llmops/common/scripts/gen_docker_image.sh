@@ -1,8 +1,42 @@
 #!/bin/bash
 
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --flow_to_execute)
+            flow_to_execute="$2"
+            shift 2
+            ;;
+        --deploy_environment)
+            deploy_environment="$2"
+            shift 2
+            ;;
+        --build_id)
+            build_id="$2"
+            shift 2
+            ;;
+        --REGISTRY_DETAILS)
+            REGISTRY_DETAILS="$2"
+            shift 2
+            ;;
+        --CONNECTION_DETAILS)
+            CONNECTION_DETAILS="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Use the assigned variables as needed
+echo "Flow to execute: $flow_to_execute"
+echo "Deploy environment: $deploy_environment"
+echo "Build ID: $build_id"
+
 # Description: 
 # This script generates docker image for Prompt flow deployment
-
 set -e # fail on error
 
 # read values from llmops_config.json related to given environment
@@ -26,11 +60,10 @@ if [[ -n "$selected_object" ]]; then
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
-    echo $connection_names
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo $CONNECTION_DETAILS | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+        api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
@@ -43,27 +76,24 @@ if [[ -n "$selected_object" ]]; then
     sleep 15
 
     docker ps -a
-        
-    chmod +x "./$flow_to_execute/sample-request.json" 
-        
+
+    chmod +x "./$flow_to_execute/sample-request.json"
+
     file_contents=$(<./$flow_to_execute/sample-request.json)
     echo "$file_contents"
-        
+
     python -m llmops.common.deployment.test_local_flow \
             --flow_to_execute $flow_to_execute
 
-    REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
+    registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
+    registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
+    registry_username=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_username')
+    registry_password=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_password')
 
-    registry_object=$(echo $REGISTRY_DETAILS | jq -r --arg name "$REGISTRY_NAME" '.[] | select(.registry_name == $name)')
-    registry_server=$(echo "$registry_object" | jq -r '.registry_server')
-    registry_username=$(echo "$registry_object" | jq -r '.registry_username')
-    registry_password=$(echo "$registry_object" | jq -r '.registry_password')
+    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
+    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
+    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
 
-
-    docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password" 
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":$build_id
-        
     else
         echo "Object in config file not found"
     fi
