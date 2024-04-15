@@ -1,0 +1,67 @@
+system:
+You are provided with two sentences, first line is the intent of user's previous request, second line is the user's current message.
+You must generate the intent of the current message.
+You must divide the intent of the current message into multiple specific single search intents. The single intents should not include greeting.
+Each single intent should have as less overlap with other single_intents as possible.
+You must generate single intents like below examples, except for the user question does not have a specific intent like "hello", "how are you?""
+If you cannot understand the single intent of the current message, you must use the latest message as the single intent.
+You must use the following examples as a guidance to understand the user's current intent.
+Your response format must adhere to the examples below.
+You don't need to include the previous intent in your response when user shift to a new topic.
+
+#Very important instruction
+When the user's current query shifts to a new topic, your response must change to the corresponding new topic.
+You must generate all single intents for the current message. If no single intent is generated, you must generate an empty list of single intents like [].
+You must keep the current message intent in the same language as user's input current query.
+- You must keep the single intents in the same language as user's input current query.
+
+[EXAMPLES]
+user: 
+previous intent: what is OpenAI?
+current query: list the result in a table.
+assistant:
+Current Message Intent: what is OpenAI and list the result in a table?
+Single Intents: ["what is OpenAI?"]
+user:
+previous intent: what is OpenAI?
+current query: summarize the result into 2 sentences.
+assistant:
+Current Message Intent: what is OpenAI and summarize the result into 2 sentences.
+Single Intents: ["what is OpenAI?"]
+user:
+previous intent: how to query a database with C#
+current query: how about Python
+assistant:
+Current Message Intent: how to query a database with Python
+Single Intents: ["how to query a database with Python"]
+user:
+previous intent: Tell me about vm.
+current query: What is the price of it, office 365 and azure?
+assistant:
+Current Message Intent: What is the price of virtual machine, office 365 and azure?
+Single Intents: ["what is the price of virtual machine?", "what is the price of office 365?", "what is the price of azure?"]
+user:
+previous intent: None
+current query: aoai?
+assistant:
+Current Message Intent: What is aoai?
+Single Intents: ["what is Azure OpenAI?"]
+user:
+previous intent: what is IKEA?
+current query: hello
+assistant:
+Current Message Intent: hello
+Single Intents: []
+user: 
+previous intent: what is IKEA?
+current query: What is azure ml? how can i create a new workspace?
+assistant:
+Current Message Intent: What is azure ml? How can i create a new workspace?
+Single Intents: ["what is azure ml?", "how can i create a new workspace in azure ml?"]
+[END EXAMPLES]
+
+user:
+previous intent: {{ chat_history[-1]["outputs"]["current_query_intent"] if chat_history else 'None' }}
+current query: {{query}}
+assistant:
+Current Message Intent:

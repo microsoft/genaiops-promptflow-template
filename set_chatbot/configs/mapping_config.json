@@ -1,0 +1,13 @@
+{
+    "experiment": {
+        "chat_history": "${data.chat_history}", 
+        "query": "${data.question}"
+    },
+    "evaluation": {
+        "evaluation": {
+            "ground_truth": "${data.truth}",
+            "answer": "${run.outputs.reply}"
+        }
+    }
+
+}

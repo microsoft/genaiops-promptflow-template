@@ -1,0 +1,22 @@
+{
+    "envs":[
+            {
+                "ENV_NAME": "pr",
+                "RUNTIME_NAME": "javiazuremltestgai2",
+                "KEYVAULT_NAME": "promptflow2501832024",
+                "RESOURCE_GROUP_NAME": "javis-test-rg",
+                "WORKSPACE_NAME": "promptflow",
+                "STANDARD_FLOW_PATH": "flows/standard",
+                "EVALUATION_FLOW_PATH": "flows/evaluation"
+            },
+            {
+                "ENV_NAME": "dev",
+                "RUNTIME_NAME": "javiazuremltestgai2",
+                "KEYVAULT_NAME": "promptflow2501832024",
+                "RESOURCE_GROUP_NAME": "javis-test-rg",
+                "WORKSPACE_NAME": "promptflow",
+                "STANDARD_FLOW_PATH": "flows/standard",
+                "EVALUATION_FLOW_PATH": "flows/evaluation"
+            }
+    ]
+}

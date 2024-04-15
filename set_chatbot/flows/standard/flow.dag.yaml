@@ -1,0 +1,125 @@
+id: template_chat_flow
+name: Template Chat Flow
+inputs:
+  chat_history:
+    type: list
+    default: []
+    is_chat_input: false
+    is_chat_history: true
+  query:
+    type: string
+    default: ""
+    is_chat_input: true
+outputs:
+  reply:
+    type: string
+    reference: ${FormatReply.output}
+    is_chat_output: false
+  search_intents:
+    type: string
+    reference: ${ExtractIntent.output.search_intents}
+    is_chat_output: false
+  fetched_docs:
+    type: string
+    reference: ${FormatRetrievedDocuments.output}
+    is_chat_output: false
+  current_query_intent:
+    type: string
+    reference: ${ExtractIntent.output.current_message_intent}
+    is_chat_output: true
+nodes:
+- name: DetermineIntent
+  type: llm
+  source:
+    type: code
+    path: DetermineIntent.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo-16k-genaiacceleratorsharedprodaxso0001
+    temperature: 0
+    top_p: 1
+    max_tokens: 800
+    presence_penalty: 0
+    frequency_penalty: 0
+    chat_history: ${inputs.chat_history}
+    query: ${inputs.query}
+  provider: AzureOpenAI
+  connection: aoai
+  api: chat
+  module: promptflow.tools.aoai
+  use_variants: false
+- name: ExtractIntent
+  type: python
+  source:
+    type: code
+    path: ExtractIntent.py
+  inputs:
+    input: ${DetermineIntent.output}
+    query: ${inputs.query}
+  use_variants: false
+- name: RetrieveDocuments
+  type: python
+  source:
+    type: code
+    path: RetrieveDocuments.py
+  inputs:
+    searchConnection: cs-genaiacceleratorsharedprodaxso0001
+    embeddingModelConnection: aoai
+    embeddingModelName: text-embedding-ada-002-genaiacceleratorsharedprodaxso0001
+    indexName: index-gai-aistudio-set-test
+    queries: ${ExtractIntent.output.search_intents}
+    queryType: vectorSimpleHybrid
+    semanticConfiguration: azureml-default
+    topK: 5
+    vectorFields: contentVector
+  provider: CognitiveSearch
+  connection: cs-genaiacceleratorsharedprodaxso0001
+  use_variants: false
+- name: FormatRetrievedDocuments
+  type: python
+  source:
+    type: code
+    path: FormatRetrievedDocuments.py
+  inputs:
+    docs: ${RetrieveDocuments.output}
+    maxTokens: 3500
+  use_variants: false
+- name: FormatConversation
+  type: python
+  source:
+    type: code
+    path: FormatConversation.py
+  inputs:
+    history: ${inputs.chat_history}
+    maxTokens: 800
+  use_variants: false
+- name: DetermineReply
+  type: llm
+  source:
+    type: code
+    path: DetermineReply.jinja2
+  inputs:
+    deployment_name: gpt-35-turbo-16k-genaiacceleratorsharedprodaxso0001
+    temperature: 0
+    top_p: 1
+    max_tokens: 800
+    presence_penalty: 0
+    frequency_penalty: 0
+    conversation: ${FormatConversation.output}
+    documentation: ${FormatRetrievedDocuments.output}
+    user_query: ${ExtractIntent.output.current_message_intent}
+  provider: AzureOpenAI
+  connection: aoai
+  api: chat
+  module: promptflow.tools.aoai
+  use_variants: false
+- name: FormatReply
+  type: python
+  source:
+    type: code
+    path: FormatReply.py
+  inputs:
+    reply: ${DetermineReply.output}
+  use_variants: false
+node_variants: {}
+environment:
+  python_requirements_txt: requirements.txt
