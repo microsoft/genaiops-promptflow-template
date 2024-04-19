@@ -102,17 +102,11 @@ class OAIChat(OAI):
         response = self.client.chat.completions.create(
             model=os.environ.get("CHAT_MODEL_DEPLOYMENT_NAME"),
             messages=messages,
-            stream=True,
+            stream=False,
             **kwargs,
         )
 
-        for chunk in response:
-            if not chunk.choices:
-                continue
-            if chunk.choices[0].delta.content:
-                yield chunk.choices[0].delta.content
-            else:
-                yield ""
+        return response.choices[0].delta.content
 
 
 class OAIEmbedding(OAI):
