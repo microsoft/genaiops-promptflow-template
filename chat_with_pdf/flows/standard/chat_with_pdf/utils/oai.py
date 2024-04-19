@@ -106,7 +106,7 @@ class OAIChat(OAI):
             **kwargs,
         )
 
-        return response.choices[0].delta.content
+        return response.choices[0].message.content
 
 
 class OAIEmbedding(OAI):
