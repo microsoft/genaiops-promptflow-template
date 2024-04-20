@@ -3,18 +3,18 @@
             {
                 "ENV_NAME": "pr",
                 "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "KEYVAULT_NAME": "amlpoc5711093846",
+                "RESOURCE_GROUP_NAME": "pf-llmops-poc",
+                "WORKSPACE_NAME": "aml-poc",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
                 "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "KEYVAULT_NAME": "amlpoc5711093846",
+                "RESOURCE_GROUP_NAME": "pf-llmops-poc",
+                "WORKSPACE_NAME": "aml-poc",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },

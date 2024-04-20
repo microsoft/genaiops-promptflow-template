@@ -3,12 +3,12 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "",
+            "ENDPOINT_NAME": "pf-endpoint-poc",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "",
+            "CURRENT_DEPLOYMENT_NAME": "pf-deployment",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
@@ -17,39 +17,41 @@
             }
         }
     ],
-    "kubernetes_endpoint":[
-        {
-            "ENV_NAME": "dev",
-            "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "",
-            "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for named entity",
-            "DEPLOYMENT_DESC": "prompt flow deployment",
-            "PRIOR_DEPLOYMENT_NAME": "",
-            "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "",
-            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": 100,
-            "COMPUTE_NAME": "",
-            "DEPLOYMENT_VM_SIZE": "",
-            "DEPLOYMENT_INSTANCE_COUNT": 1,
-            "CPU_ALLOCATION": "",
-            "MEMORY_ALLOCATION": "",
-            "ENVIRONMENT_VARIABLES": {
-                "example-name": "example-value"
-            }
-        }
-    ],
+    
+    // "kubernetes_endpoint":[
+    //     {
+    //         "ENV_NAME": "dev",
+    //         "TEST_FILE_PATH": "sample-request.json",
+    //         "ENDPOINT_NAME": "",
+    //         "ENDPOINT_DESC": "An kubernetes endpoint serving a flow for named entity",
+    //         "DEPLOYMENT_DESC": "prompt flow deployment",
+    //         "PRIOR_DEPLOYMENT_NAME": "",
+    //         "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
+    //         "CURRENT_DEPLOYMENT_NAME": "",
+    //         "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": 100,
+    //         "COMPUTE_NAME": "",
+    //         "DEPLOYMENT_VM_SIZE": "",
+    //         "DEPLOYMENT_INSTANCE_COUNT": 1,
+    //         "CPU_ALLOCATION": "",
+    //         "MEMORY_ALLOCATION": "",
+    //         "ENVIRONMENT_VARIABLES": {
+    //             "example-name": "example-value"
+    //         }
+    //     }
+    // ],
+
     "webapp_endpoint":[
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "CONNECTION_NAMES": ["aoai"],
-            "REGISTRY_NAME": "",
-            "REGISTRY_RG_NAME": "",
-            "APP_PLAN_NAME": "",
-            "WEB_APP_NAME": "",
-            "WEB_APP_RG_NAME": "",
+            "REGISTRY_NAME": "pfacrpoc",
+            "REGISTRY_RG_NAME": "pf-llmops-poc",
+            "APP_PLAN_NAME": "pf-appplan-poc",
+            "WEB_APP_NAME": "pf-webapp-poc",
+            "WEB_APP_RG_NAME": "pf-llmops-poc",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": ""
+            "USER_MANAGED_ID": "pf-uami-poc"
             
         }
     ]
