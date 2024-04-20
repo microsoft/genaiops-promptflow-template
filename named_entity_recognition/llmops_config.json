@@ -2,7 +2,7 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                // "RUNTIME_NAME": "pf-runtime-poc",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "amlpoc5711093846",
                 "RESOURCE_GROUP_NAME": "pf-llmops-poc",
                 "WORKSPACE_NAME": "aml-poc",
@@ -11,7 +11,7 @@
             },
             {
                 "ENV_NAME": "dev",
-                // "RUNTIME_NAME": "pf-runtime-poc",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "amlpoc5711093846",
                 "RESOURCE_GROUP_NAME": "pf-llmops-poc",
                 "WORKSPACE_NAME": "aml-poc",
@@ -20,7 +20,7 @@
             },
             {
                 "ENV_NAME": "postprodeval",
-                // "RUNTIME_NAME": "",
+                "RUNTIME_NAME": "",
                 "KEYVAULT_NAME": "",
                 "RESOURCE_GROUP_NAME": "",
                 "WORKSPACE_NAME": "",
