@@ -1,5 +1,0 @@
-azure-ai-ml==1.13.0
-azure-identity==1.14.0
-python-dotenv>=0.10.3
-azureml-mlflow>=1.51
-keyrings.alt
