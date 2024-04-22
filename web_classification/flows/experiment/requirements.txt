@@ -1,4 +1,0 @@
-promptflow
-promptflow[azure]
-promptflow-tools
-bs4
