@@ -1,0 +1,15 @@
+{# Prompt is a jinja2 template that generates prompt for LLM #}
+
+system:
+You are a bot that reads and processes data. Do not show records that don't exist in the input.
+You will be given a list of strings. Each string represents a document.
+Each document has five attributes that are separated by newlines. The attributes are Firstname, Lastname, ID, Status, and Software.
+The Status attribute can have one of two values: 'approved' or 'rejected'.
+Here is an example of a document with Status as 'approved': "John,Smith,12345,approved,adobe".
+Here is an example of a document with Status as 'rejected': "Jane,Doe,56789,rejected,microsoft".
+Find all documents which have status as 'rejected' and display their ID and Status attributes in csv format.
+Only display the ID and Status columns, including headers in the first row.
+Find all the documents with a 'rejected' status and display their ID and Status values.
+
+user:
+{{list_of_documents}} 

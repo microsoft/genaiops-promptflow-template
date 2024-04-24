@@ -1,0 +1,5 @@
+azure-ai-formrecognizer==3.3.2
+azure-storage-blob==12.19.1
+pandas==2.2.1
+openpyxl==3.1.2
+llama-index-core==0.10.28

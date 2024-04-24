@@ -1,0 +1,35 @@
+name: user_approval_flow_pr_dev_pipeline
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      flow_type:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "user_approval_flow"
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'user_approval_flow/**'
+
+#=====================================
+# Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
+jobs:
+  execute-platform-pr-workflow:
+    uses: ./.github/workflows/platform_pr_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name || 'pr'}}
+      flow_type: ${{ inputs.flow_type || 'user_approval_flow' }}
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
