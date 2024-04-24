@@ -1,4 +1,4 @@
-name: math_coding_pr_dev_workflow
+name: user_approval_flow_pr_dev_pipeline
 
 on:
   workflow_call:
@@ -12,7 +12,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "math_coding"
+        default: "user_approval_flow"
   pull_request:
     branches:
       - main
@@ -20,7 +20,7 @@ on:
     paths:
       - '.github/**'
       - 'llmops/**'
-      - 'math_coding/**'
+      - 'user_approval_flow/**'
 
 #=====================================
 # Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -30,6 +30,6 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      flow_type: ${{ inputs.flow_type || 'math_coding' }}
+      flow_type: ${{ inputs.flow_type || 'user_approval_flow' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

@@ -1,0 +1,46 @@
+id: template_standard_flow
+name: Template Standard Flow
+environment:
+  python_requirements_txt: requirements.txt
+inputs: {}
+outputs:
+  Output:
+    type: string
+    reference: ${LLM.output}
+nodes:
+  - name: input_processing
+    type: python
+    source:
+      type: code
+      path: input_processing.py
+    inputs:
+      myconn: StorageAccountConnection
+    use_variants: false
+  - name: LLM
+    type: llm
+    source:
+      type: code
+      path: doc_list.jinja2
+    inputs:
+      deployment_name: completion-gpt-4-32k
+      temperature: 0
+      top_p: 1
+      max_tokens: 1500
+      response_format:
+        type: text
+      presence_penalty: 0
+      frequency_penalty: 0
+      list_of_documents: ${input_processing.output}
+    provider: AzureOpenAI
+    connection: OpenAIConnection
+    api: chat
+    module: promptflow.tools.aoai
+    use_variants: false
+  - name: groundtruth
+    type: python
+    source:
+      type: code
+      path: groundtruth.py
+    inputs:
+      rejected_rows: ${LLM.output}
+    use_variants: false
