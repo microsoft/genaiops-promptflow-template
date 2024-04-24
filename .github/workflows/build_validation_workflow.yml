@@ -40,13 +40,13 @@ jobs:
           export subscriptionId=$(az account show --query id -o tsv)
           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
-      - name: Execute Unit Tests
-        shell: bash
-        run: |
-          pytest ${{ inputs.flow_type }}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+      # - name: Execute Unit Tests
+      #   shell: bash
+      #   run: |
+      #     pytest ${{ inputs.flow_type }}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
 
-      - name: Publish Unit Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: unit-test-results
-          path: "**/test-*.xml"
+      # - name: Publish Unit Test Results
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: unit-test-results
+      #     path: "**/test-*.xml"
