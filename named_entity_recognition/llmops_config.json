@@ -2,28 +2,28 @@
     "envs":[
             {
                 "ENV_NAME": "pr",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "demo-llmops",
+                "KEYVAULT_NAME": "demollmops28484278618",
+                "RESOURCE_GROUP_NAME": "demo-llmops",
+                "WORKSPACE_NAME": "demo-llmops2",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "dev",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "demo-llmops",
+                "KEYVAULT_NAME": "demollmops28484278618",
+                "RESOURCE_GROUP_NAME": "demo-llmops",
+                "WORKSPACE_NAME": "demo-llmops2",
                 "STANDARD_FLOW_PATH": "flows/standard",
                 "EVALUATION_FLOW_PATH": "flows/evaluation"
             },
             {
                 "ENV_NAME": "postprodeval",
-                "RUNTIME_NAME": "",
-                "KEYVAULT_NAME": "",
-                "RESOURCE_GROUP_NAME": "",
-                "WORKSPACE_NAME": "",
+                "RUNTIME_NAME": "demo-llmops",
+                "KEYVAULT_NAME": "demollmops28484278618",
+                "RESOURCE_GROUP_NAME": "demo-llmops",
+                "WORKSPACE_NAME": "demo-llmops2",
                 "STANDARD_FLOW_PATH": "flows/post-production-evaluation"
             }
     ]
