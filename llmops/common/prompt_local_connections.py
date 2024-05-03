@@ -16,7 +16,6 @@ from promptflow.entities import AzureOpenAIConnection
 from promptflow import PFClient
 
 from llmops.common.logger import llmops_logger
-from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 
 logger = llmops_logger("prompt_aoai_connection")
 
@@ -37,8 +36,7 @@ def prepare_and_execute(
     Returns:
         None
     """
-    config = ExperimentCloudConfig(env_name=env_name)
-    logger.info(f"Using environment '{config.environment_name}'")
+    logger.info(f"Using environment '{env_name}'")
 
     secret_config = json.loads(connection_details)
 
