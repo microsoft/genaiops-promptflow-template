@@ -12,7 +12,7 @@ pandas==2.2.1
 promptflow==1.6.0
 promptflow-tools==1.3.0
 promptflow-sdk==0.0.1
-jinja2==3.1.3
+jinja2==3.1.4
 promptflow[azure]
 openai
 promptflow-sdk[builtins]
