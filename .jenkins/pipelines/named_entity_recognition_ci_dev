@@ -3,7 +3,7 @@ pipeline {
     
     parameters {
         choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment')
-        string(name: 'flow_type', description: 'The flow usecase to execute', defaultValue: 'named_entity_recognition')
+        string(name: 'use_case_base_path', description: 'The flow usecase to execute', defaultValue: 'named_entity_recognition')
         choice(name: 'deployment_type', choices: ['aml', 'aks', 'webapp'],  description: 'Determine type of deployment')
     }
 
@@ -32,8 +32,11 @@ pipeline {
                 script {
                     build job: 'platform_ci_dev', parameters: [
                         string(name: 'env_name', value: "${params.env_name}"),
-                        string(name: 'flow_type', value: "${params.flow_type}"),
-                        string(name: 'deployment_type', value: "${params.deployment_type}")
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'deployment_type', value: "${params.deployment_type}"),
+                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}"),
+                        string(name: 'kv_name', value: "${KEY_VAULT_NAME_dev}")
                     ]
                 }
             }

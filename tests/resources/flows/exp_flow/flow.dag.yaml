@@ -1,0 +1,25 @@
+inputs:
+outputs:
+nodes:
+  - name: node_var_0
+  - name: node_var_1
+  - name: node_var_2
+node_variants:
+  node_var_0:
+    default_variant_id: var_0
+    variants:
+      var_0:
+        node:
+          type: llm
+      var_1:
+        node:
+          api: chat
+  node_var_1:
+    default_variant_id: var_3
+    variants:
+      var_3: 
+        nodes:
+          type: llm
+      var_4:
+        nodes:
+          type: llm

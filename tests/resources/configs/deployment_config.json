@@ -1,0 +1,39 @@
+{
+    "azure_managed_endpoint": [
+        {
+            "ENV_NAME": "dev",
+            "ENDPOINT_NAME": "test-endpoint",
+            "ENDPOINT_DESC": "test-endpoint-description",
+            "DEPLOYMENT_DESC": "test-deployment-description",
+            "PRIOR_DEPLOYMENT_NAME": "test-prior-deployment",
+            "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "10",
+            "CURRENT_DEPLOYMENT_NAME": "test-deployment",
+            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "90",
+            "DEPLOYMENT_VM_SIZE": "test-vm-size",
+            "DEPLOYMENT_INSTANCE_COUNT": 1,
+            "ENVIRONMENT_VARIABLES": {
+                "test-key": "test-value"
+            }
+        }
+    ],
+    "kubernetes_endpoint": [
+        {
+            "ENV_NAME": "dev",
+            "ENDPOINT_NAME": "k8s-test-endpoint",
+            "ENDPOINT_DESC": "k8s-test-endpoint-description",
+            "DEPLOYMENT_DESC": "k8s-test-deployment-description",
+            "PRIOR_DEPLOYMENT_NAME": "k8s-test-prior-deployment",
+            "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "30",
+            "CURRENT_DEPLOYMENT_NAME": "k8s-test-deployment",
+            "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "70",
+            "COMPUTE_NAME": "k8s-compute",
+            "DEPLOYMENT_VM_SIZE": "k8s-test-vm-size",
+            "DEPLOYMENT_INSTANCE_COUNT": 1,
+            "CPU_ALLOCATION": "0.5",
+            "MEMORY_ALLOCATION": "500Mi",
+            "ENVIRONMENT_VARIABLES": {
+                "k8s-test-key": "k8s-test-value"
+            }
+        }
+    ]
+}
