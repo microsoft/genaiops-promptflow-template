@@ -8,7 +8,7 @@ on:
         description: "Execution Environment"
         required: true
         default: "dev"
-      flow_type:
+      use_case_base_path:
         type: string
         description: "The flow usecase to execute"
         required: true
@@ -30,6 +30,6 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      flow_type: ${{ inputs.flow_type || 'web_classification' }}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'web_classification' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

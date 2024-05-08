@@ -2,11 +2,19 @@
 pipeline {
     agent any
 
-parameters {
+    parameters {
         string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
-        string(name: 'flow_type', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
+        string(name: 'use_case_base_path', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
         string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'aml')
         string(name: 'run_id', description: 'run id of the flow to be deployed')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+        string(name: 'kv_name', description: 'Azure Key Vault Name')
+    }
+
+    environment {
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
     }
 
     stages {
@@ -25,7 +33,7 @@ parameters {
                     sh """
                     python -m llmops.common.deployment.register_model \
                     --subscription_id $AZURE_SUBSCRIPTION_ID \
-                    --flow_to_execute $flow_type \
+                    --base_path $use_case_base_path \
                     --output_file "model_version.txt" \
                     --build_id $run_id \
                     --env_name $env_name \
@@ -59,10 +67,13 @@ parameters {
             steps {
                 script {
                     build job: 'jobs/aml_real_deployment', parameters: [
-                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
-                        string(name: 'run_id', value: "${params.run_id}")
+                        string(name: 'run_id', value: "${params.run_id}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
                     ]
                 }
             }
@@ -77,10 +88,13 @@ parameters {
             steps {
                 script {
                     build job: 'jobs/kubernetes_deployment', parameters: [
-                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${env_name_quoted}"),
                         string(name: 'model_version', value: "${model_version}"),
-                        string(name: 'run_id', value: "${params.run_id}")
+                        string(name: 'run_id', value: "${params.run_id}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
                     ]
                 }
             }
@@ -95,7 +109,7 @@ parameters {
             steps {
                 script {
                     build job: 'jobs/webapp_deployment', parameters: [
-                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${env_name_quoted}")
                     ]
                 }

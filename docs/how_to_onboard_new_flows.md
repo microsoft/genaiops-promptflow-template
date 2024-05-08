@@ -20,18 +20,18 @@ Follow these steps to onboard new Flows to your LLMOps template:
 
 **New Folder for new Flows** Similar to `named_entity_recognition` flow, a new folder should be created with the same sub-folder structure as `named_entity_recognition`.
 
-**Flow Configuration:** The `llmops_config.json` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
+**Flow Configuration:** The configuration of the use-case is managed by the `experiment.yaml` (sets the flow paths, datasets, and evaluations). Create your `experiment.yaml` file by referencing the [description](./the_experiment_file.md) of the file and the [YAML specification](./experiment.yaml) as well as checking the `experiment.yaml` of the existing use-cases.
 
 You can start by copying an existing config file and modify it with relevant values. Provide valid values for all the configuration elements for your flow.
 
-**Flows** Bring both the `standard and evaluation flows` within the `flows` sub-folder under a scenario folder. Files for both these type of flows should be under their own folder. The `llmops_config.json` should be updated with the path of these flows. The name of these folders are very important and used within multiple other configuration files - these are used in `llmops_config.json` and `mapping_config.json` files.
+**Flows** Bring both the `standard and evaluation flows` within the `flows` sub-folder under a scenario folder. Files for both these type of flows should be under their own folder.
 
 **Azure DevOps pipelines** The ``.azure-pipelines` folder should contains two yaml files - one for build validation during pull request and another for CI/CD. You can start by copying one of an existing folder under the new scenario folder and modify the files within this new folder. The modification in these files include - `Include
 paths in `trigger and pr section` and the `default value` for `flow_to_execute` parameter in `parameters section`.
 
 **Github Workflows** The `.github` folder should contains two yaml file- one for build validation during pull request and another for CI/CD for each use case along with platform related workflows and actions. You can start by copying existing scenario github workflows in this folder and modify the content to orchestrate the workflows for new flows and scenario.
 
-**Configuration for flows**  The `configs` folder contains the `deployment and data configuration` for the flows. The `data_config.json` file contains one element for each type of dataset required for an environment. For example, a flow needs 3 datasets - "pr_data", "training_data" and "test_data" represented by the "data_purpose" element. Update the `deployment_config.json` for deployment related configuration. Modify the values in these configuration files to reflect your flow deployment. Update the `mapping_config.json` for data mapping related configuration. Modify the values in these configuration files to reflect your flow execution.
+**Configuration for deployment**  The configuration of the use-case deployment is managed by the `configs/deployment_config.json` file. Update the `deployment_config.json` for deployment related configuration. Modify the values in these configuration files to reflect your flow deployment.
 
 **Bring Data**  The `data` folder contains data that would be uploaded to AzureML data assets and used for both bulk run and evaluation purpose. You can copy the data in this folder in `jsonl` format.
 

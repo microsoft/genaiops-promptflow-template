@@ -8,7 +8,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
     }
 
     stages {
@@ -48,7 +48,7 @@ pipeline {
         stage('Execute Unit Tests') {
             steps {
                 withPythonEnv('/usr/bin/python3.9') {
-                    sh "pytest ${params.flow_type}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
+                    sh "pytest ${params.use_case_base_path}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
                 }
             }
         }

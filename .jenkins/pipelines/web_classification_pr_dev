@@ -3,7 +3,7 @@ pipeline {
     
     parameters {
         string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment: pr, dev or test')
-        string(name: 'flow_type', defaultValue: 'web_classification', description: 'The flow usecase to execute')
+        string(name: 'use_case_base_path', defaultValue: 'web_classification', description: 'The flow usecase to execute')
     }
     
     // Trigger the pipeline on PR opened, reopened or synchronized
@@ -31,7 +31,9 @@ pipeline {
                 script {
                     build job: 'platform_pr_dev', parameters: [
                         string(name: 'env_name', value: "${params.env_name}"),
-                        string(name: 'flow_type', value: "${params.flow_type}")
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}")
                     ]
                 }
             }

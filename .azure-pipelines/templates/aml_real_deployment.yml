@@ -1,11 +1,15 @@
 parameters:
 - name: SUBSCRIPTION_ID
   type: string
-- name: flow_to_execute
+- name: USE_CASE_BASE_PATH
   type: string
 - name: MODEL_VERSION
   type: string
 - name: DEPLOY_ENVIRONMENT
+  type: string
+- name: RESOURCE_GROUP_NAME
+  type: string
+- name: WORKSPACE_NAME
   type: string
 - name: KEY_VAULT_NAME
   type: string
@@ -20,7 +24,7 @@ steps:
         --build_id $(Build.Buildid) \
         --output_file "endpoint_principal.txt" \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 
 - task: AzureCLI@2
@@ -48,18 +52,14 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)
     scriptLocation: inlineScript
     inlineScript: |
-      config_path="./${{ parameters.flow_to_execute }}/llmops_config.json"
-      env_name=${{ parameters.DEPLOY_ENVIRONMENT }}
-      selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+      KEY_VAULT_NAME=${{ parameters.KEY_VAULT_NAME }}
+      echo $KEY_VAULT_NAME
 
-      if [[ -n "$selected_object" ]]; then
-        echo "$selected_object"
-        KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
-        RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
-        WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
-      else
-        echo "Object in config file not found"
-      fi
+      RESOURCE_GROUP_NAME=${{ parameters.RESOURCE_GROUP_NAME }}
+      echo $RESOURCE_GROUP_NAME
+
+      WORKSPACE_NAME=${{ parameters.WORKSPACE_NAME }}
+      echo $WORKSPACE_NAME
 
       echo "assigning permissions to Principal to AzureML workspace.."
       az role assignment create --assignee $(read_endpoint_principal.ENDPOINT_PRINCIPAL) --role "AzureML Data Scientist" --scope "/subscriptions/${{ parameters.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
@@ -83,7 +83,7 @@ steps:
         --model_version ${{ parameters.MODEL_VERSION }} \
         --build_id $(Build.Buildid) \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 - template: execute_python_code.yml
   parameters:
@@ -92,7 +92,7 @@ steps:
       python -m llmops.common.deployment.test_model_on_aml \
         --subscription_id ${{ parameters.SUBSCRIPTION_ID }} \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.flow_to_execute }}
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }}
 
 
 

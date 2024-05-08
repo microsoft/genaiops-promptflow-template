@@ -13,8 +13,8 @@
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --flow_to_execute)
-            flow_to_execute="$2"
+        --use_case_base_path)
+            use_case_base_path="$2"
             shift 2
             ;;
         --deploy_environment)
@@ -40,7 +40,7 @@ set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
-deploy_config="./$flow_to_execute/configs/deployment_config.json"
+deploy_config="./$use_case_base_path/configs/deployment_config.json"
 con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
@@ -72,7 +72,7 @@ az appservice plan create --name $appserviceplan --resource-group $rgname --is-l
 
 # create/update Web App
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
-    $REGISTRY_NAME.azurecr.io/"$flow_to_execute"_"$deploy_environment":"$build_id"
+    $REGISTRY_NAME.azurecr.io/"$use_case_base_path"_"$deploy_environment":"$build_id"
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \

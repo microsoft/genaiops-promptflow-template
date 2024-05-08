@@ -1,0 +1,10 @@
+name: math_standard_flow
+
+datasets:
+- name: math_coding_pr
+  source: data/math_data.jsonl
+  description: "This dataset is for pr validation only."
+  mappings:
+    math_question: "${data.question}"
+
+evaluators:

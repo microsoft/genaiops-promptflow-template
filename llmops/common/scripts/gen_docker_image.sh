@@ -3,8 +3,8 @@
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --flow_to_execute)
-            flow_to_execute="$2"
+        --use_case_base_path)
+            use_case_base_path="$2"
             shift 2
             ;;
         --deploy_environment)
@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Use the assigned variables as needed
-echo "Flow to execute: $flow_to_execute"
+echo "Flow to execute: $use_case_base_path"
 echo "Deploy environment: $deploy_environment"
 echo "Build ID: $build_id"
 
@@ -39,24 +39,21 @@ echo "Build ID: $build_id"
 # This script generates docker image for Prompt flow deployment
 set -e # fail on error
 
-# read values from llmops_config.json related to given environment
-config_path="./$flow_to_execute/llmops_config.json"
-env_name=$deploy_environment
-selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$env_name\")" "$config_path")
+# read values from experiment.yaml related to given environment
+config_path="./$use_case_base_path/experiment.yaml"
 
-if [[ -n "$selected_object" ]]; then
-    STANDARD_FLOW=$(echo "$selected_object" | jq -r '.STANDARD_FLOW_PATH')
-        
-    pf flow build --source "./$flow_to_execute/$STANDARD_FLOW" --output "./$flow_to_execute/docker"  --format docker 
+if [[ -e "$config_path" ]]; then
+    STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
-    cp "./$flow_to_execute/environment/Dockerfile" "./$flow_to_execute/docker/Dockerfile"
+    cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
 
     # docker build the prompt flow based image
-    docker build -t localpf "./$flow_to_execute/docker" --no-cache
+    docker build -t localpf "./$use_case_base_path/docker" --no-cache
         
     docker images
 
-    deploy_config="./$flow_to_execute/configs/deployment_config.json"
+    deploy_config="./$use_case_base_path/configs/deployment_config.json"
     con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
@@ -77,13 +74,13 @@ if [[ -n "$selected_object" ]]; then
 
     docker ps -a
 
-    chmod +x "./$flow_to_execute/sample-request.json"
+    chmod +x "./$use_case_base_path/sample-request.json"
 
-    file_contents=$(<./$flow_to_execute/sample-request.json)
+    file_contents=$(<./$use_case_base_path/sample-request.json)
     echo "$file_contents"
 
     python -m llmops.common.deployment.test_local_flow \
-            --flow_to_execute $flow_to_execute
+            --base_path $use_case_base_path
 
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
@@ -91,9 +88,9 @@ if [[ -n "$selected_object" ]]; then
     registry_password=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_password')
 
     docker login "$registry_server" -u "$registry_username" --password-stdin <<< "$registry_password"
-    docker tag localpf "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
-    docker push "$registry_server"/"$flow_to_execute"_"$deploy_environment":"$build_id"
+    docker tag localpf "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
+    docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
 
-    else
-        echo "Object in config file not found"
-    fi
+else
+    echo $config_path "not found"
+fi

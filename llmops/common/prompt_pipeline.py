@@ -5,67 +5,126 @@ This function executes experiment jobs or bulk-runs using
 predefined standard flows.
 
 Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
+--file: The name of the experiment file. Default is 'experiment.yaml'.
+--variants: Defines the variants to run. (* for all, defaults for all defaults, or comma separated list)
+--base_path: Base path of the use case. Where flows, data,
+and experiment.yaml are expected to be found.
+--subscription_id: The Azure subscription ID. If this argument is not
+specified, the SUBSCRIPTION_ID environment variable is expected to be provided.
 --build_id: The unique identifier for build execution.
-This argument is required to identify the specific build execution.
---env_name: The environment name for execution and deployment.
-This argument is required to specify the environment (dev, test, prod)
-for execution or deployment.
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---output_file: A file path to save run IDs.
-This argument is required to specify the file to save the run IDs.
---flow_to_execute: The name of the flow use case.
-This argument is required to specify the name of the flow for execution.
+This argument is not required but will be added as a run tag if specified.
+--env_name: The environment name for execution and deployment. This argument
+is not required but will be used to read experiment overlay files if specified.
+--output_file: A file path to save run IDs. This argument is not required
+but will be used to save the run IDs to file if specified.
+--report_dir: The directory where the outputs and metrics will be stored.
 --save_output: Flag to save the outputs in files.
 If provided, the outputs will be saved in files.
 --save_metric: Flag to save the metrics in files.
 If provided, the metrics will be saved in files.
+
+Example for running the script with variants (using web_classification experiment):
+
+# Run only the default variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants defaults
+
+# Run all variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants all
+OR
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants *
+
+# Run specific variants
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants variant_0,variant_1
+OR
+python -m llmops.common.prompt_pipeline --base_path ./web_classification --variants summarize_text_content.variant_0,summarize_text_content.variant_1
+
 """
 
 import argparse
 import datetime
-import json
 import os
-import time
-import yaml
 import pandas as pd
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import MLClient
 from promptflow.entities import Run
 from promptflow.azure import PFClient
+from dotenv import load_dotenv
+from enum import Enum
+from typing import Optional
 
+from llmops.common.common import wait_job_finish
+from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
 logger = llmops_logger("prompt_pipeline")
 
 
-def are_dictionaries_similar(dict1, dict2):
-    """
-    Compare 2 dictionaries.
-
-    Returns:
-        None
-    """
-    for old_run in dict2:
-        set1 = {frozenset(dict(old_run).items())}
-        set2 = {frozenset(dict1.items())}
+def check_dictionary_contained(ref_dict, dict_list):
+    for candidate_dict in dict_list:
+        set1 = {frozenset(dict(candidate_dict).items())}
+        set2 = {frozenset(ref_dict.items())}
         if set1 == set2:
             return True
-
     return False
 
 
+class VariantsSelector:
+    """
+    Selects the variants to run. Options are default, all or custom.
+    """
+
+    class VariantSelectionOption(Enum):
+        DEFAULTS_ONLY = 1
+        ALL = 2
+        CUSTOM = 3
+
+    def __init__(
+        self,
+        selector: VariantSelectionOption,
+        selected_variants: Optional[list[str]] = None,
+    ):
+        self._selector = selector
+        self._selected_variants = selected_variants or []
+
+    @property
+    def defaults_only(self) -> bool:
+        return self._selector == self.VariantSelectionOption.DEFAULTS_ONLY
+
+    def is_variant_enabled(self, node: str, variant: str) -> bool:
+        if self._selector in [
+            VariantsSelector.VariantSelectionOption.DEFAULTS_ONLY,
+            VariantsSelector.VariantSelectionOption.ALL,
+        ]:
+            return True
+
+        for selected_variant in self._selected_variants:
+            if selected_variant in (variant, f"{node}.{variant}"):
+                return True
+        return False
+
+    @classmethod
+    def from_args(cls, variants: str):
+        variants = variants.strip().lower()
+        if variants in ["*", "all"]:
+            return cls(cls.VariantSelectionOption.ALL)
+        if variants in ["defaults", "default"]:
+            return cls(cls.VariantSelectionOption.DEFAULTS_ONLY)
+        return cls(
+            cls.VariantSelectionOption.CUSTOM, [v.strip() for v in variants.split(",")]
+        )
+
+
 def prepare_and_execute(
-    subscription_id,
-    build_id,
-    flow_to_execute,
-    stage,
-    output_file,
-    data_purpose,
-    save_output,
-    save_metric,
+    variants_selector: VariantsSelector,
+    exp_filename: Optional[str] = None,
+    base_path: Optional[str] = None,
+    subscription_id: Optional[str] = None,
+    report_dir: Optional[str] = None,
+    build_id: Optional[str] = None,
+    env_name: Optional[str] = None,
+    output_file: Optional[str] = None,
+    save_output: Optional[bool] = None,
+    save_metric: Optional[bool] = None,
 ):
     """
     Run the experimentation loop by executing standard flows.
@@ -80,270 +139,212 @@ def prepare_and_execute(
     Returns:
         None
     """
-    main_config = open(f"{flow_to_execute}/llmops_config.json")
-    model_config = json.load(main_config)
-
-    for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
-            config = obj
-            break
-
-    resource_group_name = config["RESOURCE_GROUP_NAME"]
-    workspace_name = config["WORKSPACE_NAME"]
-    data_mapping_config = f"{flow_to_execute}/configs/mapping_config.json"
-    standard_flow_path = config["STANDARD_FLOW_PATH"]
-    data_config_path = f"{flow_to_execute}/configs/data_config.json"
-
-    runtime = config["RUNTIME_NAME"]
-    experiment_name = f"{flow_to_execute}_{stage}"
-
-    ml_client = MLClient(
-        DefaultAzureCredential(),
-        subscription_id,
-        resource_group_name,
-        workspace_name
+    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    experiment = load_experiment(
+        filename=exp_filename, base_path=base_path, env=config.environment_name
     )
 
     pf = PFClient(
         DefaultAzureCredential(),
-        subscription_id,
-        resource_group_name,
-        workspace_name
+        config.subscription_id,
+        config.resource_group_name,
+        config.workspace_name,
     )
-    logger.info(data_mapping_config)
-    flow = f"{flow_to_execute}/{standard_flow_path}"
-    dataset_name = []
-    config_file = open(data_config_path)
-    data_config = json.load(config_file)
-    for elem in data_config["datasets"]:
-        if "DATA_PURPOSE" in elem and "ENV_NAME" in elem:
-            if (stage == elem["ENV_NAME"] and
-                    data_purpose == elem["DATA_PURPOSE"]):
-                data_name = elem["DATASET_NAME"]
-                data = ml_client.data.get(name=data_name, label="latest")
-                data_id = f"azureml:{data.name}:{data.version}"
-                dataset_name.append(data_id)
-    logger.info(dataset_name)
-    flow_file = f"{flow}/flow.dag.yaml"
 
-    with open(flow_file, "r") as yaml_file:
-        yaml_data = yaml.safe_load(yaml_file)
-    all_variants = []
-    all_llm_nodes = set()
-    default_variants = {}
-    for node_name, node_data in yaml_data.get("node_variants", {}).items():
-        node_variant_mapping = {}
-        variants = node_data.get("variants", {})
-        default_variant = node_data["default_variant_id"]
-        default_variants[node_name] = default_variant
-        for variant_name, variant_data in variants.items():
-            node_variant_mapping[variant_name] = node_name
-            all_llm_nodes.add(node_name)
-        all_variants.append(node_variant_mapping)
-
-    for nodes in yaml_data["nodes"]:
-        node_variant_mapping = {}
-        if nodes.get("type", {}) == "llm":
-            all_llm_nodes.add(nodes["name"])
-
-    mapping_file = open(data_mapping_config)
-    mapping_config = json.load(mapping_file)
-    exp_config_node = mapping_config["experiment"]
-
+    flow_detail = experiment.get_flow_detail()
     run_ids = []
     past_runs = []
-    all_eval_df = []
-    all_eval_metrics = []
+    all_df = []
+    all_metrics = []
 
-    for data_id in dataset_name:
-        data_ref = data_id.replace("azureml:", "")
-        data_ref = data_ref.split(":")[0]
+    logger.info(f"Running experiment {experiment.name}")
+    for mapped_dataset in experiment.datasets:
+        logger.info(f"Using dataset {mapped_dataset.dataset.source}")
+        dataset = mapped_dataset.dataset
+        column_mapping = mapped_dataset.mappings
+
+        env_vars = {"key1": "value1"}
         dataframes = []
         metrics = []
 
-        if len(all_variants) != 0:
-            for variant in all_variants:
+        if len(flow_detail.all_variants) != 0 and not variants_selector.defaults_only:
+            logger.info(f"Start processing {len(flow_detail.all_variants)} variants")
+            for variant in flow_detail.all_variants:
                 for variant_id, node_id in variant.items():
+                    if not variants_selector.is_variant_enabled(node_id, variant_id):
+                        continue
+                    logger.info(
+                        f"Creating run for node '{node_id}' variant '{variant_id}'"
+                    )
                     variant_string = f"${{{node_id}.{variant_id}}}"
-                    logger.info(variant_string)
-
                     get_current_defaults = {
                         key: value
-                        for key, value in default_variants.items()
+                        for key, value in flow_detail.default_variants.items()
                         if key != node_id or value != variant_id
                     }
                     get_current_defaults[node_id] = variant_id
-                    get_current_defaults["dataset"] = data_ref
-                    logger.info(get_current_defaults)
+                    get_current_defaults["dataset"] = dataset.name
 
-                    if (
-                        len(past_runs) == 0
-                        or are_dictionaries_similar(
-                            get_current_defaults,
-                            past_runs
-                            )
-                        is False
-                    ):
+                    # This check validates that we are not running the same combination of variants more than once
+                    if not check_dictionary_contained(get_current_defaults, past_runs):
                         past_runs.append(get_current_defaults)
-                        timestamp = datetime.datetime.now().strftime(
-                            "%Y%m%d_%H%M%S"
+
+                        # Create run object
+                        if not experiment.runtime:
+                            logger.info(
+                                "Using automatic runtime and serverless compute for the prompt flow run"
                             )
-
-                        run = Run(
-                            flow=flow,
-                            data=data_id,
-                            runtime=runtime,
-                            # un-comment the resources parameter assignment
-                            # and update the size of the compute and also
-                            # comment the runtime parameter assignment to
-                            # enable automatic runtime.
-                            # Reference: COMPUTE_RUNTIME
-                            # resources={"instance_type": "Standard_E4ds_v4"},
-                            variant=variant_string,
-                            name=(
-                                f"{experiment_name}_{variant_id}"
-                                f"_{timestamp}_{data_ref}"
-                                ),
-                            display_name=(
-                                f"{experiment_name}_{variant_id}"
-                                f"_{timestamp}_{data_ref}"
-                            ),
-                            environment_variables={
-                                "key1": "value1"
-                                },
-                            column_mapping=exp_config_node,
-                            tags={
-                                "build_id": build_id
-                                },
-                        )
-
-                        pipeline_job = pf.runs.create_or_update(
-                            run,
-                            stream=True
-                            )
-
-                        run_ids.append(pipeline_job.name)
-                        df_result = None
-                        time.sleep(15)
-                        if (
-                            pipeline_job.status == "Completed"
-                            or pipeline_job.status == "Finished"
-                        ):
-                            logger.info("job completed")
-                            df_result = pf.get_details(pipeline_job)
-                            if save_output:
-                                dataframes.append(df_result)
-                            if save_metric:
-                                metric_variant = pf.get_metrics(pipeline_job)
-                                metric_variant[variant_id] = variant_string
-                                metric_variant["dataset"] = data_id
-                                metrics.append(metric_variant)
-                            logger.info(df_result.head(10))
                         else:
-                            raise Exception("Sorry, job failured..")
+                            logger.info(
+                                f"Using runtime '{experiment.runtime}' for the prompt flow run"
+                            )
+
+                        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                        run_name = (
+                            f"{experiment.name}_{variant_id}_{timestamp}_{dataset.name}"
+                        )
+                        runtime_resources = (
+                            None
+                            if experiment.runtime
+                            else {"instance_type": "Standard_E4ds_v4"}
+                        )
+                        run = Run(
+                            flow=flow_detail.flow_path,
+                            data=dataset.get_remote_source(pf.ml_client),
+                            variant=variant_string,
+                            name=run_name,
+                            display_name=run_name,
+                            environment_variables=env_vars,
+                            column_mapping=column_mapping,
+                            tags={} if not build_id else {"build_id": build_id},
+                            resources=runtime_resources,
+                            runtime=experiment.runtime,
+                        )
+                        run._experiment_name = experiment.name
+
+                        # Execute the run
+                        logger.info(
+                            f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
+                        )
+                        job = pf.runs.create_or_update(run, stream=True)
+                        run_ids.append(job.name)
+                        wait_job_finish(job, logger)
+
+                        df_result = pf.get_details(job)
+                        logger.info(
+                            f"Run {job.name} completed with status {job.status}",
+                        )
+                        logger.info(f"Results:\n{df_result.head(10)}")
+                        logger.info("Finished processing default variant\n")
+
+                        if save_output:
+                            dataframes.append(df_result)
+                        if save_metric:
+                            metric_variant = df_result
+                            metric_variant[variant_id] = variant_string
+                            metric_variant["dataset"] = dataset.name
+                            metrics.append(metric_variant)
+            logger.info("Finished processing all variants")
         else:
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            run = Run(
-                flow=flow,
-                data=data_id,
-                runtime=runtime,
-                # un-comment the resources parameter assignment
-                # and update the size of the compute and also
-                # comment the runtime parameter assignment to
-                # enable automatic runtime.
-                # Reference: COMPUTE_RUNTIME
-                # resources={"instance_type": "Standard_E4ds_v4"},
-                name=f"{experiment_name}_{timestamp}_{data_ref}",
-                display_name=f"{experiment_name}_{timestamp}_{data_ref}",
-                environment_variables={
-                    "key1": "value1"
-                    },
-                column_mapping=exp_config_node,
-                tags={
-                    "build_id": build_id
-                    },
-            )
-            run._experiment_name = experiment_name
-            pipeline_job = pf.runs.create_or_update(run, stream=True)
-            run_ids.append(pipeline_job.name)
-            time.sleep(15)
-            df_result = None
+            logger.info("Start processing default variant")
 
-            if (pipeline_job.status == "Completed" or
-                    pipeline_job.status == "Finished"):
-
-                logger.info("job completed")
-                df_result = pf.get_details(pipeline_job)
-                if save_output:
-                    dataframes.append(df_result)
-                if save_metric:
-                    metric_variant = pf.get_metrics(pipeline_job)
-                    metric_variant["dataset"] = data_id
-                    metrics.append(metric_variant)
-                logger.info(df_result.head(10))
+            # Create run object
+            if not experiment.runtime:
+                logger.info(
+                    "Using automatic runtime and serverless compute for the prompt flow run"
+                )
             else:
-                raise Exception("Sorry, exiting job with failure..")
+                logger.info(
+                    f"Using runtime '{experiment.runtime}' for the prompt flow run"
+                )
 
-        if (save_output or save_metric) and not os.path.exists("./reports"):
-            os.makedirs("./reports")
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            run_name = f"{experiment.name}_{timestamp}_{dataset.name}"
+            runtime_resources = (
+                None if experiment.runtime else {"instance_type": "Standard_E4ds_v4"}
+            )
+            run = Run(
+                flow=flow_detail.flow_path,
+                data=dataset.get_remote_source(pf.ml_client),
+                name=run_name,
+                display_name=run_name,
+                environment_variables=env_vars,
+                column_mapping=column_mapping,
+                tags={} if not build_id else {"build_id": build_id},
+                resources=runtime_resources,
+                runtime=experiment.runtime,
+            )
+            run._experiment_name = experiment.name
+
+            # Execute the run
+            logger.info(
+                f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
+            )
+            pf.ml_client
+            job = pf.runs.create_or_update(run, stream=True)
+            run_ids.append(job.name)
+            wait_job_finish(job, logger)
+            df_result = pf.get_details(job)
+            logger.info(f"Run {job.name} completed with status {job.status}")
+            logger.info(
+                f"Results:\n{df_result.head(10)}",
+            )
+            logger.info("Finished processing default variant\n")
+
+            if save_output:
+                dataframes.append(df_result)
+            if save_metric:
+                metric_variant = df_result
+                metric_variant["dataset"] = dataset.name
+                metrics.append(metric_variant)
+
+        # Save outputs and metrics per dataset
+        if (save_output or save_metric) and not os.path.exists(report_dir):
+            os.makedirs(report_dir)
 
         if save_output:
             combined_results_df = pd.concat(dataframes, ignore_index=True)
-            combined_results_df.to_csv(f"./reports/{data_ref}_result.csv")
+            combined_results_df.to_csv(f"{report_dir}/{dataset.name}_result.csv")
             styled_df = combined_results_df.to_html(index=False)
-            with open(f"reports/{data_ref}_result.html", "w") as c_results:
+            with open(f"{report_dir}/{dataset.name}_result.html", "w") as c_results:
                 c_results.write(styled_df)
-            all_eval_df.append(combined_results_df)
+            all_df.append(combined_results_df)
         if save_metric:
             combined_metrics_df = pd.DataFrame(metrics)
-            combined_metrics_df.to_csv(
-                f"./reports/{data_ref}_metrics.csv"
-                )
+            combined_metrics_df.to_csv(f"{report_dir}/{dataset.name}_metrics.csv")
 
-            html_table_metrics = combined_metrics_df.to_html(
-                index=False
-                )
+            html_table_metrics = combined_metrics_df.to_html(index=False)
 
-            with open(f"reports/{data_ref}_metrics.html", "w") as full_metric:
+            with open(f"{report_dir}/{dataset.name}_metrics.html", "w") as full_metric:
                 full_metric.write(html_table_metrics)
-            all_eval_metrics.append(combined_metrics_df)
+            all_metrics.append(combined_metrics_df)
 
+    # Write to file run ids
     if output_file is not None:
         with open(output_file, "w") as out_file:
             out_file.write(str(run_ids))
     logger.info(str(run_ids))
 
+    # Save outputs and metrics for experiment
     if save_output:
-        final_results_df = pd.concat(all_eval_df, ignore_index=True)
-        final_results_df["stage"] = stage
-        final_results_df["experiment_name"] = experiment_name
+        final_results_df = pd.concat(all_df, ignore_index=True)
+        final_results_df["stage"] = env_name
+        final_results_df["experiment_name"] = experiment.name
         final_results_df["build"] = build_id
-        final_results_df.to_csv(
-            f"./reports/{experiment_name}_result.csv"
-            )
+        final_results_df.to_csv(f"./{report_dir}/{experiment.name}_result.csv")
         styled_df = final_results_df.to_html(index=False)
-        with open(f"reports/{experiment_name}_result.html", "w") as results:
+        with open(f"{report_dir}/{experiment.name}_result.html", "w") as results:
             results.write(styled_df)
-        logger.info("Saved the results in files in reports folder")
+        logger.info(f"Saved the results in files in {report_dir} folder")
 
     if save_metric:
-        final_metrics_df = pd.concat(
-            all_eval_metrics,
-            ignore_index=True
-            )
-
-        final_metrics_df.to_csv(
-            f"./reports/{experiment_name}_metrics.csv"
-            )
-
-        html_table_metrics = final_metrics_df.to_html(
-            index=False
-            )
-
-        with open(f"reports/{experiment_name}_metrics.html", "w") as f_metrics:
+        final_metrics_df = pd.concat(all_metrics, ignore_index=True)
+        final_metrics_df.to_csv(f"./{report_dir}/{experiment.name}_metrics.csv")
+        html_table_metrics = final_metrics_df.to_html(index=False)
+        with open(f"{report_dir}/{experiment.name}_metrics.html", "w") as f_metrics:
             f_metrics.write(html_table_metrics)
 
-        logger.info("Saved the metrics in files in reports folder")
+        logger.info(f"Saved the metrics in files in {report_dir} folder")
 
 
 def main():
@@ -355,66 +356,81 @@ def main():
     """
     parser = argparse.ArgumentParser("prompt_bulk_run")
     parser.add_argument(
-        "--subscription_id",
+        "--file",
         type=str,
-        help="Azure subscription id",
-        required=True,
+        help="The experiment file. Default is 'experiment.yaml'",
+        required=False,
+        default="experiment.yaml",
     )
     parser.add_argument(
-        "--build_id",
+        "--variants",
         type=str,
-        help="Unique identifier for build execution",
+        help="Defines the variants to run. (* for all, defaults for all defaults, or comma separated list)",
+        default="*",
+    )
+    parser.add_argument(
+        "--subscription_id",
+        type=str,
+        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        default=None,
+    )
+    parser.add_argument(
+        "--base_path",
+        type=str,
+        help="Base path of the use case",
         required=True,
     )
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment",
-        required=True,
+        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        default=None,
     )
     parser.add_argument(
-        "--data_purpose",
+        "--build_id",
         type=str,
-        help="data identified by purpose",
-        required=True
+        help="Unique identifier for build execution",
+        default=None,
     )
     parser.add_argument(
-        "--output_file",
+        "--report_dir",
         type=str,
-        required=True,
-        help="a file to save run ids"
+        default="./reports",
+        help="A folder to save evaluation results and metrics",
     )
     parser.add_argument(
-        "--flow_to_execute",
-        type=str,
-        help="flow use case name",
-        required=True
+        "--output_file", type=str, required=False, help="A file to save run ids"
     )
     parser.add_argument(
         "--save_output",
-        help="Save the outputs in files",
+        help="Save the outputs to report dir",
         required=False,
         action="store_true",
     )
     parser.add_argument(
         "--save_metric",
-        help="Save the metrics in files",
+        help="Save the metrics to report dir",
         required=False,
         action="store_true",
     )
     args = parser.parse_args()
 
     prepare_and_execute(
+        VariantsSelector.from_args(args.variants),
+        args.file,
+        args.base_path,
         args.subscription_id,
+        args.report_dir,
         args.build_id,
-        args.flow_to_execute,
         args.env_name,
         args.output_file,
-        args.data_purpose,
         args.save_output,
         args.save_metric,
     )
 
 
 if __name__ == "__main__":
+    # Load variables from .env file into the environment
+    load_dotenv(override=True)
+
     main()

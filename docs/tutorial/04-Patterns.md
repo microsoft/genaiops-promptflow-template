@@ -29,13 +29,12 @@ A Flow can be evaluated using different datasets. E.g. a dataset with synthetic 
 Multiple data sets can be added by following the steps mentioned below:
 
 - Add the data JSONL file to `data` directory for the specific use case folder. Example: for [web_classification](../../web_classification/) use case there are more than one data files: [data](../../web_classification/data/).
-- Add a new `datasets` block in the `configs/data_config.json` file for the specific use case folder. Example: for [web_classification](../../web_classification/) use case there are more than one datasets defined in: [data_config.json](../../web_classification/configs/data_config.json).
+- Add a new dataset in the `datasets` block in the `experiment.yaml` file for the specific use case folder (see file [description](../the_experiment_file.md) and [specs](../experiment.yaml)). Example: for [web_classification](../../web_classification/) use case there are more than one datasets defined in: [experiment.yaml](../../web_classification/experiment.yaml).
 
 ### Execute flows with different runtimes
 
 - Flow can be executed locally using the [VS Code extension](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/community-ecosystem?view=azureml-api-2#vs-code-extension) or [CLI](https://learn.microsoft.com/en-us/azure/machine-learning/prompt-flow/community-ecosystem?view=azureml-api-2#prompt-flow-sdkcli) or using [run_local.py](../../local_execution/prompt_experimentation/run_local.py) script. Example: for [web_classification](../../web_classification/) use case [web_classification_local_experiment.py](../../local_execution/web_classification_local_experiment.py) script is used to execute the flow locally.
-- Flows can be executed using dedicated runtime and compute instance in Azure ML from CI/CD pipelines. This is the default behavior of the [GitHub Actions](../../.github/workflows/) in this repo and the runtime need to be configured in the `llmops_config.json` file in the root of the specific use case folder. Example: for [web_classification](../../web_classification/) use case runtime is configured in [llmops_config.json](../../web_classification/llmops_config.json) file.
-- Flows can also be executed using automatic runtime and serverless compute in Azure ML from CI/CD pipelines. This can be enabled easily minimal change in code. (search for COMPUTE_RUNTIME in code for such changes) and also remove any value in `config.json` for each use-case example for `RUNTIME_NAME`.
+- Flows can be executed in Azure ML using dedicated runtime and compute instance OR using automatic runtime and serverless compute. To use a dedicated runtime and compute instance, set the name of the runtime in the `experiment.yaml` file in the root of the specific use case folder. To use automatic runtime and serverless compute, do not set the runtime in the `experiment.yaml` file and the automatic runtime will be use by default.
 
 ### Deploy flows with different deployment targets
 
