@@ -380,7 +380,7 @@ From local machine, create a new git branch `featurebranch` from `development` b
 git checkout -b featurebranch
 ```
 
-> Important: The pipeline expects the variables `rg_name`, `ws_name` and `kv_name` to be available in the variable group `llmops_platform_dev_vg` (this should have already been created and set [here](#create-an-azure-devops-variable-group)). These variables should contain the values of the Azure resources in the dev environment. To add a new environment, you must create a new variable group `llmops_platform_<env>_vg` and populate it with the variable values from the new environment. This variable group can then be used in the new pipelines created for that environment.
+> **Important**: The pipeline expects the variables `rg_name`, `ws_name` and `kv_name` to be available in the variable group `llmops_platform_dev_vg` (this should have already been created and set [here](#create-an-azure-devops-variable-group)). These variables should contain the values of the Azure resources in the dev environment. To add a new environment, you must create a new variable group `llmops_platform_<env>_vg` and populate it with the variable values from the new environment. This variable group can then be used in the new pipelines created for that environment.
 
 The rest of the pipeline configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
 
