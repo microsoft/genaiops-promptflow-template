@@ -9,41 +9,50 @@ AML workspace.
 --workspace_name: The AML workspace name.
 """
 
+import argparse
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
+from dotenv import load_dotenv
+from typing import Optional
+
 from llmops.common.logger import llmops_logger
-import argparse
+from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 
 logger = llmops_logger("get_workspace")
 
 
-def get_workspace(subscription_id: str,
-                  resource_group_name: str,
-                  workspace_name: str):
+def get_workspace(
+    subscription_id: Optional[str],
+    resource_group_name: Optional[str],
+    workspace_name: Optional[str],
+):
     """
     Run to get workspace object.
 
     This function uses default Azure credentials.
 
     Args:
-        subscription_id (str): user provided azure subscription id.
-        resource_group_name (str): user provided resource group name.
-        workspace_name (str): user provided azure AML workspace name.
+        subscription_id (Optional[str]): user provided azure subscription id. If not provided, uses SUBSCRIPTION_ID environment variable.
+        resource_group_name (Optional[str]): user provided resource group name. If not provided, uses RESOURCE_GROUP_NAME environment variable.
+        workspace_name (Optional[str]): user provided azure AML workspace name. If not provided, uses WORKSPACE_NAME environment variable.
 
     Returns:
         object: The generated workspace object
     """
     try:
-        logger.info(f"Getting access to {workspace_name} workspace.")
+        config = ExperimentCloudConfig(
+            subscription_id, resource_group_name, workspace_name
+        )
+        logger.info(f"Getting access to {config.workspace_name} workspace.")
         client = MLClient(
             DefaultAzureCredential(),
-            subscription_id=subscription_id,
-            resource_group_name=resource_group_name,
-            workspace_name=workspace_name,
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            workspace_name=config.workspace_name,
         )
 
         workspace = client.workspaces.get(workspace_name)
-        logger.info(f"Reference to {workspace_name} has been obtained.")
+        logger.info(f"Reference to {workspace.name} has been obtained.")
         return workspace
     except Exception as ex:
         logger.info("Oops! invalid credentials.. Try again...")
@@ -62,28 +71,30 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Azure subscription id"
-        )
+        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        default=None,
+    )
 
     parser.add_argument(
         "--resource_group_name",
         type=str,
-        help="Azure Machine learning resource group"
+        help="Azure Machine learning resource group, overrides the RESOURCE_GROUP_NAME environment variable",
+        default=None,
     )
     parser.add_argument(
         "--workspace_name",
         type=str,
-        help="Azure Machine learning Workspace name"
+        help="Azure Machine learning Workspace name, overrides the WORKSPACE_NAME environment variable",
+        default=None,
     )
 
     args = parser.parse_args()
 
-    get_workspace(
-        args.subscription_id,
-        args.resource_group_name,
-        args.workspace_name
-        )
+    get_workspace(args.subscription_id, args.resource_group_name, args.workspace_name)
 
 
 if __name__ == "__main__":
+    # Load variables from .env file into the environment
+    load_dotenv(override=True)
+
     main()

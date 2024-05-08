@@ -194,7 +194,8 @@ curl --request GET \
 
 The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime.
 
-The template supports using dedicated compute instances and runtimes by default and 'automatic runtime' can be enabled easily with minimal change in code. (Search for COMPUTE_RUNTIME in code for such changes. The comments in code provides additional information and context for required changes.) and also remove any value in `llmops_config.json` for each use-case example for `RUNTIME_NAME`.
+The template supports using 'automatic runtime' and dedicated compute instances and runtimes. This is configured in the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)).
+
 
 ## Set up Github Repo
 
@@ -239,6 +240,23 @@ More details about how to create a basic Github workflows in general can be foun
 From your GitHub project, select **Settings** -> **Secrets and  variables**,  **Actions** and **New repository secret**. Create a Github repository secret named 'AZURE_CREDENTIALS' with information related to Azure Service Principal. You can paste the service principal output as the content of the secret and use [this document](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-a-service-principal-secret) as a reference.
 
 ![Screenshot of GitHub Secrets.](images/github-secrets.png)
+
+## Set up GitHub variables for each environment
+
+There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. 
+
+From your GitHub project, select **Settings** -> **Environments**, select "New environment" and call it `dev`
+![Screenshot of GitHub environments.](images/github-environments-new-env.png)
+
+Add a new variable for each of `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` with the corresponding values from the `dev` environment. 
+
+![Screenshot of GitHub environment variable](images/github-environments-new-var.png)
+
+Repeat the same process for a new `pr` environment (you will likely want to reuse the same values as the `dev` environment). 
+
+You should have 2 GitHub environments `pr` and `dev`, each with 3 variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. You can view all environment specific variables by navigating to **Settings** -> **Secrets and  variables**,  **Actions**, **Variables**. You should have something that looks like this: 
+
+![Screenshot of GitHub environment specific variables](images/github-environments-all-vars.png)
 
 ## Setup connections for Prompt flow
 
@@ -325,21 +343,13 @@ git checkout -b featurebranch
 
 ```
 
-Update the `llmops_config.json` file for any one of the examples (e.g. `named_entity_recognization`). Update configuration so that we can create a pull request for any one of the example scenarios (e.g. named_entity_recognition). Navigate to scenario folder and update the `llmops_config.json` file. Update the KEYVAULT_NAME, RESOURCE_GROUP_NAME, RUNTIME_NAME and WORKSPACE_NAME. Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` in `configs/deployment_config.json` file  for deployment to Azure Machine Learning compute. Update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`,  and `USER_MANAGED_ID` in `configs/deployment_config.json` file  for deployment to Azure Web App.
+The pipeline expects the variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` to be available in a GitHub environment (this should have already been created and set [here](#set-up-github-variables-for-each-environment)). These variables should contain the values of the Azure resources in the dev environment.
 
-### Update llmops_config.json
+The rest of the pipeline configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
 
-Modify the configuration values in the `llmops_config.json` file available for each example based on description.
-
-- `ENV_NAME`:  This represents the environment type. (The template supports *pr* and *dev* environments.)
-- `RUNTIME_NAME`:  This is the name of a Prompt flow runtime environment, used for executing the prompt flows. Add values to this field only when you are using dedicated runtime and compute. The template uses automatic runtime by default.
-- `KEYVAULT_NAME`:  This points to an Azure Key Vault related to the Azure ML service, a service for securely storing and managing secrets, keys, and certificates.
-- `RESOURCE_GROUP_NAME`:  Name of the Azure resource group related to Azure ML workspace.
-- `WORKSPACE_NAME`:  This is name of Azure ML workspace.
-- `STANDARD_FLOW_PATH`:  This is the relative folder path to files related to a standard flow. e.g.  e.g. "flows/standard_flow.yml"
-- `EVALUATION_FLOW_PATH`:  This is a string value referring to relative evaluation flow paths. It can have multiple comma separated values- one for each evaluation flow. e.g. "flows/eval_flow_1.yml,flows/eval_flow_2.yml"
-
-For the optional post production evaluation workflow, the above configuration will be same only `ENV_NAME` will be *postprodeval* and the respective flow path need to be mentioned in `STANDARD_FLOW_PATH` configuration.
+Before running the deployment pipelines, you need to make changes to `configs/deployment_config.json`:
+- Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` if you want to deploy to Azure Machine Learning compute
+- Or update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`, and `USER_MANAGED_ID`if you want to deploy to Azure Web App.
 
 ### Update deployment_config.json in config folder
 
@@ -401,23 +411,9 @@ Now a new PR can be opened from `development` branch to the `main` branch. This 
 
 There are multiple configuration files for enabling Prompt flow run and evaluation in Azure ML and Github workflows
 
-### Update mapping_config.json in config folder
+### Update the experiment.yaml file
 
-Modify the configuration values in the `mapping_config.json` file based on both the standard and evaluation flows for an example. These are used in both experiment and evaluation flow execution.
-
-- `experiment`: This section defines inputs for standard flow. The values comes from corresponding experiment dataset.
-- `evaluation`: This section defines the inputs for the related evaluation flows. The values generally comes from two sources - dataset and output from bulk run. Evaluation involves comparing predictions made during bulk run execution of a standard flow with corresponding expected ground truth values and eventually used to assess the performance of prompt variants.
-
-### Update data_config.json in config folder
-
-Modify the configuration values in the `data_config.json` file based on the environment. These are required in creating data assets in Azure ML and also consume them in pipelines.
-
-- `ENV_NAME`: This indicates the environment name, referring to the "development" or "production" or any other environment where the prompt will be deployed and used in real-world scenarios.
-- `DATA_PURPOSE`: This denotes the purpose of the data usage. This includes data for pull-request(pr_data), experimentation(training_data) or evaluation(test_data). These 3 types are supported by the template.
-- `DATA_PATH`: This points to the file path e.g. "flows/web_classification/data/data.jsonl".
-- `DATASET_NAME`: This is the name used for the created Data Asset on Azure ML. Special characters are not allowed for naming the dataset.
-- `RELATED_EXP_DATASET`: This element is used to relate data used for bulk run with the data used for evaluation. The value is the name of the dataset used for standard flow.
-- `DATASET_DESC`: This provides a description for the dataset.
+To make any changes to your experiment set-up, refer to the `experiment.yaml` in the base path of your use-case. This file configures your use-case including flows and datasets. (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml) for more details)
 
 ### Update data folder with data files
 

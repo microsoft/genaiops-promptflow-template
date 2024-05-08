@@ -1,0 +1,21 @@
+name: math_coding
+flow: flows/math_standard_flow
+
+datasets:
+- name: math_coding_training
+  source: data/math_data.jsonl
+  description: "This dataset is for prompt experiments."
+  mappings:
+    math_question: "${data.question}"
+
+evaluators:
+- name: math_evaluation_flow
+  flow: flows/math_evaluation_flow
+  datasets:
+  - name: math_coding_test
+    reference: math_coding_training
+    source: data/test_data.jsonl
+    description: "This dataset is for evaluating flows."
+    mappings:
+      groundtruth: "${data.groundtruth}"
+      prediction: "${run.outputs.answer}"

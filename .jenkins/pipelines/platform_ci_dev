@@ -4,12 +4,17 @@ pipeline {
 
     environment {
         AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
     }
 
     parameters {
-        string(name: 'flow_type', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
         string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, webapp')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+        string(name: 'kv_name', description: 'Azure Key Vault Name')
     }
 
     stages {
@@ -29,8 +34,7 @@ pipeline {
                     sh '''
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
-                    --data_purpose "training_data" \\
-                    --flow_to_execute $flow_type \\
+                    --base_path $use_case_base_path \\
                     --env_name $env_name
                     '''
                 }
@@ -48,8 +52,7 @@ pipeline {
                     sh '''
                     python -m llmops.common.prompt_pipeline \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
-                    --data_purpose "training_data" \\
-                    --flow_to_execute $flow_type \\
+                    --base_path $use_case_base_path \\
                     --build_id $BUILD_NUMBER \\
                     --env_name $env_name \\
                     --output_file run_id.txt
@@ -67,8 +70,7 @@ pipeline {
                     sh '''
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
-                    --data_purpose ""test_data"" \\
-                    --flow_to_execute $flow_type \\
+                    --base_path $use_case_base_path \\
                     --env_name $env_name
                     '''
                 }
@@ -99,8 +101,7 @@ pipeline {
                     python -m llmops.common.prompt_eval \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --build_id $BUILD_NUMBER \\
-                    --data_purpose ""test_data"" \\
-                    --flow_to_execute $flow_type \\
+                    --base_path $use_case_base_path \\
                     --env_name $env_name \\
                     --run_id $run_id
                     '''
@@ -123,10 +124,13 @@ pipeline {
             steps {
                 script {
                     build job: 'platform_cd_dev', parameters: [
-                        string(name: 'flow_type', value: "${params.flow_type}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
-                        string(name: 'run_id', value: "${run_id}")
+                        string(name: 'run_id', value: "${run_id}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
                     ]
                 }
             }

@@ -8,4 +8,6 @@ pytest==7.1.2
 azure-ai-ml==1.13.0
 azure-identity==1.11.0
 mldesigner==0.1.0b4
-
+pandas==2.2.1
+python-dotenv>=0.10.3
+promptflow==1.6.0

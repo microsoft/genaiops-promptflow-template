@@ -1,0 +1,36 @@
+name: web_classification
+flow: flows/experiment
+
+datasets:
+- name: web_classification_train
+  source: data/data.jsonl
+  description: "This dataset is for prompt experiments."
+  mappings:
+    url: "${data.url}"
+- name: web_classification_train_new
+  source: data/data_new.jsonl
+  description: "This dataset is for prompt experiments."
+  mappings:
+    url: "${data.url}"
+
+evaluators:
+- name: web_classification_flow
+  flow: flows/evaluation
+  datasets:
+  - name: web_classification_train_eval
+    reference: web_classification_train
+    source: data/eval_data.jsonl
+    description: "This dataset is for evaluating flows."
+    mappings:
+      groundtruth: "${data.answer}"
+      prediction: "${run.outputs.category}"
+- name: web_classification_flow_adv
+  flow: flows/evaluation_adv
+  datasets:
+  - name: web_classification_train_new_eval
+    reference: web_classification_train_new
+    source: data/eval_data_new.jsonl
+    description: "This dataset is for evaluating flows."
+    mappings:
+      groundtruth: "${data.answer}"
+      prediction: "${run.outputs.category}"

@@ -2,22 +2,16 @@
 This module evaluates bulk-runs using evaluation flows.
 
 Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---build_id: The unique identifier for build execution.
-This argument is required to identify the specific build execution.
 --env_name: The environment name for execution/deployment.
 This argument is required to specify the environment (dev, test, prod)
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---run_id: The bulk run IDs.
-This argument is required to specify the bulk run IDs for execution.
---flow_to_execute: The name of the flow use case.
+--base_path: The base path of the flow use case.
 This argument is required to specify the name of the flow for execution.
+--connection_details: JSON string describing the details of local pf connection.
 """
 
 import argparse
 import json
+from dotenv import load_dotenv
 from promptflow.entities import AzureOpenAIConnection
 from promptflow import PFClient
 
@@ -27,8 +21,8 @@ logger = llmops_logger("prompt_aoai_connection")
 
 
 def prepare_and_execute(
-    flow_to_execute,
-    stage,
+    base_path,
+    env_name,
     connection_details,
 ):
     """
@@ -42,17 +36,11 @@ def prepare_and_execute(
     Returns:
         None
     """
-    main_config = open(f"{flow_to_execute}/llmops_config.json")
-    model_config = json.load(main_config)
+    logger.info(f"Using environment '{env_name}'")
 
     secret_config = json.loads(connection_details)
 
-    for obj in model_config["envs"]:
-        if obj.get("ENV_NAME") == stage:
-            logger.info("valid environment is found")
-            break
-
-    dep_config = f"{flow_to_execute}/configs/deployment_config.json"
+    dep_config = f"{base_path}/configs/deployment_config.json"
     config_file = open(dep_config)
 
     pf = PFClient()
@@ -60,25 +48,23 @@ def prepare_and_execute(
     connection_config = json.load(config_file)
     for elem in connection_config["webapp_endpoint"]:
         if "CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
-            if stage == elem["ENV_NAME"]:
+            if env_name == elem["ENV_NAME"]:
                 con_to_create = list(elem["CONNECTION_NAMES"])
 
                 for con in con_to_create:
                     for avail_con in secret_config:
-                        if avail_con['name'] == con:
-                            if avail_con['type'] == "azure_open_ai":
+                        if avail_con["name"] == con:
+                            if avail_con["type"] == "azure_open_ai":
                                 connection = AzureOpenAIConnection(
-                                    name=avail_con['name'],
-                                    api_key=avail_con['api_key'],
-                                    api_base=avail_con['api_base'],
-                                    api_type=avail_con['api_type'],
-                                    api_version=avail_con['api_version']
+                                    name=avail_con["name"],
+                                    api_key=avail_con["api_key"],
+                                    api_base=avail_con["api_base"],
+                                    api_type=avail_con["api_type"],
+                                    api_version=avail_con["api_version"],
                                 )
                                 pf.connections.create_or_update(connection)
 
-                                logger.info(
-                                    f"{avail_con['name']} created successfully"
-                                    )
+                                logger.info(f"{avail_con['name']} created successfully")
 
 
 def main():
@@ -91,34 +77,33 @@ def main():
     parser = argparse.ArgumentParser("aoai_pf_connection")
 
     parser.add_argument(
-        "--flow_to_execute",
+        "--base_path",
         type=str,
-        help="flow use case name",
-        required=True
+        help="Base path of the use case",
+        required=True,
     )
 
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment",
-        required=True,
+        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        default=None,
     )
 
     parser.add_argument(
         "--connection_details",
         type=str,
-        help="details of local pf connection name",
+        help="JSON string describing the details of local pf connection",
         required=True,
     )
 
     args = parser.parse_args()
 
-    prepare_and_execute(
-        args.flow_to_execute,
-        args.env_name,
-        args.connection_details
-    )
+    prepare_and_execute(args.base_path, args.env_name, args.connection_details)
 
 
 if __name__ == "__main__":
+    # Load variables from .env file into the environment
+    load_dotenv(override=True)
+
     main()

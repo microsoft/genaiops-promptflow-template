@@ -6,7 +6,7 @@ inputs:
   SUBSCRIPTION_ID:
     description: "subscription id needed for deployment"
     required: true
-  flow_to_execute:
+  use_case_base_path:
     description: "the flow to be registered and deployed"
     required: true
   MODEL_VERSION:
@@ -14,6 +14,15 @@ inputs:
     required: true
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
+    required: true
+  RESOURCE_GROUP_NAME:
+    description: "Resource group name"
+    required: true
+  WORKSPACE_NAME:
+    description: "Workspace name"
+    required: true
+  KEY_VAULT_NAME:
+    description: "Key vault name"
     required: true
 
 
@@ -30,7 +39,7 @@ runs:
             --build_id ${{ github.run_id }} \
             --output_file "endpoint_principal.txt" \
             --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
-            --flow_to_execute ${{ inputs.flow_to_execute }}
+            --base_path ${{ inputs.use_case_base_path }}
 
     - name: Read system managed id information
       shell: bash
@@ -43,18 +52,15 @@ runs:
     - name: Assign Azure resource permissions
       shell: bash
       run: |
-        file_path="./${{ inputs.flow_to_execute }}/llmops_config.json"
-        desired_type=${{ inputs.DEPLOY_ENVIRONMENT }}
-        selected_object=$(jq ".envs[] | select(.ENV_NAME == \"$desired_type\")" "$file_path")
+        KEY_VAULT_NAME=${{ inputs.KEY_VAULT_NAME }}
+        echo $KEY_VAULT_NAME
 
-        if [[ -n "$selected_object" ]]; then
-          echo "$selected_object"
-          KEY_VAULT_NAME=$(echo "$selected_object" | jq -r '.KEYVAULT_NAME')
-          RESOURCE_GROUP_NAME=$(echo "$selected_object" | jq -r '.RESOURCE_GROUP_NAME')
-          WORKSPACE_NAME=$(echo "$selected_object" | jq -r '.WORKSPACE_NAME')
-        else
-          echo "Object not found"
-        fi
+        RESOURCE_GROUP_NAME=${{ inputs.RESOURCE_GROUP_NAME }}
+        echo $RESOURCE_GROUP_NAME
+
+        WORKSPACE_NAME=${{ inputs.WORKSPACE_NAME }}
+        echo $WORKSPACE_NAME
+
         az role assignment create --assignee $ENDPOINT_PRINCIPAL --role "AzureML Data Scientist" --scope "/subscriptions/${{ inputs.SUBSCRIPTION_ID }}/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
         auth_type=$(az keyvault show -n $KEY_VAULT_NAME  -g $RESOURCE_GROUP_NAME --query "properties.enableRbacAuthorization")
         if [[ -z "$auth_type" ]]; then
@@ -75,7 +81,7 @@ runs:
             --model_version ${{ inputs.MODEL_VERSION }} \
             --build_id ${{ github.run_id }} \
             --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
-            --flow_to_execute ${{ inputs.flow_to_execute }}
+            --base_path ${{ inputs.use_case_base_path }}
 
     - name: Test AML Deployment
       uses: ./.github/actions/execute_script
@@ -85,4 +91,4 @@ runs:
           python -m llmops.common.deployment.test_model_on_aml \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
             --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
-            --flow_to_execute ${{ inputs.flow_to_execute }}
+            --base_path ${{ inputs.use_case_base_path }}

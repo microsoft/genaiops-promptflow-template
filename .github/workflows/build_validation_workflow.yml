@@ -3,7 +3,7 @@ name: build_validation
 on:
   workflow_call:
     inputs:
-      flow_type:
+      use_case_base_path:
         type: string
         description: "The flow use-case to validate"
         required: true
@@ -43,7 +43,7 @@ jobs:
       - name: Execute Unit Tests
         shell: bash
         run: |
-          pytest ${{ inputs.flow_type }}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+          pytest ${{ inputs.use_case_base_path }}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
 
       - name: Publish Unit Test Results
         uses: actions/upload-artifact@v3
