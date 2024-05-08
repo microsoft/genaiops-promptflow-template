@@ -240,10 +240,10 @@ and save the connection with the name `azure_connection` (it is used in the pipe
 
 Create a new variable group `llmops_platform_dev_vg` ([follow the documentation](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=classic)) with the following variables:
 
-- AZURE_RM_SVC_CONNECTION: the name of service connection created in previous step.
-- rg_name: Name of the resource group containing the Azure ML Workspace
-- ws_name: Name of the Azure ML Workspace
-- kv_name: Name of the Key Vault associated with the Azure ML Workspace
+- **AZURE_RM_SVC_CONNECTION**: the name of service connection created in previous step.
+- **rg_name**: Name of the resource group containing the Azure ML Workspace
+- **ws_name**: Name of the Azure ML Workspace
+- **kv_name**: Name of the Key Vault associated with the Azure ML Workspace
 
 ![Variable group](./images/variable-group.png)
 
