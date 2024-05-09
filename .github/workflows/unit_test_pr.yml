@@ -1,0 +1,41 @@
+name: run_unit_tests
+
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'tests/**'
+
+
+jobs:
+  validate-code:
+    name: job for validating code and structure
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Load all build validation related dependencies
+        shell: bash
+        run: |
+          set -e # fail on error
+          python -m pip install --upgrade pip
+          python -m pip install -r .github/requirements/build_validation_requirements.txt
+          az version
+
+      - name: Execute Common Unit Tests
+        shell: bash
+        run: |
+          PYTHONPATH=. pytest tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+
+      - name: Publish Unit Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-results
+          path: "**/test-*.xml"

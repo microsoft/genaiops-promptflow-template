@@ -1,0 +1,54 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment')
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+    }
+    
+    environment {
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
+    }
+
+    stages {
+        stage('Install Dependencies') {
+            steps {
+                script {
+                    sh 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash'
+                }
+            }
+        }
+
+        // Run PR code validation
+        stage('PR Code Validation') {
+            steps {
+                script {
+                    build job: 'jobs/build_validation', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
+                    ]
+                }
+            }
+        }
+
+        // Register PR data asset in AzureML
+        stage('Register experiment data asset') {
+            steps {
+                installRequirements('execute_job_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh """
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --env_name $env_name
+                    """
+                    }
+                }
+            }
+        }
+    }
+}

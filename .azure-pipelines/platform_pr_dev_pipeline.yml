@@ -3,8 +3,12 @@ parameters:
  - name: exec_environment
    displayName: "Execution Environment"
    default: "dev"
- - name: flow_to_execute
-   displayName: "type of model to execute"
+ - name: use_case_base_path
+   displayName: "Base path of model to execute"
+ - name: RESOURCE_GROUP_NAME
+   displayName: "Resource group name"
+ - name: WORKSPACE_NAME
+   displayName: "Workspace name"
 
 stages:
     - stage: build_validation
@@ -12,22 +16,27 @@ stages:
       jobs:
         - template: build_validation_pipeline.yml
           parameters:
-            flow_to_execute: ${{ parameters.flow_to_execute }}
+            use_case_base_path: ${{ parameters.use_case_base_path }}
 
     - stage: execute_training_job
       displayName: execute_training_job
       dependsOn: 
       - build_validation
+      variables: 
+      - name: WORKSPACE_NAME
+        value: ${{ parameters.WORKSPACE_NAME }}
+      - name: RESOURCE_GROUP_NAME
+        value: ${{ parameters.RESOURCE_GROUP_NAME }}
       jobs:
       - job: Execute_ml_Job_Pipeline
         steps:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
-        
+
         #=====================================
         # Registers experiment dataset in Azure ML as Data Asset
-        # Reads appropriate field values from data_config.json based on environment and data purpose
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         #=====================================           
         - template: templates/execute_python_code.yml
           parameters:
@@ -35,8 +44,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "pr_data" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --env_name ${{ parameters.exec_environment }}
 
         #=====================================
@@ -44,7 +52,7 @@ stages:
         # Generates Reports for each RUN as well as consolidated one
         # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
         # Loads appropriate experiment data from Azure ML data asset
-        # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         # Prompt Flow connections should pre-exist 
         # used automatic (serverless) runtime by default
         #=====================================
@@ -56,6 +64,5 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
                 --env_name ${{ parameters.exec_environment }} \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "pr_data" \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --output_file run_id.txt

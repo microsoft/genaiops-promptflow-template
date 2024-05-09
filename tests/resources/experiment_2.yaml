@@ -1,0 +1,9 @@
+name: exp
+flow: exp_flow
+
+datasets:
+- name: ds1
+  source: ./data/data.jsonl
+  description: ds1_description
+  mappings:
+    ds1_input: "ds1_mapping"

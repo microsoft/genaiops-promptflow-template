@@ -3,8 +3,8 @@ name: webapp_deployment
 description: deploys container on webapp
 
 inputs:
-  FLOW_TO_EXECUTE:
-    description: "the flow to be registered and deployed"
+  USE_CASE_BASE_PATH:
+    description: "the path to the flow to be registered and deployed"
     required: true
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
@@ -17,10 +17,10 @@ runs:
     - name: prepare docker image
       uses: ./.github/actions/prepare_docker_image
       with:
-        FLOW_TO_EXECUTE: ${{ inputs.FLOW_TO_EXECUTE }}
+        USE_CASE_BASE_PATH: ${{ inputs.USE_CASE_BASE_PATH }}
         DEPLOY_ENVIRONMENT: ${{ inputs.DEPLOY_ENVIRONMENT }}
 
 
     - name: create webapp
       shell: bash
-      run: flow_to_execute=${{ inputs.FLOW_TO_EXECUTE }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/az_webapp_deploy.sh 
+      run: use_case_base_path=${{ inputs.USE_CASE_BASE_PATH }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/az_webapp_deploy.sh
