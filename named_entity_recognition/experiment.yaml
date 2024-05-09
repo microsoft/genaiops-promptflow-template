@@ -1,0 +1,22 @@
+name: named_entity_recognition
+flow: flows/standard
+
+datasets:
+- name: named_entity_recognition_train
+  source: data/data.jsonl
+  description: "This dataset is for prompt experiments."
+  mappings:
+    text: "${data.text}"
+    entity_type: "${data.entity_type}"
+
+evaluators:
+- name: matcher
+  flow: flows/evaluation
+  datasets:
+  - name: named_entity_recognition_test
+    reference: named_entity_recognition_train
+    source: data/eval_data.jsonl
+    description: "This dataset is for evaluating flows."
+    mappings:
+      ground_truth: "${data.results}"
+      entities: "${run.outputs.entities}"

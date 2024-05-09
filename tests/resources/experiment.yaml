@@ -1,0 +1,38 @@
+name: exp
+flow: exp_flow
+
+datasets:
+- name: ds1
+  source: ds1_source
+  description: ds1_description
+  mappings:
+    ds1_input: "ds1_mapping"
+- name: ds2
+  source: ds2_source
+  mappings:
+    ds2_input: "ds2_mapping"
+
+evaluators:
+- name: eval1
+  datasets:
+  - name: ds1
+    mappings:
+      ds1_input: "ds1_mapping"
+      ds1_extra: "ds1_extra_mapping"
+  - name: ds3
+    source: ds3_source
+    description: ds3_description
+    reference: ds2
+    mappings:
+      ds2_extra: "ds2_extra_mapping"
+- name: eval2
+  datasets:
+  - name: ds2
+    mappings:
+      ds2_input: "ds2_diff_mapping"
+  - name: ds4
+    source: ds4_source
+    reference: ds1
+    mappings: 
+
+runtime: runtime_name

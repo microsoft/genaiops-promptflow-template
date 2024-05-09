@@ -1,0 +1,140 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+
+    environment {
+        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
+    }
+
+    parameters {
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, webapp')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+        string(name: 'kv_name', description: 'Azure Key Vault Name')
+    }
+
+    stages {
+        stage('Checkout Actions') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        // Install requirements for job execution and register the training data asset in AzureML
+        stage('Register experiment data asset') {
+            steps {
+                installRequirements('execute_job_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --env_name $env_name
+                    '''
+                }
+            }
+
+            }
+        }
+
+        // Install requirements for build validation and execute prompt flow bulk run
+        stage('Execute prompt flow bulk run') {
+            steps {
+                installRequirements('build_validation_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.prompt_pipeline \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --build_id $BUILD_NUMBER \\
+                    --env_name $env_name \\
+                    --output_file run_id.txt
+                    '''
+                }
+            }
+            }
+        }
+
+        // Register test data set in AzureML
+        stage('Register evaluation data asset') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.register_data_asset \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --env_name $env_name
+                    '''
+                }
+            }
+            }
+        }
+
+        // Export run_id as environment variable to be used in downstream jobs
+        stage('Export run_id as environment variable') {
+            steps {
+                script {
+                    def run_id = sh (returnStdout: true, script: 'cat run_id.txt').trim()
+                    env.run_id = run_id
+                    sh 'echo $run_id'
+
+                }    
+            }
+        }
+
+        // Read last prompt flow run id and execute bulk run evaluations
+        stage('Read prompt flow runs & Execute bulk run evaluations') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    run_id=$(cat run_id.txt)
+                    echo $run_id
+                    python -m llmops.common.prompt_eval \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --build_id $BUILD_NUMBER \\
+                    --base_path $use_case_base_path \\
+                    --env_name $env_name \\
+                    --run_id $run_id
+                    '''
+                }
+            }
+            }
+        }
+
+        // Save evaluation results CSV reports as artifacts
+        stage('Archive CSV') {
+            steps {
+                script {
+                    archiveArtifacts artifacts: 'reports/', allowEmptyArchive: true, onlyIfSuccessful: true
+                }
+            }
+        }
+
+        // Execute Platform CD Pipeline to deploy flow to specified deployment type
+        stage('Execute Platform CD Pipeline to deploy flow') {
+            steps {
+                script {
+                    build job: 'platform_cd_dev', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'deployment_type', value: "${params.deployment_type}"),
+                        string(name: 'run_id', value: "${run_id}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
+                    ]
+                }
+            }
+        }
+    }
+}
+
