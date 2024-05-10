@@ -13,7 +13,7 @@ evaluators:
   flow: flows/evaluation
   datasets:
   - name: chat_with_pdf_test
-    reference: chat_with_pdf_training
+    reference: chat_with_pdf
     source: data/data.jsonl
     description: "This dataset is for evaluating flows."
     mappings:
