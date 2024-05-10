@@ -48,6 +48,7 @@ if [[ -e "$config_path" ]]; then
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
+    cp "./$use_case_base_path/environment/run" "./$use_case_base_path/docker/runit/promptflow-serve/run"
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
 
     # docker build the prompt flow based image
@@ -70,6 +71,7 @@ if [[ -e "$config_path" ]]; then
 
     docker_args=$result_string
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    echo $docker_args
     docker run $(echo "$docker_args")
 
     sleep 15
