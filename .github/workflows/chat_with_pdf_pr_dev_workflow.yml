@@ -30,6 +30,6 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      flow_type: ${{ inputs.flow_type || 'chat_with_pdf' }}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'chat_with_pdf' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
