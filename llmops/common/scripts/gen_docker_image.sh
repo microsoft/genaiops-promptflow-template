@@ -68,8 +68,12 @@ if [[ -e "$config_path" ]]; then
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
     done
+    
+    echo $CONNECTION_DETAILS
+    echo $result_string
 
     docker_args=$result_string
+
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo $docker_args
     docker run $(echo "$docker_args")
