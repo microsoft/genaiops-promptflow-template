@@ -57,7 +57,7 @@ if [[ -e "$config_path" ]]; then
     docker images
 
     deploy_config="./$use_case_base_path/configs/deployment_config.json"
-    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$deploy_environment\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
     result_string=""
