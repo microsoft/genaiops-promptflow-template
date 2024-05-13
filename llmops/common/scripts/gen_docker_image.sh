@@ -44,8 +44,11 @@ config_path="./$use_case_base_path/experiment.yaml"
 
 if [[ -e "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+
+    pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
+    # cp "./$use_case_base_path/environment/run" "./$use_case_base_path/docker/runit/promptflow-serve/run"
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
 
     # docker build the prompt flow based image
@@ -54,7 +57,7 @@ if [[ -e "$config_path" ]]; then
     docker images
 
     deploy_config="./$use_case_base_path/configs/deployment_config.json"
-    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$deploy_environment\")" "$deploy_config")
 
     read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
     result_string=""
@@ -65,9 +68,14 @@ if [[ -e "$config_path" ]]; then
         modified_name="${uppercase_name}_API_KEY"
         result_string+=" -e $modified_name=$api_key"
     done
+    
+    echo $CONNECTION_DETAILS
+    echo $result_string
 
     docker_args=$result_string
+
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    echo $docker_args
     docker run $(echo "$docker_args")
 
     sleep 15
