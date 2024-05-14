@@ -133,6 +133,7 @@ principalId="$(echo $um_details | jq -r '.[2]')"
 ```bash
 az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
 ```
+You need to give additional `Azure ML Operator` permissions to the user managed identity for accessing the workspace, if you are using promptflow in AML Pipeline.
 
 8. Grant the user managed identity permission to access the workspace keyvault (get and list)
 
@@ -229,6 +230,8 @@ The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.gi
 
 The optional third Github workflow [named_entity_recognition_post_prod_eval.yml](../.github/workflows/named_entity_recognition_post_prod_eval.yml) need to be executed manually after the deployment of the Prompt flow flow to production and collecting production logs (example log file - [production_log.jsonl](../named_entity_recognition/data/production_log.jsonl)). This workflow is used to evaluate the Prompt flow flow performance in production.
 
+The optional Github workflow [web_classification_pf_in_aml_pipeline_workflow.yml](../.github/workflows/web_classification_pf_in_aml_pipeline_workflow.yml) is used to run the promptflow in AML Pipeline as a parallel component. 
+
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
 
 - Another important step in this section is to enable workflows in the new repository just created after forking.
@@ -243,7 +246,7 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 ## Set up GitHub variables for each environment
 
-There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. 
+There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. An additional variable name `COMPUTE_TARGET` is needed to use promptflow in AML Pipeline.
 
 From your GitHub project, select **Settings** -> **Environments**, select "New environment" and call it `dev`
 ![Screenshot of GitHub environments.](images/github-environments-new-env.png)
@@ -461,6 +464,11 @@ This Github CI workflow contains the following steps:
 - Upload the sampled production log dataset
 - Execute the evaluation flow on the production log dataset
 - Generate the evaluation report
+
+**Run promptflow in AML Pipeline as parallel component**
+- It reuses the already registered data assets for input.
+- Runs the promptflow in AML Pipeline as a parallel component, where we can control the concurrency and parallelism of the promptflow execution. For more details refer [here](https://microsoft.github.io/promptflow/tutorials/pipeline.html).
+- The output of the promptflow is stored in the Azure ML workspace.
 
 ### Online Endpoint
 
