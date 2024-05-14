@@ -1,0 +1,44 @@
+name: chat_with_pdf_ci_dev_workflow
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      use_case_base_path:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "chat_with_pdf"
+      deployment_type:
+        type: string
+        description: "Determine type of deployment - aml, aks, docker, webapp"
+        required: true
+  push:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'chat_with_pdf/**'
+  
+
+#=====================================
+# Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
+jobs:
+  execute-platform-flow-ci:
+    uses: ./.github/workflows/platform_ci_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name || 'dev'}}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'chat_with_pdf' }}
+      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
+      registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}

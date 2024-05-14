@@ -1,0 +1,35 @@
+name: chat_with_pdf_pr_dev_workflow
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      use_case_base_path:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "chat_with_pdf"
+  pull_request:
+    branches:
+      - main
+      - development
+    paths:
+      - '.github/**'
+      - 'llmops/**'
+      - 'chat_with_pdf/**'
+
+#=====================================
+# Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
+jobs:
+  execute-platform-pr-workflow:
+    uses: ./.github/workflows/platform_pr_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name || 'pr'}}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'chat_with_pdf' }}
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
