@@ -2,7 +2,7 @@ parameters:
  - name: exec_environment
    displayName: "Execution Environment"
    default: "dev"
- - name: flow_to_execute
+ - name: use_case_base_path
    displayName: "type of model to execute"
  - name: deployment_type
    displayName: "determine type of deployment - aks, aml, docker, webapp"
@@ -10,9 +10,20 @@ parameters:
    displayName: "determine the variable containing all connection details"
  - name: registry_details
    displayName: "determine the variable containing acr details"
+ - name: RESOURCE_GROUP_NAME
+   displayName: "Resource group name"
+ - name: WORKSPACE_NAME
+   displayName: "Workspace name"
+ - name: KEY_VAULT_NAME
+   displayName: "KeyVault name"
 
 stages:
     - stage: execute_prompt_experiment
+      variables:
+      - name: WORKSPACE_NAME
+        value: ${{ parameters.WORKSPACE_NAME }}
+      - name: RESOURCE_GROUP_NAME
+        value: ${{ parameters.RESOURCE_GROUP_NAME }}
       jobs:
       - job: Execute_ml_Job_Pipeline
         steps:
@@ -21,7 +32,7 @@ stages:
         - template: templates/get_connection_details.yml
         #=====================================
         # Registers experiment dataset in Azure ML as Data Asset
-        # Reads appropriate field values from data_config.json based on environment and data purpose
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         #=====================================        
         - template: templates/execute_python_code.yml
           parameters:
@@ -29,8 +40,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "training_data" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --env_name ${{ parameters.exec_environment }}
 
         #=====================================
@@ -38,7 +48,7 @@ stages:
         # Generates Reports for each RUN as well as consolidated one
         # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
         # Loads appropriate experiment data from Azure ML data asset
-        # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         # Prompt Flow connections should pre-exist 
         # used automatic (serverless) runtime by default
         # writes the RUN ID in run_id.txt file. Used in next step
@@ -51,8 +61,7 @@ stages:
                 --subscription_id "$(SUBSCRIPTION_ID)" \
                 --build_id $(BUILD.BUILDID) \
                 --env_name ${{ parameters.exec_environment }} \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "training_data" \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --output_file run_id.txt
 
         #=====================================
@@ -75,7 +84,7 @@ stages:
 
         #=====================================
         # Registers evaluation dataset in Azure ML as Data Asset
-        # Reads appropriate field values from data_config.json based on environment and data purpose
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         #=====================================
         - template: templates/execute_python_code.yml
           parameters:
@@ -83,8 +92,7 @@ stages:
             script_parameter: |
               python -m llmops.common.register_data_asset \
                 --subscription_id "$(SUBSCRIPTION_ID)" \
-                --data_purpose "test_data" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --env_name ${{ parameters.exec_environment }}
 
         #=====================================
@@ -92,7 +100,7 @@ stages:
         # Generates Reports for each RUN as well as consolidated one
         # Uses each RUN ID as input to run evaluation against
         # Loads appropriate evaluation data from Azure ML data asset
-        # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+        # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
         # Prompt Flow connections should pre-exist 
         # used automatic (serverless) runtime by default
         #=====================================
@@ -104,8 +112,7 @@ stages:
                 --subscription_id $(SUBSCRIPTION_ID) \
                 --build_id $(BUILD.BUILDID) \
                 --env_name "${{ parameters.exec_environment }}" \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
-                --data_purpose "test_data" \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --run_id "$(read_run_id.RUN_NAME)"
 
         #=====================================
@@ -132,6 +139,10 @@ stages:
       variables:
       - name: run_id_from_submit_job
         value: $[ stageDependencies.execute_prompt_experiment.Execute_ml_Job_Pipeline.outputs['read_run_id.RUN_NAME'] ]
+      - name: WORKSPACE_NAME
+        value: ${{ parameters.WORKSPACE_NAME }}
+      - name: RESOURCE_GROUP_NAME
+        value: ${{ parameters.RESOURCE_GROUP_NAME }}
     #=====================================
     # Manual Approval is enabled by default
     # For removal of Manual Approval:
@@ -174,7 +185,7 @@ stages:
             script_parameter: |
               python -m llmops.common.deployment.register_model \
                 --subscription_id $(SUBSCRIPTION_ID) \
-                --flow_to_execute ${{ parameters.flow_to_execute }} \
+                --base_path ${{ parameters.use_case_base_path }} \
                 --output_file "model_version.txt" \
                 --build_id $(Build.Buildid) \
                 --env_name ${{ parameters.exec_environment }}
@@ -204,11 +215,13 @@ stages:
         - ${{ if eq(lower(parameters.deployment_type), 'aks') }}:
           - template: templates/kubernetes_deployment.yml  
             parameters:
+              RESOURCE_GROUP_NAME: ${{ parameters.RESOURCE_GROUP_NAME }}
+              WORKSPACE_NAME: ${{ parameters.WORKSPACE_NAME }}
+              KEY_VAULT_NAME: ${{ parameters.KEY_VAULT_NAME }}
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              flow_to_execute: ${{ parameters.flow_to_execute }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
-              KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         #=====================================
         # Executes AML Compute deployment when parameter deployment_type == 'aml'
@@ -218,10 +231,12 @@ stages:
           - template: templates/aml_real_deployment.yml 
             parameters:
               SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
-              flow_to_execute: ${{ parameters.flow_to_execute }}
+              RESOURCE_GROUP_NAME: ${{ parameters.RESOURCE_GROUP_NAME }}
+              WORKSPACE_NAME: ${{ parameters.WORKSPACE_NAME }}
+              KEY_VAULT_NAME: ${{ parameters.KEY_VAULT_NAME }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
-              KEY_VAULT_NAME: $(KEYVAULT_NAME)
 
         #=====================================
         # Executes Azure Webapp deployment when parameter 
@@ -231,7 +246,7 @@ stages:
         - ${{ if eq(lower(parameters.deployment_type), 'webapp') }}:
           - template: templates/webapp_deployment.yml 
             parameters:
-              FLOW_TO_EXECUTE: ${{ parameters.flow_to_execute }}
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}

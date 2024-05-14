@@ -1,5 +1,5 @@
 parameters:
-- name: FLOW_TO_EXECUTE
+- name: USE_CASE_BASE_PATH
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
@@ -10,7 +10,7 @@ parameters:
 steps:
 - template: ./prepare_docker_image.yml
   parameters:
-    FLOW_TO_EXECUTE: ${{ parameters.FLOW_TO_EXECUTE }}
+    USE_CASE_BASE_PATH: ${{ parameters.USE_CASE_BASE_PATH }}
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
     CONNECTION_DETAILS: '${{ parameters.CONNECTION_DETAILS }}'
     REGISTRY_DETAILS: '${{ parameters.REGISTRY_DETAILS }}'
@@ -23,4 +23,4 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
-      flow_to_execute=${{ parameters.FLOW_TO_EXECUTE }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.BuildNumber) CONNECTION_DETAILS='${{ parameters.CONNECTION_DETAILS }}' "./llmops/common/scripts/az_webapp_deploy.sh" 
+      use_case_base_path=${{ parameters.USE_CASE_BASE_PATH }} deploy_environment=${{ parameters.DEPLOY_ENVIRONMENT }} build_id=$(Build.BuildNumber) CONNECTION_DETAILS='${{ parameters.CONNECTION_DETAILS }}' "./llmops/common/scripts/az_webapp_deploy.sh"

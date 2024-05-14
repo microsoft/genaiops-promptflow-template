@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment')
+        string(name: 'use_case_base_path', description: 'The flow usecase to execute', defaultValue: 'math_coding')
+        choice(name: 'deployment_type', choices: ['aml', 'aks', 'webapp'],  description: 'Determine type of deployment')
+    }
+
+    // Trigger the pipeline on push to development branch
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'ref', value: '$.ref']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on ref',
+                tokenCredentialId: 'WEBHOOK-TOKEN-SECRET',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$ref',
+                regexpFilterExpression: 'refs/heads/development'
+         )
+    }
+
+    // Trigger Platform CI Dev Pipeline
+    stages {
+        stage('Trigger Platform CI Dev Pipeline') {
+            steps {
+                script {
+                    build job: 'platform_ci_dev', parameters: [
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'deployment_type', value: "${params.deployment_type}"),
+                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}"),
+                        string(name: 'kv_name', value: "${KEY_VAULT_NAME_dev}"),
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -20,8 +20,8 @@ parameters:
  - name: env_name
    displayName: "Execution Environment"
    default: "pr"
- - name: flow_to_execute
-   displayName: "flow to execute"
+ - name: use_case_base_path
+   displayName: "Base path of flow to execute"
    default: "named_entity_recognition"
 
 #=====================================
@@ -30,5 +30,7 @@ parameters:
 stages:
   - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
     parameters:
+      RESOURCE_GROUP_NAME: $(rg_name) # Expected in llmops_platform_dev_vg
+      WORKSPACE_NAME: $(ws_name)      # Expected in llmops_platform_dev_vg
       exec_environment: ${{ parameters.env_name }}
-      flow_to_execute: ${{ parameters.flow_to_execute }}
+      use_case_base_path: ${{ parameters.use_case_base_path }}

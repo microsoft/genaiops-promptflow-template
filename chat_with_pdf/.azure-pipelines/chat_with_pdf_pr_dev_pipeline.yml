@@ -1,0 +1,36 @@
+trigger: none
+pr:
+  branches:
+   include:
+     - main
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - llmops/*
+      - chat_with_pdf/*
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: llmops_platform_dev_vg
+
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "pr"
+ - name: use_case_base_path
+   displayName: "flow to execute"
+   default: "chat_with_pdf"
+
+#=====================================
+# Execute platform_pr_dev_pipeline pipeline for experiment, evaluation and deployment of flows
+#=====================================
+stages:
+  - template: ../../.azure-pipelines/platform_pr_dev_pipeline.yml
+    parameters:
+      RESOURCE_GROUP_NAME: $(rg_name) # Expected in llmops_platform_dev_vg
+      WORKSPACE_NAME: $(ws_name)      # Expected in llmops_platform_dev_vg
+      exec_environment: ${{ parameters.env_name }}
+      use_case_base_path: ${{ parameters.use_case_base_path }}

@@ -7,7 +7,7 @@ on:
         type: string
         description: "Execution Environment"
         required: true
-      flow_type:
+      use_case_base_path:
         type: string
         description: "The flow use-case to execute"
         required: true
@@ -22,12 +22,16 @@ jobs:
     name: Build Validation
     uses: ./.github/workflows/build_validation_workflow.yml
     with:
-      flow_type: ${{ inputs.flow_type }}
+      use_case_base_path: ${{ inputs.use_case_base_path }}
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}
   pr_flow_validation:
     runs-on: ubuntu-latest
     needs: pr_code_validation
+    environment: ${{ inputs.env_name }}
+    env:
+      RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+      WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
@@ -46,7 +50,7 @@ jobs:
 
       #=====================================
       # Registers experiment dataset in Azure ML as Data Asset
-      # Reads appropriate field values from data_config.json based on environment and data purpose
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       #=====================================        
       - name: Register experiment data asset
         uses: ./.github/actions/execute_script
@@ -55,8 +59,7 @@ jobs:
           script_parameter: |
             python -m llmops.common.register_data_asset \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --data_purpose "pr_data" \
-            --flow_to_execute ${{ inputs.flow_type }} \
+            --base_path ${{ inputs.use_case_base_path }} \
             --env_name ${{ inputs.env_name }}
 
       #=====================================
@@ -64,7 +67,7 @@ jobs:
       # Generates Reports for each RUN as well as consolidated one
       # Execute a RUN for each unique variant combination (keeping default variant id for other nodes)
       # Loads appropriate experiment data from Azure ML data asset
-      # Reads appropriate field values from mapping_config.json based on environment and evaluation flow name
+      # Reads appropriate field values from experiment.yaml or experiment.<env>.yaml
       # Prompt Flow connections should pre-exist 
       # used automatic (serverless) runtime by default
       #=====================================
@@ -76,9 +79,8 @@ jobs:
             python -m llmops.common.prompt_pipeline \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
             --build_id ${{ github.run_id }} \
-            --flow_to_execute ${{ inputs.flow_type }} \
+            --base_path ${{ inputs.use_case_base_path }} \
             --env_name ${{ inputs.env_name }} \
-            --data_purpose "pr_data" \
             --output_file run_id.txt
             
 

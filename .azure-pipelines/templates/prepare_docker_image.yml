@@ -1,5 +1,5 @@
 parameters:
-- name: FLOW_TO_EXECUTE
+- name: USE_CASE_BASE_PATH
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
@@ -14,7 +14,7 @@ steps:
     script_parameter: |
       python -m llmops.common.prompt_local_connections \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --flow_to_execute ${{ parameters.FLOW_TO_EXECUTE }} \
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }} \
         --connection_details '${{ parameters.CONNECTION_DETAILS }}'
 
 - task: Bash@3
@@ -24,7 +24,7 @@ steps:
     targetType: filePath
     filePath: ./llmops/common/scripts/gen_docker_image.sh
   env:
-    flow_to_execute: ${{ parameters.flow_to_execute }}
+    use_case_base_path: ${{ parameters.USE_CASE_BASE_PATH }}
     deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
     CONNECTION_DETAILS: ${{ parameters.CONNECTION_DETAILS }}
     REGISTRY_DETAILS: ${{ parameters.REGISTRY_DETAILS }}

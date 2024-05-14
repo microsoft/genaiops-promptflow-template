@@ -1,5 +1,5 @@
 parameters:
- - name: flow_to_execute
+ - name: use_case_base_path
    displayName: "type of model to execute"
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
     displayName: "Load Python Dependencies"
 
   - script: |
-      pytest ${{ parameters.flow_to_execute }}/tests  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+      pytest ${{ parameters.use_case_base_path }}/tests  --ignore=sandbox/ --junitxml=junit/test-results.xml --cov=. --cov-report=xml
     displayName: 'Run Unit Tests'
     condition: succeededOrFailed()
 

@@ -21,7 +21,7 @@ parameters:
  - name: env_name
    displayName: "Execution Environment"
    default: "dev"
- - name: flow_to_execute
+ - name: use_case_base_path
    displayName: "flow to execute"
    default: "web_classification"
  - name: deployment_type
@@ -34,8 +34,11 @@ parameters:
 stages:
   - template: ../../.azure-pipelines/platform_ci_dev_pipeline.yml
     parameters:
+      RESOURCE_GROUP_NAME: $(rg_name) # Expected in llmops_platform_dev_vg
+      WORKSPACE_NAME: $(ws_name)      # Expected in llmops_platform_dev_vg
+      KEY_VAULT_NAME: $(kv_name)      # Expected in llmops_platform_dev_vg
       exec_environment: ${{ parameters.env_name }}
-      flow_to_execute: ${{ parameters.flow_to_execute }}
+      use_case_base_path: ${{ parameters.use_case_base_path }}
       deployment_type: ${{ lower(parameters.deployment_type) }}
       connection_details: '$(COMMON_DEV_CONNECTIONS)'
       registry_details: '$(DOCKER_IMAGE_REGISTRY)'

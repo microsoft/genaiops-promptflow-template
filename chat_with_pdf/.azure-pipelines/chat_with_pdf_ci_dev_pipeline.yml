@@ -1,0 +1,45 @@
+pr: none
+trigger:
+  branches:
+   include:
+     - main
+     - development
+  paths:
+    include:
+      - .azure-pipelines/*
+      - llmops/*
+      - chat_with_pdf/*
+      - environment/*
+
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: llmops_platform_dev_vg
+
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "dev"
+ - name: use_case_base_path
+   displayName: "flow to execute"
+   default: "chat_with_pdf"
+ - name: deployment_type
+   displayName: "Determine type of deployment - aml, aks, docker, webapp"
+   default: "aml"
+
+#=====================================
+# Execute platform_ci_dev_pipeline pipeline for experiment, evaluation and deployment of flows
+#=====================================
+stages:
+  - template: ../../.azure-pipelines/platform_ci_dev_pipeline.yml
+    parameters:
+      RESOURCE_GROUP_NAME: $(rg_name) # Expected in llmops_platform_dev_vg
+      WORKSPACE_NAME: $(ws_name)      # Expected in llmops_platform_dev_vg
+      KEY_VAULT_NAME: $(kv_name)      # Expected in llmops_platform_dev_vg
+      exec_environment: ${{ parameters.env_name }}
+      use_case_base_path: ${{ parameters.use_case_base_path }}
+      deployment_type: ${{ lower(parameters.deployment_type) }}
+      connection_details: '$(COMMON_DEV_CONNECTIONS)'
+      registry_details: '$(DOCKER_IMAGE_REGISTRY)'

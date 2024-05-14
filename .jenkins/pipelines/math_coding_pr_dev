@@ -1,0 +1,42 @@
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment: pr, dev or test')
+        string(name: 'use_case_base_path', defaultValue: 'math_coding', description: 'The flow usecase to execute')
+    }
+    
+    // Trigger the pipeline on PR opened, reopened or synchronized
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'action', value: '$.action']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on $action',
+                tokenCredentialId: 'WEBHOOK-TOKEN-SECRET',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$action',
+                regexpFilterExpression: '^(opened|reopened|synchronize)$'
+         )
+    }
+
+    // Trigger Platform PR Dev Pipeline
+    stages {
+        stage('Trigger Platform PR Dev Pipeline') {
+            steps {
+                script {
+                    build job: 'platform_pr_dev', parameters: [
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
+                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}")
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,63 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+    parameters {
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
+        string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
+    }
+
+    environment {
+        dev_connections = credentials('COMMON_DEV_CONNECTIONS')
+        registry_details = credentials('DOCKER_IMAGE_REGISTRY')
+    }
+
+    // Install requirements for job execution and build validation and create local promptflow connections
+    stages {
+        stage('Create local promptflow connections') {
+            steps {
+                installRequirements('execute_job_requirements')
+                installRequirements('build_validation_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.prompt_local_connections \\
+                    --base_path ${use_case_base_path} \\
+                    --env_name ${deploy_environment} \\
+                    --connection_details "$dev_connections"
+                    '''
+                    }
+                }
+            }
+        }
+
+        // Create Docker image and push to Azure Container Registry
+        stage('Create Docker Image') {
+                steps {
+                    installRequirements('build_validation_requirements')
+                    withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
+                    string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                            # Your Docker image creation command here
+                            echo "build no script:"
+                            echo ${BUILD_NUMBER}
+                            #!/bin/bash
+                            ./llmops/common/scripts/gen_docker_image.sh --use_case_base_path $use_case_base_path --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}' --CONNECTION_DETAILS '${connection_details}'
+                        """
+                        }
+                    }
+                }
+            }
+
+        // Deploy Docker image to Azure Webapp
+        stage('Create Webapp') {
+            steps {
+                withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
+                    sh """
+                    /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --use_case_base_path $use_case_base_path --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --CONNECTION_DETAILS '${connection_details}'
+                    """
+                }
+            }
+        }
+    }
+}
