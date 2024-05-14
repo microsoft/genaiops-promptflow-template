@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 
 from azure.ai.ml import Input, MLClient, Output, command, dsl, load_component
 from azure.ai.ml.constants import AssetTypes, InputOutputModes
-from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
@@ -121,7 +120,6 @@ def prepare_and_execute(
     base_path: Optional[str] = None,
     subscription_id: Optional[str] = None,
     env_name: Optional[str] = None,
-    compute_target: Optional[str] = None,
 ):
     """
     Run the experimentation loop by executing standard flows.
@@ -210,10 +208,6 @@ def main():
         default=None,
     )
 
-    parser.add_argument(
-        "--compute_target", type=str, required=True, help="Compute target name"
-    )
-
     args = parser.parse_args()
 
     prepare_and_execute(
@@ -221,7 +215,6 @@ def main():
         args.base_path,
         args.subscription_id,
         args.env_name,
-        args.compute_target,
     )
 
 
