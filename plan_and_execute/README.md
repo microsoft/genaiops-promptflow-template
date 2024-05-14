@@ -32,13 +32,15 @@ Tools are implemented as standard Python functions, but strongly typed. In this 
 The Solver is also implemented as an AutoGen AssistantAgent. Its system message is implemented as a Prompt flow prompt. It takes as input the user's request and the plan steps results and is instructed to use the information from the plan step results to answer the user's request.
 
 ## How to setup and deploy this flow
+Notice: the current implementation support deployment with Azure DevOps only. Support for GitHub workflows will be added in the future.
+
 This example supports Azure DevOps pipelines as a platform for Flow operationalization. Please follow the instructions in [How to setup the repo with Azure DevOps](https://github.com/microsoft/llmops-promptflow-template/blob/main/docs/Azure_devops_how_to_setup.md).
 
 ### Prerequisites
 Follow the prerequisites in [How to setup the repo with Azure DevOps](https://github.com/microsoft/llmops-promptflow-template/blob/main/docs/Azure_devops_how_to_setup.md). After that, you will also need the following:
 
 - a Bing Web Search API key. You create one in your Azure subscription following the instructions [here](https://aka.ms/bingapisignup).
-- a `gpt-35-turbo` and a `gpt-4` model deployment on your Azure Open AI service. Both should be under the same service (same base URL).
+- a `gpt-35-turbo` and a `gpt-4` model deployment on your Azure Open AI service. Both should be under the same service (same base URL). Please see [here](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/working-with-models) for more details.
 - a Prompt flow custom connection. Please see below.
 
 Create a Prompt flow connection of type Custom and name it `plan_execute_agent_connection`. To do so, go to your Azure Machine Learning workspace portal, click `Prompt flow` -> `Connections` -> `Create` -> `Custom`. Fill in the key-value pairs according to the figure below:
