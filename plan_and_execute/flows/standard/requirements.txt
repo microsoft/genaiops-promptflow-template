@@ -1,0 +1,5 @@
+promptflow
+pyautogen
+bs4
+wikipedia
+numexpr

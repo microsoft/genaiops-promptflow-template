@@ -1,0 +1,29 @@
+{
+    "datasets":[
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "plan_and_execute",
+            "ENV_NAME": "pr",
+            "DATA_PURPOSE": "pr_data",
+            "DATA_PATH":"data/data.jsonl",
+            "DATASET_NAME":"temp_dataset",
+            "DATASET_DESC":"this dataset is for pr validation only"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "plan_and_execute",
+            "ENV_NAME": "dev",
+            "DATA_PURPOSE": "test_data",
+            "DATA_PATH":"data/eval_data.jsonl",
+            "DATASET_NAME":"plan_and_execute_test",
+            "RELATED_EXP_DATASET": "plan_and_execute_train",
+            "DATASET_DESC":"this dataset is for evaluating flows"
+        },
+        {
+            "PROMPT_FLOW_CONFIG_NAME": "plan_and_execute",
+            "ENV_NAME": "dev",
+            "DATA_PURPOSE": "training_data",
+            "DATA_PATH":"data/data.jsonl",
+            "DATASET_NAME":"plan_and_execute_train",
+            "DATASET_DESC":"this dataset is for prompt experiments"
+        }
+    ]
+}

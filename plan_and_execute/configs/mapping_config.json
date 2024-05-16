@@ -1,0 +1,13 @@
+{
+    "experiment": {
+        "question": "${data.question}"
+    },
+    "evaluation": {
+        "evaluation": {
+            "question": "${data.question}",
+            "generated_answer": "${run.outputs.answer}",
+            "ground_truth_answer": "${data.answer}"
+        }
+    }
+
+}
