@@ -1,15 +1,16 @@
 
-from promptflow import tool
-
+"""Solver node for the plan_and_execute flow."""
+from promptflow.core import tool
 from autogen import AssistantAgent
 from connection_utils import CustomConnection
+
 
 # The inputs section will change based on the arguments of the tool function, after you save the code
 # Adding type to arguments and return value will help the system show the types properly
 # Please update the function name/signature per need
 @tool
 def solver_tool(connection: CustomConnection, system_message: str, question: str, results: str) -> str:
-
+    """Create a final response to the user's request."""
     config_list_gpt4 = [{
         "model": connection.configs["aoai_model_gpt4"],
         "api_key": connection.secrets["aoai_api_key"],

@@ -1,8 +1,7 @@
 inputs:
   question:
     type: string
-    default: What government position was held by the woman who portrayed Corliss
-      Archer in the film Kiss and Tell?
+    default: What was the total box office performance of 'Inception' and 'Interstellar' together?
 outputs:
   answer:
     type: string

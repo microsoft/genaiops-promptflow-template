@@ -1,16 +1,16 @@
-
-from promptflow import tool
-
+"""Planner node for the plan_and_execute flow."""
+from promptflow.core import tool
 from autogen import AssistantAgent
 from connection_utils import CustomConnection
 from tools import register_tools
+
 
 # The inputs section will change based on the arguments of the tool function, after you save the code
 # Adding type to arguments and return value will help the system show the types properly
 # Please update the function name/signature per need
 @tool
 def planner_tool(connection: CustomConnection, system_message: str, question: str) -> str:
-
+    """Generate a step-by-step execution plan to solve the user's request."""
     config_list_gpt4 = [{
         "model": connection.configs["aoai_model_gpt4"],
         "api_key": connection.secrets["aoai_api_key"],
