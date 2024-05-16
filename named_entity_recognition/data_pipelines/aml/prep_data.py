@@ -7,21 +7,22 @@ from azure.storage.blob import BlobServiceClient
 import io
 
 """
-This module evaluates bulk-runs using evaluation flows.
+This function prepares data for processing.
+It reads a CSV file from a source blob storage,
+converts the CSV data to JSONL (JSON Lines) format,
+and then uploads the JSONL data to a target blob storage.
 
 Args:
---subscription_id: The Azure subscription ID.
-This argument is required for identifying the Azure subscription.
---build_id: The unique identifier for build execution.
-This argument is required to identify the specific build execution.
---env_name: The environment name for execution/deployment.
-This argument is required to specify the environment (dev, test, prod)
---data_purpose: The data identified by its purpose.
-This argument is required to specify the purpose of the data.
---run_id: The bulk run IDs.
-This argument is required to specify the bulk run IDs for execution.
---flow_to_execute: The name of the flow use case.
-This argument is required to specify the name of the flow for execution.
+--blob_service_client: The Azure blob service client.
+This argument is required for interacting with Azure blob storage.
+--source_container_name: The name of the source container in blob storage.
+This argument is required to specify the source container from where the CSV data is read.
+--target_container_name: The name of the target container in blob storage.
+This argument is required to specify the target container to where the JSONL data is uploaded.
+--source_blob: The name of the source blob in the source container.
+This argument is required to specify the source blob from where the CSV data is read.
+--target_data_assets: The target data assets in the target container.
+This argument is required to specify the target data assets to where the JSONL data is uploaded.
 """
 
 

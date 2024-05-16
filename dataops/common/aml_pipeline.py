@@ -20,7 +20,7 @@ pipeline_components = []
 ()
 
 """
-This function defines a pipeline for data preparation in Named Entity Recognition (NER) tasks.
+This function defines a AML pipeline for data preparation in Named Entity Recognition (NER) tasks.
 The pipeline is identified by its name and description, and consists of a data preparation job.
 
 The data preparation job is the first component in the pipeline components list.
@@ -50,7 +50,7 @@ def ner_data_prep_pipeline(
 
 
 """
-This function prepares a data component for a data pipeline.
+This function executes a data preparation component for a data pipeline.
 The data component is identified by its name, display name,
 and description, and is associated with a specific environment, storage account,
 source and target containers, source blob, assets, and custom compute.
