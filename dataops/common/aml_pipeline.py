@@ -5,7 +5,7 @@ from datetime import datetime
 from azure.ai.ml.dsl import pipeline
 from azure.identity import DefaultAzureCredential
 from azure.ai.ml import command, UserIdentityConfiguration
-from azure.ai.ml import Input, Output
+from azure.ai.ml import Output
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
     JobSchedule,
@@ -18,6 +18,23 @@ import json
 pipeline_components = []
 
 ()
+
+"""
+This function defines a pipeline for data preparation in Named Entity Recognition (NER) tasks.
+The pipeline is identified by its name and description, and consists of a data preparation job.
+
+The data preparation job is the first component in the pipeline components list.
+The output of the data preparation job is a target directory, which is returned by the pipeline.
+
+Decorator:
+@pipeline: A decorator to declare this function as a pipeline.
+It takes two arguments - name and description of the pipeline.
+
+Returns:
+A dictionary with the target directory as the output of the data preparation job.
+"""
+
+
 @pipeline(
     name="ner_data_prep_test",
     description="data prep pipeline",
@@ -30,6 +47,39 @@ def ner_data_prep_pipeline(
     return {
         "target_dir": prep_data_job.outputs.target_dir
     }
+
+
+"""
+This function prepares a data component for a data pipeline.
+The data component is identified by its name, display name,
+and description, and is associated with a specific environment, storage account,
+source and target containers, source blob, assets, and custom compute.
+
+Args:
+--name: The name of the data component.
+This argument is required to specify the name of the data component.
+--display_name: The display name of the data component.
+This argument is required to specify the display name of the data component.
+--description: The description of the data component.
+This argument is required to provide a description of the data component.
+--data_pipeline_code_dir: The directory of the data pipeline code.
+This argument is required to specify the directory of the data pipeline code.
+--environment: The environment for the data component.
+This argument is required to specify the environment for the data component.
+--storage_account: The storage account in Azure.
+This argument is required to specify the storage account in Azure.
+--source_container_name: The name of the source container in the storage account.
+This argument is required to specify the source container in the storage account.
+--target_container_name: The name of the target container in the storage account.
+This argument is required to specify the target container in the storage account.
+--source_blob: The name of the source blob in the source container.
+This argument is required to specify the source blob in the source container.
+--assets: The assets in the target container.
+This argument is required to specify the assets in the target container.
+--custom_compute: The custom compute for the data component.
+This argument is required to specify the custom compute for the data component.
+"""
+
 
 def get_prep_data_component(
         name,
@@ -54,7 +104,7 @@ def get_prep_data_component(
         name=name,
         display_name=display_name,
         description=description,
-        inputs={ },
+        inputs={},
         outputs=dict(
             target_dir=Output(type="uri_folder", mode="rw_mount"),
         ),
@@ -64,7 +114,7 @@ def get_prep_data_component(
                 --source_container_name {source_container_name} \
                 --target_container_name {target_container_name} \
                 --source_blob {source_blob} \
-                --assets_str {asset_str} 
+                --assets_str {asset_str}
                 """,
         environment=environment,
         compute=custom_compute,
@@ -73,6 +123,21 @@ def get_prep_data_component(
     prep_data_components.append(prep_data_component)
 
     return prep_data_components
+
+
+"""
+This function creates and returns an Azure Machine Learning (AML) client.
+The AML client is used to interact with Azure Machine Learning services.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--resource_group_name: The name of the resource group in Azure.
+This argument is required to specify the resource group in Azure.
+--workspace_name: The name of the workspace in Azure Machine Learning.
+This argument is required to specify the workspace in Azure Machine Learning.
+"""
+
 
 def get_aml_client(
         subscription_id,
@@ -88,6 +153,39 @@ def get_aml_client(
 
     return aml_client
 
+
+"""
+This function creates a pipeline job with a data component.
+The pipeline job is associated with a specific component name, display name,
+description, data pipeline, code directory, environment, storage account
+source and target containers, source blob, assets, and custom compute.
+
+Args:
+--component_name: The name of the data component.
+This argument is required to specify the name of the data component.
+--component_display_name: The display name of the data component.
+This argument is required to specify the display name of the data component.
+--component_description: The description of the data component.
+This argument is required to provide a description of the data component.
+--data_pipeline_code_dir: The directory of the data pipeline code.
+This argument is required to specify the directory of the data pipeline code.
+--aml_env_name: The name of the Azure Machine Learning environment.
+This argument is required to specify the Azure Machine Learning environment.
+--storage_account: The storage account in Azure.
+This argument is required to specify the storage account in Azure.
+--source_container_name: The name of the source container in the storage account.
+This argument is required to specify the source container in the storage account.
+--target_container_name: The name of the target container in the storage account.
+This argument is required to specify the target container in the storage account.
+--source_blob: The name of the source blob in the source container.
+This argument is required to specify the source blob in the source container.
+--assets: The assets in the target container.
+This argument is required to specify the assets in the target container.
+--custom_compute: The custom compute for the data component.
+This argument is required to specify the custom compute for the data component.
+"""
+
+
 def create_pipeline_job(
         component_name,
         component_display_name,
@@ -101,26 +199,45 @@ def create_pipeline_job(
         assets,
         custom_compute
 ):
-
     prep_data_component = get_prep_data_component(
-        name = component_name,
-        display_name = component_display_name,
-        description = component_description,
-        data_pipeline_code_dir = data_pipeline_code_dir,
-        environment = aml_env_name,
-        storage_account = storage_account,
-        source_container_name = source_container_name,
-        target_container_name = target_container_name,
-        source_blob = source_blob,
-        assets = assets,
+        name=component_name,
+        display_name=component_display_name,
+        description=component_description,
+        data_pipeline_code_dir=data_pipeline_code_dir,
+        environment=aml_env_name,
+        storage_account=storage_account,
+        source_container_name=source_container_name,
+        target_container_name=target_container_name,
+        source_blob=source_blob,
+        assets=assets,
         custom_compute=custom_compute
     )
 
     pipeline_components.extend(prep_data_component)
 
-    pipeline_job = ner_data_prep_pipeline( )
+    pipeline_job = ner_data_prep_pipeline()
 
     return pipeline_job
+
+
+"""
+This function schedules a pipeline job.
+The schedule is identified by its name, cron expression, and timezone,
+and is associated with a specific job and Azure Machine Learning client.
+
+Args:
+--schedule_name: The name of the schedule.
+This argument is required to specify the name of the schedule.
+--schedule_cron_expression: The cron expression for the schedule.
+This argument is required to specify the cron expression for the schedule.
+--schedule_timezone: The timezone for the schedule.
+This argument is required to specify the timezone for the schedule.
+--job: The job for the schedule.
+This argument is required to specify the job for the schedule.
+--aml_client: The Azure Machine Learning client.
+This argument is required to interact with Azure Machine Learning services.
+"""
+
 
 def schedule_pipeline_job(
         schedule_name,
@@ -131,9 +248,9 @@ def schedule_pipeline_job(
 ):
     schedule_start_time = datetime.utcnow()
     cron_trigger = CronTrigger(
-        expression = schedule_cron_expression,
-        start_time = schedule_start_time,
-        time_zone = schedule_timezone
+        expression=schedule_cron_expression,
+        start_time=schedule_start_time,
+        time_zone=schedule_timezone
     )
 
     job_schedule = JobSchedule(
@@ -143,6 +260,7 @@ def schedule_pipeline_job(
     aml_client.schedules.begin_create_or_update(
         schedule=job_schedule
     ).result()
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -221,26 +339,27 @@ def main():
     )
 
     job = create_pipeline_job(
-            component_name,
-            component_display_name,
-            component_description,
-            data_pipeline_code_dir,
-            aml_env_name,
-            storage_account,
-            source_container_name,
-            target_container_name,
-            source_blob,
-            assets,
-            custom_compute
-        )
-    
+        component_name,
+        component_display_name,
+        component_description,
+        data_pipeline_code_dir,
+        aml_env_name,
+        storage_account,
+        source_container_name,
+        target_container_name,
+        source_blob,
+        assets,
+        custom_compute
+    )
+
     schedule_pipeline_job(
-            schedule_name,
-            schedule_cron_expression,
-            schedule_timezone,
-            job,
-            aml_client
-        )
+        schedule_name,
+        schedule_cron_expression,
+        schedule_timezone,
+        job,
+        aml_client
+    )
+
 
 if __name__ == "__main__":
     main()

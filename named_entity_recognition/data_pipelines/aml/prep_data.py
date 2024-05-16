@@ -6,19 +6,37 @@ from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 import io
 
-# Replace the following code with the real data transformation code. This is just a placeholder data pipeline.
+"""
+This module evaluates bulk-runs using evaluation flows.
 
-def prepare_data(blob_service_client, 
-         source_container_name, 
-         target_container_name, 
-         source_blob, 
-         target_data_assets):
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--build_id: The unique identifier for build execution.
+This argument is required to identify the specific build execution.
+--env_name: The environment name for execution/deployment.
+This argument is required to specify the environment (dev, test, prod)
+--data_purpose: The data identified by its purpose.
+This argument is required to specify the purpose of the data.
+--run_id: The bulk run IDs.
+This argument is required to specify the bulk run IDs for execution.
+--flow_to_execute: The name of the flow use case.
+This argument is required to specify the name of the flow for execution.
+"""
+
+
+def prepare_data(blob_service_client,
+                 source_container_name,
+                 target_container_name,
+                 source_blob,
+                 target_data_assets):
     print('Data processing component')
 
-    source_blob_client = blob_service_client.get_blob_client(container=source_container_name, blob=source_blob)
+    source_blob_client = blob_service_client.get_blob_client(container=source_container_name,
+                                                             blob=source_blob)
     source_blob_content = source_blob_client.download_blob().readall()
 
-    assets  = [item.strip() for item in target_data_assets.split(":")]
+    assets = [item.strip() for item in target_data_assets.split(":")]
 
     df = pd.read_csv(io.StringIO(source_blob_content.decode('utf-8')))
 
@@ -29,7 +47,7 @@ def prepare_data(blob_service_client,
     # Upload JSONL data to the target container
     for asset in assets:
         target_blob_client = blob_service_client.get_blob_client(container=target_container_name,
-                                                                                blob=asset)
+                                                                 blob=asset)
         target_blob_client.upload_blob('\n'.join(jsonl_list), overwrite=True)
         print(f"CSV data converted to JSONL and uploaded successfully!: {asset}")
 
@@ -68,9 +86,14 @@ if __name__ == "__main__":
     target_container_name = args.target_container_name
     source_blob = args.source_blob
     target_data_assets = args.assets_str
-        
+
     storage_account_url = f"https://{storage_account}.blob.core.windows.net"
 
-    blob_service_client = BlobServiceClient(storage_account_url, credential=DefaultAzureCredential())
+    blob_service_client = BlobServiceClient(storage_account_url,
+                                            credential=DefaultAzureCredential())
 
-    prepare_data(blob_service_client, source_container_name, target_container_name, source_blob, target_data_assets)
+    prepare_data(blob_service_client,
+                 source_container_name,
+                 target_container_name,
+                 source_blob,
+                 target_data_assets)
