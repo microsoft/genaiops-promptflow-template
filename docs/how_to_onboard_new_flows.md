@@ -16,6 +16,10 @@ Before you begin the onboarding process, ensure you have the following prerequis
 
 ![dataops llmops](images/dataops_llmops.png)
 
+The sample data pipelines assumes that, there are raw data stored in storage account. The raw data is processed and transformed to clean jsonl files and stored in storage account or onelake.
+
+The sample CI/CD piepelines manage the lifecycle of the data pipelines. They build and deploy the pipelines to the target environments. The CI/CD pipelines also registers the required Datastores and Data Assets according to the processed jsonl files for Promptflow to consume.
+
 If you are not using data pipelines to create the data assets, the promptflow Flows will use the jsonl files inside the `data` folder to create the data assets.
 
 ## Steps to Onboard new Flows
