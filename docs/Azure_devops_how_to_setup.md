@@ -244,6 +244,7 @@ Create a new variable group `llmops_platform_dev_vg` ([follow the documentation]
 - **rg_name**: Name of the resource group containing the Azure ML Workspace
 - **ws_name**: Name of the Azure ML Workspace
 - **kv_name**: Name of the Key Vault associated with the Azure ML Workspace
+- **COMPUTE_TARGET**: Name of the compute cluster used in the Azure ML Workspace
 
 ![Variable group](./images/variable-group.png)
 
@@ -328,7 +329,9 @@ As a result the code for LLMOps Prompt flow template will now be available in Az
 
 - The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
 
-- The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements. 
+- The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements.
+  
+- There is another pipeline added :[web_classification_pf_in_aml_pipeline_workflow.yml](../.azure-pipelines/web_classification_pf_in_aml_pipeline_workflow.yml) is used to run the promptflow in AML Pipeline as a parallel component. 
 
 These following steps should be executed twice - once for PR pipeline and again for CI pipeline.
   
@@ -471,7 +474,7 @@ The sample-request.json file contains a single test record used for testing the 
 
 Manual approval is enabled by default. The template uses a dummy `replace@youremail.com` email Id. Replace this with valid email address in code.
 
-## Example Prompt Run, Evaluation and Deployment Scenario
+## Example Prompt Run,  and Deployment Scenario
 
 There are three examples in this template. While named_entity_recognition and math_coding has same functionality, web_classification has multiple evaluation flows and datasets for dev environment. This is a flow in general across all examples.
 
@@ -482,7 +485,12 @@ This Azure DevOps CI pipelines contains the following steps:
 **Run Prompts in Flow**
 - Upload bulk run dataset
 - Bulk run prompt flow based on dataset.
-- Bulk run each prompt variant 
+- Bulk run each prompt variant
+
+**Run promptflow in AML Pipeline as parallel component**
+- It reuses the already registered data assets for input.
+- Runs the promptflow in AML Pipeline as a parallel component, where we can control the concurrency and parallelism of the promptflow execution. For more details refer [here](https://microsoft.github.io/promptflow/tutorials/pipeline.html).
+- The output of the promptflow is stored in the Azure ML workspace.
 
 **Evaluate Results**
 - Upload ground test dataset
