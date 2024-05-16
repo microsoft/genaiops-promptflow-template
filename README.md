@@ -140,6 +140,8 @@ DataOps combines aspects of DevOps, agile methodologies, and data management pra
 
 The data pipelines are kept seperate from the prompt engineering flows. Data pipelines create the datasets and the datasets are registered as data assets in Azure ML for the flows to consume. This approach helps to scale and troubleshoot independently different parts of the system.
 
+For details on how to get started with DataOps, please follow this document - [How to Configure DataOps](./docs/how_to_configure_dataops.md).
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
