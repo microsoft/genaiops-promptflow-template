@@ -10,7 +10,7 @@ This document assumes that you already have gone through [How to Onboard new flo
 
 ## The Sample Implementation
 
-This repository includes an implementaion of DataOps for the named_entity_recognition sample. The sample implementation uses Azure Machine Learning to run the data pipelines.
+This repository includes an implementaion of DataOps for the `named_entity_recognition` sample. The sample implementation uses Azure Machine Learning to run the data pipelines.
 
 The data pipeline loads data from the source system and process it and stores it in the target location. The processed data is stored as jsonl files which are registered as data assets.
 
@@ -37,8 +37,3 @@ You can start by copying an existing config file and modify it with relevant val
 **Updating Flow Configuration:** The configuration of the use-case is managed by the `experiment.yaml` (sets the flow paths, datasets, and evaluations). The `experiment.yaml` in the repo uses local data files. If you are using DataOps,this config file needs to point to the Data Asset path. The data asset path will look like this `azureml://datastores/[data_store_name]/paths/[file_path]`
 
 So, update any `datasets` component in the `experiment.yaml` file and make sure the `source` field point to the Data Asset path.
-
-The `llmops_config.json` file in scenario folder contains a section for each environment (dev, test, production). The values for elements in this file should reflect the provisioned infrastructure and flows.
-
-You can start by copying an existing config file and modify it with relevant values. Provide valid values for all the configuration elements for your flow.
-
