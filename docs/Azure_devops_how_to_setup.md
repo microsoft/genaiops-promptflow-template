@@ -474,7 +474,7 @@ The sample-request.json file contains a single test record used for testing the 
 
 Manual approval is enabled by default. The template uses a dummy `replace@youremail.com` email Id. Replace this with valid email address in code.
 
-## Example Prompt Run,  and Deployment Scenario
+## Example Prompt Run, Evaluation and Deployment Scenario
 
 There are three examples in this template. While named_entity_recognition and math_coding has same functionality, web_classification has multiple evaluation flows and datasets for dev environment. This is a flow in general across all examples.
 
