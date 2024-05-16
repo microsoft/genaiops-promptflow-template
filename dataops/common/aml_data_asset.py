@@ -1,12 +1,7 @@
 """
 This module creates the data assets.
 """
-from azure.ai.ml.dsl import pipeline
-from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
-from azure.ai.ml import command
-from azure.ai.ml import Input, Output
-from azure.ai.ml import Input, Output
 from azure.ai.ml.entities import Data
 from azure.ai.ml import MLClient
 from azure.ai.ml.constants import AssetTypes
@@ -15,6 +10,20 @@ import argparse
 import json
 
 pipeline_components = []
+
+"""
+This function creates and returns an Azure Machine Learning (AML) client.
+The AML client is used to interact with Azure Machine Learning services.
+
+Args:
+--subscription_id: The Azure subscription ID.
+This argument is required for identifying the Azure subscription.
+--resource_group_name: The name of the resource group in Azure.
+This argument is required to specify the resource group in Azure.
+--workspace_name: The name of the workspace in Azure Machine Learning.
+This argument is required to specify the workspace in Azure Machine Learning.
+"""
+
 
 def get_aml_client(
         subscription_id,
@@ -30,6 +39,25 @@ def get_aml_client(
 
     return aml_client
 
+
+"""
+This function registers a data asset in Azure Machine Learning.
+The data asset is identified by its name and description, and is associated with a specific data store and file path.
+
+Args:
+--name: The name of the data asset.
+This argument is required to specify the name of the data asset.
+--description: The description of the data asset.
+This argument is required to provide a description of the data asset.
+--aml_client: The Azure Machine Learning client.
+This argument is required to interact with Azure Machine Learning services.
+--data_store: The name of the data store in Azure.
+This argument is required to specify the data store in Azure.
+--file_path: The file path of the data asset in the data store.
+This argument is required to specify the file path of the data asset in the data store.
+"""
+
+
 def register_data_asset(
         name,
         description,
@@ -39,13 +67,14 @@ def register_data_asset(
 ):
     target_path = f"azureml://datastores/{data_store}/paths/{file_path}"
     aml_dataset = Data(
-        path = target_path,
-        type = AssetTypes.URI_FILE,
-        description = description,
-        name = name
+        path=target_path,
+        type=AssetTypes.URI_FILE,
+        description=description,
+        name=name
     )
 
     aml_client.data.create_or_update(aml_dataset)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -98,12 +127,13 @@ def main():
         data_asset_description = data_asset_config['DESCRIPTION']
 
         register_data_asset(
-            name = data_asset_name,
-            description = data_asset_description,
-            aml_client = aml_client,
-            data_store = data_store,
-            file_path = data_asset_file_path
+            name=data_asset_name,
+            description=data_asset_description,
+            aml_client=aml_client,
+            data_store=data_store,
+            file_path=data_asset_file_path
         )
+
 
 if __name__ == "__main__":
     main()
