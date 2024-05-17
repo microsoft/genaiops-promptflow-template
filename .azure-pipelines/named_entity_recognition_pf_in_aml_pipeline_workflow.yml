@@ -1,0 +1,27 @@
+parameters:
+ - name: env_name
+   displayName: "Execution Environment"
+   default: "dev"
+ - name: use_case_base_path
+   displayName: "Base path of model to execute"
+   default: "named_entity_recognition"
+
+stages:
+    - stage: execute_training_job
+      displayName: execute_training_job
+      jobs:
+      - job: Execute_ml_Job_Pipeline
+        steps:
+        - template: templates/get_connection_details.yml
+
+        - template: templates/configure_azureml_agent.yml
+
+     
+        - template: templates/execute_python_code.yml
+          parameters:
+            step_name: "Execute PF IN AML Pipeline"
+            script_parameter: |
+                  python -m pf_aml_pipeline.promptflow_in_aml_pipeline \
+                  --subscription_id "$(SUBSCRIPTION_ID)" \
+                  --env_name ${{ parameters.env_name }} \
+                  --base_path ${{ parameters.use_case_base_path }}
