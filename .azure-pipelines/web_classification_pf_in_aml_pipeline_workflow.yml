@@ -15,7 +15,6 @@ stages:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
-
      
         - template: templates/execute_python_code.yml
           parameters:

@@ -17,10 +17,6 @@ on:
       azure_credentials:
         description: "service principal authentication to Azure"
         required: true
-  pull_request:
-    branches:
-      - main
-      - development
 jobs:
   flow-experiment-and_evaluation:
     name: prompt flow experiment and evaluation job in Azure ML
