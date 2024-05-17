@@ -7,11 +7,11 @@ from dotenv import load_dotenv
 from azure.ai.ml import Input, MLClient, Output, command, dsl, load_component
 from azure.ai.ml.constants import AssetTypes, InputOutputModes
 from azure.identity import DefaultAzureCredential
-from llmops.common.experiment_cloud_config import ExperimentCloudConfig
-from llmops.common.experiment import load_experiment
-from llmops.common.logger import llmops_logger
+from experiment_cloud_config import ExperimentCloudConfig
+from experiment import load_experiment
+from logger import pf_aml_logger
 
-logger = llmops_logger("promptflow_in_aml_pipeline")
+logger = pf_aml_logger("promptflow_in_aml_pipeline")
 
 pipeline_components = []
 
