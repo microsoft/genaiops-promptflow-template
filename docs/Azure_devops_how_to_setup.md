@@ -334,7 +334,7 @@ As a result the code for LLMOps Prompt flow template will now be available in Az
   b) There is another pipeline added :[web_classification_pf_in_aml_pipeline_workflow.yml](../.azure-pipelines/web_classification_pf_in_aml_pipeline_workflow.yml) 
   - It is used to run the promptflow in AML Pipeline as a parallel component. 
 
-  - You can use this to run other flows as well, all you need to do is change the use_case_base_path to other use cases, like math_coding, named_entity_recognition.
+  - You can use this to run other use cases as well, all you need to do is change the use_case_base_path to other use cases, like math_coding, named_entity_recognition.
 
 These following steps should be executed twice - once for PR pipeline and again for CI pipeline.
   
