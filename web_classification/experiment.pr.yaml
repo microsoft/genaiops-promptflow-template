@@ -1,0 +1,10 @@
+name: web_classification
+
+datasets:
+- name: web_classification_pr
+  source: data/data.jsonl
+  description: "This dataset is for pr validation only."
+  mappings:
+    url: "${data.url}"
+
+evaluators:

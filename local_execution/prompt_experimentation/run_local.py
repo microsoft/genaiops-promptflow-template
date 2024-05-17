@@ -7,7 +7,7 @@ import pandas as pd
 
 from promptflow.entities import Run
 from promptflow.entities import AzureOpenAIConnection
-from promptflow import PFClient 
+from promptflow import PFClient
 
 def are_dictionaries_similar(dict1, old_runs):
     for old_run in old_runs:
@@ -18,6 +18,11 @@ def are_dictionaries_similar(dict1, old_runs):
     
     return False
 
+def find_dictionary_by_value(key, value, list_of_dictionaries):
+    for element in list_of_dictionaries:
+        if element[key] == value:
+            return element
+
 def column_widths(column):
     max_length = max(column.astype(str).apply(len))
     return f'width: {max_length}em;'
@@ -27,13 +32,15 @@ class LocalFlowExecution:
                 exp_flow_path,
                 eval_flow_path,
                 data_path,
-                column_mapping
+                column_mapping,
+                connections_config
             ):
 
         self.exp_flow_path = exp_flow_path
         self.eval_flow_path = eval_flow_path
-        self.data_path  =  data_path
+        self.data_path = data_path
         self.column_mapping = column_mapping
+        self.connections_config = connections_config
 
         self.local_pf_client = PFClient()
 
@@ -43,7 +50,7 @@ class LocalFlowExecution:
         all_llm_nodes = set()
         all_connection_nodes = []
         default_variants = {}
-        llm_connections =  []
+        llm_connections = []
         connections = {}
 
         flow_file = f"{self.exp_flow_path}/flow.dag.yaml"
@@ -89,13 +96,15 @@ class LocalFlowExecution:
                 "deployment_name": llm_con["deployment_name"]
             }
             print(all_connection_nodes)
-            llm_connection ={}
+            llm_connection = {}
+            connection_config = find_dictionary_by_value('connection', llm_con["connection_name"], self.connections_config)
+            print(connection_config)
             llm_connection["name"] = llm_con["connection_name"]
             llm_connection["provider"] = llm_con["provider"]
-            llm_connection["api_key"] = json.loads(os.getenv(llm_con["connection_name"]))["api_key"]
-            llm_connection["api_base"] = json.loads(os.getenv(llm_con["connection_name"]))["api_base"]
-            llm_connection["api_type"] = json.loads(os.getenv(llm_con["connection_name"]))["api_type"]
-            llm_connection["api_version"] = json.loads(os.getenv(llm_con["connection_name"]))["api_version"]
+            llm_connection["api_key"] = connection_config["api_key"]
+            llm_connection["api_base"] = connection_config["api_base"]
+            llm_connection["api_type"] = connection_config["api_type"]
+            llm_connection["api_version"] = connection_config["api_version"]
             llm_connections.append(llm_connection)
 
         self.all_variants = all_variants

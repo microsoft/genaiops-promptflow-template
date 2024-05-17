@@ -15,7 +15,7 @@ class LLMOpsConfig:
         self, 
         flow_name: str = "",
         environment: str = "pr", 
-        config_path: str = "configs/llmops_config.yaml"
+        config_path: str = "llmops_config.yaml"
     ):
         """Intialize MLConfig with yaml config data."""
         self.config_path = Path(flow_name, config_path)
@@ -30,51 +30,83 @@ class LLMOpsConfig:
         return self._raw_config[__name]
     
     @property
-    def model_config(self):
-        """Get model configuration."""
-        return self._raw_config['llmops_config'][self._environment]
+    def azure_config(self):
+        """Get azure workspace config"""
+        return self._raw_config['azure_config']
+
+    @property
+    def connections(self):
+        """Get connections configuration"""
+        return self._raw_config['connections']
     
     @property
-    def mapping_config(self):
-        """Get dataset mapping configuration."""
-        return self._raw_config['llmops_config']['mapping_config']
+    def env_config(self):
+        """Get environment configuration."""
+        return self._raw_config['environments'][self._environment]
+    
+    @property
+    def base_experiment_config(self):
+        if 'experiment' in self._raw_config:
+            return self._raw_config['experiment']
+        else:
+            return None
+    
+    @property
+    def overlay_experiment_config(self):
+        if 'experiment' in self.env_config:
+            return self.env_config['experiment']
+        else:
+            return None
+    
+    @property
+    def evaluators_config(self):
+        """Get evaluator configuration."""
+        return self.overlay_experiment_config['evaluators']
     
     @property
     def deployment_configs(self):
-        """Get webapp endpoint deployment configuration."""
-        return self.model_config['deployment_configs']
-
-    @property
-    def datasets_config(self):
-        """Get datasets configuration."""
-        return self.model_config['datasets_config']
+        """Get deployment configuration."""
+        if 'deployment_configs' in self.env_config:
+            return self.env_config['deployment_configs']
+        else:
+            return None
 
     @property
     def azure_managed_endpoint_config(self):
         """Get azure managed endpoint deployment configuration."""
-        return self.model_config['deployment_configs']['azure_managed_endpoint']
+        if 'deployment_configs' in self.env_config and 'azure_managed_endpoint' in self.env_config['deployment_configs']:
+            return self.env_config['deployment_configs']['azure_managed_endpoint']
+        else:
+            return None
     
     @property
     def kubernetes_endpoint_config(self):
         """Get kubernetes endpoint deployment configuration."""
-        return self.model_config['deployment_configs']['kubernetes_endpoint']
+        if 'deployment_configs' in self.env_config and 'kubernetes_endpoint' in self.env_config['deployment_configs']:
+            return self.env_config['deployment_configs']['kubernetes_endpoint']
+        else:
+            return None
     
     @property
     def webapp_endpoint_config(self):
         """Get webapp endpoint deployment configuration."""
-        return self.model_config['deployment_configs']['webapp_endpoint']
+        if 'deployment_configs' in self.env_config and 'webapp_endpoint' in self.env_config['deployment_configs']:
+            return self.env_config['deployment_configs']['webapp_endpoint']
+        return None
     
 
-
 if __name__ == "__main__":
-    config = LLMOpsConfig(flow_name="web_classification", environment="dev")
-    print(config.model_config)
-    print(config.datasets_config)
+    config = LLMOpsConfig(flow_name="math_coding", environment="pr")
+    print(config.azure_config)
+    print(config.connections)
+    print(config.env_config)
+    print(config.base_experiment_config)
+    print(config.overlay_experiment_config)
+    print(config.evaluators_config)
     print(config.deployment_configs)
-    print(config.mapping_config)
     print(config.azure_managed_endpoint_config)
     print(config.kubernetes_endpoint_config)
     print(config.webapp_endpoint_config)
-    print(config.webapp_endpoint_config['CONNECTION_NAMES'])
-    for connection in config.webapp_endpoint_config['CONNECTION_NAMES']:
-        print(connection)
+    if config.webapp_endpoint_config:
+        for webapp_endpoint in config.webapp_endpoint_config:
+            print(webapp_endpoint['CONNECTION_NAMES'])

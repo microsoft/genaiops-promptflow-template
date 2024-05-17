@@ -1,0 +1,120 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
+        string(name: 'use_case_base_path', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
+        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'aml')
+        string(name: 'run_id', description: 'run id of the flow to be deployed')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+        string(name: 'kv_name', description: 'Azure Key Vault Name')
+    }
+
+    environment {
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
+    }
+
+    stages {
+        stage('Checkout Git') {
+            steps {
+                checkout scm
+            }
+        }
+
+        // Installs requirements and registers the flow as a model in AzureML
+        stage('Register flow as model in AzureML') {
+            steps {
+                installRequirements('execute_job_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh """
+                    python -m llmops.common.deployment.register_model \
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \
+                    --base_path $use_case_base_path \
+                    --output_file "model_version.txt" \
+                    --build_id $run_id \
+                    --env_name $env_name \
+                    """
+                    }
+                }
+            }
+        }
+
+        // Export model_version and env_name_quoted as env var to be used in downstream jobs
+        stage('Export model_version and env_name_quoted as environment variable') {
+            steps {
+                script {
+                    def env_name_quoted = "\"${params.env_name}\""
+                    env.env_name_quoted = env_name_quoted
+                    def model_version = sh (returnStdout: true, script: 'cat model_version.txt').trim()
+                    env.model_version = model_version
+                    sh 'echo $model_version'
+
+                }    
+            }
+        }
+
+        // Based on the deployment type one of the stages below will deploy the model
+        stage('Deploy to AML real-time online endpoint') {
+            when {
+                expression {
+                    params.deployment_type == 'aml'
+                }
+            }
+            steps {
+                script {
+                    build job: 'jobs/aml_real_deployment', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'env_name', value: "${env_name_quoted}"),
+                        string(name: 'model_version', value: "${model_version}"),
+                        string(name: 'run_id', value: "${params.run_id}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
+                    ]
+                }
+            }
+        }
+
+        stage('Deploy to kubernetes real-time online endpoint') {
+            when {
+                expression {
+                    params.deployment_type == 'aks'
+                }
+            }
+            steps {
+                script {
+                    build job: 'jobs/kubernetes_deployment', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'env_name', value: "${env_name_quoted}"),
+                        string(name: 'model_version', value: "${model_version}"),
+                        string(name: 'run_id', value: "${params.run_id}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
+                    ]
+                }
+            }
+        }
+
+        stage('Deploy to webapp') {
+            when {
+                expression {
+                    params.deployment_type == 'webapp'
+                }
+            }
+            steps {
+                script {
+                    build job: 'jobs/webapp_deployment', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'env_name', value: "${env_name_quoted}")
+                    ]
+                }
+            }
+        }
+    }
+}
+

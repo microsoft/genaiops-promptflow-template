@@ -1,0 +1,62 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
+    parameters {
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to validate')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        // Load dependencies, login to Azure and load subscription details
+        stage('Load Dependencies') {
+            steps {
+                installRequirements('build_validation_requirements')
+                sh 'az version'
+            }
+        }
+
+        stage('Azure Login') {
+            steps {
+                azureLogin()
+                }
+            }
+
+        stage('Load Azure Subscription Details') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    export subscriptionId=$(az account show --query id -o tsv)
+                    echo "SUBSCRIPTION_ID=$AZURE_SUBSCRIPTION_ID"
+                    '''
+                }
+            }
+        }
+
+        // Execute unit tests and publish results
+        stage('Execute Unit Tests') {
+            steps {
+                withPythonEnv('/usr/bin/python3.9') {
+                    sh "pytest ${params.use_case_base_path}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
+                }
+            }
+        }
+
+        stage('Publish Unit Test Results') {
+            steps {
+                archiveArtifacts artifacts: '**/test-*.xml', fingerprint: true
+            }
+        }
+    }
+}

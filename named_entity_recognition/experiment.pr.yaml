@@ -1,0 +1,11 @@
+name: named_entity_recognition
+
+datasets:
+- name: named_entity_recognition_pr
+  source: data/data.jsonl
+  description: "This dataset is for pr validation only."
+  mappings:
+    text: "${data.text}"
+    entity_type: "${data.entity_type}"
+
+evaluators:

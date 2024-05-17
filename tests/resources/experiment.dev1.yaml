@@ -1,0 +1,5 @@
+datasets:
+- name: dsx
+  source: "dsx_source"
+  mappings: 
+    dsx_input: "dsx_mapping"

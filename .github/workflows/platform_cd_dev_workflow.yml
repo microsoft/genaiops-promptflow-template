@@ -7,7 +7,7 @@ on:
         type: string
         description: "Execution Environment"
         required: true
-      flow_type:
+      use_case_base_path:
         type: string
         description: "The flow use-case to execute"
         required: true
@@ -32,7 +32,7 @@ on:
         description: "Execution Environment"
         required: true
         default: "dev"
-      flow_type:
+      use_case_base_path:
         type: string
         description: "The flow use-case to execute"
         required: true
@@ -45,6 +45,11 @@ jobs:
   flow-deployment:
     name: prompt flow deployment job
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ inputs.env_name }}
+    env:
+      RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+      WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
@@ -73,7 +78,7 @@ jobs:
           script_parameter: |
             python -m llmops.common.deployment.register_model \
             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --flow_to_execute ${{ inputs.flow_type }} \
+            --base_path ${{ inputs.use_case_base_path }} \
             --output_file "model_version.txt" \
             --build_id ${{ github.run_id }} \
             --env_name ${{ inputs.env_name }} \
@@ -99,8 +104,11 @@ jobs:
         uses: ./.github/actions/aml_real_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
-          flow_to_execute: ${{ inputs.flow_type }}
+          use_case_base_path: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+          WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+          KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
@@ -112,8 +120,11 @@ jobs:
         uses: ./.github/actions/kubernetes_deployment
         with:
           SUBSCRIPTION_ID: ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }}
-          flow_to_execute: ${{ inputs.flow_type }}
+          use_case_base_path: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+          WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+          KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
 
       #=====================================
@@ -128,7 +139,7 @@ jobs:
           script_parameter: |
             python -m llmops.common.prompt_local_connections \
               --env_name ${{ inputs.env_name }} \
-              --flow_to_execute ${{ inputs.flow_type }} \
+              --base_path ${{ inputs.use_case_base_path }} \
               --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
         #=====================================
@@ -140,7 +151,7 @@ jobs:
         if: ${{ inputs.deployment_type == 'webapp'  }}  
         uses: ./.github/actions/webapp_deployment
         with:
-          FLOW_TO_EXECUTE: ${{ inputs.flow_type }}
+          USE_CASE_BASE_PATH: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
         env:
           CONNECTION_DETAILS: ${{ secrets.connection_details }} 

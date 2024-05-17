@@ -1,0 +1,102 @@
+@Library('shared-library') _
+pipeline {
+    agent any
+    
+    parameters {
+        string(name: 'env_name', defaultValue: "dev", description: 'env stage e.g. dev, test, prod')
+        string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'flow type to be registered and deployed')
+        string(name: 'model_version', description: 'flow version in registry to be deployed')
+        string(name: 'run_id', description: 'run id of the flow to be deployed')
+        string(name: 'kv_name', description: 'Key Vault name')
+        string(name: 'ws_name', description: 'Workspace name')
+        string(name: 'rg_name', description: 'Resource group name')
+    }
+
+    environment {
+        RESOURCE_GROUP_NAME = "${rg_name}"
+        WORKSPACE_NAME = "${ws_name}"
+        KEY_VAULT_NAME = "${kv_name}"
+    }
+
+    // Install requirements and provision AML Managed Online Endpoint
+    stages {
+        stage('Provision AML Online Endpoint') {
+            steps {
+                installRequirements('execute_job_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """               
+                        python -m llmops.common.deployment.provision_endpoint \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --build_id $run_id \
+                            --output_file "endpoint_principal.txt" \
+                            --env_name $env_name \
+                            --base_path $use_case_base_path
+                        """
+                    }
+                }
+            }
+        }
+        
+        // Assign Azure resource permissions to endpoint principal
+        stage('Assign Azure resource permissions') {
+            steps {
+                azureLogin()
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    sh '''
+                    endpoint_principal=$(cat endpoint_principal.txt)
+                    echo $KEY_VAULT_NAME
+                    echo $RESOURCE_GROUP_NAME
+                    echo $WORKSPACE_NAME
+                    echo $endpoint_principal
+
+                    az role assignment create --assignee $endpoint_principal --role "AzureML Data Scientist" --scope "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.MachineLearningServices/workspaces/$WORKSPACE_NAME"
+                    
+                    auth_type=$(az keyvault show -n $KEY_VAULT_NAME  -g $RESOURCE_GROUP_NAME --query "properties.enableRbacAuthorization")
+                    if [[ -z "$auth_type" ]]; then
+                        echo "assigning RBAC permission"
+                        az role assignment create --assignee $endpoint_principal --role "Key Vault Reader" --scope "/subscriptions/$AZURE_SUBSCRIPTION_ID/resourcegroups/$RESOURCE_GROUP_NAME/providers/Microsoft.KeyVault/vaults/$KEY_VAULT_NAME"
+                    else
+                        echo "assigning policy permission"
+                        az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $endpoint_principal --secret-permissions get list
+                    fi
+                    '''
+                }
+            }
+        }
+
+        // Provision AML Online Deployment for given model version and run id
+        stage('Provision AML Online Deployment') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                        python -m llmops.common.deployment.provision_deployment \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --model_version $model_version \
+                            --build_id $run_id \
+                            --env_name $env_name \
+                            --base_path $use_case_base_path
+                        """
+                    }
+                }
+            }
+        }
+
+        // Test Online AML Deployment
+        stage('Test AML Deployment') {
+            steps {
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        sh """
+                        python -m llmops.common.deployment.test_model_on_aml \
+                            --subscription_id $AZURE_SUBSCRIPTION_ID \
+                            --env_name $env_name \
+                            --base_path $use_case_base_path
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
