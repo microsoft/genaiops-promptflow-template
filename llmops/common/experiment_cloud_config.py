@@ -53,6 +53,7 @@ class ExperimentCloudConfig:
         resource_group_name: Optional[str] = None,
         workspace_name: Optional[str] = None,
         env_name: Optional[str] = None,
+        compute_target: Optional[str] = None,
     ):
         self.subscription_id = subscription_id or _try_get_env_var("SUBSCRIPTION_ID")
         self.resource_group_name = resource_group_name or _try_get_env_var(
@@ -60,3 +61,4 @@ class ExperimentCloudConfig:
         )
         self.workspace_name = workspace_name or _try_get_env_var("WORKSPACE_NAME")
         self.environment_name = env_name or _get_optional_env_var("ENV_NAME")
+        self.compute_target = compute_target or _get_optional_env_var("COMPUTE_TARGET")
