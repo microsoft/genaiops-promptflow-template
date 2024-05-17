@@ -58,7 +58,7 @@ jobs:
         with:
             step_name: "Run Promptflow in AML Pipeline"
             script_parameter: |
-                python -m llmops.common.promptflow_in_aml_pipeline \
+                python -m pf_aml_pipeline.promptflow_in_aml_pipeline \
                 --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
                 --env_name ${{ inputs.env_name || 'dev' }} \
                 --base_path ${{ inputs.use_case_base_path || 'web_classification'}} \
