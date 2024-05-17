@@ -231,8 +231,6 @@ The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.gi
 
 The optional third Github workflow [named_entity_recognition_post_prod_eval.yml](../.github/workflows/named_entity_recognition_post_prod_eval.yml) need to be executed manually after the deployment of the Prompt flow flow to production and collecting production logs (example log file - [production_log.jsonl](../named_entity_recognition/data/production_log.jsonl)). This workflow is used to evaluate the Prompt flow flow performance in production.
 
-The optional Github workflow [web_classification_pf_in_aml_pipeline_workflow.yml](../.github/workflows/web_classification_pf_in_aml_pipeline_workflow.yml) is used to run the promptflow in AML Pipeline as a parallel component. You can use it to run other use cases as well, for example, math_coding. Just change the use_case_base_path value in the pipeline.
-
 More details about how to create a basic Github workflows in general can be found [here](https://docs.github.com/en/actions/using-workflows).
 
 - Another important step in this section is to enable workflows in the new repository just created after forking.
@@ -277,6 +275,12 @@ Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Co
 The configuration for connection used while authoring the repo:
 
 ![connection details](images/connection-details.png)
+
+## Steps for executing the Promptflow in AML Pipeline
+  There is another github workflow  added [web_classification_pf_in_aml_pipeline_workflow.yml](../.github/workflows/web_classification_pf_in_aml_pipeline_workflow.yml) peline.
+  - It is used to run the promptflow in AML Pipeline as a parallel component.
+  - You can use this to run other use cases as well, all you need to do is change the use_case_base_path to other use cases, like math_coding, named_entity_recognition.
+
 
 ## Set up Secrets in GitHub
 
