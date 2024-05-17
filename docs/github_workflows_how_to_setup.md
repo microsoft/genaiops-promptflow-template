@@ -133,7 +133,7 @@ principalId="$(echo $um_details | jq -r '.[2]')"
 ```bash
 az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
 ```
-You need to give additional `Azure ML Operator` permissions to the user managed identity for accessing the workspace, if you are using promptflow in AML Pipeline.
+You need to give additional `Azure ML Operator` permissions to the user managed identity for accessing the workspace, if you are using promptflow in AML Pipeline. Note, this will not work in serverless. You shall need a compute cluster.
 
 8. Grant the user managed identity permission to access the workspace keyvault (get and list)
 

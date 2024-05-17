@@ -325,13 +325,16 @@ As a result the code for LLMOps Prompt flow template will now be available in Az
   ![devops-default-branch](images/devops-default-branch.png)
 
 
-6. Create two Azure Pipelines [[how to create a basic Azure Pipeline](https://learn.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs)] for each scenario (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files:
+6. a) Create two Azure Pipelines [[how to create a basic Azure Pipeline](https://learn.microsoft.com/en-us/azure/devops/pipelines/create-first-pipeline?view=azure-devops&tabs)] for each scenario (e.g. named_entity_recognition). Both Azure Pipelines should be created based on existing YAML files:
 
-- The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
+  - The first one is based on the [named_entity_recognition_pr_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_pr_dev_pipeline.yml), and it helps to maintain code quality for all PRs including integration tests for the Azure ML experiment. Usually, we recommend to have a toy dataset for the integration tests to make sure that the Prompt flow job can be completed fast enough - there is not a goal to check prompt quality and we just need to make sure that our job can be executed. 
 
-- The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements.
+  - The second Azure Pipeline is based on [named_entity_recognition_ci_dev_pipeline.yml](../named_entity_recognition/.azure-pipelines/named_entity_recognition_ci_dev_pipeline.yml) is executed automatically once new PR has been merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run, evaluation on the full dataset for all prompt variants. Both the workflow can be modified and extended based on the project's requirements.
   
-- There is another pipeline added :[web_classification_pf_in_aml_pipeline_workflow.yml](../.azure-pipelines/web_classification_pf_in_aml_pipeline_workflow.yml) is used to run the promptflow in AML Pipeline as a parallel component. 
+  b) There is another pipeline added :[web_classification_pf_in_aml_pipeline_workflow.yml](../.azure-pipelines/web_classification_pf_in_aml_pipeline_workflow.yml) 
+  - It is used to run the promptflow in AML Pipeline as a parallel component. 
+
+  - You can use this to run other flows as well, all you need to do is change the use_case_base_path to other use cases, like math_coding, named_entity_recognition.
 
 These following steps should be executed twice - once for PR pipeline and again for CI pipeline.
   
