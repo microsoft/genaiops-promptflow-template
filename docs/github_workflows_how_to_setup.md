@@ -133,6 +133,8 @@ principalId="$(echo $um_details | jq -r '.[2]')"
 ```bash
 az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
 ```
+You need to give additional `Azure ML Operator` permissions to the user managed identity for accessing the workspace, if you are using promptflow in AML Pipeline. 
+Note: this will not work in serverless. You shall need a compute cluster.
 
 8. Grant the user managed identity permission to access the workspace keyvault (get and list)
 
@@ -243,7 +245,7 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 ## Set up GitHub variables for each environment
 
-There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. 
+There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. An additional variable name `COMPUTE_TARGET` is needed to use promptflow in AML Pipeline.
 
 From your GitHub project, select **Settings** -> **Environments**, select "New environment" and call it `dev`
 ![Screenshot of GitHub environments.](images/github-environments-new-env.png)
@@ -273,6 +275,12 @@ Please go to Azure Machine Learning workspace portal, click `Prompt flow` -> `Co
 The configuration for connection used while authoring the repo:
 
 ![connection details](images/connection-details.png)
+
+## Steps for executing the Promptflow in AML Pipeline
+  There is another github workflow  added [web_classification_pf_in_aml_pipeline_workflow.yml](../.github/workflows/web_classification_pf_in_aml_pipeline_workflow.yml) peline.
+  - It is used to run the promptflow in AML Pipeline as a parallel component.
+  - You can use this to run other use cases as well, all you need to do is change the use_case_base_path to other use cases, like math_coding, named_entity_recognition.
+
 
 ## Set up Secrets in GitHub
 
@@ -461,6 +469,11 @@ This Github CI workflow contains the following steps:
 - Upload the sampled production log dataset
 - Execute the evaluation flow on the production log dataset
 - Generate the evaluation report
+
+**Run promptflow in AML Pipeline as parallel component**
+- It reuses the already registered data assets for input.
+- Runs the promptflow in AML Pipeline as a parallel component, where we can control the concurrency and parallelism of the promptflow execution. For more details refer [here](https://microsoft.github.io/promptflow/tutorials/pipeline.html).
+- The output of the promptflow is stored in the Azure ML workspace.
 
 ### Online Endpoint
 

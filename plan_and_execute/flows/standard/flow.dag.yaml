@@ -1,0 +1,48 @@
+inputs:
+  question:
+    type: string
+    default: What was the total box office performance of 'Inception' and 'Interstellar' together?
+outputs:
+  answer:
+    type: string
+    reference: ${solver.output}
+nodes:
+- name: planner_system_prompt
+  type: prompt
+  source:
+    type: code
+    path: planner_system_prompt.jinja2
+  inputs: {}
+- name: planner
+  type: python
+  source:
+    type: code
+    path: planner.py
+  inputs:
+    connection: plan_execute_agent_connection
+    system_message: ${planner_system_prompt.output}
+    question: ${inputs.question}
+- name: executor
+  type: python
+  source:
+    type: code
+    path: executor.py
+  inputs:
+    connection: plan_execute_agent_connection
+    plan: ${planner.output}
+- name: solver_system_prompt
+  type: prompt
+  source:
+    type: code
+    path: solver_system_prompt.jinja2
+  inputs: {}
+- name: solver
+  type: python
+  source:
+    type: code
+    path: solver.py
+  inputs:
+    connection: plan_execute_agent_connection
+    system_message: ${solver_system_prompt.output}
+    question: ${inputs.question}
+    results: ${executor.output}

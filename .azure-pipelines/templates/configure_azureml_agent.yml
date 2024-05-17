@@ -16,7 +16,7 @@ steps:
 
       python -m pip install --upgrade pip
       python -m pip install -r .azure-pipelines/requirements/execute_job_requirements.txt
-      python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins]
+      python -m pip install promptflow promptflow-tools promptflow-sdk jinja2 promptflow[azure] openai promptflow-sdk[builtins] PyPDF2 faiss-cpu
 
       az version
 
