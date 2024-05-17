@@ -1,0 +1,16 @@
+text	entity_type	results
+The software engineer is working on a new update for the application.	job title	software engineer
+The project manager and the data analyst are collaborating to interpret the project data.	job title	"project manager, data analyst"
+The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.	job title	"marketing manager, graphic designer"
+The CEO and CFO are discussing the financial forecast for the next quarter.	job title	"CEO, CFO"
+The web developer and UX designer are working together to improve the website's user interface.	job title	"web developer, UX designer"
+John finally decided to change his phone number after receiving too many spam calls.	phone number	None
+"If you have any questions about our products, please call our customer service at (123) 456-7890."	phone number	(123) 456-7890
+"My new phone number is (098) 765-4321, please update your contact list."	phone number	(098) 765-4321
+The phone number (321) 654-0987 is no longer in service.	phone number	(321) 654-0987
+Please dial the following phone number: (555) 123-4567 to reach our technical support.	phone number	(555) 123-4567
+John Doe has been appointed as the new CEO of the company.	people's full name	John Doe
+The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.	people's full name	F. Scott Fitzgerald
+Mary Jane Watson and Peter Parker are characters in the Spider-Man series.	people's full name	"Mary Jane Watson, Peter Parker"
+"The famous physicists, Albert Einstein and Isaac Newton, made significant contributions to the field of physics."	people's full name	"Isaac Newton, Albert Einstein"
+The Eiffel Tower is an iconic landmark in Paris.	people's full name	None
