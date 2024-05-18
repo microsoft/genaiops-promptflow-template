@@ -18,3 +18,4 @@ pytest-cov
 pytest-azurepipelines
 pytest-mock
 pytest
+bs4

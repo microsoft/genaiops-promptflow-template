@@ -8,6 +8,7 @@ from azure.ai.ml import Input, MLClient, Output, command, dsl, load_component
 from azure.ai.ml.constants import AssetTypes, InputOutputModes
 from azure.identity import DefaultAzureCredential
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
@@ -134,9 +135,14 @@ def prepare_and_execute(
     Returns:
         None
     """
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    cloud_config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    config = LLMOpsConfig(flow_name=base_path, environment=env_name)
+    
     experiment = load_experiment(
-        filename=exp_filename, base_path=base_path, env=config.environment_name
+        base_path=base_path,
+        base_experiment_config=config.base_experiment_config,
+        overlay_experiment_config=config.overlay_experiment_config,
+        env=cloud_config.environment_name
     )
 
     flow_detail = experiment.get_flow_detail()
@@ -147,7 +153,7 @@ def prepare_and_execute(
         dataset = mapped_dataset.dataset
 
         ml_client = MLClient(
-            DefaultAzureCredential(), subscription_id, config.resource_group_name, config.workspace_name
+            DefaultAzureCredential(), subscription_id, cloud_config.resource_group_name, cloud_config.workspace_name
         )
 
         experiment_name = f"{experiment.name}_{env_name}"
@@ -163,7 +169,7 @@ def prepare_and_execute(
         )
 
         pipeline_job = pipeline_definition(name="mypipeline", input_data_path=input_data_uri_file)
-        pipeline_job.settings.default_compute = config.compute_target
+        pipeline_job.settings.default_compute = cloud_config.compute_target
         # Execute the ML Pipeline
         job = ml_client.jobs.create_or_update(
             pipeline_job,

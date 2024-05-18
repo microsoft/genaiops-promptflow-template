@@ -141,22 +141,21 @@ def prepare_and_execute(
     Returns:
         None
     """
-    # config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    config = LLMOpsConfig(flow_name, env_name)
-    azure_config = config.azure_config
-    if subscription_id:
-        azure_config['subscription_id'] = subscription_id
+    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(base_path, env_name)
+
     experiment = load_experiment(
-        base_experiment_config=config.base_experiment_config,
-        overlay_experiment_config=config.overlay_experiment_config,
-        base_path=flow_name
+        base_path=base_path,
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=env_name
     )
 
     pf = PFClient(
         DefaultAzureCredential(),
-        azure_config['subscription_id'],
-        azure_config['resource_group_name'],
-        azure_config['workspace_name'],
+        config.subscription_id,
+        config.resource_group_name,
+        config.workspace_name,
     )
 
     flow_detail = experiment.get_flow_detail()
@@ -364,11 +363,11 @@ def main():
     """
     parser = argparse.ArgumentParser("prompt_bulk_run")
     parser.add_argument(
-        "--flow_name",
+        "--file",
         type=str,
-        help="Flow name. Default is 'experiment.yaml'",
-        required=True,
-        default="math_coding",
+        help="The experiment file. Default is 'experiment.yaml'",
+        required=False,
+        default="experiment.yaml",
     )
     parser.add_argument(
         "--variants",
@@ -425,7 +424,7 @@ def main():
 
     prepare_and_execute(
         VariantsSelector.from_args(args.variants),
-        args.flow_name,
+        args.file,
         args.base_path,
         args.subscription_id,
         args.report_dir,
@@ -438,4 +437,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # Load variables from .env file into the environment
+    load_dotenv(override=True)
+
     main()

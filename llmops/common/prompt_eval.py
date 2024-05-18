@@ -32,7 +32,6 @@ from llmops.common.common import resolve_run_ids, wait_job_finish
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
-from llmops.common.config_utils import LLMOpsConfig
 
 logger = llmops_logger("prompt_eval")
 
@@ -57,15 +56,14 @@ def prepare_and_execute(
     Returns:
         None
     """
-    # config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    config = LLMOpsConfig(flow_name, env_name)
-    azure_config = config.azure_config
-    if subscription_id:
-        azure_config['subscription_id'] = subscription_id
+    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
+
     experiment = load_experiment(
-        base_experiment_config=config.base_experiment_config,
-        overlay_experiment_config=config.overlay_experiment_config,
-        base_path=flow_name
+        base_path=base_path,
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=config.environment_name
     )
     experiment_name = experiment.name
 
@@ -77,9 +75,9 @@ def prepare_and_execute(
 
     pf = PFClient(
         DefaultAzureCredential(),
-        azure_config['subscription_id'],
-        azure_config['resource_group_name'],
-        azure_config['workspace_name'],
+        config.subscription_id,
+        config.resource_group_name,
+        config.workspace_name,
     )
 
     standard_flow_detail = experiment.get_flow_detail()
@@ -265,11 +263,11 @@ def main():
     """
     parser = argparse.ArgumentParser("prompt_evaluation")
     parser.add_argument(
-        "--flow_name",
+        "--file",
         type=str,
-        help="The experiment file. Default is 'experiment.yaml'",
+        help="The experiment flow name",
         required=False,
-        default="experiment.yaml",
+        default="",
     )
     parser.add_argument(
         "--subscription_id",
@@ -312,7 +310,7 @@ def main():
 
     prepare_and_execute(
         args.run_id,
-        args.flow_name,
+        args.file,
         args.base_path,
         args.subscription_id,
         args.build_id,
@@ -322,4 +320,6 @@ def main():
 
 
 if __name__ == "__main__":
+    # Load variables from .env file into the environment
+    load_dotenv(override=True)
     main()

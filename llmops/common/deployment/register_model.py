@@ -26,6 +26,7 @@ from typing import Optional
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.experiment import load_experiment
 
 logger = llmops_logger("register_flow")
@@ -59,8 +60,12 @@ def register_model(
     output_file: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(base_path, environment=env_name)
     experiment = load_experiment(
-        filename=exp_filename, base_path=base_path, env=config.environment_name
+        base_path=base_path,
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"

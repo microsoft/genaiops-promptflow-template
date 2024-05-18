@@ -39,8 +39,11 @@ def create_endpoint(
     output_file: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
 
-    real_config = f"{base_path}/configs/deployment_config.json"
+
+    real_config = llmops_config.deployment_configs
+    azure_managed_endpoints = real_config['azure_managed_endpoint']
 
     ml_client = MLClient(
         DefaultAzureCredential(),
@@ -49,10 +52,9 @@ def create_endpoint(
         config.workspace_name,
     )
 
-    config_file = open(real_config)
-    endpoint_config = json.load(config_file)
 
-    for elem in endpoint_config["azure_managed_endpoint"]:
+
+    for elem in azure_managed_endpoints:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]

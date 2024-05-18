@@ -57,13 +57,15 @@ def create_kubernetes_deployment(
     subscription_id: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
     experiment = load_experiment(
-        filename=exp_filename, base_path=base_path, env=config.environment_name
+        base_path=base_path,
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
-
-    real_config = f"{base_path}/configs/deployment_config.json"
 
     logger.info(f"Model name: {model_name}")
 
@@ -76,9 +78,8 @@ def create_kubernetes_deployment(
 
     model = ml_client.models.get(model_name, model_version)
 
-    config_file = open(real_config)
-    endpoint_config = json.load(config_file)
-    for elem in endpoint_config["kubernetes_endpoint"]:
+    kubernetes_endpoints = llmops_config.deployment_configs['kubernetes_endpoint']
+    for elem in kubernetes_endpoints:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]

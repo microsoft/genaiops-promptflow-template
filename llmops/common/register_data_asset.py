@@ -25,7 +25,6 @@ from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
-from llmops.common.config_utils import LLMOpsConfig
 
 
 logger = llmops_logger("register_data_asset")
@@ -53,20 +52,20 @@ def register_data_asset(
     subscription_id: Optional[str] = None,
     env_name: Optional[str] = None,
 ):
-    config = LLMOpsConfig(base_path, env_name)
-    azure_config = config.azure_config
+    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(base_path, env_name)
 
     experiment = load_experiment(
         base_path=base_path,
-        base_experiment_config=config.base_experiment_config,
-        overlay_experiment_config=config.overlay_experiment_config,
-        env=env_name
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=config.environment_name
     )
     ml_client = MLClient(
         DefaultAzureCredential(),
-        azure_config['subscription_id'],
-        azure_config['resource_group_name'],
-        azure_config['workspace_name'],
+        config.subscription_id,
+        config.resource_group_name,
+        config.workspace_name,
     )
 
     # Get all used datasets

@@ -1,4 +1,3 @@
-
 azure_config:
   subscription_id: ${SUBSCRIPTION_ID}
   resource_group_name: ${RESOURCE_GROUP_NAME}
@@ -12,103 +11,117 @@ connections:
   api_key: ${AZURE_OPENAI_KEY}
   api_base: ${AZURE_OPENAI_ENDPOINT}
   api_version: ${AZURE_OPENAI_API_VERSION}
-  
+
 experiment:
-  name: math_coding
-  flow: flows/math_standard_flow
+  name: named_entity_recognition
+  flow: flows/standard
 
   datasets:
-  - name: math_coding_training
-    source: data/math_data.jsonl
+  - name: named_entity_recognition_train
+    source: data/data.jsonl
     description: "This dataset is for prompt experiments."
     mappings:
-      math_question: "${data.question}"
+      text: "${data.text}"
+      entity_type: "${data.entity_type}"
 
   evaluators:
-  - name: math_evaluation_flow
-    flow: flows/math_evaluation_flow
+  - name: matcher
+    flow: flows/evaluation
     datasets:
-    - name: math_coding_test
-      reference: math_coding_training
-      source: data/test_data.jsonl
+    - name: named_entity_recognition_test
+      reference: named_entity_recognition_train
+      source: data/eval_data.jsonl
       description: "This dataset is for evaluating flows."
       mappings:
-        groundtruth: "${data.groundtruth}"
-        prediction: "${run.outputs.answer}"
+        ground_truth: "${data.results}"
+        entities: "${run.outputs.entities}"
 
-environments:  
+environments:
   pr:
     env_name: pr
 
     experiment:
-      name: math_standard_flow
+      name: named_entity_recognition
 
       datasets:
-      - name: math_coding_pr
-        source: data/math_data.jsonl
+      - name: named_entity_recognition_pr
+        source: data/data.jsonl
         description: "This dataset is for pr validation only."
+        
         mappings:
-          math_question: "${data.question}"
+          text: "${data.text}"
+          entity_type: "${data.entity_type}"
 
       evaluators:
 
   dev:
     env_name: dev
     
-    experiment:  
-    
+    experiment:
+
     deployment_configs:
       azure_managed_endpoint:
       - name: azure_managed_endpoint_1
         ENV_NAME: dev
         TEST_FILE_PATH: sample-request.json
         ENDPOINT_NAME: 
-        ENDPOINT_DESC: An online endpoint serving a flow for math coding flow
+        ENDPOINT_DESC: An online endpoint serving a flow for named entity flow
         DEPLOYMENT_DESC: prompt flow deployment
         PRIOR_DEPLOYMENT_NAME: 
-        PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION: 
-        CURRENT_DEPLOYMENT_NAME: 
+        PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION:
+        CURRENT_DEPLOYMENT_NAME:
         CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION: "100"
         DEPLOYMENT_VM_SIZE: Standard_F4s_v2
         DEPLOYMENT_INSTANCE_COUNT: 1
         ENVIRONMENT_VARIABLES: 
           example-name: example-value
-
+      
       kubernetes_endpoint:
       - name: kubernetes_endpoint_1
         ENV_NAME: dev
         TEST_FILE_PATH: sample-request.json
-        ENDPOINT_NAME: 
-        ENDPOINT_DESC: An kubernetes endpoint serving a flow for math coding
+        ENDPOINT_NAME:
+        ENDPOINT_DESC: An kubernetes endpoint serving a flow for named entity
         DEPLOYMENT_DESC: prompt flow deployment
-        PRIOR_DEPLOYMENT_NAME: 
-        PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION: 
-        CURRENT_DEPLOYMENT_NAME: 
-        CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION: 100
-        COMPUTE_NAME: 
-        DEPLOYMENT_VM_SIZE: promptinstancetype
+        PRIOR_DEPLOYMENT_NAME:
+        PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION:
+        CURRENT_DEPLOYMENT_NAME:
+        CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION: 100,
+        COMPUTE_NAME:
+        DEPLOYMENT_VM_SIZE:
         DEPLOYMENT_INSTANCE_COUNT: 1
         CPU_ALLOCATION: 
         MEMORY_ALLOCATION: 
         ENVIRONMENT_VARIABLES: 
           example-name: example-value
-
+      
       webapp_endpoint:
-      - name: webapp_endpoint_1      
+      - name: webapp_endpoint_1
         ENV_NAME: dev
         TEST_FILE_PATH: sample-request.json
         CONNECTION_NAMES:
           - aoai
-        REGISTRY_NAME: 
-        REGISTRY_RG_NAME: 
+        REGISTRY_NAME:
+        REGISTRY_RG_NAME:
         APP_PLAN_NAME:
-        WEB_APP_NAME: 
+        WEB_APP_NAME:
         WEB_APP_RG_NAME:
         WEB_APP_SKU: "B3"
-        USER_MANAGED_ID: 
+        USER_MANAGED_ID:
 
+  postprod:
+    env_name: postprodeval
+    
+    experiment:
+      name: named_entity_recognition
+      flow: flows/post-production-evaluation
 
+      datasets:
+      - name: named_entity_recognition_pp_eval
+        source: data/production_log.jsonl
+        description: "This dataset is for post production evaluation."
+        mappings:
+          text: "${data.text}"
+          entity_type: "${data.entity_type}"
 
-
-
-
+      evaluators: 

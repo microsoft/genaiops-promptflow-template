@@ -37,6 +37,7 @@ from dotenv import load_dotenv
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.config_utils import LLMOpsConfig
 from llmops.common.experiment import load_experiment
 
 logger = llmops_logger("provision_deployment")
@@ -51,13 +52,15 @@ def create_deployment(
     subscription_id: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
     experiment = load_experiment(
-        filename=exp_filename, base_path=base_path, env=config.environment_name
+        base_path=base_path,
+        base_experiment_config=llmops_config.base_experiment_config,
+        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
-
-    real_config = f"{base_path}/configs/deployment_config.json"
 
     logger.info(f"Model name: {model_name}")
 
@@ -70,9 +73,8 @@ def create_deployment(
 
     model = ml_client.models.get(model_name, model_version)
 
-    config_file = open(real_config)
-    endpoint_config = json.load(config_file)
-    for elem in endpoint_config["azure_managed_endpoint"]:
+    azure_managed_endpoints = llmops_config.deployment_configs['azure_managed_endpount']
+    for elem in azure_managed_endpoints:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]

@@ -40,15 +40,16 @@ set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
-deploy_config="./$use_case_base_path/configs/deployment_config.json"
-con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
-REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
-rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
-udmid=$(echo "$con_object" | jq -r '.USER_MANAGED_ID')
-appserviceplan=$(echo "$con_object" | jq -r '.APP_PLAN_NAME')
-appserviceweb=$(echo "$con_object" | jq -r '.WEB_APP_NAME')
-acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
-websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
+llmops_config="./$use_case_base_path/llmops_config.yaml"
+con_object=$(yq ".environments.'$env_name'.deployment_configs.webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$llmops_config")
+# con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
+REGISTRY_NAME=$(echo "$con_object" | yq -r '.REGISTRY_NAME')
+rgname=$(echo "$con_object" | yq -r '.WEB_APP_RG_NAME')
+udmid=$(echo "$con_object" | yq -r '.USER_MANAGED_ID')
+appserviceplan=$(echo "$con_object" | yq -r '.APP_PLAN_NAME')
+appserviceweb=$(echo "$con_object" | yq -r '.WEB_APP_NAME')
+acr_rg=$(echo "$con_object" | yq -r '.REGISTRY_RG_NAME')
+websku=$(echo "$con_object" | yq -r '.WEB_APP_SKU')
 
 read -r -a connection_names <<< "$(echo "$con_object" | yq -r '.CONNECTION_NAMES | join(" ")')"
 echo $connection_names
@@ -79,7 +80,7 @@ az webapp config appsettings set --resource-group $rgname --name $appserviceweb 
     --settings WEBSITES_PORT=8080
 
 for name in "${connection_names[@]}"; do
-    api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
+    api_key=$(echo ${CONNECTION_DETAILS} | yq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
 
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     modified_name="${uppercase_name}_API_KEY"

@@ -5,11 +5,11 @@ from local_execution.prompt_experimentation.run_local import LocalFlowExecution
 
 def main():
     config = LLMOpsConfig("math_coding")
-    connections = config.connections
+    connections_config = config.connections
     data = "math_coding/data/test_data.jsonl"
     flow = "math_coding/flows/math_standard_flow"
     eval_flow = "math_coding/flows/math_evaluation_flow"
-    math_coding_flow = LocalFlowExecution(flow, eval_flow, data, {"math_question": "${data.question}"}, connections)
+    math_coding_flow = LocalFlowExecution(flow, eval_flow, data, {"math_question": "${data.question}"}, connections_config)
 
     math_coding_flow.process_local_flow()
     math_coding_flow.create_local_connections()

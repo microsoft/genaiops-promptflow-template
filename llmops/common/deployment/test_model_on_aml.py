@@ -31,7 +31,7 @@ def test_aml_model(
     subscription_id: Optional[str],
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    real_config = f"{base_path}/configs/deployment_config.json"
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
 
     ml_client = MLClient(
         DefaultAzureCredential(),
@@ -40,9 +40,8 @@ def test_aml_model(
         config.workspace_name,
     )
 
-    config_file = open(real_config)
-    endpoint_config = json.load(config_file)
-    for elem in endpoint_config["azure_managed_endpoint"]:
+    azure_managed_endpoints = llmops_config.deployment_configs['azure_managed_endpoint']
+    for elem in azure_managed_endpoints:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]

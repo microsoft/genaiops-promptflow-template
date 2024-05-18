@@ -18,6 +18,7 @@ class LLMOpsConfig:
         config_path: str = "llmops_config.yaml"
     ):
         """Intialize MLConfig with yaml config data."""
+        flow_name = flow_name.strip('./')
         self.config_path = Path(flow_name, config_path)
         self._environment = environment
         load_dotenv()

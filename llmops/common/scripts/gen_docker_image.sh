@@ -40,10 +40,10 @@ echo "Build ID: $build_id"
 set -e # fail on error
 
 # read values from experiment.yaml related to given environment
-config_path="./$use_case_base_path/experiment.yaml"
-
-if [[ -e "$config_path" ]]; then
-    STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+# config_path="./$use_case_base_path/experiment.yaml"
+llmops_config="./$use_case_base_path/llmops_config.yaml"
+if [[ -e "$llmops_config" ]]; then
+    STANDARD_FLOW=$(yq eval '.experiment.flow // .name' "$llmops_config")
 
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
@@ -55,10 +55,12 @@ if [[ -e "$config_path" ]]; then
         
     docker images
 
-    deploy_config="./$use_case_base_path/configs/deployment_config.json"
-    con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$deploy_environment\")" "$deploy_config")
+    con_object=$(yq ".environments.'$env_name'.deployment_configs.webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$llmops_config")
 
-    read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
+    # deploy_config="./$use_case_base_path/configs/deployment_config.json"
+    # con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$deploy_environment\")" "$deploy_config")
+
+    read -r -a connection_names <<< "$(echo "$con_object" | yq -r '.CONNECTION_NAMES | join(" ")')"
     result_string=""
 
     for name in "${connection_names[@]}"; do

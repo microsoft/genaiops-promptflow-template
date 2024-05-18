@@ -26,6 +26,7 @@ from azure.identity import DefaultAzureCredential
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.config_utils import LLMOpsConfig
 
 logger = llmops_logger("provision_endpoint")
 
@@ -38,8 +39,7 @@ def create_kubernetes_endpoint(
     output_file: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-
-    real_config = f"{base_path}/configs/deployment_config.json"
+    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
 
     ml_client = MLClient(
         DefaultAzureCredential(),
@@ -48,10 +48,9 @@ def create_kubernetes_endpoint(
         config.workspace_name,
     )
 
-    config_file = open(real_config)
-    endpoint_config = json.load(config_file)
+    kubernetes_endpoints = llmops_config.deployment_configs['kubernetes_endpoint']
 
-    for elem in endpoint_config["kubernetes_endpoint"]:
+    for elem in kubernetes_endpoints:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]
