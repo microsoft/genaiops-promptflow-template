@@ -5,7 +5,7 @@
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "test-pf-endpoint",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
-            "DEPLOYMENT_DESC": "prompt flow deployment",
+            "DEPLOYMENT_DESC": "prompt flow deployment !",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
             "CURRENT_DEPLOYMENT_NAME": "test1",
