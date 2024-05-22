@@ -1,0 +1,30 @@
+parameters:
+- name: SUBSCRIPTION_ID
+  type: string
+- name: USE_CASE_BASE_PATH
+  type: string
+- name: DEPLOY_ENVIRONMENT
+  type: string
+- name: BUILD_ID
+  type: string
+- name: WORKSPACE_NAME
+  type: string
+- name: RESOURCE_GROUP_NAME
+  type: string
+
+steps:
+- task: AzureCLI@2
+  displayName: Publish Prompt Flow 
+  continueOnError: false
+  inputs: 
+    azureSubscription: $(AZURE_RM_SVC_CONNECTION)
+    scriptType: bash
+    workingDirectory: $(System.DefaultWorkingDirectory)
+    scriptLocation: inlineScript
+    inlineScript: |
+      config_path="./${{ parameters.USE_CASE_BASE_PATH }}/experiment.yaml"
+      STANDARD_FLOW_NAME="${"$(cat $config_path | yq .flow)"/"flows\/"/""}"
+      STANDARD_FLOW_PATH="./${{ parameters.USE_CASE_BASE_PATH }}/$(cat $config_path | yq .flow)"
+
+      echo "Publishing standard flow..."
+      pfazure flow create --flow $STANDARD_FLOW_PATH --set display_name="${{ parameters.USE_CASE_BASE_PATH }}"_"$STANDARD_FLOW_NAME":${{ parameters.BUILD_ID }} --set type=chat --subscription ${{ parameters.SUBSCRIPTION_ID }} --resource-group ${{ parameters.RESOURCE_GROUP_NAME }} --workspace-name ${{ parameters.WORKSPACE_NAME }}

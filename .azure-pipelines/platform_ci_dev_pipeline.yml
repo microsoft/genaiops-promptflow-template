@@ -147,7 +147,7 @@ stages:
     # Manual Approval is enabled by default
     # For removal of Manual Approval:
     # Remove the job ApproveDeployment
-    # and remove its dependency from job deploy_flow
+    # and remove its dependency from job deploy_flow and publish_flow
     #=====================================
       jobs:
       - job: ApproveDeployment
@@ -165,7 +165,25 @@ stages:
               replace@youremail.com
             instructions: "$(run_id_from_submit_job)"
             onTimeout: 'reject'
-      
+
+      #=====================================
+      # Publish the flow in promptflow blade
+      #===================================== 
+      - job: publish_flow
+        dependsOn: 
+        - ApproveDeployment
+        steps:
+        - template: templates/get_connection_details.yml
+        - template: templates/configure_azureml_agent.yml
+        - template: templates/publish_promptflow.yml
+          parameters:
+              SUBSCRIPTION_ID: $(SUBSCRIPTION_ID)
+              USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
+              DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
+              BUILD_ID: $(Build.Buildid)
+              WORKSPACE_NAME: ${{ parameters.WORKSPACE_NAME }}
+              RESOURCE_GROUP_NAME: ${{ parameters.RESOURCE_GROUP_NAME }}
+
       - job: deploy_flow
         dependsOn: 
         - ApproveDeployment
