@@ -11,12 +11,12 @@ inputs:
   question:
     type: string
     is_chat_input: true
-    default: what is BERT?
+    default: how to setup a telegram notification?
   config:
     type: object
     default:
       EMBEDDING_MODEL_DEPLOYMENT_NAME: text-embedding-ada-002
-      CHAT_MODEL_DEPLOYMENT_NAME: aoai
+      CHAT_MODEL_DEPLOYMENT_NAME: gpt-4
       PROMPT_TOKEN_LIMIT: 3000
       MAX_COMPLETION_TOKENS: 1024
       VERBOSE: true

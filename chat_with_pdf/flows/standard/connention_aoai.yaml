@@ -1,0 +1,9 @@
+
+#https://llmopsdemo0919076961.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2023-03-15-preview
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/AzureOpenAIConnection.schema.json
+name: llm_ops_demo_aoai
+type: azure_open_ai
+api_key: "e7466001159f4f4780e4877537af5e74"
+api_base: "https://llmopsdemo0919076961.openai.azure.com/"
+api_type: "azure"
+
