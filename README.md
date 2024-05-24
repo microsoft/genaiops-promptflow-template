@@ -76,6 +76,8 @@ Additionally, there is a `experiment.yaml` file that configures the use-case (se
 
 - The 'local_execution' folder contains python scripts for executing both the standard and evaluation flow locally.
 
+- The 'pf_aml_pipeline' folder contains the python scripts for executing promptflow as a parallel component in the AML pipeline
+
 # Documentation
 
 - Full documentation on using this repo using Azure DevOps can be found [here](./docs/Azure_devops_how_to_setup.md)
