@@ -23,7 +23,7 @@ from dotenv import load_dotenv
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import ManagedOnlineEndpoint
 from azure.identity import DefaultAzureCredential
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
@@ -39,10 +39,10 @@ def create_endpoint(
     output_file: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
+    experiment_config = ExperimentConfig(flow_name=base_path, environment=env_name)
 
 
-    real_config = llmops_config.deployment_configs
+    real_config = experiment_config.deployment_configs
     azure_managed_endpoints = real_config['azure_managed_endpoint']
 
     ml_client = MLClient(

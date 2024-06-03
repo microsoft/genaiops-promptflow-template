@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 load_dotenv()  
 
 from local_execution.prompt_experimentation.run_local import LocalFlowExecution
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 
 def main():
-    config = LLMOpsConfig("math_coding")
+    config = ExperimentConfig("web_classification")
     connections_config = config.connections    
     data = "web_classification/data/data.jsonl"
     flow = "web_classification/flows/experiment"

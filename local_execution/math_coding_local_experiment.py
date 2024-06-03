@@ -1,10 +1,10 @@
 from pathlib import Path
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from local_execution.prompt_experimentation.run_local import LocalFlowExecution
 
 
 def main():
-    config = LLMOpsConfig("math_coding")
+    config = ExperimentConfig("math_coding")
     connections_config = config.connections
     data = "math_coding/data/test_data.jsonl"
     flow = "math_coding/flows/math_standard_flow"

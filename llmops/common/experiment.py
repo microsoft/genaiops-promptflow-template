@@ -431,7 +431,7 @@ def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
     return os.path.join(safe_base_path, _DEFAULT_FLOWS_DIR, flow)
 
 
-def _load_base_experiment(exp_config, base_path: Optional[str]) -> Experiment:
+def _load_base_experiment(exp_config: dict, base_path: Optional[str]) -> Experiment:
     
     # Read base raw datasets and create base datasets and mappings
     raw_datasets: list[dict] = exp_config.get("datasets")

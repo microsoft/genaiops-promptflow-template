@@ -15,9 +15,9 @@ from dotenv import load_dotenv
 from promptflow.entities import AzureOpenAIConnection
 from promptflow import PFClient
 
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from llmops.common.logger import llmops_logger
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 
 logger = llmops_logger("prompt_aoai_connection")
 
@@ -42,7 +42,7 @@ def prepare_and_execute(
 
     secret_config = json.loads(connection_details)
 
-    config = LLMOpsConfig(base_path, env_name)
+    config = ExperimentConfig(base_path, env_name)
 
     pf = PFClient()
 

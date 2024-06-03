@@ -8,7 +8,7 @@ from azure.ai.ml import Input, MLClient, Output, command, dsl, load_component
 from azure.ai.ml.constants import AssetTypes, InputOutputModes
 from azure.identity import DefaultAzureCredential
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
@@ -136,7 +136,7 @@ def prepare_and_execute(
         None
     """
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
+    llmops_config = ExperimentConfig(flow_name=base_path, environment=env_name)
     
     experiment = load_experiment(
         base_path=base_path,

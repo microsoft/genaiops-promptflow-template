@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 from typing import Optional
 
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
@@ -53,12 +53,12 @@ def register_data_asset(
     env_name: Optional[str] = None,
 ):
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    llmops_config = LLMOpsConfig(base_path, env_name)
+    experiment_config = ExperimentConfig(base_path, env_name)
 
     experiment = load_experiment(
         base_path=base_path,
-        base_experiment_config=llmops_config.base_experiment_config,
-        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        base_experiment_config=experiment_config.base_experiment_config,
+        overlay_experiment_config=experiment_config.overlay_experiment_config,
         env=config.environment_name
     )
     ml_client = MLClient(

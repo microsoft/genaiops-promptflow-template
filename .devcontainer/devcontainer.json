@@ -1,40 +1,25 @@
 {
     "name": "llmops_promptflow_container",
-    // "context" is the path that the Codespaces docker build command should be run from, relative to devcontainer.json
-    "context": ".",
-    "dockerFile": "Dockerfile",
-    "runArgs": ["-v", "/var/run/docker.sock:/var/run/docker.sock"],
+    "image": "mcr.microsoft.com/azureml/promptflow/promptflow-runtime-stable",
+	
     "customizations": {
-      "codespaces": {
-        "openFiles": ["README.md", "docs/how_to_onboard_new_flows.md"]
-      },
-      "vscode": {
-          // Set *default* container specific settings.json values on container create.
-          "settings": {
-            "terminal.integrated.shell.linux": "/bin/bash"
-          },
-          // Add the IDs of extensions you want installed when the container is created.
-          "extensions": [
-            "ms-python.python",
-            "ms-toolsai.vscode-ai",
-            "ms-toolsai.jupyter",
-            "redhat.vscode-yaml",
-            "prompt-flow.prompt-flow",
+		"vscode": {
+            "extensions": [
+		        "ms-python.python",
             "ms-python.debugpy",
 		        "ms-toolsai.vscode-ai",
 		        "ms-toolsai.jupyter",
 		        "redhat.vscode-yaml",
-            "github.vscode-pull-request-github",
-            "ms-vscode.azure-account",
-            "ms-python.flake8",
-            "ms-azuretools.azure-dev",
-            "streetsidesoftware.code-spell-checker"
-          ]
+		        "prompt-flow.prompt-flow"
+	        ]
         }
-      },
-      "features": { 
+    },
+
+    "features": {
       "ghcr.io/devcontainers/features/azure-cli:1": {
         "version": "latest"
       }
-    }
+    },
+    "containerEnv": { "SUBSCRIPTION_ID": "${localEnv:SUBSCRIPTION_ID}" },
+    "postCreateCommand": "pip3 install -r /workspaces/llmops-promptflow-template/.devcontainer/requirements.txt"    
   }

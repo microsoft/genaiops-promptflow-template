@@ -2,10 +2,10 @@ from dotenv import load_dotenv
 load_dotenv()  
 
 from local_execution.prompt_experimentation.run_local import LocalFlowExecution
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 
 def main():
-    config = LLMOpsConfig("math_coding")
+    config = ExperimentConfig("named_entity_recognition")
     connections_config = config.connections    
     data = "named_entity_recognition/data/data.jsonl"
     flow = "named_entity_recognition/flows/standard"

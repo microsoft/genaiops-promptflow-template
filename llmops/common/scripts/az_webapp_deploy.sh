@@ -40,8 +40,8 @@ set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
-llmops_config="./$use_case_base_path/llmops_config.yaml"
-con_object=$(yq ".environments.'$env_name'.deployment_configs.webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$llmops_config")
+config="./$use_case_base_path/experiment_$env_name.yaml"
+con_object=$(yq ".deployment_configs.webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$config")
 # con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 REGISTRY_NAME=$(echo "$con_object" | yq -r '.REGISTRY_NAME')
 rgname=$(echo "$con_object" | yq -r '.WEB_APP_RG_NAME')

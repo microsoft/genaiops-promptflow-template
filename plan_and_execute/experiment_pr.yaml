@@ -1,0 +1,14 @@
+env_name: pr
+experiment_config:
+
+  name: plan_and_execute
+
+  datasets:
+  - name: plan_and_execute_pr
+    source: data/data.jsonl
+    description: "This dataset is for pr validation only."
+    
+    mappings:
+      question: "${data.question}"
+
+  evaluators:

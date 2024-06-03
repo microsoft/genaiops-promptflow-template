@@ -27,7 +27,7 @@ from promptflow.entities import Run
 from promptflow.azure import PFClient
 from typing import Optional
 
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from llmops.common.common import resolve_run_ids, wait_job_finish
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
@@ -57,12 +57,12 @@ def prepare_and_execute(
         None
     """
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    llmops_config = LLMOpsConfig(flow_name=base_path, environment=env_name)
+    experiment_config = ExperimentConfig(flow_name=base_path, environment=env_name)
 
     experiment = load_experiment(
         base_path=base_path,
-        base_experiment_config=llmops_config.base_experiment_config,
-        overlay_experiment_config=llmops_config.overlay_experiment_config,
+        base_experiment_config=experiment_config.base_experiment_config,
+        overlay_experiment_config=experiment_config.overlay_experiment_config,
         env=config.environment_name
     )
     experiment_name = experiment.name

@@ -1,4 +1,4 @@
-"""Configuration utils to load config from yaml/json."""
+"""Configuration utils to load config from yaml"""
 import os
 from typing import Dict, Any
 from pathlib import Path
@@ -6,98 +6,123 @@ from dotenv import load_dotenv
 import yaml
 
 
-class LLMOpsConfig:
-    """LLMOpsConfig Class."""
-
+class ExperimentConfig:
+    """ExperimentConfig Class."""
     _raw_config: Any
 
     def __init__(
         self, 
         flow_name: str = "",
-        environment: str = "pr", 
-        config_path: str = "llmops_config.yaml"
+        environment: str = None
     ):
-        """Intialize MLConfig with yaml config data."""
+        """Intialize raw config with yaml config data."""
+        config_path = "experiment.yaml"
         flow_name = flow_name.strip('./')
-        self.config_path = Path(flow_name, config_path)
+        self._exp_config_path = Path(flow_name, config_path)
+        if self._exp_config_path.is_file():
+            self._raw_config = self.load_yaml(self._exp_config_path)
         self._environment = environment
+        if self._environment:
+            self._env_exp_config_path = Path(flow_name, f'experiment_{self._environment}.yaml')
+            if self._env_exp_config_path.is_file():
+                self._env_exp_config = self.load_yaml(self._env_exp_config_path)
+        
+      
+    def load_yaml(self, config_path: str) -> Any:
+        """Load yaml file config"""
         load_dotenv()
+        raw_config = None
+        with open(config_path, "r", encoding="utf-8") as stream:
+            raw_config = yaml.safe_load(os.path.expandvars(stream.read()))
+        return raw_config
 
-        with open(self.config_path, "r", encoding="utf-8") as stream:
-            self._raw_config = yaml.safe_load(os.path.expandvars(stream.read()))
-
+        
     def __getattr__(self, __name: str) -> Any:
         """Get values for top level keys in configuration."""
+        print(__name)
         return self._raw_config[__name]
+    
+
+    @property
+    def base_exp_config(self):
+        return self._raw_config
     
     @property
     def azure_config(self):
         """Get azure workspace config"""
-        return self._raw_config['azure_config']
+        if 'azure_config' in self.base_exp_config:
+            return self.base_exp_config['azure_config']
+        else:
+            return None
 
     @property
     def connections(self):
         """Get connections configuration"""
-        return self._raw_config['connections']
+        if 'connections' in self.base_exp_config:
+            return self.base_exp_config['connections']
     
     @property
     def env_config(self):
         """Get environment configuration."""
-        return self._raw_config['environments'][self._environment]
+        return self._env_exp_config
+
     
     @property
     def base_experiment_config(self):
-        if 'experiment' in self._raw_config:
-            return self._raw_config['experiment']
+        if 'experiment_config' in self.base_exp_config:
+            return self.base_exp_config['experiment_config']
         else:
             return None
     
     @property
     def overlay_experiment_config(self):
-        if 'experiment' in self.env_config:
-            return self.env_config['experiment']
+        if 'experiment_config' in self._env_exp_config:
+            return self._env_exp_config['experiment_config']
         else:
             return None
     
     @property
     def evaluators_config(self):
         """Get evaluator configuration."""
-        return self.overlay_experiment_config['evaluators']
+        if self.overlay_experiment_config and 'evaluators' in self.overlay_experiment_config:
+            return self.overlay_experiment_config['evaluators']
+        else:
+            return None
     
     @property
     def deployment_configs(self):
         """Get deployment configuration."""
-        if 'deployment_configs' in self.env_config:
-            return self.env_config['deployment_configs']
+        if 'deployment_configs' in self._env_exp_config:
+            return self._env_exp_config['deployment_configs']
         else:
             return None
 
     @property
     def azure_managed_endpoint_config(self):
         """Get azure managed endpoint deployment configuration."""
-        if 'deployment_configs' in self.env_config and 'azure_managed_endpoint' in self.env_config['deployment_configs']:
-            return self.env_config['deployment_configs']['azure_managed_endpoint']
+        if 'deployment_configs' in self._env_exp_config and 'azure_managed_endpoint' in self._env_exp_config['deployment_configs']:
+            return self._env_exp_config['deployment_configs']['azure_managed_endpoint']
         else:
             return None
     
     @property
     def kubernetes_endpoint_config(self):
         """Get kubernetes endpoint deployment configuration."""
-        if 'deployment_configs' in self.env_config and 'kubernetes_endpoint' in self.env_config['deployment_configs']:
-            return self.env_config['deployment_configs']['kubernetes_endpoint']
+        if 'deployment_configs' in self._env_exp_config and 'kubernetes_endpoint' in self._env_exp_config['deployment_configs']:
+            return self._env_exp_config['deployment_configs']['kubernetes_endpoint']
         else:
             return None
     
     @property
     def webapp_endpoint_config(self):
         """Get webapp endpoint deployment configuration."""
-        if 'deployment_configs' in self.env_config and 'webapp_endpoint' in self.env_config['deployment_configs']:
-            return self.env_config['deployment_configs']['webapp_endpoint']
+        if 'deployment_configs' in self._env_exp_config and 'webapp_endpoint' in self._env_exp_config['deployment_configs']:
+            return self._env_exp_config['deployment_configs']['webapp_endpoint']
         return None
     
 
 if __name__ == "__main__":
-    config = LLMOpsConfig(flow_name="math_coding", environment="pr")
+    config = ExperimentConfig(flow_name="web_classification", environment="dev")
     print(config.azure_config)
     print(config.connections)
     print(config.env_config)

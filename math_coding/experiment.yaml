@@ -1,0 +1,37 @@
+
+azure_config:
+  subscription_id: ${SUBSCRIPTION_ID}
+  resource_group_name: ${RESOURCE_GROUP_NAME}
+  workspace_name: ${WORKSPACE_NAME}
+  keyvault_name: ${KEYVAULT_NAME}
+  compute_target: ${COMPUTE_TARGET}
+  
+connections:
+- connection: aoai
+  api_type: azure
+  api_key: ${AZURE_OPENAI_KEY}
+  api_base: ${AZURE_OPENAI_ENDPOINT}
+  api_version: ${AZURE_OPENAI_API_VERSION}
+  
+experiment:
+  name: math_coding
+  flow: flows/math_standard_flow
+
+  datasets:
+  - name: math_coding_training
+    source: data/math_data.jsonl
+    description: "This dataset is for prompt experiments."
+    mappings:
+      math_question: "${data.question}"
+
+  evaluators:
+  - name: math_evaluation_flow
+    flow: flows/math_evaluation_flow
+    datasets:
+    - name: math_coding_test
+      reference: math_coding_training
+      source: data/test_data.jsonl
+      description: "This dataset is for evaluating flows."
+      mappings:
+        groundtruth: "${data.groundtruth}"
+        prediction: "${run.outputs.answer}"

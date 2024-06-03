@@ -47,11 +47,12 @@ import pandas as pd
 from azure.identity import DefaultAzureCredential
 from promptflow.entities import Run
 from promptflow.azure import PFClient
+from promptflow.tracing import start_trace, stop_trace
 from dotenv import load_dotenv
 from enum import Enum
 from typing import Optional
 
-from llmops.common.config_utils import LLMOpsConfig
+from llmops.common.config_utils import ExperimentConfig
 from llmops.common.common import wait_job_finish
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
@@ -142,15 +143,15 @@ def prepare_and_execute(
         None
     """
     config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
-    llmops_config = LLMOpsConfig(base_path, env_name)
+    exp_config = ExperimentConfig(base_path, env_name)
 
     experiment = load_experiment(
         base_path=base_path,
-        base_experiment_config=llmops_config.base_experiment_config,
-        overlay_experiment_config=llmops_config.overlay_experiment_config,
-        env=env_name
+        base_experiment_config=exp_config.base_experiment_config,
+        overlay_experiment_config=exp_config.overlay_experiment_config,
+        env=config.environment_name
     )
-
+    start_trace()
     pf = PFClient(
         DefaultAzureCredential(),
         config.subscription_id,
@@ -352,6 +353,7 @@ def prepare_and_execute(
             f_metrics.write(html_table_metrics)
 
         logger.info(f"Saved the metrics in files in {report_dir} folder")
+    stop_trace()
 
 
 def main():
