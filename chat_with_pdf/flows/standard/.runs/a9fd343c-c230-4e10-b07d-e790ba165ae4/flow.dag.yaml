@@ -1,11 +1,9 @@
 id: web_classification
 name: Web Classification
-environment:
-  python_requirements_txt: requirements.txt
 inputs:
   article:
     type: string
-    default: ""
+    default: https://www.microsoft.com/en-us/store/collections/xboxseriessconsoles?icid=CNav_Xbox_Series_S
     is_chat_input: false
 outputs:
   Translated_Article:
@@ -25,6 +23,11 @@ nodes:
     response_format:
       type: text
     article: ${inputs.article}
-  connection: aoai-eastus-pelope
+  provider: AzureOpenAI
+  connection: aoaieastuspelope
   api: chat
+  module: promptflow.tools.aoai
   use_variants: false
+node_variants: {}
+environment:
+  python_requirements_txt: requirements.txt
