@@ -15,6 +15,9 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
+      env_vars:
+        description: "env vars for the flow"
+        required: true
 
 
 jobs:
@@ -36,7 +39,7 @@ jobs:
       - name: Checkout Actions
         uses: actions/checkout@v4
       - name: Create .env file
-        run: echo "${{ secrets.ENV_VARS }}" > .env
+        run: echo "${{ secrets.env_vars }}" > .env
       - name: Azure login
         uses: azure/login@v1
         with:
