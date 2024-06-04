@@ -18,8 +18,6 @@ on:
       - main
       - development
     paths:
-      - '.github/**'
-      - 'llmops/**'
       - 'web_classification/**'
 
 #=====================================

@@ -1,4 +1,4 @@
-name: math_coding_pr_dev_workflow
+name: test_pr_dev_workflow
 
 on:
   workflow_call:
@@ -12,13 +12,15 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "math_coding"
+        default: "flex-flows"
   pull_request:
     branches:
       - main
       - development
     paths:
-      - 'math_coding/**'
+      - '.github/**'
+      - 'llmops/**'
+      - 'flex-flows/**'
 
 #=====================================
 # Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -28,6 +30,6 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      use_case_base_path: ${{ inputs.flow_type || 'math_coding' }}
+      use_case_base_path: ${{ inputs.flow_type || 'flex-flows' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

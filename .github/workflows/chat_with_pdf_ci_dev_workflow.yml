@@ -23,8 +23,6 @@ on:
       - main
       - development
     paths:
-      - '.github/**'
-      - 'llmops/**'
       - 'chat_with_pdf/**'
   
 

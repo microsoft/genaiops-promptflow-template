@@ -22,8 +22,6 @@ on:
       - main
       - development
     paths:
-      - '.github/**'
-      - 'llmops/**'
       - 'math_coding/**'
 
 #=====================================
