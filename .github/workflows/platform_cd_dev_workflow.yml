@@ -25,6 +25,9 @@ on:
       registry_details:
         description: "prompt flow registry details"
         required: false
+      env_vars:
+        description: "prompt flow registry details"
+        required: false
   workflow_dispatch:
     inputs:
       env_name:
@@ -162,6 +165,7 @@ jobs:
         env:
           CONNECTION_DETAILS: ${{ secrets.connection_details }} 
           REGISTRY_DETAILS: ${{ secrets.registry_details }}
+          ENV_VARS: ${{ secrets.env_vars }}
         
             
 

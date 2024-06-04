@@ -171,3 +171,4 @@ jobs:
       azure_credentials: ${{ secrets.azure_credentials }}  
       connection_details: ${{ secrets.connection_details }}
       registry_details: ${{ secrets.registry_details }}
+      env_vars: ${{ secrets.env_vars }}
