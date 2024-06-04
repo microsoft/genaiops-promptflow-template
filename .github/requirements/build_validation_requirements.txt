@@ -11,3 +11,4 @@ mldesigner==0.1.0b4
 pandas==2.2.1
 python-dotenv>=0.10.3
 promptflow>=1.11.0
+dotenv
