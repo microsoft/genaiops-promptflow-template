@@ -53,8 +53,7 @@ jobs:
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
-      - name: Create .env file
-        run: echo "${{ secrets.ENV_VARS }}" > .env
+
       - name: Azure login
         uses: azure/login@v1
         with:
@@ -62,10 +61,10 @@ jobs:
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
 
-      - name: Display .env file contents
-        run: cat .env
-      - name: Display .env file contents
-        run: echo "$GITHUB_ENV"
+      - name: Create .env file
+        run: echo "${{ secrets.env_vars }}" > .env
+      - name: load .env file
+        run: python -c "from dotenv import load_dotenv; load_dotenv()"
       - name: load the current Azure subscription details
         id: subscription_details
         shell: bash
