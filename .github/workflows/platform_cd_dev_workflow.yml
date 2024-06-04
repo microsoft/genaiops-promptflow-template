@@ -151,6 +151,12 @@ jobs:
               --base_path ${{ inputs.use_case_base_path }} \
               --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
+      - name: Read .env file
+        id: env_vars
+        run: |
+          LOCAL_VARS=$(cat .env)
+          echo "local_vars=$LOCAL_VARS" >> $GITHUB_OUTPUT
+
         #=====================================
         # Executes Azure Webapp deployment when parameter 
         # deployment_type == 'webapp' using docker image
@@ -162,10 +168,11 @@ jobs:
         with:
           USE_CASE_BASE_PATH: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          ENV_VARS: ${{ steps.env_vars.outputs.local_vars }}
         env:
           CONNECTION_DETAILS: ${{ secrets.connection_details }} 
           REGISTRY_DETAILS: ${{ secrets.registry_details }}
-          ENV_VARS: ${{ secrets.env_vars }}
+
         
             
 
