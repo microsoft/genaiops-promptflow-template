@@ -17,7 +17,7 @@ on:
         required: true
       env_vars:
         description: "env vars for the flow"
-        required: true
+        required: false
 
 
 jobs:
