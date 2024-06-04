@@ -40,6 +40,8 @@ jobs:
         uses: actions/checkout@v4
       - name: Create .env file
         run: echo "${{ secrets.env_vars }}" > .env
+      - name: load .env file
+        run: python -c "from dotenv import load_dotenv; load_dotenv()"
       - name: Display .env file contents
         run: cat .env
       - name: Display .env file contents
