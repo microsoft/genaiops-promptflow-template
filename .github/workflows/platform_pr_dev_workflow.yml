@@ -40,6 +40,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Create .env file
         run: echo "${{ secrets.env_vars }}" > .env
+      - name: Display .env file contents
+        run: cat .env
+      - name: Display .env file contents
+        run: echo "$GITHUB_ENV"
       - name: Azure login
         uses: azure/login@v1
         with:
