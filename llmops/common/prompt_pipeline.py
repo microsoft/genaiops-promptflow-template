@@ -46,17 +46,29 @@ import os
 import pandas as pd
 from azure.identity import DefaultAzureCredential
 from promptflow.entities import Run
-from promptflow.azure import PFClient
+
+from azure.ai.ml import MLClient
+
+from llmops.config import EXECUTION_TYPE
+
 from dotenv import load_dotenv
 from enum import Enum
 from typing import Optional
+import json
+import importlib
+import yaml
+import inspect
+import sys
+import ast
 
-from llmops.common.common import wait_job_finish
+from llmops.common.common import wait_job_finish, resolve_flow_type, resolve_env_vars
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
+from llmops.common.common import FlowTypeOption
 logger = llmops_logger("prompt_pipeline")
+
 
 
 def check_dictionary_contained(ref_dict, dict_list):
@@ -144,26 +156,39 @@ def prepare_and_execute(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
 
-    pf = PFClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
-    )
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+    print(params_dict)
 
-    flow_detail = experiment.get_flow_detail()
+    if EXECUTION_TYPE == "LOCAL":
+        from promptflow.client import PFClient
+        pf = PFClient()
+    else:
+        from promptflow.azure import PFClient
+        pf = PFClient(
+            credential=DefaultAzureCredential(),
+            subscription_id=config.subscription_id,
+            workspace_name=config.workspace_name,
+            resource_group_name=config.resource_group_name
+        )
+
+    flow_detail = experiment.get_flow_detail(flow_type)
+    print(flow_detail.flow_path)
     run_ids = []
     past_runs = []
     all_df = []
     all_metrics = []
 
+
+    env_vars = {}
+    env_vars = resolve_env_vars(experiment.base_path)
+    
     logger.info(f"Running experiment {experiment.name}")
     for mapped_dataset in experiment.datasets:
         logger.info(f"Using dataset {mapped_dataset.dataset.source}")
         dataset = mapped_dataset.dataset
         column_mapping = mapped_dataset.mappings
 
-        env_vars = {"key1": "value1"}
+
         dataframes = []
         metrics = []
 
@@ -208,31 +233,51 @@ def prepare_and_execute(
                             if experiment.runtime
                             else {"instance_type": "Standard_E4ds_v4"}
                         )
-                        run = Run(
-                            flow=flow_detail.flow_path,
-                            data=dataset.get_remote_source(pf.ml_client),
-                            variant=variant_string,
-                            name=run_name,
-                            display_name=run_name,
-                            environment_variables=env_vars,
-                            column_mapping=column_mapping,
-                            tags={} if not build_id else {"build_id": build_id},
-                            resources=runtime_resources,
-                            runtime=experiment.runtime,
-                        )
+                        
+                        if flow_type == FlowTypeOption.DAG_FLOW or flow_type == FlowTypeOption.FUNCTION_FLOW:
+                            run = pf.run(
+                                flow=flow_detail.flow_path,
+                                data=dataset.get_local_source(base_path) if EXECUTION_TYPE == "LOCAL" else dataset.get_remote_source(pf.ml_client),
+                                variant=variant_string,
+                                name=run_name,
+                                display_name=run_name,
+                                environment_variables=env_vars,
+                                column_mapping=column_mapping,
+                                tags={} if not build_id else {"build_id": build_id},
+                                resources=runtime_resources,
+                                runtime=experiment.runtime,
+                                stream=True,
+                            )
+                        elif flow_type == FlowTypeOption.CLASS_FLOW:
+                            run = pf.run(
+                                flow=flow_detail.flow_path,
+                                data=dataset.get_local_source(base_path) if EXECUTION_TYPE == "LOCAL" else dataset.get_remote_source(pf.ml_client),
+                                variant=variant_string,
+                                name=run_name,
+                                display_name=run_name,
+                                environment_variables=env_vars,
+                                column_mapping=column_mapping,
+                                tags={} if not build_id else {"build_id": build_id},
+                                resources=runtime_resources,
+                                runtime=experiment.runtime,
+                                init=params_dict,
+                                stream=True,
+                            )
+                        else:
+                            raise ValueError("Invalid flow type")
                         run._experiment_name = experiment.name
 
                         # Execute the run
                         logger.info(
                             f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
                         )
-                        job = pf.runs.create_or_update(run, stream=True)
-                        run_ids.append(job.name)
-                        wait_job_finish(job, logger)
+                        df_result = pf.get_details(run=run)
+                        run_ids.append(str(run.name))
+                        #wait_job_finish(job, logger)
 
-                        df_result = pf.get_details(job)
+                        #df_result = pf.get_details(job)
                         logger.info(
-                            f"Run {job.name} completed with status {job.status}",
+                            f"Run {run.name} completed with status {run.status}",
                         )
                         logger.info(f"Results:\n{df_result.head(10)}")
                         logger.info("Finished processing default variant\n")
@@ -263,29 +308,45 @@ def prepare_and_execute(
             runtime_resources = (
                 None if experiment.runtime else {"instance_type": "Standard_E4ds_v4"}
             )
-            run = Run(
-                flow=flow_detail.flow_path,
-                data=dataset.get_remote_source(pf.ml_client),
-                name=run_name,
-                display_name=run_name,
-                environment_variables=env_vars,
-                column_mapping=column_mapping,
-                tags={} if not build_id else {"build_id": build_id},
-                resources=runtime_resources,
-                runtime=experiment.runtime,
-            )
+
+            if flow_type == FlowTypeOption.DAG_FLOW or flow_type == FlowTypeOption.FUNCTION_FLOW:
+                run = pf.run(
+                    flow=flow_detail.flow_path,
+                    data=dataset.get_local_source(base_path) if EXECUTION_TYPE == "LOCAL" else dataset.get_remote_source(pf.ml_client),
+                    name=run_name,
+                    display_name=run_name,
+                    environment_variables=env_vars,
+                    column_mapping=column_mapping,
+                    tags={} if not build_id else {"build_id": build_id},
+                    resources=runtime_resources,
+                    runtime=experiment.runtime,
+                    stream=True,
+                )
+            elif flow_type == FlowTypeOption.CLASS_FLOW:
+                run = pf.run(
+                    flow=flow_detail.flow_path,
+                    data=dataset.get_local_source(base_path) if EXECUTION_TYPE == "LOCAL" else dataset.get_remote_source(pf.ml_client),
+                    name=run_name,
+                    display_name=run_name,
+                    environment_variables=env_vars,
+                    column_mapping=column_mapping,
+                    tags={} if not build_id else {"build_id": build_id},
+                    resources=runtime_resources,
+                    runtime=experiment.runtime,
+                    init=params_dict,
+                    stream=True,
+                )
             run._experiment_name = experiment.name
+            print(run.name)
 
             # Execute the run
             logger.info(
                 f"Starting prompt flow run '{run.name}' in Azure ML. This can take a few minutes.",
             )
-            pf.ml_client
-            job = pf.runs.create_or_update(run, stream=True)
-            run_ids.append(job.name)
-            wait_job_finish(job, logger)
-            df_result = pf.get_details(job)
-            logger.info(f"Run {job.name} completed with status {job.status}")
+            
+            df_result = pf.get_details(run=run)
+            run_ids.append(str(run.name))
+            logger.info(f"Run {run.name} completed with status {run.status}")
             logger.info(
                 f"Results:\n{df_result.head(10)}",
             )

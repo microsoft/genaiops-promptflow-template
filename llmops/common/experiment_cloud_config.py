@@ -1,10 +1,16 @@
+"""
+This module provides Cloud config class used along with Azure.
+
+"""
+
 import os
 from typing import Optional
 
 
 def _try_get_env_var(variable_name: str) -> str:
     """
-    Try to read environment variable. Raise ValueError if the variable doesn't exist or is empty.
+    Try to read environment variable. Raise ValueError if the variable
+    doesn't exist or is empty.
 
     :param variable_name: Environment variable name.
     :type variable_name: str

@@ -27,6 +27,7 @@ from typing import Optional
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
+from llmops.common.common import resolve_flow_type
 
 logger = llmops_logger("register_flow")
 
@@ -65,6 +66,8 @@ def register_model(
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
 
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+
     logger.info(f"Model name: {model_name}")
 
     ml_client = MLClient(
@@ -74,7 +77,7 @@ def register_model(
         config.workspace_name,
     )
 
-    model_path = experiment.get_flow_detail().flow_path
+    model_path = experiment.get_flow_detail(flow_type).flow_path
     model_hash = hash_folder(model_path)
     model_tags = {"model_hash": model_hash}
     if build_id:

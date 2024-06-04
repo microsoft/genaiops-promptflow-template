@@ -29,7 +29,7 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
+source .env
 # Use the assigned variables as needed
 echo "Flow to execute: $use_case_base_path"
 echo "Deploy environment: $deploy_environment"
@@ -41,17 +41,33 @@ set -e # fail on error
 
 # read values from experiment.yaml related to given environment
 config_path="./$use_case_base_path/experiment.yaml"
+env_var_file_path="./$use_case_base_path/environment/env.yaml"
+
 
 if [[ -e "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
+    init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
+
+    init_output=""
+    if [ -e "$init_file_path" ]; then
+        init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
+    fi
+    
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
 
+
+    env_output=""
+    if [ -e "$env_var_file_path" ]; then
+        env_output=$(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "true")
+    fi
+   
+    python -m llmops.common.deployment.migrate_connections --base_path $use_case_base_path --env_name $deploy_environment
     # docker build the prompt flow based image
-    docker build -t localpf "./$use_case_base_path/docker" --no-cache
+    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker" 
         
     docker images
 
@@ -69,7 +85,21 @@ if [[ -e "$config_path" ]]; then
     done
     
     docker_args=$result_string
+    
+    if [ -n "$init_output" ]; then
+        docker_args+=" $init_output"
+    fi
+
+    if [ -n "$env_output" ]; then
+        docker_args+=" $env_output"
+    fi
+    
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+
+
+    echo "$docker_args"
+
+
     docker run $(echo "$docker_args")
 
     sleep 15

@@ -4,7 +4,10 @@ from azure.ai.ml import MLClient
 
 import yaml
 
+from llmops.common.common import FlowTypeOption
+
 _FLOW_DAG_FILENAME = "flow.dag.yaml"
+_FLOW_FLEX_FILENAME= "flow.flex.yaml"
 _DEFAULT_FLOWS_DIR = "flows"
 _DEFAULT_DATA_DIR = "data"
 
@@ -219,45 +222,64 @@ class Experiment:
             if ds.name == name:
                 return ds
 
-    def get_flow_detail(self) -> FlowDetail:
-        self._flow_detail = self._flow_detail or self._load_flow_detail()
+    def get_flow_detail(self, flow_type: FlowTypeOption) -> FlowDetail:
+        self._flow_detail = self._flow_detail or self._load_flow_detail(flow_type)
         return self._flow_detail
 
-    def _load_flow_detail(self) -> FlowDetail:
+    def _load_flow_detail(self, flow_type: FlowTypeOption) -> FlowDetail:
         """
         Load flow details from the yaml files describing the experiment and the flow.
         """
         # Load flow data
-        flow_path = _resolve_flow_dir(self.base_path, self.flow)
-        flow_file_path = os.path.join(flow_path, _FLOW_DAG_FILENAME)
-        if not os.path.exists(flow_file_path):
+
+                    
+        if flow_type is FlowTypeOption.DAG_FLOW:
+            flow_path = _resolve_flow_dir(self.base_path, self.flow)
+            flow_file_path = os.path.join(flow_path, _FLOW_DAG_FILENAME)
+            if not os.path.exists(flow_file_path):
+                raise ValueError(
+                    f"Could not open prompt flow file in path {flow_file_path}"
+                )
+
+            yaml_data: dict
+            with open(flow_file_path, "r") as yaml_file:
+                yaml_data = yaml.safe_load(yaml_file)
+
+            # Find prompt variants and nodes
+            all_variants: list[dict[str, Any]] = []
+            all_llm_nodes = set()
+            default_variants = {}
+            for node_name, node_data in yaml_data.get("node_variants", {}).items():
+                node_variant_mapping = {}
+                variants = node_data.get("variants", {})
+                default_variant: str = node_data["default_variant_id"]
+                default_variants[node_name] = default_variant
+                for variant_name, _ in variants.items():
+                    node_variant_mapping[variant_name] = node_name
+                    all_llm_nodes.add(node_name)
+                all_variants.append(node_variant_mapping)
+
+            for nodes in yaml_data["nodes"]:
+                node_variant_mapping = {}
+                if nodes.get("type", {}) == "llm":
+                    all_llm_nodes.add(nodes["name"])
+        elif flow_type in [FlowTypeOption.FUNCTION_FLOW, FlowTypeOption.CLASS_FLOW]:
+            flow_path = os.path.abspath(os.path.join(self.base_path, self.flow))
+            flow_file_path = os.path.join(flow_path, _FLOW_FLEX_FILENAME)
+            if not os.path.exists(flow_file_path):
+                raise ValueError(
+                    f"Could not open prompt flow file in path {flow_file_path}"
+                )
+            yaml_data: dict
+            with open(flow_file_path, "r") as yaml_file:
+                yaml_data = yaml.safe_load(yaml_file)
+                all_variants = []
+                default_variants = {}
+                all_llm_nodes = set()
+        else:
             raise ValueError(
-                f"Could not open prompt flow file in path {flow_file_path}"
-            )
-
-        yaml_data: dict
-        with open(flow_file_path, "r") as yaml_file:
-            yaml_data = yaml.safe_load(yaml_file)
-
-        # Find prompt variants and nodes
-        all_variants: list[dict[str, Any]] = []
-        all_llm_nodes = set()
-        default_variants = {}
-        for node_name, node_data in yaml_data.get("node_variants", {}).items():
-            node_variant_mapping = {}
-            variants = node_data.get("variants", {})
-            default_variant: str = node_data["default_variant_id"]
-            default_variants[node_name] = default_variant
-            for variant_name, _ in variants.items():
-                node_variant_mapping[variant_name] = node_name
-                all_llm_nodes.add(node_name)
-            all_variants.append(node_variant_mapping)
-
-        for nodes in yaml_data["nodes"]:
-            node_variant_mapping = {}
-            if nodes.get("type", {}) == "llm":
-                all_llm_nodes.add(nodes["name"])
-
+                    f"Invalid flow type {flow_file_path}"
+                ) 
         return FlowDetail(flow_path, all_variants, all_llm_nodes, default_variants)
 
 
@@ -372,17 +394,22 @@ def _create_eval_datasets_and_default_mappings(
 
 
 def _create_evaluators(
-    raw_evaluators: list[dict], datasets: dict[str, Dataset], base_path: Optional[str]
+    raw_evaluators: list[dict],
+    datasets: dict[str, Dataset],
+    base_path: Optional[str]
 ) -> list[Evaluator]:
     """
-    Create evaluators from a list of dictionaries describing the raw evaluators, a dictionary of existing datasets,
+    Create evaluators from a list of dictionaries describing the
+    raw evaluators, a dictionary of existing datasets,
     and the path to the evaluator flow.
 
-    :param raw_evaluators: List of dictionaries containing the description of the experiment evaluators.
+    :param raw_evaluators: List of dictionaries containing the description of
+    the experiment evaluators.
     :type raw_evaluators: list[dict]
     :param datasets: Dictionary from dataset name to Dataset object.
     :type datasets: dict[str, Dataset]
-    :param base_path: Path to the evaluator flow directory containing the yaml description.
+    :param base_path: Path to the evaluator flow directory containing
+    the yaml description.
     Default value is current working directory.
     :type base_path: Optional[str]
     :return: List of evaluators.
@@ -394,7 +421,7 @@ def _create_evaluators(
         _raise_error_if_missing_keys(
             ["name", "datasets"],
             raw_evaluator,
-            message=f"Evaluator '{raw_evaluator.get('name')}' config missing parameter",
+            message=f"Evaluator '{raw_evaluator.get('name')}' config missing",
         )
         evaluator_datasets = _create_eval_datasets_and_default_mappings(
             raw_evaluator["datasets"], datasets
@@ -411,12 +438,12 @@ def _create_evaluators(
 
 def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
     """
-    Resolve path to the yaml file describing the flow. Tries multiple resolution methods.
+    Resolve path to the yaml file describing the flow.
     - If base_path not provided, uses the current working directory
-    - Looks for "flow.dag.yaml" in the base_path/flow, returns that path if found; otherwise returns
-      base_path/flows/flow.
+    - Looks for "flow.xx.yaml" in the base_path/flow. If found, returns path.
+      otherwise returns base_path/flows/flow.
 
-    :param base_path: Path to the flow directory. Default value is current working directory.
+    :param base_path: Path of flow directory. Default current working folder.
     :type base_path: Optional[str]
     :param flow: Name of the flow.
     :type flow: str
@@ -427,11 +454,15 @@ def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
     safe_base_path = base_path or ""
     if os.path.isfile(os.path.join(safe_base_path, flow, _FLOW_DAG_FILENAME)):
         return os.path.abspath(os.path.join(safe_base_path, flow))
+    if os.path.isfile(os.path.join(safe_base_path, flow, _FLOW_FLEX_FILENAME)):
+        return os.path.abspath(os.path.join(safe_base_path, flow))
 
-    return os.path.join(safe_base_path, _DEFAULT_FLOWS_DIR, flow)
+    return os.path.join(safe_base_path, flow)
 
 
-def _load_base_experiment(exp_file_path: str, base_path: Optional[str]) -> Experiment:
+def _load_base_experiment(
+        exp_file_path: str, 
+        base_path: Optional[str]) -> Experiment:
     exp_config: dict
     with open(exp_file_path, "r") as yaml_file:
         exp_config = yaml.safe_load(yaml_file)
@@ -478,9 +509,10 @@ def _apply_overlay(
     if "datasets" in overlay_config:
         overlay_raw_datasets: list[dict] = overlay_config["datasets"]
         if overlay_raw_datasets:
-            overlay_datasets, overlay_mappings = _create_datasets_and_default_mappings(
-                overlay_raw_datasets
-            )
+            overlay_datasets, overlay_mappings = \
+                _create_datasets_and_default_mappings(
+                        overlay_raw_datasets
+                    )
             # Override experiment datasets
             experiment.datasets = overlay_mappings
             experiment_dataset_map = overlay_datasets
@@ -512,10 +544,12 @@ def load_experiment(
 
     :param filename: The experiment filename. Default is "experiment.yaml"
     :type filename: Optional[str]
-    :param base_path: The base path of the experiment. If not specified, the current working directory is used.
+    :param base_path: The base path of the experiment. If not specified,
+    the current working directory is used.
     :type base_path: Optional[str]
-    :param env: The environment to use. If specified, look for an overlay experiment file named
-    <experiment_name>.<env>.yaml and use it to override experiment dataset sources.
+    :param env: The environment to use. If specified, look for an overlay
+    experiment file named
+    <experiment_name>.<env>.yaml use it to override experiment dataset sources.
     :type env: Optional[str]
     """
 
@@ -525,13 +559,13 @@ def load_experiment(
     # Validate the experiment file name
     file_parts = os.path.splitext(experiment_file_name)
     if len(file_parts) != 2:  # noqa: PLR2004
-        raise ValueError(f"Invalid experiment filename '{experiment_file_name}'")
+        raise ValueError(f"Invalid experiment file '{experiment_file_name}'")
     env_experiment_file_name = f"{file_parts[0]}.{env}{file_parts[1]}"
 
     # Create base experiment
     exp_file_path = os.path.join(safe_base_path, experiment_file_name)
     if not os.path.exists(exp_file_path):
-        raise ValueError(f"Could not open experiment file in path {exp_file_path}")
+        raise ValueError(f"Could not open experiment file {exp_file_path}")
     experiment = _load_base_experiment(exp_file_path, safe_base_path)
 
     # Apply environment overlay

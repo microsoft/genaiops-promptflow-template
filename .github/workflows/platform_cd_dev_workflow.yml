@@ -53,6 +53,8 @@ jobs:
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_VARS }}" > .env
       - name: Azure login
         uses: azure/login@v1
         with:

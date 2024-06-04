@@ -41,6 +41,7 @@ set -e # fail on error
 # read values from deployment_config.json related to `webapp_endpoint`
 env_name=$deploy_environment
 deploy_config="./$use_case_base_path/configs/deployment_config.json"
+env_var_file_path="./$use_case_base_path/environment/env.yaml"
 con_object=$(jq ".webapp_endpoint[] | select(.ENV_NAME == \"$env_name\")" "$deploy_config")
 REGISTRY_NAME=$(echo "$con_object" | jq -r '.REGISTRY_NAME')
 rgname=$(echo "$con_object" | jq -r '.WEB_APP_RG_NAME')
@@ -50,8 +51,21 @@ appserviceweb=$(echo "$con_object" | jq -r '.WEB_APP_NAME')
 acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
 websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
 
+config_path="./$use_case_base_path/experiment.yaml"
+STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
+
+init_output=()
+if [ -e "$init_file_path" ]; then
+    IFS=' ' read -r -a init_output <<< $(python llmops/common/deployment/generate_config.py "$init_file_path" "false")
+fi
+
+env_output=()
+if [ -e "$init_file_path" ]; then
+    IFS=' ' read -r -a env_output <<< $(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "false")
+fi
 read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES | join(" ")')"
-echo $connection_names
+
 
 # create a resource group
 az group create --name $rgname --location westeurope
@@ -88,6 +102,34 @@ for name in "${connection_names[@]}"; do
         --name $appserviceweb \
         --settings $modified_name=$api_key
 done
+
+for pair in "${env_output[@]}"; do
+    echo "Key-value pair: $pair"
+    key="${pair%%=*}"
+    value="${pair#*=}"
+    key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
+    pair="$key=$value"
+    az webapp config appsettings set \
+        --resource-group $rgname \
+        --name $appserviceweb \
+        --settings $key=$value
+done
+
+for element in "${init_output[@]}"
+do
+    echo "Key-value pair: $element"
+    key="${element%%=*}"
+    value="${element#*=}"
+    key=$(echo "$key" | tr '[:lower:]' '[:upper:]')
+    pair="$key=$value"
+    az webapp config appsettings set \
+        --resource-group $rgname \
+        --name $appserviceweb \
+        --settings $key=$value
+    echo "$element"
+done
+
+
 
 # Assign user managed identifier to Web APp
 id=$(az identity show --resource-group $rgname --name $udmid --query id --output tsv)

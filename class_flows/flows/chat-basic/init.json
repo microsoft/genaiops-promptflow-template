@@ -1,0 +1,7 @@
+{
+    "model_config": {
+        "azure_deployment": "gpt-35-turbo",
+        "connection": "aoai"
+    },
+    "max_total_token": 2048
+}

@@ -30,7 +30,6 @@ from azure.ai.ml.entities import (
     OnlineRequestSettings,
     BuildContext,
 )
-from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 
@@ -38,6 +37,7 @@ from dotenv import load_dotenv
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
+from llmops.common.common import resolve_flow_type, resolve_env_vars
 
 logger = llmops_logger("provision_deployment")
 
@@ -56,6 +56,10 @@ def create_deployment(
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
+
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+    print(params_dict)
+    env_vars = resolve_env_vars(experiment.base_path)
 
     real_config = f"{base_path}/configs/deployment_config.json"
 
@@ -88,6 +92,12 @@ def create_deployment(
                 ]
                 deployment_desc = elem["DEPLOYMENT_DESC"]
                 environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
+                if isinstance(env_vars, dict):
+                    if env_vars:
+                        for key, value in env_vars.items():
+                            environment_variables[key] = value
+                for key,value in params_dict.items():
+                    environment_variables[key] = value
                 environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
                 environment_variables["PRT_CONFIG_OVERRIDE"] = (
                     f"deployment.subscription_id={config.subscription_id},"
@@ -96,7 +106,7 @@ def create_deployment(
                     f"deployment.endpoint_name={endpoint_name},"
                     f"deployment.deployment_name={deployment_name}"
                 )
-
+                print(environment_variables)
                 traffic_allocation = {}
                 deployments = ml_client.online_deployments.list(
                     endpoint_name, local=False
@@ -114,7 +124,7 @@ def create_deployment(
 
                 env_docker = Environment(
                     build=BuildContext(
-                        path=experiment.get_flow_detail().flow_path,
+                        path=experiment.get_flow_detail(flow_type).flow_path,
                         dockerfile_path="docker/dockerfile",
                     ),
                     name=deployment_name,

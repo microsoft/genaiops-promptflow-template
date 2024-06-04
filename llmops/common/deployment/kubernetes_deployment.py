@@ -43,6 +43,7 @@ from dotenv import load_dotenv
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
+from llmops.common.common import resolve_flow_type
 
 logger = llmops_logger("kubernetes_deployment")
 
@@ -61,7 +62,7 @@ def create_kubernetes_deployment(
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
-
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
     real_config = f"{base_path}/configs/deployment_config.json"
 
     logger.info(f"Model name: {model_name}")
@@ -105,7 +106,7 @@ def create_kubernetes_deployment(
                 )
                 environment = Environment(
                     build=BuildContext(
-                        path=experiment.get_flow_detail().flow_path,
+                        path=experiment.get_flow_detail(flow_type).flow_path,
                         dockerfile_path="docker/dockerfile",
                     ),
                     name=deployment_name,

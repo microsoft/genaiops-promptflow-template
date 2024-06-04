@@ -6,14 +6,15 @@ Args:
 This argument is required to specify the environment (dev, test, prod)
 --base_path: The base path of the flow use case.
 This argument is required to specify the name of the flow for execution.
---connection_details: JSON string describing the details of local pf connection.
+--connection_details: JSON string describing the details of
+local pf connection.
 """
 
 import argparse
 import json
 from dotenv import load_dotenv
 from promptflow.entities import AzureOpenAIConnection
-from promptflow import PFClient
+from promptflow.azure import PFClient
 
 from llmops.common.logger import llmops_logger
 
@@ -64,7 +65,7 @@ def prepare_and_execute(
                                 )
                                 pf.connections.create_or_update(connection)
 
-                                logger.info(f"{avail_con['name']} created successfully")
+                                logger.info(f"{avail_con['name']} created")
 
 
 def main():
@@ -86,7 +87,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
 
