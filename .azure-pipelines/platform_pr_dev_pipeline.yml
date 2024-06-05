@@ -9,6 +9,8 @@ parameters:
    displayName: "Resource group name"
  - name: WORKSPACE_NAME
    displayName: "Workspace name"
+ - name: env_vars
+   displayName: "env vars"
 
 stages:
     - stage: build_validation
@@ -33,6 +35,24 @@ stages:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
+
+        - task: Bash@3
+          displayName: Create .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "$(env_vars)" > .env
+          env:
+            env_vars: $(env_vars)
+
+        - task: UsePythonVersion@0
+          displayName: Load .env file
+          inputs:
+            versionSpec: '3.x'
+            addToPath: true
+            script: |
+              from dotenv import load_dotenv
+              load_dotenv()
 
         #=====================================
         # Registers experiment dataset in Azure ML as Data Asset

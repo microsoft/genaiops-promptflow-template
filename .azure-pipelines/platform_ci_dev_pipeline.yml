@@ -16,6 +16,8 @@ parameters:
    displayName: "Workspace name"
  - name: KEY_VAULT_NAME
    displayName: "KeyVault name"
+ - name: env_vars
+   displayName: "env vars"
 
 stages:
     - stage: execute_prompt_experiment
@@ -28,6 +30,24 @@ stages:
       - job: Execute_ml_Job_Pipeline
         steps:
         - template: templates/configure_azureml_agent.yml
+
+        - task: Bash@3
+          displayName: Create .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "$(env_vars)" > .env
+          env:
+            env_vars: $(env_vars)
+
+        - task: UsePythonVersion@0
+          displayName: Load .env file
+          inputs:
+            versionSpec: '3.x'
+            addToPath: true
+            script: |
+              from dotenv import load_dotenv
+              load_dotenv()
 
         - template: templates/get_connection_details.yml
         #=====================================
@@ -173,7 +193,24 @@ stages:
         - template: templates/get_connection_details.yml
       
         - template: templates/configure_azureml_agent.yml
-      
+
+        - task: Bash@3
+          displayName: Create .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "$(env_vars)" > .env
+          env:
+            env_vars: $(env_vars)
+
+        - task: UsePythonVersion@0
+          displayName: Load .env file
+          inputs:
+            versionSpec: '3.x'
+            addToPath: true
+            script: |
+              from dotenv import load_dotenv
+              load_dotenv()
         #=====================================
         # Registers the flow in Azure ML registry
         # Writes latest model version to model_version.txt file.
@@ -222,6 +259,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
+              ENV_VARS: ${{ parameters.env_cars }}
 
         #=====================================
         # Executes AML Compute deployment when parameter deployment_type == 'aml'
@@ -237,6 +275,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
+              ENV_VARS: ${{ parameters.env_cars }}
 
         #=====================================
         # Executes Azure Webapp deployment when parameter 
@@ -250,3 +289,4 @@ stages:
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}
+              ENV_VARS: ${{ parameters.env_cars }}

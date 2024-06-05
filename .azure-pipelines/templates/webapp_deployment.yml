@@ -7,6 +7,8 @@ parameters:
   type: string
 - name: REGISTRY_DETAILS
   type: string
+- name: ENV_VARS
+  type: string
 steps:
 - template: ./prepare_docker_image.yml
   parameters:
@@ -14,6 +16,7 @@ steps:
     DEPLOY_ENVIRONMENT: ${{ parameters.DEPLOY_ENVIRONMENT }}
     CONNECTION_DETAILS: '${{ parameters.CONNECTION_DETAILS }}'
     REGISTRY_DETAILS: '${{ parameters.REGISTRY_DETAILS }}'
+    ENV_VARS: '${{ parameters.ENV_VARS }}'
 
 - task: AzureCLI@2
   displayName: Webapp deployment

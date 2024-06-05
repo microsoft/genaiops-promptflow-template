@@ -8,7 +8,7 @@ trigger:
     include:
       - .azure-pipelines/*
       - llmops/*
-      - named_entity_recognition/*
+      - class_flows/*
 
 
 pool:
@@ -23,7 +23,7 @@ parameters:
    default: "dev"
  - name: use_case_base_path
    displayName: "flow to execute"
-   default: "named_entity_recognition"
+   default: "class_flows"
  - name: deployment_type
    displayName: "Determine type of deployment - aml, aks, docker, webapp"
    default: "aml"
@@ -42,3 +42,4 @@ stages:
       deployment_type: ${{ lower(parameters.deployment_type) }}
       connection_details: '$(COMMON_DEV_CONNECTIONS)'
       registry_details: '$(DOCKER_IMAGE_REGISTRY)'
+      env_vars: $(env_vars)

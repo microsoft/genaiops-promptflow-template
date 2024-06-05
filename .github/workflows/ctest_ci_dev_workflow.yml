@@ -35,7 +35,7 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       use_case_base_path: ${{ inputs.use_case_base_path || 'class_flows' }}
-      deployment_type: ${{ inputs.deployment_type|| 'webapp' }}
+      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
