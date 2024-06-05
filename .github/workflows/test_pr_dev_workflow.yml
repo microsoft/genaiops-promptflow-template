@@ -34,3 +34,4 @@ jobs:
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       env_vars: ${{ secrets.ENV_VARS }}
+
