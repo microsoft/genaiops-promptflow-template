@@ -21,7 +21,7 @@ This argument is required to specify the version of the model for deployment.
 import json
 import argparse
 from typing import Optional
-
+import subprocess
 import os
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
@@ -38,8 +38,12 @@ from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.common import resolve_flow_type, resolve_env_vars
+from llmops.common.common import FlowTypeOption
 
 logger = llmops_logger("provision_deployment")
+
+_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml") 
+_FLOW_FLEX_FILENAME= ("flow.flex.yml", "flow.flex.yaml")
 
 
 def create_deployment(
@@ -56,9 +60,39 @@ def create_deployment(
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
+    found_flex = False
+    flow_type = FlowTypeOption.CLASS_FLOW
+    for root, dirs, files in os.walk(os.path.join(experiment.base_path, experiment.flow)):
+        for file in files:
+            if file in _FLOW_FLEX_FILENAME:
+                found_flex = True
+                flow_type = FlowTypeOption.CLASS_FLOW
+                flow_file_path = os.path.abspath(os.path.join(experiment.base_path, experiment.flow, file))
+            elif file in _FLOW_DAG_FILENAME:
+                flow_file_path = os.path.abspath(os.path.join(experiment.base_path, experiment.flow, file))
+                flow_type = FlowTypeOption.DAG_FLOW
 
-    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
-    print(params_dict)
+    #flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+    params_dict = {}
+    if found_flex:
+        result = subprocess.run(["python", "llmops/common/deployment/generate_config.py", flow_file_path, "false"], stdout=subprocess.PIPE)
+        output = result.stdout.decode("utf-8")
+        substrings = output.split()
+    
+        # Create an empty dictionary to store the key-value pairs
+        
+        
+        # Iterate over each substring
+        for substring in substrings:
+            # Split the substring by the "=" delimiter
+            key_value = substring.split("=")
+            
+            # Check if the substring contains the "=" delimiter
+            if len(key_value) == 2:
+                key, value = key_value
+                params_dict[key] = value
+        print(params_dict)
+
     env_vars = resolve_env_vars(experiment.base_path)
 
     real_config = f"{base_path}/configs/deployment_config.json"
@@ -107,6 +141,7 @@ def create_deployment(
                     f"deployment.deployment_name={deployment_name}"
                 )
                 print(environment_variables)
+                
                 traffic_allocation = {}
                 deployments = ml_client.online_deployments.list(
                     endpoint_name, local=False

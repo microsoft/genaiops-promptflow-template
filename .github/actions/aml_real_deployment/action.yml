@@ -37,6 +37,7 @@ runs:
     - name: load .env file
       shell: bash
       run: python -c "from dotenv import load_dotenv; load_dotenv()"
+      
     - name: Provision AML Online Endpoint
       uses: ./.github/actions/execute_script
       with:
