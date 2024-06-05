@@ -51,3 +51,43 @@
 {"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "results":"Harper Lee"}
 {"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "results":"Arthur Conan Doyle"}
 {"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "results":"Vincent Van Gogh"}
+{"text": "The marketing manager is planning the new campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The software engineer is developing a new application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager is overseeing the new project.", "entity_type": "job title", "llm_result": "project manager"}
+{"text": "The business analyst is studying the market trends.", "entity_type": "job title", "llm_result": "business analyst"}
+{"text": "The financial advisor is providing investment advice.", "entity_type": "job title", "llm_result": "financial advisor"}
+{"text": "The system administrator is maintaining the network systems.", "entity_type": "job title", "llm_result": "system administrator"}
+{"text": "The database administrator is managing the company's data.", "entity_type": "job title", "llm_result": "database administrator"}
+{"text": "The web developer is designing a new website.", "entity_type": "job title", "llm_result": "web developer"}
+{"text": "The IT manager is coordinating all technology operations.", "entity_type": "job title", "llm_result": "IT manager"}
+{"text": "The UX designer is improving the user interface of the application.", "entity_type": "job title", "llm_result": "UX designer"}
+{"text": "The contact number for our head office is (555) 321-0987.", "llm_result": "(555) 321-0987", "entity_type": "phone number"}
+{"text": "For technical support, please call (444) 654-3210.", "llm_result": "(444) 654-3210", "entity_type": "phone number"}
+{"text": "Our helpline number is (333) 765-4321.", "llm_result": "(333) 765-4321", "entity_type": "phone number"}
+{"text": "You can reach our customer service at (222) 123-4567.", "llm_result": "(222) 123-4567", "entity_type": "phone number"}
+{"text": "The emergency contact number is (111) 911-9111.", "llm_result": "(111) 911-9111", "entity_type": "phone number"}
+{"text": "The novel 'Pride and Prejudice' was written by Jane Austen.", "entity_type":"people's full name", "llm_result":"Jane Austen"}
+{"text": "The character James Bond was created by Ian Fleming.", "entity_type":"people's full name", "llm_result":"Ian Fleming"}
+{"text": "The famous physicist, Albert Einstein, developed the theory of relativity.", "entity_type":"people's full name", "llm_result":"Albert Einstein"}
+{"text": "The renowned mathematician, Isaac Newton, discovered the laws of motion.", "entity_type":"people's full name", "llm_result":"Isaac Newton"}
+{"text": "The character Frodo Baggins was created by J.R.R. Tolkien.", "entity_type":"people's full name", "llm_result":"J.R.R. Tolkien"}
+{"text": "The marketing manager is planning the new campaign.", "entity_type": "job title", "results": "marketing manager"}
+{"text": "The software engineer is developing a new application.", "entity_type": "job title", "results": "software engineer"}
+{"text": "The project manager is overseeing the new project.", "entity_type": "job title", "results": "project manager"}
+{"text": "The business analyst is studying the market trends.", "entity_type": "job title", "results": "business analyst"}
+{"text": "The financial advisor is providing investment advice.", "entity_type": "job title", "results": "financial advisor"}
+{"text": "The system administrator is maintaining the network systems.", "entity_type": "job title", "results": "system administrator"}
+{"text": "The database administrator is managing the company's data.", "entity_type": "job title", "results": "database administrator"}
+{"text": "The web developer is designing a new website.", "entity_type": "job title", "results": "web developer"}
+{"text": "The IT manager is coordinating all technology operations.", "entity_type": "job title", "results": "IT manager"}
+{"text": "The UX designer is improving the user interface of the application.", "entity_type": "job title", "results": "UX designer"}
+{"text": "The contact number for our head office is (555) 321-0987.", "results": "(555) 321-0987", "entity_type": "phone number"}
+{"text": "For technical support, please call (444) 654-3210.", "results": "(444) 654-3210", "entity_type": "phone number"}
+{"text": "Our helpline number is (333) 765-4321.", "results": "(333) 765-4321", "entity_type": "phone number"}
+{"text": "You can reach our customer service at (222) 123-4567.", "results": "(222) 123-4567", "entity_type": "phone number"}
+{"text": "The emergency contact number is (111) 911-9111.", "results": "(111) 911-9111", "entity_type": "phone number"}
+{"text": "The novel 'Pride and Prejudice' was written by Jane Austen.", "entity_type":"people's full name", "results":"Jane Austen"}
+{"text": "The character James Bond was created by Ian Fleming.", "entity_type":"people's full name", "results":"Ian Fleming"}
+{"text": "The famous physicist, Albert Einstein, developed the theory of relativity.", "entity_type":"people's full name", "results":"Albert Einstein"}
+{"text": "The renowned mathematician, Isaac Newton, discovered the laws of motion.", "entity_type":"people's full name", "results":"Isaac Newton"}
+{"text": " EVAL: The character Frodo Baggins was created by J.R.R. Tolkien.", "entity_type":"people's full name", "results":"J.R.R. Tolkien"}

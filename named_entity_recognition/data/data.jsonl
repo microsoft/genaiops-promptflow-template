@@ -1,18 +1,18 @@
-{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "results": "software engineer"}
-{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "results": "project manager, data analyst"}
-{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "results": "marketing manager, graphic designer"}
-{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "results": "CEO, CFO"}
-{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "results": "web developer, UX designer"}
-{"text": "John finally decided to change his phone number after receiving too many spam calls.", "results": "None", "entity_type": "phone number"}
-{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "results": "(123) 456-7890", "entity_type": "phone number"}
-{"text": "My new phone number is (098) 765-4321, please update your contact list.", "results": "(098) 765-4321", "entity_type": "phone number"}
-{"text": "The phone number (321) 654-0987 is no longer in service.", "results": "(321) 654-0987", "entity_type": "phone number"}
-{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "results": "(555) 123-4567", "entity_type": "phone number"}
-{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "results":"John Doe"}
-{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "results":"F. Scott Fitzgerald"}
-{"text": "Mary Jane Watson and Peter Parker are characters in the Spider-Man series.", "entity_type":"people's full name", "results":"Mary Jane Watson, Peter Parker"}
-{"text": "The famous physicists, Albert Einstein and Isaac Newton, made significant contributions to the field of physics.", "entity_type":"people's full name", "results":"Isaac Newton, Albert Einstein"}
-{"text": "The Eiffel Tower is an iconic landmark in Paris.", "entity_type":"people's full name", "results":"None"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "123 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "Mary Jane Watson and Peter Parker are characters in the Spider-Man series.", "entity_type":"people's full name", "llm_result":"Peter Parker"}
+{"text": "The famous physicists, Albert Einstein and Isaac Newton, made significant contributions to the field of physics.", "entity_type":"people's full name", "llm_result":"Isaac Newton"}
+{"text": "The Eiffel Tower is an iconic landmark in Paris.", "entity_type":"people's full name", "llm_result":"Paris"}
 {"text": "The software developer is debugging the code to find the error.", "entity_type": "job title", "llm_result": "software developer"}
 {"text": "The data scientist is analyzing the dataset to extract useful insights.", "entity_type": "job title", "llm_result": "data scientist"}
 {"text": "The HR manager is conducting interviews for the new job openings.", "entity_type": "job title", "llm_result": "HR manager"}
@@ -33,21 +33,268 @@
 {"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
 {"text": "The renowned scientist, Marie Curie, was the first woman to win a Nobel Prize.", "entity_type":"people's full name", "llm_result":"Marie Curie"}
 {"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
-{"text": "The software developer is debugging the code to find the error.", "entity_type": "job title", "results": "software developer"}
-{"text": "The data scientist is analyzing the dataset to extract useful insights.", "entity_type": "job title", "results": "data scientist"}
-{"text": "The HR manager is conducting interviews for the new job openings.", "entity_type": "job title", "results": "HR manager"}
-{"text": "The product manager is planning the features for the next release.", "entity_type": "job title", "results": "product manager"}
-{"text": "The graphic designer is creating a new logo for the company.", "entity_type": "job title", "results": "graphic designer"}
-{"text": "The customer service representative is handling the complaints from the customers.", "entity_type": "job title", "results": "customer service representative"}
-{"text": "The sales executive is meeting with potential clients to discuss business opportunities.", "entity_type": "job title", "results": "sales executive"}
-{"text": "The network engineer is setting up the new server.", "entity_type": "job title", "results": "network engineer"}
-{"text": "The accountant is preparing the financial report for the last fiscal year.", "entity_type": "job title", "results": "accountant"}
-{"text": "The operations manager is overseeing the daily operations of the company.", "entity_type": "job title", "results": "operations manager"}
-{"text": "The phone number for the emergency services is (911).", "results": "(911)", "entity_type": "phone number"}
-{"text": "You can reach our sales department at (800) 123-4567.", "results": "(800) 123-4567", "entity_type": "phone number"}
-{"text": "For inquiries, please call our hotline at (888) 765-4321.", "results": "(888) 765-4321", "entity_type": "phone number"}
-{"text": "Our customer support can be reached at (777) 654-3210.", "results": "(777) 654-3210", "entity_type": "phone number"}
-{"text": "The contact number for our branch office is (666) 123-0987.", "results": "(666) 123-0987", "entity_type": "phone number"}
-{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "results":"Harper Lee"}
-{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "results":"Arthur Conan Doyle"}
-{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "results":"Vincent Van Gogh"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "123 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The marketing manager is planning the new campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The software engineer is developing a new application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager is overseeing the new project.", "entity_type": "job title", "llm_result": "project manager"}
+{"text": "The business analyst is studying the market trends.", "entity_type": "job title", "llm_result": "business analyst"}
+{"text": "The financial advisor is providing investment advice.", "entity_type": "job title", "llm_result": "financial advisor"}
+{"text": "The system administrator is maintaining the network systems.", "entity_type": "job title", "llm_result": "system administrator"}
+{"text": "The database administrator is managing the company's data.", "entity_type": "job title", "llm_result": "database administrator"}
+{"text": "The web developer is designing a new website.", "entity_type": "job title", "llm_result": "web developer"}
+{"text": "The IT manager is coordinating all technology operations.", "entity_type": "job title", "llm_result": "IT manager"}
+{"text": "The UX designer is improving the user interface of the application.", "entity_type": "job title", "llm_result": "UX designer"}
+{"text": "The contact number for our head office is (555) 321-0987.", "llm_result": "(555) 321-0987", "entity_type": "phone number"}
+{"text": "For technical support, please call (444) 654-3210.", "llm_result": "(444) 654-3210", "entity_type": "phone number"}
+{"text": "Our helpline number is (333) 765-4321.", "llm_result": "(333) 765-4321", "entity_type": "phone number"}
+{"text": "You can reach our customer service at (222) 123-4567.", "llm_result": "(222) 123-4567", "entity_type": "phone number"}
+{"text": "The emergency contact number is (111) 911-9111.", "llm_result": "(111) 911-9111", "entity_type": "phone number"}
+{"text": "The novel 'Pride and Prejudice' was written by Jane Austen.", "entity_type":"people's full name", "llm_result":"Jane Austen"}
+{"text": "The character James Bond was created by Ian Fleming.", "entity_type":"people's full name", "llm_result":"Ian Fleming"}
+{"text": "The famous physicist, Albert Einstein, developed the theory of relativity.", "entity_type":"people's full name", "llm_result":"Albert Einstein"}
+{"text": "The renowned mathematician, Isaac Newton, discovered the laws of motion.", "entity_type":"people's full name", "llm_result":"Isaac Newton"}
+{"text": "The character Frodo Baggins was created by J.R.R. Tolkien.", "entity_type":"people's full name", "llm_result":"J.R.R. Tolkien"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The marketing manager is planning the new campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The software engineer is developing a new application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager is overseeing the new project.", "entity_type": "job title", "llm_result": "project manager"}
+{"text": "The business analyst is studying the market trends.", "entity_type": "job title", "llm_result": "business analyst"}
+{"text": "The financial advisor is providing investment advice.", "entity_type": "job title", "llm_result": "financial advisor"}
+{"text": "The system administrator is maintaining the network systems.", "entity_type": "job title", "llm_result": "system administrator"}
+{"text": "The database administrator is managing the company's data.", "entity_type": "job title", "llm_result": "database administrator"}
+{"text": "The web developer is designing a new website.", "entity_type": "job title", "llm_result": "web developer"}
+{"text": "The IT manager is coordinating all technology operations.", "entity_type": "job title", "llm_result": "IT manager"}
+{"text": "The UX designer is improving the user interface of the application.", "entity_type": "job title", "llm_result": "UX designer"}
+{"text": "The contact number for our head office is (555) 321-0987.", "llm_result": "(555) 321-0987", "entity_type": "phone number"}
+{"text": "For technical support, please call (444) 654-3210.", "llm_result": "(444) 654-3210", "entity_type": "phone number"}
+{"text": "Our helpline number is (333) 765-4321.", "llm_result": "(333) 765-4321", "entity_type": "phone number"}
+{"text": "You can reach our customer service at (222) 123-4567.", "llm_result": "(222) 123-4567", "entity_type": "phone number"}
+{"text": "The emergency contact number is (111) 911-9111.", "llm_result": "(111) 911-9111", "entity_type": "phone number"}
+{"text": "The novel 'Pride and Prejudice' was written by Jane Austen.", "entity_type":"people's full name", "llm_result":"Jane Austen"}
+{"text": "The character James Bond was created by Ian Fleming.", "entity_type":"people's full name", "llm_result":"Ian Fleming"}
+{"text": "The famous physicist, Albert Einstein, developed the theory of relativity.", "entity_type":"people's full name", "llm_result":"Albert Einstein"}
+{"text": "The renowned mathematician, Isaac Newton, discovered the laws of motion.", "entity_type":"people's full name", "llm_result":"Isaac Newton"}
+{"text": "The character Frodo Baggins was created by J.R.R. Tolkien.", "entity_type":"people's full name", "llm_result":"J.R.R. Tolkien"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
+{"text": "Please dial the following phone number: (555) 123-4567 to reach our technical support.", "llm_result": "(555) 123-4567", "entity_type": "phone number"}
+{"text": "John Doe has been appointed as the new CEO of the company.", "entity_type":"people's full name", "llm_result":"John Doe"}
+{"text": "The novel 'The Great Gatsby' was written by F. Scott Fitzgerald.", "entity_type":"people's full name", "llm_result":"F. Scott Fitzgerald"}
+{"text": "The data scientist is analyzing the latest user data.", "entity_type": "job title", "llm_result": "data scientist"}
+{"text": "The network engineer is upgrading the company's network infrastructure.", "entity_type": "job title", "llm_result": "network engineer"}
+{"text": "The HR manager is conducting the annual employee review.", "entity_type": "job title", "llm_result": "HR manager"}
+{"text": "The sales manager is preparing for the upcoming product launch.", "entity_type": "job title", "llm_result": "sales manager"}
+{"text": "The graphic designer is creating new designs for the marketing campaign.", "entity_type": "job title", "llm_result": "graphic designer"}
+{"text": "The product manager is coordinating with the development team.", "entity_type": "job title", "llm_result": "product manager"}
+{"text": "The QA engineer is testing the new software update.", "entity_type": "job title", "llm_result": "QA engineer"}
+{"text": "The customer service representative is handling customer complaints.", "entity_type": "job title", "llm_result": "customer service representative"}
+{"text": "The operations manager is overseeing the daily operations.", "entity_type": "job title", "llm_result": "operations manager"}
+{"text": "The account manager is managing client relationships.", "entity_type": "job title", "llm_result": "account manager"}
+{"text": "The contact number for our sales department is (666) 789-0123.", "llm_result": "(666) 789-0123", "entity_type": "phone number"}
+{"text": "For billing inquiries, please call (777) 890-1234.", "llm_result": "(777) 890-1234", "entity_type": "phone number"}
+{"text": "Our product support number is (888) 901-2345.", "llm_result": "(888) 901-2345", "entity_type": "phone number"}
+{"text": "You can reach our HR department at (999) 012-3456.", "llm_result": "(999) 012-3456", "entity_type": "phone number"}
+{"text": "The direct line for our CEO is (000) 123-4567.", "llm_result": "(000) 123-4567", "entity_type": "phone number"}
+{"text": "The novel 'To Kill a Mockingbird' was written by Harper Lee.", "entity_type":"people's full name", "llm_result":"Harper Lee"}
+{"text": "The character Sherlock Holmes was created by Arthur Conan Doyle.", "entity_type":"people's full name", "llm_result":"Arthur Conan Doyle"}
+{"text": "The famous artist, Vincent Van Gogh, painted 'The Starry Night'.", "entity_type":"people's full name", "llm_result":"Vincent Van Gogh"}
+{"text": "The renowned composer, Ludwig van Beethoven, composed 'Fur Elise'.", "entity_type":"people's full name", "llm_result":"Ludwig van Beethoven"}
+{"text": "The character Harry Potter was created by J.K. Rowling.", "entity_type":"people's full name", "llm_result":"J.K. Rowling"}
+{"text": "The software engineer is working on a new update for the application.", "entity_type": "job title", "llm_result": "software engineer"}
+{"text": "The project manager and the data analyst are collaborating to interpret the project data.", "entity_type": "job title", "llm_result": "project manager, data analyst"}
+{"text": "The marketing manager is coordinating with the graphic designer to create a new advertisement campaign.", "entity_type": "job title", "llm_result": "marketing manager"}
+{"text": "The CEO and CFO are discussing the financial forecast for the next quarter.", "entity_type": "job title", "llm_result": "CEO"}
+{"text": "The web developer and UX designer are working together to improve the website's user interface.", "entity_type": "job title", "llm_result": "web developer, UX designer"}
+{"text": "John finally decided to change his phone number after receiving too many spam calls.", "llm_result": "None", "entity_type": "phone number"}
+{"text": "If you have any questions about our products, please call our customer service at (123) 456-7890.", "llm_result": "(123) 456-7890", "entity_type": "phone number"}
+{"text": "My new phone number is (098) 765-4321, please update your contact list.", "llm_result": "(098) 765-4321", "entity_type": "phone number"}
+{"text": "The phone number (321) 654-0987 is no longer in service.", "llm_result": "(321) 654-0987", "entity_type": "phone number"}
