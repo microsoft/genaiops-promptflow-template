@@ -41,7 +41,7 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-              echo "$(env_vars)" > .env
+              echo "$(env_vars)" | tr ' ' '\n' > .env
           env:
             env_vars: $(env_vars)
 
