@@ -17,6 +17,23 @@ parameters:
   type: string
 
 steps:
+- task: Bash@3
+  displayName: Create .env file
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "$(env_vars)" > .env
+  env:
+    env_vars: $(env_vars)
+
+- task: UsePythonVersion@0
+  displayName: Load .env file
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+    script: |
+      from dotenv import load_dotenv
+      load_dotenv()
 - template: execute_python_code.yml
   parameters:
     step_name: "Provision AzureML Endpoint"

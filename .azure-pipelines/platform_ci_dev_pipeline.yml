@@ -259,7 +259,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
-              ENV_VARS: ${{ parameters.env_cars }}
+              ENV_VARS: ${{ parameters.env_vars }}
 
         #=====================================
         # Executes AML Compute deployment when parameter deployment_type == 'aml'
@@ -275,7 +275,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
-              ENV_VARS: ${{ parameters.env_cars }}
+              ENV_VARS: ${{ parameters.env_vars }}
 
         #=====================================
         # Executes Azure Webapp deployment when parameter 
@@ -289,4 +289,4 @@ stages:
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}
-              ENV_VARS: ${{ parameters.env_cars }}
+              ENV_VARS: ${{ parameters.env_vars }}

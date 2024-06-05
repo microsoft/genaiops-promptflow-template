@@ -10,6 +10,24 @@ parameters:
 - name: ENV_VARS
   type: string
 steps:
+
+- task: Bash@3
+  displayName: Create .env file
+  inputs:
+    targetType: 'inline'
+    script: |
+      echo "$(env_vars)" > .env
+  env:
+    env_vars: $(env_vars)
+
+- task: UsePythonVersion@0
+  displayName: Load .env file
+  inputs:
+    versionSpec: '3.x'
+    addToPath: true
+    script: |
+      from dotenv import load_dotenv
+      load_dotenv()
 - template: ./prepare_docker_image.yml
   parameters:
     USE_CASE_BASE_PATH: ${{ parameters.USE_CASE_BASE_PATH }}
