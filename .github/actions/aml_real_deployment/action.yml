@@ -24,8 +24,6 @@ inputs:
   KEY_VAULT_NAME:
     description: "Key vault name"
     required: true
-
-secrets:
   ENV_VARS:
     description: 'The API key for authentication'
     required: false
@@ -34,7 +32,7 @@ runs:
   using: composite
   steps:
     - name: Create .env file
-      run: echo "${{ secrets.ENV_VARS }}" > .env
+      run: echo "${{ inputs.ENV_VARS }}" > .env
     - name: load .env file
       run: python -c "from dotenv import load_dotenv; load_dotenv()"
     - name: Provision AML Online Endpoint

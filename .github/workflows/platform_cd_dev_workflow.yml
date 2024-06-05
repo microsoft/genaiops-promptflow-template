@@ -119,7 +119,6 @@ jobs:
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
           KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
-        secrets:
           ENV_VARS: ${{ secrets.env_vars }}
 
       #=====================================
