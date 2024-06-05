@@ -15,9 +15,7 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-      env_vars:
-        description: "env vars for the flow"
-        required: false
+
 
 
 jobs:
@@ -46,7 +44,7 @@ jobs:
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
       - name: Create .env file
-        run: echo "${{ secrets.env_vars }}" > .env
+        run: echo "${{ secrets.ENV_VARS }}" > .env
       - name: load .env file
         run: python -c "from dotenv import load_dotenv; load_dotenv()"
 
