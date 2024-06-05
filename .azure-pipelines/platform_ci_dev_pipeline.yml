@@ -40,14 +40,12 @@ stages:
           env:
             env_vars: $(env_vars)
 
-        - task: UsePythonVersion@0
+        - task: Bash@3
           displayName: Load .env file
           inputs:
-            versionSpec: '3.x'
-            addToPath: true
+            targetType: 'inline'
             script: |
-              from dotenv import load_dotenv
-              load_dotenv()
+              python -c "from dotenv import load_dotenv; load_dotenv()"
 
         - template: templates/get_connection_details.yml
         #=====================================
