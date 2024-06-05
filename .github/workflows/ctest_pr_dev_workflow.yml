@@ -1,4 +1,4 @@
-name: test_pr_dev_workflow
+name: ctest_pr_dev_workflow
 
 on:
   workflow_call:
@@ -12,13 +12,15 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "flex-flows"
+        default: "class_flows"
   pull_request:
     branches:
       - main
       - development
     paths:
-      - 'flex-flows/**'
+      - '.github/**'
+      - 'llmops/**'
+      - 'class_flows/**'
 
 #=====================================
 # Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -28,7 +30,7 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      use_case_base_path: ${{ inputs.flow_type || 'flex-flows' }}
+      use_case_base_path: ${{ inputs.flow_type || 'class_flows' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       env_vars: ${{ secrets.ENV_VARS }}
