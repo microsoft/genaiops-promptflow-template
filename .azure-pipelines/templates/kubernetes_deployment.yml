@@ -17,22 +17,6 @@ parameters:
   type: string
 
 steps:
-- task: Bash@3
-  displayName: Create .env file
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo "$(env_vars)" | tr ' ' '\n' > .env
-  env:
-    env_vars: $(env_vars)
-
-- task: Bash@3
-  displayName: Load .env file
-  inputs:
-    targetType: 'inline'
-    script: |
-      python -c "from dotenv import load_dotenv; load_dotenv()"
-
 - template: execute_python_code.yml
   parameters:
     step_name: "Provision Kubernetes Endpoint"
