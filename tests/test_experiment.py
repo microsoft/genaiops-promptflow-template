@@ -19,6 +19,8 @@ from llmops.common.experiment import (
     load_experiment,
 )
 from llmops.common.common import resolve_flow_type, resolve_env_vars
+from llmops.common.common import FlowTypeOption
+
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
 
@@ -354,12 +356,12 @@ def test_create_evaluators():
         Evaluator(
             g_eval_name,
             [MappedDataset(g_ds_mappings, g_ds_dataset)],
-            os.path.join(base_path, "flows", g_eval_flow),
+            os.path.join(base_path, g_eval_flow),
         ),
         Evaluator(
             r_eval_name,
             [MappedDataset(r_ds_mappings, r_ds_dataset)],
-            os.path.join(base_path, "flows", r_eval_name),
+            os.path.join(base_path,  r_eval_name),
         ),
     ]
 
@@ -375,12 +377,12 @@ def test_create_evaluators():
         Evaluator(
             g_eval_name,
             [MappedDataset(g_ds_mappings, g_ds_dataset)],
-            os.path.join("flows", g_eval_flow),
+            g_eval_flow,
         ),
         Evaluator(
             r_eval_name,
             [MappedDataset(r_ds_mappings, r_ds_dataset)],
-            os.path.join("flows", r_eval_name),
+            r_eval_name,
         ),
     ]
 
@@ -403,14 +405,14 @@ def test_create_evaluators():
 @pytest.mark.parametrize(
     ("raw_evaluators", "error"),
     [
-        ([{}], "Evaluator 'None' config missing parameter: name"),
+        ([{}], "Evaluator 'None' config missing: name"),
         (
             [
                 {
                     "name": "groundedness",
                 }
             ],
-            "Evaluator 'groundedness' config missing parameter: datasets",
+            "Evaluator 'groundedness' config missing: datasets",
         ),
     ],
 )
@@ -427,7 +429,7 @@ def test_experiment_creation():
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
     name = "exp_name"
-    flow = "exp_flow"
+    flow = "flows/exp_flow"
 
     # Prepare expected outputs
     expected_flow_variants = [
@@ -439,17 +441,18 @@ def test_experiment_creation():
         "node_var_0",
         "node_var_1",
     }
-
+    expected_flow_type = FlowTypeOption.DAG_FLOW
     
     # Check outputs
     experiment = Experiment(base_path, name, flow, [], [], None)
     flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
     flow_detail = experiment.get_flow_detail(flow_type)
 
-    assert flow_detail.flow_path == os.path.join(base_path, "flows", flow)
+    assert flow_detail.flow_path == os.path.join(base_path, flow)
     assert flow_detail.all_variants == expected_flow_variants
     assert flow_detail.default_variants == expected_flow_default_variants
     assert flow_detail.all_llm_nodes == expected_flow_llm_nodes
+    assert flow_type == expected_flow_type
 
 
 @pytest.fixture(scope="session")
@@ -493,12 +496,12 @@ def prepare_expected_experiment():
         Evaluator(
             "eval1",
             expected_evaluator_mapped_datasets[0],
-            os.path.join(base_path, "flows", "eval1"),
+            os.path.join(base_path, "eval1"),
         ),
         Evaluator(
             "eval2",
             expected_evaluator_mapped_datasets[1],
-            os.path.join(base_path, "flows", "eval2"),
+            os.path.join(base_path, "eval2"),
         ),
     ]
 
@@ -525,7 +528,7 @@ def prepare_expected_overlay():
         Evaluator(
             "evalx",
             expected_evaluator_mapped_datasets,
-            os.path.join(base_path, "flows", "evalx"),
+            os.path.join(base_path, "evalx"),
         )
     ]
     yield expected_mapped_datasets, expected_evaluators
@@ -549,7 +552,7 @@ def prepare_special_overlay_evaluators():
         Evaluator(
             "evalx",
             expected_evaluator_mapped_datasets,
-            os.path.join(base_path, "flows", "evalx"),
+            os.path.join(base_path,  "evalx"),
         )
     ]
     yield expected_evaluators
@@ -562,7 +565,7 @@ def test_load_base_experiment(prepare_expected_experiment):
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
     expected_runtime = "runtime_name"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_experiment
@@ -591,7 +594,7 @@ def test_apply_overlay(
 
     # Prepare expected results
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
     base_mapped_datasets, base_evaluators = prepare_expected_experiment
     overlay_mapped_datasets, overlay_evaluators = prepare_expected_overlay
 
@@ -654,7 +657,7 @@ def test_load_experiment(prepare_expected_experiment):
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_experiment
 
@@ -676,7 +679,7 @@ def test_load_experiment_with_overlay(prepare_expected_overlay):
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_overlay
 

@@ -67,6 +67,11 @@ from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
 from llmops.common.common import FlowTypeOption
+
+from promptflow.client import PFClient as PFClientLocal
+from promptflow.azure import PFClient as PFClientAzure
+
+
 logger = llmops_logger("prompt_pipeline")
 
 
@@ -160,11 +165,11 @@ def prepare_and_execute(
     print(params_dict)
 
     if EXECUTION_TYPE == "LOCAL":
-        from promptflow.client import PFClient
-        pf = PFClient()
+        #from promptflow.client import PFClient
+        pf = PFClientLocal()
     else:
-        from promptflow.azure import PFClient
-        pf = PFClient(
+        #from promptflow.azure import PFClient
+        pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
             workspace_name=config.workspace_name,

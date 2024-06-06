@@ -9,8 +9,8 @@ from typing import Dict, Union
 
 from promptflow.entities import Run
 
-_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml") 
-_FLOW_FLEX_FILENAME= ("flow.flex.yml", "flow.flex.yaml")
+_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
+_FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
 class FlowTypeOption(Enum):
     DAG_FLOW = 1
@@ -19,7 +19,7 @@ class FlowTypeOption(Enum):
 
 yaml_base_name = "config"
 
-def resolve_env_vars(base_path: str) ->  Dict:
+def resolve_env_vars(base_path: str) -> Dict:
     """
     Resolve the environment variables from the config files.
 
@@ -56,13 +56,13 @@ def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, D
             if file in _FLOW_FLEX_FILENAME:
                 found_flex = True
                 flow_file_path = os.path.abspath(os.path.join(safe_base_path, flow_path, file))
+                print(flow_file_path)
             elif file in _FLOW_DAG_FILENAME:
                 found_dag = True
                 flow_file_path = os.path.abspath(os.path.join(safe_base_path, flow_path, file))
-        
+                print(flow_file_path)       
     if found_flex is False and found_dag is False:
         raise FileNotFoundError("No YAML file found with .yml or .yaml extension.")
-    
     if found_flex is True and found_dag is False:
         with open(flow_file_path) as file:
             config = yaml.safe_load(file)
