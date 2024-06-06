@@ -19,6 +19,8 @@ on:
       - development
     paths:
       - 'web_classification/**'
+      - '.github/**'
+      - 'llmops/**'
 
 #=====================================
 # Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows

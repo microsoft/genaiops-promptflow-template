@@ -24,6 +24,8 @@ on:
       - development
     paths:
       - 'chat_with_pdf/**'
+      - '.github/**'
+      - 'llmops/**'
   
 
 #=====================================

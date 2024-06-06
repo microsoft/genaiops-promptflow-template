@@ -23,6 +23,8 @@ on:
       - development
     paths:
       - 'web_classification/**'
+      - '.github/**'
+      - 'llmops/**'
 
 
 #=====================================
