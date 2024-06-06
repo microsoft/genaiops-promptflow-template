@@ -1,5 +1,14 @@
+"""
+This script reads a YAML file and generates a list of environment variables.
+based on the contents of the file.
+
+The script expects the name of the YAML file as a command-line argument.
+The script also expects a second command-line argument that specifies whether
+the output should be formatted as environment variables or as a list of
+command-line arguments.
+"""
+# Import the required libraries
 import yaml
-import json
 import sys
 import os
 from dotenv import load_dotenv
@@ -26,12 +35,8 @@ for key, value in data.items():
     else:
         output_list.append(f'{key.upper()}={os.environ.get(key, None)}')
 
-    # Join the output list with spaces
-if is_env == 'true':
-    output = ' '.join(output_list)
-else:
-    output =  ' '.join(output_list)
-
+# Join the output list with spaces
+output = ' '.join(output_list)
 
 # Print the output
 print(output)

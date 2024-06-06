@@ -4,9 +4,9 @@ import sys
 import os
 from dotenv import load_dotenv 
 # Get the file name from the command-line argument
-file_name = sys.argv[1] #
+file_name = sys.argv[1]
 
-is_env =  sys.argv[2] # 
+is_env = sys.argv[2]
 
 load_dotenv()
 # Read the YAML file
@@ -19,12 +19,12 @@ if 'sample' in data and 'init' in data['sample']:
 
     # Create the output list
     output_list = []
-    model_config_dict ={}
+    model_config_dict = {}
     # Iterate over the top-level elements under 'init'
     for key, value in init_data.items():
         if isinstance(value, dict):
             # Convert the sub-elements to a JSON string without spaces
-            #sub_elements_json = json.dumps(value, separators=(',', ':')) 
+            # sub_elements_json = json.dumps(value, separators=(',', ':'))
             inner_params = {}
             for sub_key, sub_value in value.items():
                 if isinstance(sub_value, str) and sub_value.startswith('${') and sub_value.endswith('}'):
@@ -39,7 +39,7 @@ if 'sample' in data and 'init' in data['sample']:
 
                 inner_params[sub_key] = env_value
             model_config_dict["model_config"] = inner_params
-            sub_elements_json = json.dumps(model_config_dict, separators=(',',':'))
+            sub_elements_json = json.dumps(model_config_dict, separators=(',', ':'))
             if is_env == 'true':
                 output_list.append(f'-e PF_FLOW_INIT_CONFIG={sub_elements_json}')
             else:
@@ -62,12 +62,8 @@ if 'sample' in data and 'init' in data['sample']:
             else:
                 output_list.append(f'{key.upper()}={value}')
 
-
     # Join the output list with spaces
-    if is_env == 'true':
-        output = ' '.join(output_list)
-    else:
-        output =  ' '.join(output_list)
+    output = ' '.join(output_list)
 else:
     output = ''
 

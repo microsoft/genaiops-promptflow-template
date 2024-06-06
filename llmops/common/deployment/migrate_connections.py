@@ -68,7 +68,6 @@ def prepare_and_execute(
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
-    experiment_name = experiment.name
 
     print(config.workspace_name)
     pf = PFClient()
@@ -122,10 +121,9 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
-
 
     args = parser.parse_args()
 

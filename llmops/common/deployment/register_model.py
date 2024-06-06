@@ -66,7 +66,7 @@ def register_model(
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
 
-    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow)
 
     logger.info(f"Model name: {model_name}")
 
@@ -123,7 +123,7 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID",
         default=None,
     )
     parser.add_argument(
@@ -135,7 +135,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
     parser.add_argument(
@@ -145,7 +145,7 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "--output_file", type=str, required=False, help="A file to save model version"
+        "--output_file", type=str, required=False, help="save model version"
     )
 
     args = parser.parse_args()

@@ -95,10 +95,8 @@ def prepare_and_execute(
                                                )
 
     if EXECUTION_TYPE == "LOCAL":
-        #from promptflow.client import PFClient
         pf = PFClientLocal()
     else:
-        #from promptflow.azure import PFClient
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
@@ -258,7 +256,7 @@ def prepare_and_execute(
                         f"Starting run '{run.name}' inAML. This can be long.",
                     )
 
-                    eval_run_ids.append(run.name)   
+                    eval_run_ids.append(run.name)
 
                     df_result = pf.get_details(run=run)
                     metric_variant = pf.get_metrics(run)
@@ -294,7 +292,7 @@ def prepare_and_execute(
 
                     logger.info(json.dumps(metrics, indent=4))
                     logger.info(df_result.head(10))
-        
+
             if evaluator_executed and report_dir:
                 if not os.path.exists(report_dir):
                     os.makedirs(report_dir)

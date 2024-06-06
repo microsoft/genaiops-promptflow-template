@@ -70,7 +70,7 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID",
         default=None,
     )
     parser.add_argument(
@@ -82,7 +82,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
     args = parser.parse_args()

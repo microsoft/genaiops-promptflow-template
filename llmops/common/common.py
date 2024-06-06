@@ -12,12 +12,17 @@ from promptflow.entities import Run
 _FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
 _FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
+
 class FlowTypeOption(Enum):
+    """Flow type options."""
+
     DAG_FLOW = 1
     CLASS_FLOW = 2
     FUNCTION_FLOW = 3
 
+
 yaml_base_name = "config"
+
 
 def resolve_env_vars(base_path: str) -> Dict:
     """
@@ -38,6 +43,7 @@ def resolve_env_vars(base_path: str) -> Dict:
         env_vars = {}
         print("no values")
     return env_vars
+
 
 def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, Dict]:
     """
@@ -111,7 +117,7 @@ def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, D
                         print(value)
                         if value.startswith('${') and value.endswith('}'):
                             env_var_value = os.environ.get(key)
-                            
+
                             if env_var_value:
                                 env_value = env_var_value
                             else:
@@ -129,12 +135,13 @@ def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, D
 
     if found_flex is False and found_dag is True:
         flow_type = FlowTypeOption.DAG_FLOW
-    
+
     return (flow_type, params_dict)
+
 
 def wait_job_finish(job: Run, logger: logging.Logger):
     """
-    Wait for job to complete/finish
+    Wait for job to complete/finish.
 
     :param job: The prompt flow run object.
     :type job: Run
@@ -162,7 +169,8 @@ def resolve_run_ids(run_id: str) -> list[str]:
     """
     Read run_id from string or from file.
 
-    :param run_id: List of run IDs (example '["run_id_1", "run_id_2", ...]') OR path to file containing list of run IDs.
+    :param run_id: List of run IDs (example '["run_id_1", "run_id_2", ...]')
+    OR path to file containing list of run IDs.
     :type run_id: str
     :return: List of run IDs.
     :rtype: List[str]
