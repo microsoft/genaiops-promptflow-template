@@ -1,7 +1,7 @@
 {
     "azure_managed_endpoint":[
         {
-            "ENV_NAME": "pr",
+            "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "flexendpoint",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
