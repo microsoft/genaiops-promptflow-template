@@ -18,7 +18,7 @@ from llmops.common.experiment import (
     _apply_overlay,
     load_experiment,
 )
-
+from llmops.common.common import resolve_flow_type, resolve_env_vars
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
 
@@ -440,9 +440,11 @@ def test_experiment_creation():
         "node_var_1",
     }
 
+    
     # Check outputs
     experiment = Experiment(base_path, name, flow, [], [], None)
-    flow_detail = experiment.get_flow_detail()
+    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
+    flow_detail = experiment.get_flow_detail(flow_type)
 
     assert flow_detail.flow_path == os.path.join(base_path, "flows", flow)
     assert flow_detail.all_variants == expected_flow_variants
