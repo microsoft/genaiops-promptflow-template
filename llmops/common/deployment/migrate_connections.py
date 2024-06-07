@@ -32,7 +32,9 @@ from llmops.common.logger import llmops_logger
 
 logger = llmops_logger("prompt_eval")
 
+
 def find_connection(data):
+    """Find connection element in the init element."""
     if isinstance(data, dict):
         for key, value in data.items():
             if key == 'connection':
@@ -47,6 +49,7 @@ def find_connection(data):
                     if result is not None:
                         return result
     return None
+
 
 def prepare_and_execute(
     exp_filename: Optional[str] = None,
@@ -71,8 +74,10 @@ def prepare_and_execute(
 
     print(config.workspace_name)
     pf = PFClient()
-    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
- 
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow
+    )
+
     standard_flow_detail = experiment.get_flow_detail(flow_type)
     print(standard_flow_detail.flow_path)
 
@@ -80,21 +85,23 @@ def prepare_and_execute(
         flow_path = standard_flow_detail.flow_path
         print(flow_path)
         f = FlowOperations(pf)
-        with open( os.path.join(flow_path, "flow.flex.yaml"), 'r') as file:
+        with open(os.path.join(flow_path, "flow.flex.yaml"), 'r') as file:
             data = yaml.safe_load(file)
-        
+
         # Check for the 'init' element
         init_element = data.get('sample', {}).get('init', {})
-        
+
         # Find connection recursively
         connection_value = find_connection(init_element)
-        
+
         if connection_value is not None:
             print(f"Connection value found: {connection_value}")
-            print(f._migrate_connections(["aoai"], Path(os.path.join(experiment.base_path, "docker", "connections"))))
+            print(f._migrate_connections(["aoai"], Path(os.path.join(
+                experiment.base_path, "docker", "connections")))
+            )
         else:
             print("No connection element found within init element.")
-        
+
 
 def main():
     """

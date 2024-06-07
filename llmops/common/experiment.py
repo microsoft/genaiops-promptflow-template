@@ -1,3 +1,19 @@
+"""
+This module contains classes and functions to load and manage experiments.
+
+The module contains the following classes:
+- Dataset: Defines an Azure ML Dataset or a local dataset.
+- MappedDataset: Defines an Azure ML Mapped dataset referencing a
+    Dataset object
+- Evaluator: Defines a prompt flow evaluator flow.
+- FlowDetail: Contains the details of a flow (location, nodes, variants).
+- Experiment: Contains details of an experiment(name, flow, path, datasets,
+    evaluators).
+
+The module contains the following functions:
+- load_experiment: Load an experiment from a YAML file.
+"""
+
 import os
 from typing import Any, List, Optional, Tuple
 from azure.ai.ml import MLClient
@@ -7,7 +23,7 @@ import yaml
 from llmops.common.common import FlowTypeOption
 
 _FLOW_DAG_FILENAME = "flow.dag.yaml"
-_FLOW_FLEX_FILENAME= "flow.flex.yaml"
+_FLOW_FLEX_FILENAME = "flow.flex.yaml"
 _DEFAULT_FLOWS_DIR = "flows"
 _DEFAULT_DATA_DIR = "data"
 
@@ -18,11 +34,14 @@ class Dataset:
 
     :param name: Unique name given to the dataset.
     :type name: str
-    :param source: Azure ML name and version (example: azureml:<dataset_name_in_azureml>:<version>) or path to file.
+    :param source: Azure ML name and version
+    (example: azureml:<dataset_name_in_azureml>:<version>) or path to file.
     :type source: str
-    :param description: Description of the Azure ML dataset (only required if source is a path to file).
+    :param description: Description of the Azure ML dataset
+    (only required if source is a path to file).
     :type description: str
-    :param reference: Reference to a related dataset (for linking evaluation datasets to standard datasets).
+    :param reference: Reference to a related dataset
+    (for linking evaluation datasets to standard datasets).
     :type reference: str
     """
 
@@ -33,6 +52,7 @@ class Dataset:
         description: Optional[str],
         reference: Optional[str],
     ):
+        """Initialize Dataset object."""
         self.name = name
         self.source = source
         self.description = description
@@ -40,12 +60,15 @@ class Dataset:
         self._is_remote_source = self.source.startswith("azureml:")
 
     def with_mappings(self, mappings: dict[str, str]) -> "MappedDataset":
+        """Create a mapped dataset with the given mappings."""
         return MappedDataset(mappings, self)
 
     def is_eval(self):
+        """Check if the dataset is an evaluation dataset."""
         return self.reference is not None
 
     def get_remote_source(self, ml_client: MLClient):
+        """Get the remote source of the dataset."""
         if self._is_remote_source:
             parts = self.source.split(":")
             name = parts[1]
@@ -54,7 +77,8 @@ class Dataset:
                 ml_client.data.get(name=name, version=version)
             except Exception:
                 raise ValueError(
-                    f"Azure ML dataset {name} not found in workspace {ml_client.workspace_name}"
+                    f"Azure ML dataset {name} not found"
+                    f" in workspace {ml_client.workspace_name}"
                 )
             return self.source
 
@@ -62,11 +86,13 @@ class Dataset:
             ds = ml_client.data.get(name=self.name, label="latest")
         except Exception:
             raise ValueError(
-                f"Azure ML dataset {self.name} not found in workspace {ml_client.workspace_name}"
+                f"Azure ML dataset {self.name} not found"
+                f" in workspace {ml_client.workspace_name}"
             )
         return f"azureml:{self.name}:{ds.version}"
 
     def get_local_source(self, base_path: Optional[str] = None):
+        """Get the local source of the dataset."""
         if self._is_remote_source:
             return None
         safe_base_path = base_path or ""
@@ -77,6 +103,7 @@ class Dataset:
 
     # Define equality operation
     def __eq__(self, other):
+        """Check if two datasets are equal."""
         if not isinstance(other, Dataset):
             return NotImplemented
 
@@ -90,26 +117,33 @@ class Dataset:
 
 class MappedDataset:
     """
-    Defines an Azure ML Mapped dataset referencing a Dataset object and a dictionary mapping prompt flow inputs to
-    dataset columns or previous run outputs.
+    Defines an Azure ML Mapped dataset referencing a Dataset object.
 
+    A dictionary mapping prompt flow inputs to
+    dataset columns or previous run outputs.
     :param dataset: Dataset to be mapped.
     :type dataset: Dataset
-    :param mappings: Dictionary mapping prompt flow inputs to dataset columns or previous run outputs
+    :param mappings: Dictionary mapping prompt flow inputs to dataset columns
+    or previous run outputs
     (example: {"col_0": "${data:col_0}", "col_1": "${run.outputs.col_1}"}).
     :type mappings: dict[str, str]
     """
 
     def __init__(self, mappings: dict[str, str], dataset: Dataset):
+        """Initialize MappedDataset object."""
         self.dataset = dataset
         self.mappings = mappings
 
     # Define equality operation
     def __eq__(self, other):
+        """Check if two mapped datasets are equal."""
         if not isinstance(other, MappedDataset):
             return NotImplemented
 
-        return self.dataset == other.dataset and self.mappings == other.mappings
+        return (
+            self.dataset == other.dataset
+            and self.mappings == other.mappings
+        )
 
 
 class Evaluator:
@@ -125,13 +159,21 @@ class Evaluator:
     """
 
     def __init__(
-        self, name: str, datasets: list[MappedDataset], path: Optional[str] = None
+        self,
+        name: str,
+        datasets: list[MappedDataset],
+        path: Optional[str] = None
     ):
+        """Initialize Evaluator object."""
         self.name = name
         self.path = path or os.path.join("flows", name)
         self.datasets = datasets
 
-    def find_dataset_with_reference(self, dataset_name: str) -> List[MappedDataset]:
+    def find_dataset_with_reference(
+            self,
+            dataset_name: str
+            ) -> List[MappedDataset]:
+        """Find datasets with the given reference."""
         matching_datasets = []
         for dataset in self.datasets:
             if (
@@ -143,6 +185,7 @@ class Evaluator:
 
     # Define equality operation
     def __eq__(self, other):
+        """Check if two evaluators are equal."""
         if not isinstance(other, Evaluator):
             return NotImplemented
 
@@ -155,15 +198,17 @@ class Evaluator:
 
 class FlowDetail:
     """
-    Contains the details of a flow (location, nodes, variants)
+    Contains the details of a flow (location, nodes, variants).
 
     :param flow_path: Path to a prompt flow flow.
     :type flow_path: str
-    :param all_variants: List of dictionaries, one per llm node, from llm node variant name to llm node name.
+    :param all_variants: List of dictionaries, one per llm node, from llm
+    node variant name to llm node name.
     :type all_variants: list[dict[str, Any]]
     :param all_llm_nodes: Set of llm node names.
     :type all_llm_nodes: set
-    :param default_variants: Dictionary from llm node name to default node variant.
+    :param default_variants: Dictionary from llm node name to
+    default node variant.
     :type default_variants: dict[str, str]
     """
 
@@ -174,6 +219,7 @@ class FlowDetail:
         all_llm_nodes: set,
         default_variants: dict,
     ):
+        """Initialize FlowDetail object."""
         self.flow_path = flow_path
         self.all_variants = all_variants
         self.all_llm_nodes = all_llm_nodes
@@ -182,9 +228,10 @@ class FlowDetail:
 
 class Experiment:
     """
-    Contains the details of an experiment (name, flow, path, datasets, evaluators)
+    Contains details of an experiment(name, flow, path, datasets, evaluators).
 
-    :param base_path: Path to the directory containing the yaml file defining the experiment. Default value is current
+    :param base_path: Path to the directory containing the yaml file defining
+    the experiment. Default value is current
     working directory.
     :type base_path: Optional[str]
     :param name: Name of the experiment.
@@ -195,7 +242,8 @@ class Experiment:
     :type datasets: List[Dataset]
     :param evaluators: List of evaluators.
     :type evaluators: List[Evaluator]
-    :param runtime: Name of the Prompt flow runtime to use in Azure ML. If not provided, use automatic runtime.
+    :param runtime: Name of the Prompt flow runtime to use in Azure ML.
+    If not provided, use automatic runtime.
     :type runtime: str
     """
 
@@ -208,6 +256,7 @@ class Experiment:
         evaluators: list[Evaluator],
         runtime: Optional[str],
     ):
+        """Initialize Experiment object."""
         self.base_path = base_path
         self.name = name
         self.flow = flow or name
@@ -217,22 +266,23 @@ class Experiment:
         self._flow_detail: Optional[FlowDetail] = None
 
     def get_dataset(self, name: str):
+        """Get the dataset with the given name."""
         for mapped_ds in self.datasets:
             ds = mapped_ds.dataset
             if ds.name == name:
                 return ds
 
     def get_flow_detail(self, flow_type: FlowTypeOption) -> FlowDetail:
-        self._flow_detail = self._flow_detail or self._load_flow_detail(flow_type)
+        """Get the flow details for the given flow type."""
+        self._flow_detail = self._flow_detail or self._load_flow_detail(
+            flow_type
+        )
         return self._flow_detail
 
     def _load_flow_detail(self, flow_type: FlowTypeOption) -> FlowDetail:
-        """
-        Load flow details from the yaml files describing the experiment and the flow.
-        """
+        """Load flow details from the flow yaml file."""
         # Load flow data
 
-                    
         if flow_type is FlowTypeOption.DAG_FLOW:
             flow_path = _resolve_flow_dir(self.base_path, self.flow)
             flow_file_path = os.path.join(flow_path, _FLOW_DAG_FILENAME)
@@ -249,7 +299,9 @@ class Experiment:
             all_variants: list[dict[str, Any]] = []
             all_llm_nodes = set()
             default_variants = {}
-            for node_name, node_data in yaml_data.get("node_variants", {}).items():
+            for node_name, node_data in yaml_data.get(
+                "node_variants", {}
+            ).items():
                 node_variant_mapping = {}
                 variants = node_data.get("variants", {})
                 default_variant: str = node_data["default_variant_id"]
@@ -263,8 +315,11 @@ class Experiment:
                 node_variant_mapping = {}
                 if nodes.get("type", {}) == "llm":
                     all_llm_nodes.add(nodes["name"])
-        elif flow_type in [FlowTypeOption.FUNCTION_FLOW, FlowTypeOption.CLASS_FLOW]:
-            flow_path = os.path.abspath(os.path.join(self.base_path, self.flow))
+        elif (flow_type in
+              [FlowTypeOption.FUNCTION_FLOW, FlowTypeOption.CLASS_FLOW]):
+            flow_path = os.path.abspath(
+                os.path.join(self.base_path, self.flow)
+                )
             flow_file_path = os.path.join(flow_path, _FLOW_FLEX_FILENAME)
             if not os.path.exists(flow_file_path):
                 raise ValueError(
@@ -279,8 +334,10 @@ class Experiment:
         else:
             raise ValueError(
                     f"Invalid flow type {flow_file_path}"
-                ) 
-        return FlowDetail(flow_path, all_variants, all_llm_nodes, default_variants)
+                )
+        return FlowDetail(
+            flow_path, all_variants, all_llm_nodes, default_variants
+        )
 
 
 # Helper function for raising errors
@@ -302,9 +359,11 @@ def _create_datasets_and_default_mappings(
     """
     Create datasets and mapped datasets from list of dictionaries.
 
-    :param raw: List of dictionaries containing the description of the experiment datasets.
+    :param raw: List of dictionaries containing the description
+    of the experiment datasets.
     :type raw: list[dict]
-    :return: Tuple of dictionary from dataset name to dataset and list of mapped datasets
+    :return: Tuple of dictionary from dataset name to dataset
+    and list of mapped datasets
     :rtype: Tuple[dict[str, Dataset], list[MappedDataset]]
     """
     datasets: dict[str, Dataset] = {}
@@ -320,10 +379,16 @@ def _create_datasets_and_default_mappings(
         _raise_error_if_existing_keys(
             ["reference"],
             ds,
-            message=f"Unexpected parameter found in dataset '{ds.get('name')}' description",
+            message=(
+                f"Unexpected parameter found in dataset"
+                f" '{ds.get('name')}' description"
+            ),
         )
         dataset = Dataset(
-            ds["name"], ds["source"], ds.get("description"), ds.get("reference")
+            ds["name"],
+            ds["source"],
+            ds.get("description"),
+            ds.get("reference")
         )
         datasets[dataset.name] = dataset
         mappings.append(dataset.with_mappings(ds["mappings"] or {}))
@@ -337,7 +402,8 @@ def _create_eval_datasets_and_default_mappings(
     """
     Create mapped datasets from list of evaluation datasets.
 
-    :param raw: List of dictionaries containing the description of the evaluation datasets.
+    :param raw: List of dictionaries containing the description
+    of the evaluation datasets.
     :type raw: list[dict]
     :param datasets: Dictionary from dataset name to Dataset object.
     :type datasets: dict[str, Dataset]
@@ -346,12 +412,13 @@ def _create_eval_datasets_and_default_mappings(
     """
     mappings: list[MappedDataset] = []
 
-    # The datasets here are "evaluation" datasets, used to run the evaluation flows.
-    # The datasets are either a direct reference to an existing dataset (in practice this means
-    # that the the evaluation flow and standard flow are running on the same dataset);
-    # or they are new - in which case the new dataset they must still "reference" an existing
-    # dataset (in practice  this means that the evaluation flow and standard flow are running on
-    # different but related datasets.)
+    # The datasets are "evaluation" datasets, used to run the evaluation flows.
+    # The datasets are either a direct reference to an existing dataset
+    # (in practice this means that the the evaluation flow and standard flow
+    # are running on the same dataset) or they are new - in which case the
+    # new dataset they must still "reference" an existing
+    # dataset (in practice  this means that the evaluation flow and
+    # standard flow are running on different but related datasets.)
 
     for ds in raw:
         # Check that the common keys are available
@@ -368,7 +435,10 @@ def _create_eval_datasets_and_default_mappings(
             _raise_error_if_existing_keys(
                 ["source", "reference"],
                 ds,
-                message=f"Dataset '{ds_name}' config is referencing an existing dataset so it doesn't support parameter",
+                message=(
+                    f"Dataset '{ds_name}' config"
+                    f" doesn't support parameter"
+                ),
             )
             dataset = existing_datasets.get(ds_name)
         else:
@@ -378,7 +448,10 @@ def _create_eval_datasets_and_default_mappings(
                 message=f"Dataset '{ds_name}' config missing parameter",
             )
             dataset = Dataset(
-                ds_name, ds.get("source"), ds.get("description"), ds.get("reference")
+                ds_name,
+                ds.get("source"),
+                ds.get("description"),
+                ds.get("reference")
             )
 
             # Validate that the reference dataset exists
@@ -399,18 +472,17 @@ def _create_evaluators(
     base_path: Optional[str]
 ) -> list[Evaluator]:
     """
-    Create evaluators from a list of dictionaries describing the
-    raw evaluators, a dictionary of existing datasets,
-    and the path to the evaluator flow.
+    Create evaluators from a list of evaluator dictionaries.
 
+    A dictionary of existing datasets,
+    and the path to the evaluator flow.
     :param raw_evaluators: List of dictionaries containing the description of
-    the experiment evaluators.
+        the experiment evaluators.
     :type raw_evaluators: list[dict]
     :param datasets: Dictionary from dataset name to Dataset object.
     :type datasets: dict[str, Dataset]
     :param base_path: Path to the evaluator flow directory containing
-    the yaml description.
-    Default value is current working directory.
+        the yaml description. Default value is the current working directory.
     :type base_path: Optional[str]
     :return: List of evaluators.
     :rtype: list[Evaluator]
@@ -439,10 +511,10 @@ def _create_evaluators(
 def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
     """
     Resolve path to the yaml file describing the flow.
+
     - If base_path not provided, uses the current working directory
     - Looks for "flow.xx.yaml" in the base_path/flow. If found, returns path.
       otherwise returns base_path/flows/flow.
-
     :param base_path: Path of flow directory. Default current working folder.
     :type base_path: Optional[str]
     :param flow: Name of the flow.
@@ -461,8 +533,9 @@ def _resolve_flow_dir(base_path: Optional[str], flow: str) -> str:
 
 
 def _load_base_experiment(
-        exp_file_path: str, 
+        exp_file_path: str,
         base_path: Optional[str]) -> Experiment:
+    """Load base experiment from file."""
     exp_config: dict
     with open(exp_file_path, "r") as yaml_file:
         exp_config = yaml.safe_load(yaml_file)
@@ -495,6 +568,7 @@ def _load_base_experiment(
 def _apply_overlay(
     experiment: Experiment, overlay_file_path: str, base_path: Optional[str]
 ):
+    """Apply overlay to experiment."""
     overlay_config: dict
     with open(overlay_file_path, "r") as yaml_file:
         overlay_config = yaml.safe_load(yaml_file)
@@ -552,7 +626,6 @@ def load_experiment(
     <experiment_name>.<env>.yaml use it to override experiment dataset sources.
     :type env: Optional[str]
     """
-
     safe_base_path = base_path or ""
     experiment_file_name = filename or "experiment.yaml"
 

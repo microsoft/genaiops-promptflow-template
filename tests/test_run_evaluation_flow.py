@@ -1,6 +1,7 @@
+"""Tests for the run_evaluation_flow module."""
 from pathlib import Path
 from unittest.mock import Mock, patch
-from llmops.config import EXECUTION_TYPE
+
 import pandas as pd
 import pytest
 from llmops.common.prompt_eval import prepare_and_execute
@@ -18,6 +19,7 @@ def _set_required_env_vars():
 
 
 def get_mocked_source(name, version):
+    """Return a mocked source."""
     source = Mock()
     source.name = name
     source.version = version
@@ -25,9 +27,12 @@ def get_mocked_source(name, version):
 
 
 def test_run_multiple_evaluation_flows():
+    """Test run_evaluation_flow with multiple evaluation flows."""
     with patch(
         "llmops.common.prompt_eval.PFClientLocal"
-    ) as mock_local_pf_client, patch("llmops.common.prompt_eval.PFClientAzure") as mock_pf_client:
+    ), patch(
+        "llmops.common.prompt_eval.PFClientAzure"
+    ) as mock_pf_client:
         # Mock the PFClient
         pf_client_instance = Mock()
         mock_pf_client.return_value = pf_client_instance
@@ -36,12 +41,14 @@ def test_run_multiple_evaluation_flows():
         ds_names = ["ds1", "ds2", "ds3", "ds4"]
         ds_versions = ["3", "5", "42", "11"]
 
-        pf_client_instance.ml_client.data.get.side_effect = lambda name, label: {
-            ds_names[0]: get_mocked_source(ds_names[0], ds_versions[0]),
-            ds_names[1]: get_mocked_source(ds_names[1], ds_versions[1]),
-            ds_names[2]: get_mocked_source(ds_names[2], ds_versions[2]),
-            ds_names[3]: get_mocked_source(ds_names[3], ds_versions[3]),
-        }.get(name)
+        pf_client_instance.ml_client.data.get.side_effect = (
+            lambda name, label: {
+                ds_names[0]: get_mocked_source(ds_names[0], ds_versions[0]),
+                ds_names[1]: get_mocked_source(ds_names[1], ds_versions[1]),
+                ds_names[2]: get_mocked_source(ds_names[2], ds_versions[2]),
+                ds_names[3]: get_mocked_source(ds_names[3], ds_versions[3]),
+            }.get(name)
+        )
 
         standard_run_source_0 = f"azureml:{ds_names[0]}:{ds_versions[0]}"
         standard_run_source_1 = f"azureml:{ds_names[1]}:{ds_versions[1]}"
@@ -76,12 +83,12 @@ def test_run_multiple_evaluation_flows():
             base_path=str(RESOURCE_PATH),
         )
 
-        # Get the argument of each time pf_client.runs.create_or_update is called
+        # Get the argument of each time runs.create_or_update is called
         created_runs = pf_client_instance.runs.create_or_update
 
         # Expect 4 created runs
-        # Two for the "eval1" evaluator, one using ds1_source and one using ds3_source
-        # Two for the "eval2" evaluator, one using ds4_source and one using ds2_source
+        # Two for the "eval1" evaluator, one ds1_source and another ds3_source
+        # Two for the "eval2" evaluator, one ds4_source and another ds2_source
 
         # Expected run arguments
         expected_run = [
@@ -103,11 +110,13 @@ def test_run_multiple_evaluation_flows():
             {"ds2_input": "ds2_diff_mapping"},
         ]
 
-        #assert created_runs.call_count == len(expected_run)
+        # assert created_runs.call_count == len(expected_run)
 
         # created_runs.call_args_list is triple nested,
-        # first index: select the call of pf_client_instance.runs.create_or_update [0, 5]
-        # second index: select the argument of pf_client_instance.runs.create_or_update [0 (run), 1 (stream)]
+        # first index: select the call of
+        # pf_client_instance.runs.create_or_update [0, 5]
+        # second index: select the argument of
+        # pf_client_instance.runs.create_or_update [0 (run), 1 (stream)]
         # third index: select the first element of the tuple [0]
         for i, call_args in enumerate(created_runs.call_args_list):
             run = call_args[0][0]
@@ -118,9 +127,12 @@ def test_run_multiple_evaluation_flows():
 
 
 def test_run_single_evaluation_flow():
+    """Test run_evaluation_flow with a single evaluation flow."""
     with patch(
         "llmops.common.prompt_eval.PFClientLocal"
-    ) as mock_local_pf_client, patch("llmops.common.prompt_eval.PFClientAzure") as mock_pf_client:
+    ), patch(
+        "llmops.common.prompt_eval.PFClientAzure"
+    ) as mock_pf_client:
         # Mock the PFClient
         pf_client_instance = Mock()
         mock_pf_client.return_value = pf_client_instance
@@ -129,10 +141,12 @@ def test_run_single_evaluation_flow():
         ds_names = ["ds1", "ds4"]
         ds_versions = ["3", "11"]
 
-        pf_client_instance.ml_client.data.get.side_effect = lambda name, label: {
-            ds_names[0]: get_mocked_source(ds_names[0], ds_versions[0]),
-            ds_names[1]: get_mocked_source(ds_names[1], ds_versions[1]),
-        }.get(name)
+        pf_client_instance.ml_client.data.get.side_effect = (
+            lambda name, label: {
+                ds_names[0]: get_mocked_source(ds_names[0], ds_versions[0]),
+                ds_names[1]: get_mocked_source(ds_names[1], ds_versions[1]),
+            }.get(name)
+        )
 
         standard_run_source_0 = f"azureml:{ds_names[0]}:{ds_versions[0]}"
         evaluation_run_source_0 = f"azureml:{ds_names[1]}:{ds_versions[1]}"
@@ -158,11 +172,12 @@ def test_run_single_evaluation_flow():
             base_path=str(RESOURCE_PATH),
         )
 
-        # Get the argument of each time pf_client.runs.create_or_update is called
+        # Get the argument of each time runs.create_or_update is called
         created_runs = pf_client_instance.runs.create_or_update
 
         # Expect 2 created runs
-        # One for the "eval1" evaluator using ds1_source and one for the "eval2" evaluator using ds4_source
+        # One for the "eval1" evaluator using ds1_source
+        # and one for the "eval2" evaluator using ds4_source
 
         # Expected run arguments
         expected_run = [standard_run_instance_0, standard_run_instance_0]
@@ -172,11 +187,13 @@ def test_run_single_evaluation_flow():
             {},
         ]
 
-        #assert created_runs.call_count == len(expected_run)
+        # assert created_runs.call_count == len(expected_run)
 
         # created_runs.call_args_list is triple nested,
-        # first index: select the call of pf_client_instance.runs.create_or_update [0, 5]
-        # second index: select the argument of pf_client_instance.runs.create_or_update [0 (run), 1 (stream)]
+        # first index: select the call of
+        # pf_client_instance.runs.create_or_update [0, 5]
+        # second index: select the argument of
+        # pf_client_instance.runs.create_or_update [0 (run), 1 (stream)]
         # third index: select the first element of the tuple [0]
         for i, call_args in enumerate(created_runs.call_args_list):
             run = call_args[0][0]

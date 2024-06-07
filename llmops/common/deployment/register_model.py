@@ -59,14 +59,19 @@ def register_model(
     build_id: Optional[str] = None,
     output_file: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Register model in Azure ML."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
 
-    flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow)
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow
+    )
 
     logger.info(f"Model name: {model_name}")
 
@@ -88,7 +93,9 @@ def register_model(
         name=model_name,
         path=model_path,
         stage="Production",
-        description=(f"{experiment_name} model registered for prompt flow deployment"),
+        description=(
+            f"{experiment_name} model registered for prompt flow deployment"
+        ),
         properties={"azureml.promptflow.source_flow_id": model_path},
         tags=model_tags,
     )
@@ -112,6 +119,7 @@ def register_model(
 
 
 def main():
+    """Entry main function to register model."""
     parser = argparse.ArgumentParser("register Flow")
     parser.add_argument(
         "--file",

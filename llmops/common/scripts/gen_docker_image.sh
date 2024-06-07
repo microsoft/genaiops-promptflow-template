@@ -67,7 +67,7 @@ if [[ -e "$config_path" ]]; then
    
     python -m llmops.common.deployment.migrate_connections --base_path $use_case_base_path --env_name $deploy_environment
     # docker build the prompt flow based image
-    docker build -t localpf "./$use_case_base_path/docker" 
+    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker" 
         
     docker images
 

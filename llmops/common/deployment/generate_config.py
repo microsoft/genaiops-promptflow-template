@@ -1,8 +1,20 @@
+"""
+This script reads flow file and extracts the 'init' element.
+
+The init element is extracted from the 'sample' element.
+It then generates a list of environment variables based on
+the contents of the 'init' element.
+The script expects the name of the YAML file as a command-line argument.
+The script also expects a second command-line argument that specifies whether
+the output should be formatted as environment variables or as a list of
+command-line arguments.
+"""
+# Import the required libraries
 import yaml
 import json
 import sys
 import os
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 # Get the file name from the command-line argument
 file_name = sys.argv[1]
 
@@ -27,7 +39,11 @@ if 'sample' in data and 'init' in data['sample']:
             # sub_elements_json = json.dumps(value, separators=(',', ':'))
             inner_params = {}
             for sub_key, sub_value in value.items():
-                if isinstance(sub_value, str) and sub_value.startswith('${') and sub_value.endswith('}'):
+                if (
+                    isinstance(sub_value, str)
+                    and sub_value.startswith('${')
+                    and sub_value.endswith('}')
+                ):
                     env_var_name = f"{key}_{sub_key}"
                     env_var_value = os.environ.get(env_var_name)
                     if env_var_value:
@@ -39,9 +55,13 @@ if 'sample' in data and 'init' in data['sample']:
 
                 inner_params[sub_key] = env_value
             model_config_dict["model_config"] = inner_params
-            sub_elements_json = json.dumps(model_config_dict, separators=(',', ':'))
+            sub_elements_json = json.dumps(
+                model_config_dict, separators=(',', ':')
+            )
             if is_env == 'true':
-                output_list.append(f'-e PF_FLOW_INIT_CONFIG={sub_elements_json}')
+                output_list.append(
+                    f'-e PF_FLOW_INIT_CONFIG={sub_elements_json}'
+                )
             else:
                 output_list.append(f'PF_FLOW_INIT_CONFIG={sub_elements_json}')
         elif isinstance(value, str):

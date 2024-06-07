@@ -44,13 +44,13 @@ from dotenv import load_dotenv
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
-from llmops.common.common import resolve_flow_type, resolve_env_vars
+from llmops.common.common import resolve_env_vars
 from llmops.common.common import FlowTypeOption
 
 logger = llmops_logger("provision_deployment")
 
-_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml") 
-_FLOW_FLEX_FILENAME= ("flow.flex.yml", "flow.flex.yaml")
+_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
+_FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
 
 def create_kubernetes_deployment(
@@ -61,40 +61,53 @@ def create_kubernetes_deployment(
     env_name: Optional[str] = None,
     subscription_id: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Create deployment for the model version."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
-    
+
     found_flex = False
     flow_type = FlowTypeOption.CLASS_FLOW
-    for root, dirs, files in os.walk(os.path.join(experiment.base_path, experiment.flow)):
+    for root, dirs, files in os.walk(
+            os.path.join(experiment.base_path, experiment.flow)
+            ):
         for file in files:
             if file in _FLOW_FLEX_FILENAME:
                 found_flex = True
                 flow_type = FlowTypeOption.CLASS_FLOW
-                flow_file_path = os.path.abspath(os.path.join(experiment.base_path, experiment.flow, file))
+                flow_file_path = os.path.abspath(
+                    os.path.join(experiment.base_path, experiment.flow, file)
+                    )
             elif file in _FLOW_DAG_FILENAME:
-                flow_file_path = os.path.abspath(os.path.join(experiment.base_path, experiment.flow, file))
+                flow_file_path = os.path.abspath(
+                    os.path.join(experiment.base_path, experiment.flow, file)
+                    )
                 flow_type = FlowTypeOption.DAG_FLOW
 
-    #flow_type, params_dict = resolve_flow_type(experiment.base_path, experiment.flow )
     params_dict = {}
     if found_flex:
-        result = subprocess.run(["python", "llmops/common/deployment/generate_config.py", flow_file_path, "false"], stdout=subprocess.PIPE)
+        result = subprocess.run(
+            [
+                "python",
+                "llmops/common/deployment/generate_config.py",
+                flow_file_path,
+                "false"
+            ],
+            stdout=subprocess.PIPE
+        )
         output = result.stdout.decode("utf-8")
         substrings = output.split()
-    
-        # Create an empty dictionary to store the key-value pairs
-        
-        
+
         # Iterate over each substring
         for substring in substrings:
             # Split the substring by the "=" delimiter
             key_value = substring.split("=")
-            
+
             # Check if the substring contains the "=" delimiter
             if len(key_value) == 2:
                 key, value = key_value
@@ -131,16 +144,16 @@ def create_kubernetes_deployment(
                 prior_deployment_name = elem["PRIOR_DEPLOYMENT_NAME"]
                 cpu_allocation = elem["CPU_ALLOCATION"]
                 memory_allocation = elem["MEMORY_ALLOCATION"]
-                prior_deployment_traffic_allocation = elem[
-                    "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
-                ]
+                # prior_deployment_traffic_allocation = elem[
+                #    "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
+                # ]
                 deployment_desc = elem["DEPLOYMENT_DESC"]
                 environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
                 if isinstance(env_vars, dict):
                     if env_vars:
                         for key, value in env_vars.items():
                             environment_variables[key] = value
-                for key,value in params_dict.items():
+                for key, value in params_dict.items():
                     environment_variables[key] = value
                 environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
                 environment_variables["PRT_CONFIG_OVERRIDE"] = (
@@ -172,7 +185,9 @@ def create_kubernetes_deployment(
                 deploy_count = sum(1 for _ in deployments)
 
                 if deploy_count >= 1:
-                    traffic_allocation[deployment_name] = deployment_traffic_allocation
+                    traffic_allocation[deployment_name] = (
+                        deployment_traffic_allocation
+                    )
                     traffic_allocation[prior_deployment_name] = 100 - int(
                         deployment_traffic_allocation
                     )
@@ -190,7 +205,9 @@ def create_kubernetes_deployment(
                     environment_variables=dict(environment_variables),
                     tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
-                    request_settings=OnlineRequestSettings(request_timeout_ms=90000),
+                    request_settings=OnlineRequestSettings(
+                        request_timeout_ms=90000
+                    ),
                     resources=ResourceRequirementsSettings(
                         requests=ResourceSettings(
                             cpu=cpu_allocation,
@@ -203,12 +220,15 @@ def create_kubernetes_deployment(
                     blue_deployment
                 ).result()
 
-                endpoint = ml_client.online_endpoints.get(endpoint_name, local=False)
+                endpoint = ml_client.online_endpoints.get(
+                    endpoint_name, local=False
+                )
                 endpoint.traffic = traffic_allocation
                 ml_client.begin_create_or_update(endpoint).result()
 
 
 def main():
+    """Entry main function to create deployment."""
     parser = argparse.ArgumentParser("provision_kubernetes_deployment")
     parser.add_argument(
         "--file",

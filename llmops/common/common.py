@@ -1,3 +1,4 @@
+"""Common utility functions for the promptflow package."""
 import ast
 import logging
 import os
@@ -45,7 +46,9 @@ def resolve_env_vars(base_path: str) -> Dict:
     return env_vars
 
 
-def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, Dict]:
+def resolve_flow_type(
+        base_path: str,
+        flow_path: str) -> Union[FlowTypeOption, Dict]:
     """
     Resolve the flow type based on the flow folder files.
 
@@ -61,14 +64,18 @@ def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, D
         for file in files:
             if file in _FLOW_FLEX_FILENAME:
                 found_flex = True
-                flow_file_path = os.path.abspath(os.path.join(safe_base_path, flow_path, file))
+                flow_file_path = os.path.abspath(
+                    os.path.join(safe_base_path, flow_path, file)
+                    )
                 print(flow_file_path)
             elif file in _FLOW_DAG_FILENAME:
                 found_dag = True
-                flow_file_path = os.path.abspath(os.path.join(safe_base_path, flow_path, file))
-                print(flow_file_path)       
+                flow_file_path = os.path.abspath(
+                    os.path.join(safe_base_path, flow_path, file)
+                    )
+                print(flow_file_path)
     if found_flex is False and found_dag is False:
-        raise FileNotFoundError("No YAML file found with .yml or .yaml extension.")
+        raise FileNotFoundError("No YAML file found.")
     if found_flex is True and found_dag is False:
         with open(flow_file_path) as file:
             config = yaml.safe_load(file)
@@ -76,31 +83,44 @@ def resolve_flow_type(base_path: str, flow_path: str) -> Union[FlowTypeOption, D
         entry_value = config["entry"]
         print(entry_value)
         file_name, entry_name = entry_value.split(":")
-        with open(os.path.abspath(os.path.join(safe_base_path, flow_path, file_name + ".py"))) as file:
+        with open(os.path.abspath(os.path.join(
+            safe_base_path, flow_path, file_name + ".py"))
+        ) as file:
             source_code = file.read()
         tree = ast.parse(source_code)
 
         entry_object = None
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and node.name == entry_name:
+            if (
+                isinstance(node, (ast.FunctionDef, ast.ClassDef))
+                and node.name == entry_name
+            ):
                 entry_object = node
                 break
         print(entry_object)
         if entry_object is None:
             raise ValueError(f"Entry '{entry_name}' not found in the module.")
-                
+
         if isinstance(entry_object, ast.ClassDef):
-            if os.path.isfile(os.path.abspath(os.path.join(safe_base_path, flow_path, "init.json"))):
-                with open(os.path.abspath(os.path.join(safe_base_path, flow_path, "init.json"))) as file:
+            if os.path.isfile(os.path.abspath(os.path.join(
+                safe_base_path, flow_path, "init.json"))
+            ):
+                with open(os.path.abspath(os.path.join(
+                    safe_base_path, flow_path, "init.json"))
+                ) as file:
                     init_data = json.load(file)
-                
+
                 for key, value in init_data.items():
-                    #params_dict[key] = value
+                    # params_dict[key] = value
                     if isinstance(value, dict):
                         inner_params = {}
                         for sub_key, sub_value in value.items():
                             env_value = ""
-                            if isinstance(sub_value, str) and sub_value.startswith('${') and sub_value.endswith('}'):
+                            if (
+                                isinstance(sub_value, str)
+                                and sub_value.startswith('${')
+                                and sub_value.endswith('}')
+                            ):
                                 env_var_name = f"{key}_{sub_key}"
 
                                 env_var_value = os.environ.get(env_var_name)
@@ -178,7 +198,9 @@ def resolve_run_ids(run_id: str) -> list[str]:
     if os.path.isfile(run_id):
         with open(run_id, "r") as run_file:
             raw_runs_ids = run_file.read()
-            run_ids = [] if raw_runs_ids is None else ast.literal_eval(raw_runs_ids)
+            run_ids = [] if raw_runs_ids is None else ast.literal_eval(
+                raw_runs_ids
+            )
     else:
         run_ids = [] if run_id is None else ast.literal_eval(run_id)
 

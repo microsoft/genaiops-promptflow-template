@@ -37,7 +37,10 @@ def create_kubernetes_endpoint(
     subscription_id: Optional[str] = None,
     output_file: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Create endpoint for the model version."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
 
     real_config = f"{base_path}/configs/deployment_config.json"
 
@@ -81,6 +84,7 @@ def create_kubernetes_endpoint(
 
 
 def main():
+    """Entry main function to create endpoint."""
     parser = argparse.ArgumentParser("provision_kubernetes_endpoints")
     parser.add_argument(
         "--subscription_id",

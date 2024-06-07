@@ -1,6 +1,5 @@
 """
 This script reads a YAML file and generates a list of environment variables.
-based on the contents of the file.
 
 The script expects the name of the YAML file as a command-line argument.
 The script also expects a second command-line argument that specifies whether

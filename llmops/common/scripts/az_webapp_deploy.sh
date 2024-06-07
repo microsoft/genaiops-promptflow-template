@@ -84,9 +84,11 @@ registryId=$(az acr show --resource-group $acr_rg \
 az role assignment create --assignee $principalId --scope $registryId --role "AcrPull"
 az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
+sleep 15
 # create/update Web App
 az webapp create --resource-group $rgname --plan $appserviceplan --name $appserviceweb --deployment-container-image-name \
     $REGISTRY_NAME.azurecr.io/"$use_case_base_path"_"$deploy_environment":"$build_id"
+sleep 15
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \

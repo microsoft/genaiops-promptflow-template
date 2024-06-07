@@ -50,6 +50,7 @@ python -m llmops.common.prompt_pipeline
 import argparse
 import datetime
 import os
+import sys
 import pandas as pd
 from azure.identity import DefaultAzureCredential
 
