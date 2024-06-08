@@ -2,6 +2,10 @@ $schema: https://azuremlschemas.azureedge.net/promptflow/latest/flow.schema.json
 entry: programmer:write_simple_program
 environment:
   python_requirements_txt: requirements.txt
-sample:
-  inputs:
-    text: Java Hello World!
+inputs:
+  text:
+    type: string
+    default: Java Hello World!
+  deployment_name:
+    type: string
+    default: 'gpt-35-turbo'

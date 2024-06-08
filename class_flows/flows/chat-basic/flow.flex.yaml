@@ -1,14 +1,24 @@
-$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
 entry: flow:ChatFlow
-sample:
-  inputs:
-    question: What's Azure Machine Learning?
-  init:
-    model_config:
-      azure_endpoint: ${azure_endpoint}
+environment:
+  python_requirements_txt: requirements.txt
+inputs:
+  question:
+    type: string
+    default: What's Azure Machine Learning?
+  chat_history:
+    type: list
+    default: ''
+outputs:
+  output:
+    type: string
+init:
+  model_config:
+    type: AzureOpenAIModelConfiguration
+    default:
+      azure_endpoint: https://demoopenaiexamples.openai.azure.com/
       azure_deployment: gpt-35-turbo
       api_version: 2023-07-01-preview
       api_key: ${api_key}
-    max_total_token: 2048
-environment:
-  python_requirements_txt: requirements.txt
+  max_total_token:
+    type: string
+    default: ${max_total_token}
