@@ -1,4 +1,4 @@
-name: test_pr_dev_workflow
+name: flex_flows_pr_dev_workflow
 
 on:
   workflow_call:

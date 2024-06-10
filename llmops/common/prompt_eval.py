@@ -95,6 +95,12 @@ def prepare_and_execute(
 
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
+        create_pf_connections(
+            subscription_id,
+            exp_filename,
+            base_path,
+            env_name
+        )
     else:
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
@@ -102,12 +108,6 @@ def prepare_and_execute(
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
-    create_pf_connections(
-        subscription_id,
-        exp_filename,
-        base_path,
-        env_name
-    )
 
     standard_flow_detail = experiment.get_flow_detail(flow_type)
     default_variants = standard_flow_detail.default_variants
