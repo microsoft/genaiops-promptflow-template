@@ -93,7 +93,7 @@ if [[ -e "$config_path" ]]; then
         env_var_key="${uppercase_name}_API_KEY"
         echo "$env_var_key"
         api_key=${!env_var_key}
-        echo "$api_key
+        echo "$api_key"
         abc=" -e $env_var_key=$api_key"
 
     done
