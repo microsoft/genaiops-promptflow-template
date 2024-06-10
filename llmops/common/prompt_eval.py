@@ -286,16 +286,16 @@ def prepare_and_execute(
                             module_names = dir(service_module)
 
                             # Filter names to get classes defined in the module
-                            class_names = [
-                                name for name in module_names
-                                if inspect.isclass
-                                (
-                                    getattr(
-                                        service_module,
-                                        name
-                                        )
-                                    )
-                                ]
+                            # class_names = [
+                            #    name for name in module_names
+                            #    if inspect.isclass
+                            #    (
+                            #        getattr(
+                            #            service_module,
+                            #            name
+                            #            )
+                            #        )
+                            #    ]
 
                             # Filter names to get functions defined in module
                             function_names = [

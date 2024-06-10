@@ -101,7 +101,6 @@ def prepare_and_execute(
                         )
                     )
                 )
-            
         else:
             print("No connection element found within init element.")
 

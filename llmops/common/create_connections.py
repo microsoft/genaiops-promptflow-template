@@ -4,7 +4,6 @@
 from llmops.common.common import resolve_flow_type
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
-from llmops.common.logger import llmops_logger
 from llmops.config import EXECUTION_TYPE
 
 from azure.identity import DefaultAzureCredential
