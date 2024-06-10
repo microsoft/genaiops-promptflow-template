@@ -86,7 +86,7 @@ if [[ -e "$config_path" ]]; then
         api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         modified_name="${uppercase_name}_API_KEY"
-        result_string+=" -e $modified_name=$api_key"
+        abc+=" -e $modified_name=$api_key"
 
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         echo "$uppercase_name"
@@ -94,8 +94,8 @@ if [[ -e "$config_path" ]]; then
         echo "$env_var_key"
         api_key=${!env_var_key}
         echo "$api_key"
-        abc=" -e $env_var_key=$api_key"
-
+        result_string+=" -e $env_var_key=$api_key"
+        echo "$result_string"
     done
     echo "$result_string"
     docker_args=$result_string
