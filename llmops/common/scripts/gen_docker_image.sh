@@ -43,7 +43,8 @@ set -e # fail on error
 config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
-
+source .env
+. .env
 if [[ -e "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
@@ -53,7 +54,8 @@ if [[ -e "$config_path" ]]; then
     if [ -e "$init_file_path" ]; then
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
     fi
-    
+    echo "$init_output"
+
     #pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
@@ -83,7 +85,7 @@ if [[ -e "$config_path" ]]; then
         api_key=${!env_var_key}
         result_string+=" -e $env_var_key=$api_key"
     done
-    
+    echo "$result_string"
     docker_args=$result_string
 
     if [ -n "$init_output" ]; then
