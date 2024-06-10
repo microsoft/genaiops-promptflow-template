@@ -83,10 +83,7 @@ if [[ -e "$config_path" ]]; then
         echo "ritesh"
         echo "$name"
         echo "modi"
-        api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-        uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
-        modified_name="${uppercase_name}_API_KEY"
-        abc+=" -e $modified_name=$api_key"
+
 
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         echo "$uppercase_name"
