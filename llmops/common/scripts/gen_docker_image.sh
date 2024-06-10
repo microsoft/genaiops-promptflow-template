@@ -54,7 +54,7 @@ if [[ -e "$config_path" ]]; then
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
     fi
     
-    pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
+    #pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
@@ -78,14 +78,14 @@ if [[ -e "$config_path" ]]; then
     result_string=""
 
     for name in "${connection_names[@]}"; do
-        api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
-        modified_name="${uppercase_name}_API_KEY"
-        result_string+=" -e $modified_name=$api_key"
+        env_var_key="${uppercase_name}_API_KEY"
+        api_key=${!env_var_key}
+        result_string+=" -e $env_var_key=$api_key"
     done
     
     docker_args=$result_string
-    
+
     if [ -n "$init_output" ]; then
         docker_args+=" $init_output"
     fi

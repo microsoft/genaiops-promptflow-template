@@ -40,3 +40,4 @@ jobs:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
       registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
+      env_vars: ${{ secrets.ENV_VARS }}

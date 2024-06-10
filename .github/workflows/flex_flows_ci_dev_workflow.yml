@@ -1,4 +1,4 @@
-name: test_ci_dev_workflow
+name: flex_flows_ci_dev_workflow
 
 on:
   workflow_call:
@@ -12,7 +12,7 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "flex-flows"
+        default: "flex_flows"
       deployment_type:
         type: string
         description: "Determine type of deployment - aml, aks, docker, webapp"
@@ -22,7 +22,7 @@ on:
       - main
       - development
     paths:
-      - 'flex-flows/**'
+      - 'flex_flows/**'
       - '.github/**'
       - 'llmops/**'
 
@@ -34,7 +34,7 @@ jobs:
     uses: ./.github/workflows/platform_ci_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
-      use_case_base_path: ${{ inputs.use_case_base_path || 'flex-flows' }}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'flex_flows' }}
       deployment_type: ${{ inputs.deployment_type|| 'aml' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}

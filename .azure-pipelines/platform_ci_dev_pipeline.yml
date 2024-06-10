@@ -19,6 +19,7 @@ parameters:
  - name: env_vars
    displayName: "env vars"
 
+
 stages:
     - stage: execute_prompt_experiment
       variables:
@@ -36,7 +37,12 @@ stages:
           inputs:
             targetType: 'inline'
             script: |
-              echo "$(env_vars)" | tr ' ' '\n' > .env
+              if [[ -n "$env_vars" ]]; then
+                echo "$(env_vars)" | tr ' ' '\n' > .env
+                echo "Environment variables have been written to .env file."
+              else
+                echo "env_vars is empty or not set."
+              fi
           env:
             env_vars: $(env_vars)
 

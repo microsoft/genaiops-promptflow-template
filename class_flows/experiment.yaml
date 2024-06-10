@@ -1,5 +1,20 @@
 name: class_flows
-flow: flows/chat-basic
+flow: flows/chat_basic
+
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_endpoint: ${api_endpoint}
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
+- name: aoai1
+  connection_type: AzureOpenAIConnection
+  api_endpoint: ${api_endpoint}
+  api_type: azure
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
 
 datasets:
 - name: class_flow_data
@@ -11,7 +26,7 @@ datasets:
 
 evaluators:
 - name: class_flows
-  flow: flows/eval-checklist
+  flow: flows/eval_checklist
   datasets:
   - name: class_flow_data_test
     reference: class_flow_data

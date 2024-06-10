@@ -13,7 +13,10 @@ local pf connection.
 import argparse
 import json
 from dotenv import load_dotenv
-from promptflow.entities import AzureOpenAIConnection
+
+from promptflow.entities import (
+    AzureOpenAIConnection,
+)
 from promptflow.client import PFClient
 
 from llmops.common.logger import llmops_logger

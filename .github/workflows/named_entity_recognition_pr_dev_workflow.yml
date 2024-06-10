@@ -33,3 +33,4 @@ jobs:
       use_case_base_path: ${{ inputs.use_case_base_path || 'named_entity_recognition' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      env_vars: ${{ secrets.ENV_VARS }}

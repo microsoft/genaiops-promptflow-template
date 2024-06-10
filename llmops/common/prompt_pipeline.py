@@ -51,10 +51,6 @@ import argparse
 import datetime
 import os
 import pandas as pd
-from azure.identity import DefaultAzureCredential
-
-from llmops.config import EXECUTION_TYPE
-
 from dotenv import load_dotenv
 from enum import Enum
 from typing import Optional
@@ -63,11 +59,14 @@ from llmops.common.common import resolve_flow_type, resolve_env_vars
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
-
+from llmops.common.create_connections import create_pf_connections
 from llmops.common.common import FlowTypeOption
+from llmops.config import EXECUTION_TYPE
 
 from promptflow.client import PFClient as PFClientLocal
 from promptflow.azure import PFClient as PFClientAzure
+
+from azure.identity import DefaultAzureCredential
 
 logger = llmops_logger("prompt_pipeline")
 
@@ -168,7 +167,7 @@ def prepare_and_execute(
         experiment.base_path, experiment.flow)
 
     print(params_dict)
-
+    print(experiment.connections)
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
     else:
@@ -178,6 +177,12 @@ def prepare_and_execute(
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
+    create_pf_connections(
+        subscription_id,
+        exp_filename,
+        base_path,
+        env_name
+    )
 
     flow_detail = experiment.get_flow_detail(flow_type)
     print(flow_detail.flow_path)

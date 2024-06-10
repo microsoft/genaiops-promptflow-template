@@ -3,9 +3,9 @@ import ast
 import logging
 import os
 import time
-from enum import Enum
 import yaml
 import json
+from enum import Enum
 from typing import Dict, Union
 
 from promptflow.entities import Run
@@ -20,6 +20,7 @@ class FlowTypeOption(Enum):
     DAG_FLOW = 1
     CLASS_FLOW = 2
     FUNCTION_FLOW = 3
+    NO_FLOW = 4
 
 
 yaml_base_name = "config"
@@ -38,7 +39,9 @@ def resolve_env_vars(base_path: str) -> Dict:
         with open(yaml_file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
         for key, value in yaml_data.items():
-            env_vars[key] = os.environ.get(key, None)
+            temp_val = os.environ.get(key, None)
+            if temp_val is not None:
+                env_vars[key] = os.environ.get(key, None)
             print(env_vars[key])
     else:
         env_vars = {}
@@ -74,8 +77,11 @@ def resolve_flow_type(
                     os.path.join(safe_base_path, flow_path, file)
                     )
                 print(flow_file_path)
+
     if found_flex is False and found_dag is False:
-        raise FileNotFoundError("No YAML file found.")
+        flow_type = FlowTypeOption.NO_FLOW
+        params_dict = {}
+
     if found_flex is True and found_dag is False:
         with open(flow_file_path) as file:
             config = yaml.safe_load(file)
@@ -155,6 +161,7 @@ def resolve_flow_type(
 
     if found_flex is False and found_dag is True:
         flow_type = FlowTypeOption.DAG_FLOW
+        params_dict = {}
 
     return (flow_type, params_dict)
 

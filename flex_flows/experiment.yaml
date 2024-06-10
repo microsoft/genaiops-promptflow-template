@@ -1,5 +1,21 @@
-name: flex-flows
+name: flex_flows
 flow: flows/basic
+
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_endpoint: ${api_endpoint}
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
+- name: aoai1
+  connection_type: AzureOpenAIConnection
+  api_endpoint: ${api_endpoint}
+  api_type: azure
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+
 
 datasets:
 - name: flex_flow_data

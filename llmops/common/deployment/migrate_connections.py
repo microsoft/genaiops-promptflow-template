@@ -33,22 +33,16 @@ from llmops.common.logger import llmops_logger
 logger = llmops_logger("prompt_eval")
 
 
-def find_connection(data):
-    """Find connection element in the init element."""
+def find_connections(data, key, connections):
+    '''Find the value of a key in a nested dictionary'''
     if isinstance(data, dict):
-        for key, value in data.items():
-            if key == 'connection':
-                return value
-            elif isinstance(value, dict):
-                result = find_connection(value)
-                if result is not None:
-                    return result
-            elif isinstance(value, list):
-                for item in value:
-                    result = find_connection(item)
-                    if result is not None:
-                        return result
-    return None
+        if key in data:
+            connections.append(data[key])
+        for value in data.values():
+            find_connections(value, key, connections)
+    elif isinstance(data, list):
+        for item in data:
+            find_connections(item, key, connections)
 
 
 def prepare_and_execute(
@@ -79,26 +73,35 @@ def prepare_and_execute(
     )
 
     standard_flow_detail = experiment.get_flow_detail(flow_type)
-    print(standard_flow_detail.flow_path)
 
     if flow_type == FlowTypeOption.CLASS_FLOW:
         flow_path = standard_flow_detail.flow_path
-        print(flow_path)
-        f = FlowOperations(pf)
+        flow_ops = FlowOperations(pf)
         with open(os.path.join(flow_path, "flow.flex.yaml"), 'r') as file:
             data = yaml.safe_load(file)
 
         # Check for the 'init' element
-        init_element = data.get('sample', {}).get('init', {})
+        init_element = data.get('init', {})
+        if not init_element:
+            init_element = data.get('sample', {}).get('init', {})
 
         # Find connection recursively
-        connection_value = find_connection(init_element)
+        connections = []
+        find_connections(init_element, 'connection', connections)
 
-        if connection_value is not None:
-            print(f"Connection value found: {connection_value}")
-            print(f._migrate_connections(["aoai"], Path(os.path.join(
-                experiment.base_path, "docker", "connections")))
-            )
+        if connections is not None:
+            print(f"Connection value found: {connections}")
+            flow_ops._migrate_connections(
+                connections,
+                Path(
+                    os.path.join(
+                        experiment.base_path,
+                        "docker",
+                        "connections"
+                        )
+                    )
+                )
+            
         else:
             print("No connection element found within init element.")
 

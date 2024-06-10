@@ -19,6 +19,7 @@ init:
       azure_deployment: gpt-35-turbo
       api_version: 2023-07-01-preview
       api_key: ${api_key}
+      connection: aoai
   max_total_token:
-    type: string
-    default: ${max_total_token}
+    type: int
+    default: 4096
