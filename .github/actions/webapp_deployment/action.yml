@@ -16,10 +16,12 @@ inputs:
 runs:
   using: composite
   steps:
-      - name: Create .env file
-        run: echo "${{ secrets.env_vars }}" > .env
-      - name: load .env file
-        run: python -c "from dotenv import load_dotenv; load_dotenv()"
+    - name: Convert .env to environment variables
+      shell: bash
+      run: |
+        while IFS='=' read -r key value; do
+          echo "$key=$value" >> $GITHUB_ENV
+        done <<< "${{ inputs.env_vars }}"
 
     - name: create docker image
       shell: bash
