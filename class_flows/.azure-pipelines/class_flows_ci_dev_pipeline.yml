@@ -26,7 +26,7 @@ parameters:
    default: "class_flows"
  - name: deployment_type
    displayName: "Determine type of deployment - aml, aks, docker, webapp"
-   default: "aml"
+   default: "webapp"
 
 #=====================================
 # Execute platform_ci_dev_pipeline pipeline for experiment, evaluation and deployment of flows
