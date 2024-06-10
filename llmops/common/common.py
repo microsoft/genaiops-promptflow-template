@@ -42,7 +42,6 @@ def resolve_env_vars(base_path: str) -> Dict:
             temp_val = os.environ.get(key, None)
             if temp_val is not None:
                 env_vars[key] = os.environ.get(key, None)
-            print(env_vars[key])
     else:
         env_vars = {}
         print("no values")
@@ -70,13 +69,11 @@ def resolve_flow_type(
                 flow_file_path = os.path.abspath(
                     os.path.join(safe_base_path, flow_path, file)
                     )
-                print(flow_file_path)
             elif file in _FLOW_DAG_FILENAME:
                 found_dag = True
                 flow_file_path = os.path.abspath(
                     os.path.join(safe_base_path, flow_path, file)
                     )
-                print(flow_file_path)
 
     if found_flex is False and found_dag is False:
         flow_type = FlowTypeOption.NO_FLOW
@@ -87,7 +84,6 @@ def resolve_flow_type(
             config = yaml.safe_load(file)
 
         entry_value = config["entry"]
-        print(entry_value)
         file_name, entry_name = entry_value.split(":")
         with open(os.path.abspath(os.path.join(
             safe_base_path, flow_path, file_name + ".py"))
@@ -103,7 +99,6 @@ def resolve_flow_type(
             ):
                 entry_object = node
                 break
-        print(entry_object)
         if entry_object is None:
             raise ValueError(f"Entry '{entry_name}' not found in the module.")
 
@@ -140,7 +135,6 @@ def resolve_flow_type(
                         params_dict[key] = inner_params
                     elif isinstance(value, str):
                         env_value = ""
-                        print(value)
                         if value.startswith('${') and value.endswith('}'):
                             env_var_value = os.environ.get(key)
 

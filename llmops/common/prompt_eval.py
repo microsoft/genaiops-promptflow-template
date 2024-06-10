@@ -87,8 +87,6 @@ def prepare_and_execute(
 
     eval_flows = experiment.evaluators
 
-    print(config.workspace_name)
-
     flow_type, params_dict = resolve_flow_type(experiment.base_path,
                                                experiment.flow
                                                )
@@ -144,6 +142,7 @@ def prepare_and_execute(
             # Skip the evaluation of this run if not found
             current_standard_run = runs[flow_run]
             run_data_id = current_standard_run.data
+            print(run_data_id)
             if not run_data_id:
                 raise ValueError(f"Run {flow_run}has no data reference.")
 
@@ -156,13 +155,14 @@ def prepare_and_execute(
                 run_data_name = os.path.sep.join(run_data_id.split(
                     os.path.sep)[-2:]
                     )
-
+                print(run_data_name)
                 for ds in experiment.datasets:
-
+                    print(ds.dataset.source)
                     if ds.dataset.source == run_data_name:
                         run_dataset = experiment.get_dataset(
                             ds.dataset.name
                             )
+                        break
                     else:
                         run_dataset = None
 
@@ -184,9 +184,11 @@ def prepare_and_execute(
                 )
                 column_mapping = dataset_mapping.mappings
                 dataset = dataset_mapping.dataset
-                data_id = dataset.get_local_source(base_path) \
-                    if EXECUTION_TYPE == "LOCAL" \
-                    else dataset.get_remote_source(pf.ml_client),
+                data_id = (
+                    dataset.get_local_source(base_path)
+                    if EXECUTION_TYPE == "LOCAL"
+                    else dataset.get_remote_source(pf.ml_client)
+                    )
 
                 evaluator_executed = True
                 # Create run object
@@ -208,10 +210,6 @@ def prepare_and_execute(
                     if experiment.runtime
                     else {"instance_type": "Standard_E4ds_v4"}
                 )
-                print(evaluator.path)
-                print(params_dict)
-                print(data_id)
-                print(env_vars)
                 # Check if any of the files exist in the directory
                 files_found = [
                     file for file in files_to_check
@@ -224,7 +222,7 @@ def prepare_and_execute(
                             or flow_type == FlowTypeOption.FUNCTION_FLOW:
                         run = pf.run(
                             flow=evaluator.path,
-                            data=str(*data_id),
+                            data=data_id,
                             run=current_standard_run,
                             name=run_name,
                             display_name=run_name,
@@ -240,7 +238,7 @@ def prepare_and_execute(
                     elif flow_type == FlowTypeOption.CLASS_FLOW:
                         run = pf.run(
                             flow=evaluator.path,
-                            data=str(*data_id),
+                            data=data_id,
                             run=current_standard_run,
                             name=run_name,
                             display_name=run_name,
@@ -352,7 +350,7 @@ def prepare_and_execute(
                     variant_value = (
                         variant_id[start_index:end_index].split(".")
                     )
-
+                    print(data_id)
                     df_result[variant_value[0]] = variant_value[1]
                     metric_variant[variant_value[0]] = variant_value[1]
                     df_result["dataset"] = data_id
