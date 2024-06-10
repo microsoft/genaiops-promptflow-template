@@ -3,12 +3,12 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "classendpoint5",
+            "ENDPOINT_NAME": "cf01e",
             "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
-            "CURRENT_DEPLOYMENT_NAME": "classdeployment5",
+            "CURRENT_DEPLOYMENT_NAME": "cf01d",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
@@ -42,14 +42,14 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": [],
+            "CONNECTION_NAMES": ["aoai"],
             "REGISTRY_NAME": "researchmlops",
             "REGISTRY_RG_NAME": "mlops",
-            "APP_PLAN_NAME": "qweqfsdd6",
-            "WEB_APP_NAME": "vbhghtr6",
-            "WEB_APP_RG_NAME": "ghgfht6",
+            "APP_PLAN_NAME": "cf0000001p",
+            "WEB_APP_NAME": "cf0000001w",
+            "WEB_APP_RG_NAME": "cf0000001",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "vcbb6"
+            "USER_MANAGED_ID": "cf0000001p"
             
         }
     ]
