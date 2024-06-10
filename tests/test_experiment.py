@@ -486,7 +486,7 @@ def test_experiment_creation():
     expected_flow_type = FlowTypeOption.DAG_FLOW
 
     # Check outputs
-    experiment = Experiment(base_path, name, flow, [], [], None)
+    experiment = Experiment(base_path, name, flow, [], [], None, [])
     flow_type, params_dict = resolve_flow_type(
         experiment.base_path, experiment.flow
     )

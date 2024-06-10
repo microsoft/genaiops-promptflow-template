@@ -34,7 +34,7 @@ logger = llmops_logger("prompt_eval")
 
 
 def find_connections(data, key, connections):
-    '''Find the value of a key in a nested dictionary'''
+    """Find the value of a key in a nested dictionary."""
     if isinstance(data, dict):
         if key in data:
             connections.append(data[key])
