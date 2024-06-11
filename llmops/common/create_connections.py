@@ -29,15 +29,8 @@ def create_pf_connections(
 
     print(params_dict)
 
-    if EXECUTION_TYPE == "LOCAL":
-        pf = PFClientLocal()
-    else:
-        pf = PFClientAzure(
-            credential=DefaultAzureCredential(),
-            subscription_id=config.subscription_id,
-            workspace_name=config.workspace_name,
-            resource_group_name=config.resource_group_name
-        )
+    pf = PFClientLocal()
+
     for connection_details in experiment.connections:
         if connection_details.connection_type.lower() == (
             "azureopenaiconnection"
