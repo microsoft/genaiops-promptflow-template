@@ -35,7 +35,8 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
-
+source .env
+. .env
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
@@ -95,14 +96,19 @@ az webapp config appsettings set --resource-group $rgname --name $appserviceweb 
     --settings WEBSITES_PORT=8080
 
 for name in "${connection_names[@]}"; do
-    api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
-
+    #api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
-    modified_name="${uppercase_name}_API_KEY"
+    echo "$uppercase_name"
+    env_var_key="${uppercase_name}_API_KEY"
+    echo "$env_var_key"
+    api_key=${!env_var_key}
+    echo "$api_key"
+    #uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
+    #modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
         --resource-group $rgname \
         --name $appserviceweb \
-        --settings $modified_name=$api_key
+        --settings "${env_var_key}=${api_key}"
 done
 
 for pair in "${env_output[@]}"; do
