@@ -86,7 +86,7 @@ if [[ -e "$config_path" ]]; then
         echo "$env_var_key"
         api_key=${!env_var_key}
         echo "$api_key"
-        result_string+=" -e ${env_var_key}=${api_key}"
+        result_string+=$(printf " -e %s=%s" "$env_var_key" "$api_key")
         echo "$result_string"
     done
     echo "$result_string"

@@ -11,21 +11,14 @@ local pf connection.
 """
 
 import argparse
-import json
+
 from dotenv import load_dotenv
+from llmops.common.common import resolve_flow_type
 
-from promptflow.entities import (
-    AzureOpenAIConnection,
-)
-from promptflow.client import PFClient
-
-from llmops.common.common import resolve_flow_type, resolve_env_vars
-from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 from llmops.common.create_connections import create_pf_connections
-from llmops.common.common import FlowTypeOption
-from llmops.config import EXECUTION_TYPE
+
 
 logger = llmops_logger("prompt_aoai_connection")
 
