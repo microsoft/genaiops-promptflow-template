@@ -64,7 +64,7 @@ def _get_valid_connection_values(con_name, con_property):
         con_property = con_property.replace('${', '').replace('}', '')
 
         env_var_value = os.environ.get(f"{con_name}_{con_property}")
-
+        
         if env_var_value:
             return env_var_value
         else:
