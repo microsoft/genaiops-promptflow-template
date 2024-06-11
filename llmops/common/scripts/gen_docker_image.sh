@@ -56,7 +56,7 @@ if [[ -e "$config_path" ]]; then
     fi
     echo "$init_output"
 
-    #pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
+    pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
@@ -86,7 +86,7 @@ if [[ -e "$config_path" ]]; then
         echo "$env_var_key"
         api_key=${!env_var_key}
         echo "$api_key"
-        result_string+=" -e $env_var_key=$api_key"
+        result_string+=" -e ${env_var_key}=${api_key}"
         echo "$result_string"
     done
     echo "$result_string"
