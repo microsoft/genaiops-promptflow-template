@@ -80,11 +80,6 @@ if [[ -e "$config_path" ]]; then
     result_string=""
     printenv
     for name in "${connection_names[@]}"; do
-        echo "ritesh"
-        echo "$name"
-        echo "modi"
-
-
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
         echo "$uppercase_name"
         env_var_key="${uppercase_name}_API_KEY"
