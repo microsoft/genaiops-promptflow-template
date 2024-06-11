@@ -19,7 +19,13 @@ from promptflow.entities import (
 )
 from promptflow.client import PFClient
 
+from llmops.common.common import resolve_flow_type, resolve_env_vars
+from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
+from llmops.common.create_connections import create_pf_connections
+from llmops.common.common import FlowTypeOption
+from llmops.config import EXECUTION_TYPE
 
 logger = llmops_logger("prompt_aoai_connection")
 
@@ -42,33 +48,22 @@ def prepare_and_execute(
     """
     logger.info(f"Using environment '{env_name}'")
 
-    secret_config = json.loads(connection_details)
+    experiment = load_experiment(
+        filename="experiment.yaml", base_path=base_path, env=env_name
+    )
 
-    dep_config = f"{base_path}/configs/deployment_config.json"
-    config_file = open(dep_config)
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow)
 
-    pf = PFClient()
+    print(params_dict)
+    print(experiment.connections)
 
-    connection_config = json.load(config_file)
-    for elem in connection_config["webapp_endpoint"]:
-        if "CONNECTION_NAMES" in elem and "ENV_NAME" in elem:
-            if env_name == elem["ENV_NAME"]:
-                con_to_create = list(elem["CONNECTION_NAMES"])
-
-                for con in con_to_create:
-                    for avail_con in secret_config:
-                        if avail_con["name"] == con:
-                            if avail_con["type"] == "azure_open_ai":
-                                connection = AzureOpenAIConnection(
-                                    name=avail_con["name"],
-                                    api_key=avail_con["api_key"],
-                                    api_base=avail_con["api_base"],
-                                    api_type=avail_con["api_type"],
-                                    api_version=avail_con["api_version"],
-                                )
-                                pf.connections.create_or_update(connection)
-
-                                logger.info(f"{avail_con['name']} created")
+    create_pf_connections(
+        "",
+        "experiment.yaml",
+        base_path,
+        env_name
+    )
 
 
 def main():

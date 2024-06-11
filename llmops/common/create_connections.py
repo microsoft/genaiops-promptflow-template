@@ -2,14 +2,14 @@
 """Create connections for local run."""
 
 from llmops.common.common import resolve_flow_type
-from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+# from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.config import EXECUTION_TYPE
 
-from azure.identity import DefaultAzureCredential
+
 from promptflow.entities import AzureOpenAIConnection
-from promptflow.client import PFClient as PFClientLocal
-from promptflow.azure import PFClient as PFClientAzure
+from promptflow.client import PFClient
+
 
 import os
 
@@ -18,8 +18,8 @@ def create_pf_connections(
             subscription_id, exp_filename, base_path, env_name
         ):
     """Create local connections for local run."""
-    config = ExperimentCloudConfig(
-        subscription_id=subscription_id, env_name=env_name)
+    # config = ExperimentCloudConfig(
+    #     subscription_id=subscription_id, env_name=env_name)
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=env_name
     )
@@ -29,7 +29,7 @@ def create_pf_connections(
 
     print(params_dict)
 
-    pf = PFClientLocal()
+    pf = PFClient()
 
     for connection_details in experiment.connections:
         if connection_details.connection_type.lower() == (
