@@ -94,11 +94,8 @@ az webapp config appsettings set --resource-group $rgname --name $appserviceweb 
 for name in "${connection_names[@]}"; do
     #api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
-    echo "$uppercase_name"
     env_var_key="${uppercase_name}_API_KEY"
-    echo "$env_var_key"
     api_key=${!env_var_key}
-    echo "$api_key"
     #uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     #modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
@@ -133,13 +130,11 @@ do
     echo "$element"
 done
 
-
-
 # Assign user managed identifier to Web APp
 id=$(az identity show --resource-group $rgname --name $udmid --query id --output tsv)
 
 az webapp identity assign --resource-group $rgname --name $appserviceweb --identities $id
- 
+sleep 30
 appConfig=$(az webapp config show --resource-group $rgname --name $appserviceweb --query id --output tsv)
 
 az resource update --ids $appConfig --set properties.acrUseManagedIdentityCreds=True
@@ -147,4 +142,4 @@ az resource update --ids $appConfig --set properties.acrUseManagedIdentityCreds=
 clientId=$(az identity show --resource-group $rgname --name $udmid --query clientId --output tsv)
 
 az resource update --ids $appConfig --set properties.AcrUserManagedIdentityID=$clientId
-
+sleep 30

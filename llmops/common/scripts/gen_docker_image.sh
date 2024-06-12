@@ -77,15 +77,11 @@ if [[ -e "$config_path" ]]; then
     printenv
     for name in "${connection_names[@]}"; do
         uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
-        echo "$uppercase_name"
         env_var_key="${uppercase_name}_API_KEY"
-        echo "$env_var_key"
         api_key=${!env_var_key}
-        echo "$api_key"
         result_string+=$(printf " -e %s=%s" "$env_var_key" "$api_key")
-        echo "$result_string"
     done
-    echo "$result_string"
+
     docker_args=$result_string
 
     if [ -n "$init_output" ]; then
@@ -97,10 +93,6 @@ if [[ -e "$config_path" ]]; then
     fi
     
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
-
-
-    echo "$docker_args"
-
 
     docker run $(echo "$docker_args")
 
