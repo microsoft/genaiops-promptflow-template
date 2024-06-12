@@ -17,4 +17,3 @@ def eval_use_case(run_name, data_id, column_mapping):
     print("invoke evaluate function withe valuators and evaluator_config")
     print("from promptflow.evals.evaluate import evaluate")
     print("from promptflow.evals.evaluators import  SimilarityEvaluator")
-    

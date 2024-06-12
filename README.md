@@ -5,6 +5,25 @@ The rise of AI and large language models (LLMs) has transformed various industri
 
 As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingly evident. Prompt Engineering plays a crucial role in harnessing the full potential of LLMs by creating effective prompts that cater to specific business scenarios. This process enables developers to create tailored AI solutions, making AI more accessible and useful to a broader audience.
 
+It is an experimentation and evaluation framework for Prompt Flow. It is just not CI/CD pipelines for Prompt Flow, although it supports it. It has rich set of features for experimentation, evaluation, deployment and monitoring of Prompt Flow. It is a complete end-to-end solution for Prompt Flow operationalization.
+
+This template supports different types of flows, allowing you to define and execute workflows based on your specific requirements. The two main flow types supported are:
+
+- Flexible Flows 
+    - Function based flows (python functions)
+    - Class based flows (python classes)
+
+- Directed Acyclic Graph (DAG) Flows
+    - YAML based flows
+
+One of the powerful features of this project is its ability to automatically detect the flow type based on the presence of the flow.flex.yaml or flow.dag.yaml file in the flows directory.
+
+This template supports:
+- Local initialization and execution of flows for experimentation and evaluation locally
+- Local initialization and execution of flows for experimentation and evaluation on Azure
+- Pipeline initialization and execution of flows for experimentation and evaluation on Azure
+- Deployment of all types of flows to Kubernetes, Azure Web Apps and AzureML Managed compute
+
 # Challenges in LLMOps
 
 - Managing Large Language based flows, from local experimentation to production deployment, has been far from straightforward and isn't a one-size-fits-all task.
@@ -54,8 +73,9 @@ LLMOps with Prompt flow provides capabilities for both simple as well as complex
 Each use case (set of Prompt flow standard and evaluation flows) should follow the folder structure as shown here:
 
 - .azure-pipelines : It contains the CI and PR related pipelines for Azure DevOps and specific to a use-case
+- configs          : It contains the configuration files for the use-case deployment
 - data             : This folder contains data files related to Prompt flow standard and evaluation flow
-- environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps.
+- environment      : It contains a dockerfile used for running containers with flows for inferencing on Azure webapps and env.yml for declaring app specific environment variables.
 - flows            : It should contain minimally two folder - one for standard Prompt flow related files and another for Evaluation flow related file. There can be multiple evaluation flow related folders.
 - tests            : contains unit tests for the flows
 - data-pipelines   : It contains the data pipelines to generate the datasets (experimentation, evaluation etc.) necessary for the flows. This folder will have sub-folders specific to the data engineering tool - Microsoft Fabric, Azure ML etc.
@@ -75,6 +95,45 @@ Additionally, there is a `experiment.yaml` file that configures the use-case (se
 - The 'dataops' folder contains all the code related to data pipeline deployment.
 
 - The 'local_execution' folder contains python scripts for executing both the standard and evaluation flow locally.
+
+# Use Cases
+
+The project includes 6 examples demonstrating different scenarios:
+
+- Web Classification (YAML-based)
+
+Location: ./web_classification
+Importance: Demonstrates website content summarization with multiple variants, showcasing the flexibility and customization options available in the template.
+
+
+- Named Entity Recognition (YAML-based)
+
+Location: ./named_entity_recognition
+Importance: Showcases the extraction of named entities from text, which is valuable for various natural language processing tasks and information extraction.
+
+
+- Chat with PDF (YAML-based, RAG-based)
+
+Location: ./chat_with_pdf
+Importance: Demonstrates a conversational interface for interacting with PDF documents, leveraging the power of retrieval-augmented generation (RAG) to provide accurate and relevant responses.
+
+
+- Math Coding (YAML-based)
+
+Location: ./math_coding
+Importance: Showcases the ability to perform mathematical calculations and generate code snippets, highlighting the versatility of the template in handling computational tasks.
+
+
+- Code Generation (Function-based flows)
+
+Location: ./function_flows
+Importance: Demonstrates the generation of code snippets based on user prompts, showcasing the potential for automating code generation tasks.
+
+
+- Chat Application (Class-based flows)
+
+Location: ./class_flows
+Importance: Showcases a chat application built using class-based flows, illustrating the structuring and organization of more complex conversational interfaces.
 
 # Documentation
 

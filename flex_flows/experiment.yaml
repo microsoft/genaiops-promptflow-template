@@ -35,14 +35,3 @@ evaluators:
     mappings:
       groundtruth: "${data.code}"
       prediction: "${run.outputs.output}"
-
-- name: python_based_eval
-  flow: flows/eval-flow
-  datasets:
-  - name: flex_flow_data_test
-    reference: flex_flow_data
-    source: data/data_test.jsonl
-    description: "This dataset is for evaluating flows."
-    mappings:
-      groundtruth: "${data.code}"
-      prediction: "${run.outputs.output}"

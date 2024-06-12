@@ -4,12 +4,8 @@
 from llmops.common.common import resolve_flow_type
 # from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
-from llmops.config import EXECUTION_TYPE
-
-
 from promptflow.entities import AzureOpenAIConnection
 from promptflow.client import PFClient
-
 
 import os
 
@@ -64,7 +60,6 @@ def _get_valid_connection_values(con_name, con_property):
         con_property = con_property.replace('${', '').replace('}', '')
 
         env_var_value = os.environ.get(f"{con_name}_{con_property}")
-        
         if env_var_value:
             return env_var_value
         else:

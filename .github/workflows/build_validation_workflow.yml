@@ -47,6 +47,11 @@ jobs:
       - name: Python code linting
         run:  flake8 ./llmops ./tests
 
+      - name: Execute Unit Tests
+        shell: bash
+        run: |
+          pytest ${{ inputs.use_case_base_path }}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+
       - name: Publish Unit Test Results
         uses: actions/upload-artifact@v3
         with:
