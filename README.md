@@ -111,13 +111,6 @@ Importance: Demonstrates website content summarization with multiple variants, s
 Location: ./named_entity_recognition
 Importance: Showcases the extraction of named entities from text, which is valuable for various natural language processing tasks and information extraction.
 
-
-- Chat with PDF (YAML-based, RAG-based)
-
-Location: ./chat_with_pdf
-Importance: Demonstrates a conversational interface for interacting with PDF documents, leveraging the power of retrieval-augmented generation (RAG) to provide accurate and relevant responses.
-
-
 - Math Coding (YAML-based)
 
 Location: ./math_coding
