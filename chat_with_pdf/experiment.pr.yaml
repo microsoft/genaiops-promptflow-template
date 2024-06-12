@@ -1,0 +1,10 @@
+name: standard
+
+datasets:
+- name: chat_with_pdf_pr
+  source: data/bert-paper-qna-1-line.jsonl
+  description: "This dataset is for pr validation only."
+  mappings:
+    math_question: "${data.question}"
+
+evaluators:
