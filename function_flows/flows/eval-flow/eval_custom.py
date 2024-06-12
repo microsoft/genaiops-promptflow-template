@@ -10,7 +10,7 @@ from promptflow.core import AzureOpenAIModelConfiguration
 from promptflow.core._flow import Prompty
 from promptflow.evals.evaluate import evaluate
 from promptflow.evals.evaluators import  SimilarityEvaluator
-from flex_flows.flows.basic.programmer import write_simple_program
+from function_flows.flows.basic.programmer import write_simple_program
 
 def eval_use_case(run_name, data_id, column_mapping):
     print("Implement your custom evaluation here")

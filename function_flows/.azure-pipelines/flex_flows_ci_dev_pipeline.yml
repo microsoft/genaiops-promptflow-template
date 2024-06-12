@@ -8,7 +8,7 @@ trigger:
     include:
       - .azure-pipelines/*
       - llmops/*
-      - flex_flows/*
+      - function_flows/*
 
 
 pool:
@@ -23,7 +23,7 @@ parameters:
    default: "dev"
  - name: use_case_base_path
    displayName: "flow to execute"
-   default: "flex_flows"
+   default: "function_flows"
  - name: deployment_type
    displayName: "Determine type of deployment - aml, aks, docker, webapp"
    default: "webapp"

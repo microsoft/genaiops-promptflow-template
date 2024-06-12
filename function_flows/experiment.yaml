@@ -1,4 +1,4 @@
-name: flex_flows
+name: function_flows
 flow: flows/basic
 
 connections:

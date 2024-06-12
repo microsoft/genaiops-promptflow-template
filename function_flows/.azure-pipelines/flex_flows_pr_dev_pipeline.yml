@@ -8,7 +8,7 @@ pr:
     include:
       - .azure-pipelines/*
       - llmops/*
-      - flex_flows/*
+      - function_flows/*
 
 pool:
   vmImage: ubuntu-latest
@@ -22,7 +22,7 @@ parameters:
    default: "pr"
  - name: use_case_base_path
    displayName: "Base path of flow to execute"
-   default: "flex_flows"
+   default: "function_flows"
 
 #=====================================
 # Execute platform_pr_dev_pipeline pipeline for experiment, evaluation and deployment of flows
