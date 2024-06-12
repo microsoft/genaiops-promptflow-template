@@ -6,8 +6,6 @@ parameters:
    displayName: "type of model to execute"
  - name: deployment_type
    displayName: "determine type of deployment - aks, aml, docker, webapp"
- - name: connection_details
-   displayName: "determine the variable containing all connection details"
  - name: registry_details
    displayName: "determine the variable containing acr details"
  - name: RESOURCE_GROUP_NAME
@@ -289,6 +287,5 @@ stages:
             parameters:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
-              CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}
               ENV_VARS: ${{ parameters.env_vars }}

@@ -21,9 +21,6 @@ on:
       azure_credentials:
         description: "service principal authentication to Azure"
         required: true
-      connection_details:
-        description: "prompt flow connection details"
-        required: false
       registry_details:
         description: "prompt flow registry details"
         required: false
@@ -169,6 +166,5 @@ jobs:
       deployment_type: ${{ inputs.deployment_type }}
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
-      connection_details: ${{ secrets.connection_details }}
       registry_details: ${{ secrets.registry_details }}
       env_vars: ${{ secrets.env_vars }}

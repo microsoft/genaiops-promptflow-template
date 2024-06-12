@@ -26,7 +26,6 @@ logger = llmops_logger("prompt_aoai_connection")
 def prepare_and_execute(
     base_path,
     env_name,
-    connection_details,
 ):
     """
     Run the evaluation loop by executing evaluation flows.
@@ -82,16 +81,9 @@ def main():
         default=None,
     )
 
-    parser.add_argument(
-        "--connection_details",
-        type=str,
-        help="JSON string describing the details of local pf connection",
-        required=True,
-    )
-
     args = parser.parse_args()
 
-    prepare_and_execute(args.base_path, args.env_name, args.connection_details)
+    prepare_and_execute(args.base_path, args.env_name)
 
 
 if __name__ == "__main__":

@@ -19,9 +19,6 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-      connection_details:
-        description: "prompt flow connection details"
-        required: false
       registry_details:
         description: "prompt flow registry details"
         required: false
@@ -150,7 +147,6 @@ jobs:
             python -m llmops.common.prompt_local_connections \
               --env_name ${{ inputs.env_name }} \
               --base_path ${{ inputs.use_case_base_path }} \
-              --connection_details '${{ secrets.CONNECTION_DETAILS }}'
 
       - name: Read .env file
         id: env_vars
@@ -171,7 +167,6 @@ jobs:
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
           ENV_VARS: ${{ steps.env_vars.outputs.local_vars }}
         env:
-          CONNECTION_DETAILS: ${{ secrets.connection_details }} 
           REGISTRY_DETAILS: ${{ secrets.registry_details }}
 
         
