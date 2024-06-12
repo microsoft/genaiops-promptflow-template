@@ -124,7 +124,9 @@ def resolve_flow_type(
                             ):
                                 env_var_name = f"{key}_{sub_key}"
 
-                                env_var_value = os.environ.get(env_var_name)
+                                env_var_value = os.environ.get(
+                                    env_var_name.upper()
+                                    )
                                 if env_var_value:
                                     env_value = env_var_value
                                 else:
@@ -136,7 +138,7 @@ def resolve_flow_type(
                     elif isinstance(value, str):
                         env_value = ""
                         if value.startswith('${') and value.endswith('}'):
-                            env_var_value = os.environ.get(key)
+                            env_var_value = os.environ.get(key.upper())
 
                             if env_var_value:
                                 env_value = env_var_value

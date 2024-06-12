@@ -47,7 +47,9 @@ if 'init' in data:
                             and sub_sub_value.endswith('}')
                         ):
                             env_var_name = f"{key}_{sub_sub_key}"
-                            env_var_value = os.environ.get(env_var_name)
+                            env_var_value = os.environ.get(
+                                env_var_name.upper()
+                                )
                             if env_var_value:
                                 env_value = env_var_value
                             else:
@@ -61,7 +63,7 @@ if 'init' in data:
                 elif isinstance(sub_value, str):
                     env_value = ""
                     if sub_value.startswith('${') and sub_value.endswith('}'):
-                        env_var_value = os.environ.get(key)
+                        env_var_value = os.environ.get(key.upper())
                         if env_var_value:
                             env_value = env_var_value
                         else:
@@ -94,7 +96,7 @@ elif 'sample' in data and 'init' in data['sample']:
                     and sub_value.endswith('}')
                 ):
                     env_var_name = f"{key}_{sub_key}"
-                    env_var_value = os.environ.get(env_var_name)
+                    env_var_value = os.environ.get(env_var_name.upper())
                     if env_var_value:
                         env_value = env_var_value
                     else:
@@ -106,7 +108,7 @@ elif 'sample' in data and 'init' in data['sample']:
             model_config_dict[key] = inner_params
         elif isinstance(value, str):
             if value.startswith('${') and value.endswith('}'):
-                env_var_value = os.environ.get(key)
+                env_var_value = os.environ.get(key.upper())
                 if env_var_value:
                     env_value = env_var_value
                 else:
