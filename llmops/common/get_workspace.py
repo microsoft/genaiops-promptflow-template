@@ -10,10 +10,11 @@ AML workspace.
 """
 
 import argparse
-from azure.ai.ml import MLClient
-from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
 from typing import Optional
+
+from azure.ai.ml import MLClient
+from azure.identity import DefaultAzureCredential
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
@@ -32,9 +33,12 @@ def get_workspace(
     This function uses default Azure credentials.
 
     Args:
-        subscription_id (Optional[str]): user provided azure subscription id. If not provided, uses SUBSCRIPTION_ID environment variable.
-        resource_group_name (Optional[str]): user provided resource group name. If not provided, uses RESOURCE_GROUP_NAME environment variable.
-        workspace_name (Optional[str]): user provided azure AML workspace name. If not provided, uses WORKSPACE_NAME environment variable.
+        subscription_id (Optional[str]): user provided azure subscription id.
+        If not provided, uses SUBSCRIPTION_ID environment variable.
+        resource_group_name (Optional[str]): user provided resource group name.
+        If not provided, uses RESOURCE_GROUP_NAME environment variable.
+        workspace_name (Optional[str]): user provided azure AML workspace name.
+        If not provided, uses WORKSPACE_NAME environment variable.
 
     Returns:
         object: The generated workspace object
@@ -71,26 +75,29 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID, overrides the SUBSCRIPTION_ID env variable",
         default=None,
     )
 
     parser.add_argument(
         "--resource_group_name",
         type=str,
-        help="Azure Machine learning resource group, overrides the RESOURCE_GROUP_NAME environment variable",
+        help="AML RG, overrides the RESOURCE_GROUP_NAME env variable",
         default=None,
     )
     parser.add_argument(
         "--workspace_name",
         type=str,
-        help="Azure Machine learning Workspace name, overrides the WORKSPACE_NAME environment variable",
+        help="AML Workspace name, overrides the WORKSPACE_NAME env var",
         default=None,
     )
 
     args = parser.parse_args()
 
-    get_workspace(args.subscription_id, args.resource_group_name, args.workspace_name)
+    get_workspace(args.subscription_id,
+                  args.resource_group_name,
+                  args.workspace_name
+                  )
 
 
 if __name__ == "__main__":
