@@ -40,5 +40,5 @@ stages:
       exec_environment: ${{ parameters.env_name }}
       use_case_base_path: ${{ parameters.use_case_base_path }}
       deployment_type: ${{ lower(parameters.deployment_type) }}
-      connection_details: '$(COMMON_DEV_CONNECTIONS)'
       registry_details: '$(DOCKER_IMAGE_REGISTRY)'
+      env_vars: $(env_vars)
