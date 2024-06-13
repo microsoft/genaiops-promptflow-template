@@ -1,6 +1,11 @@
-azure-ai-ml==1.13.0
-azure-identity==1.14.0
-python-dotenv>=0.10.3
-azureml-mlflow>=1.51
+promptflow>=1.11.0
+promptflow-azure>=1.11.0
+promptflow-tools>=1.4.0
+promptflow-evals>=0.3.0
+azure-ai-ml>=1.16.0
+azure-identity==1.15.0
+python-dotenv>=1.0.0
+azureml-mlflow>=1.56.0
 keyrings.alt
-bs4
+python-dotenv
+
