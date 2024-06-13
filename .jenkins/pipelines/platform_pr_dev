@@ -38,9 +38,8 @@ pipeline {
                     withPythonEnv('/usr/bin/python3.9') {
 
                     // copy env file to .env file
-                    sh 'cat $secretFile'
-                    sh 'cp $ENV_FILE .env'
-                    echo $ENV_FILE
+                    sh 'cp $secretFile .env'
+                    echo $secretFile
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
