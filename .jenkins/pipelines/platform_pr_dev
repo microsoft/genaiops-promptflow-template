@@ -29,8 +29,8 @@ pipeline {
             }
         }
 
-               // Create .env file
-        stage('Load .env file from ENV VARs') {
+        // Create .env file
+        stage('Load .env file') {
             steps {
                 script {
                     // Ensure the workspace directory is writable
@@ -49,19 +49,19 @@ pipeline {
                         sh 'ls -l .env'
 
                         // Echo the contents of the .env file
-                        //sh 'cat .env'
+                        sh 'cat .env'
 
                         // Optionally, load the .env file using Python
                         def loadEnvScript = """
-                        import os
-                        from dotenv import load_dotenv
+import os
+from dotenv import load_dotenv
 
-                        # Load the .env file
-                        load_dotenv('.env')
+# Load the .env file
+load_dotenv('.env')
 
-                        # Print all environment variables for debugging purposes (optional)
-                        for key, value in os.environ.items():
-                            print(f"Value:{key}={value}")
+# Print all environment variables for debugging purposes (optional)
+for key, value in os.environ.items():
+    print(f"{key}={value}")
                         """
 
                         // Execute the Python script
