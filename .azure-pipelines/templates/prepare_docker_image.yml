@@ -3,19 +3,20 @@ parameters:
   type: string
 - name: DEPLOY_ENVIRONMENT
   type: string
-- name: CONNECTION_DETAILS
-  type: string
 - name: REGISTRY_DETAILS
   type: string
+- name: ENV_VARS
+  type: string
+
 steps:
+
 - template: execute_python_code.yml
   parameters:
     step_name: "Create local Connection"
     script_parameter: |
       python -m llmops.common.prompt_local_connections \
         --env_name ${{ parameters.DEPLOY_ENVIRONMENT }} \
-        --base_path ${{ parameters.USE_CASE_BASE_PATH }} \
-        --connection_details '${{ parameters.CONNECTION_DETAILS }}'
+        --base_path ${{ parameters.USE_CASE_BASE_PATH }} 
 
 - task: Bash@3
   displayName: Build Docker Image with flow artifacts
@@ -26,6 +27,5 @@ steps:
   env:
     use_case_base_path: ${{ parameters.USE_CASE_BASE_PATH }}
     deploy_environment: ${{ parameters.DEPLOY_ENVIRONMENT }}
-    CONNECTION_DETAILS: ${{ parameters.CONNECTION_DETAILS }}
     REGISTRY_DETAILS: ${{ parameters.REGISTRY_DETAILS }}
     build_id: $(Build.BuildNumber)
