@@ -1,4 +1,4 @@
-name: named_entity_recognition_pr_dev_pipeline
+name: function_flows_pr_dev_workflow
 
 on:
   workflow_call:
@@ -12,13 +12,13 @@ on:
         type: string
         description: "The flow usecase to execute"
         required: true
-        default: "named_entity_recognition"
+        default: "function_flows"
   pull_request:
     branches:
       - main
       - development
     paths:
-      - 'named_entity_recognition/**'
+      - 'function_flows/**'
       - '.github/**'
       - 'llmops/**'
 
@@ -30,7 +30,8 @@ jobs:
     uses: ./.github/workflows/platform_pr_dev_workflow.yml
     with:
       env_name: ${{ inputs.env_name || 'pr'}}
-      use_case_base_path: ${{ inputs.use_case_base_path || 'named_entity_recognition' }}
+      use_case_base_path: ${{ inputs.flow_type || 'function_flows' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       env_vars: ${{ secrets.ENV_VARS }}
+

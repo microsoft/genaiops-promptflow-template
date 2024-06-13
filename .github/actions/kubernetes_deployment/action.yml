@@ -29,6 +29,12 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Create .env file
+      shell: bash
+      run: echo "${{ inputs.ENV_VARS }}" > .env
+    - name: load .env file
+      shell: bash
+      run: python -c "from dotenv import load_dotenv; load_dotenv()"
     - name: Provision Kubernetes Online Endpoint
       uses: ./.github/actions/execute_script
       with:

@@ -22,9 +22,9 @@ on:
       - main
       - development
     paths:
+      - 'math_coding/**'
       - '.github/**'
       - 'llmops/**'
-      - 'math_coding/**'
 
 #=====================================
 # Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -35,8 +35,8 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       use_case_base_path: ${{ inputs.use_case_base_path || 'math_coding' }}
-      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
+      deployment_type: ${{ inputs.deployment_type|| 'webapp' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-      connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
       registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
+      env_vars: ${{ secrets.ENV_VARS }}
