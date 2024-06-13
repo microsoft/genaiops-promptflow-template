@@ -6,8 +6,6 @@ parameters:
    displayName: "type of model to execute"
  - name: deployment_type
    displayName: "determine type of deployment - aks, aml, docker, webapp"
- - name: connection_details
-   displayName: "determine the variable containing all connection details"
  - name: registry_details
    displayName: "determine the variable containing acr details"
  - name: RESOURCE_GROUP_NAME
@@ -16,6 +14,9 @@ parameters:
    displayName: "Workspace name"
  - name: KEY_VAULT_NAME
    displayName: "KeyVault name"
+ - name: env_vars
+   displayName: "env vars"
+
 
 stages:
     - stage: execute_prompt_experiment
@@ -28,6 +29,29 @@ stages:
       - job: Execute_ml_Job_Pipeline
         steps:
         - template: templates/configure_azureml_agent.yml
+          parameters:
+            base_path: ${{ parameters.use_case_base_path }}
+
+        - task: Bash@3
+          displayName: Create .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              if [[ -n "$env_vars" ]]; then
+                echo "$(env_vars)" | tr ' ' '\n' > .env
+                echo "Environment variables have been written to .env file."
+              else
+                echo "env_vars is empty or not set."
+              fi
+          env:
+            env_vars: $(env_vars)
+
+        - task: Bash@3
+          displayName: Load .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              python -c "from dotenv import load_dotenv; load_dotenv()"
 
         - template: templates/get_connection_details.yml
         #=====================================
@@ -173,7 +197,23 @@ stages:
         - template: templates/get_connection_details.yml
       
         - template: templates/configure_azureml_agent.yml
-      
+          parameters:
+            base_path: ${{ parameters.use_case_base_path }}
+        - task: Bash@3
+          displayName: Create .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              echo "$(env_vars)" | tr ' ' '\n' > .env
+          env:
+            env_vars: $(env_vars)
+
+        - task: Bash@3
+          displayName: Load .env file
+          inputs:
+            targetType: 'inline'
+            script: |
+              python -c "from dotenv import load_dotenv; load_dotenv()"
         #=====================================
         # Registers the flow in Azure ML registry
         # Writes latest model version to model_version.txt file.
@@ -222,6 +262,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
+              ENV_VARS: ${{ parameters.env_vars }}
 
         #=====================================
         # Executes AML Compute deployment when parameter deployment_type == 'aml'
@@ -237,6 +278,7 @@ stages:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
               MODEL_VERSION: $(read_model_version.MODEL_VERSION)
+              ENV_VARS: ${{ parameters.env_vars }}
 
         #=====================================
         # Executes Azure Webapp deployment when parameter 
@@ -248,5 +290,5 @@ stages:
             parameters:
               USE_CASE_BASE_PATH: ${{ parameters.use_case_base_path }}
               DEPLOY_ENVIRONMENT: ${{ parameters.exec_environment }}
-              CONNECTION_DETAILS: ${{ parameters.connection_details }}
               REGISTRY_DETAILS: ${{ parameters.registry_details }}
+              ENV_VARS: ${{ parameters.env_vars }}
