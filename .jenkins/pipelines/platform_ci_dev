@@ -4,6 +4,7 @@ pipeline {
 
     environment {
         AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
+        ENV_VARS = credentials('ENV_VARS')
         RESOURCE_GROUP_NAME = "${rg_name}"
         WORKSPACE_NAME = "${ws_name}"
     }
@@ -45,7 +46,7 @@ pipeline {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     // Create .env file with environment variables
-                    sh 'echo "$AZURE_CREDENTIALS" > .env'
+                    sh 'echo "$env.ENV_VARS" > .env'
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
@@ -164,7 +165,7 @@ pipeline {
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${AZURE_CREDENTIALS}")
+                        string(name: 'env_vars', value: "${env.ENV_VARS}")
                     ]
                 }
             }
