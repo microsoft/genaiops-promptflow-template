@@ -39,8 +39,7 @@ pipeline {
 
                     // copy env file to .env file
                     sh 'chmod -R 777 $WORKSPACE'
-                    sh 'echo "secretFile" > .env'
-                    echo $secretFile
+                    sh 'echo "$secretFile" > .env'
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
