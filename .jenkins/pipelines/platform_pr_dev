@@ -32,6 +32,7 @@ pipeline {
         // Create .env file and load the current Azure subscription details
         stage('Prepare Environment and Azure Subscription Details') {
             steps {
+            script{
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                  withCredentials([file(credentialsId: 'ENV_VARS', variable: 'secretFile')]) {
@@ -39,7 +40,12 @@ pipeline {
 
                     // copy env file to .env file
                     sh 'chmod -R 777 $WORKSPACE'
-                    sh 'echo "$secretFile" > .env'
+
+                    // Read the content of the secret file
+                    def envContent = readFile(file:secretFile)
+
+                    // Write the content to .env file in the workspace
+                    writeFile file: '.env', text: envContent
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
@@ -50,6 +56,7 @@ pipeline {
                     sh 'cat .env'
                     '''
                 }
+            }
             }
             }
 
