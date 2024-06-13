@@ -41,11 +41,16 @@ pipeline {
                     // copy env file to .env file
                     sh 'chmod -R 777 $WORKSPACE'
 
+                    sh 'ls -l $'secretFile'
+
                     // Read the content of the secret file
                     def envContent = readFile(file:secretFile)
 
                     // Write the content to .env file in the workspace
                     writeFile file: '.env', text: envContent
+
+                    // Check if the .env file was created
+                    sh 'ls -l .env'
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
