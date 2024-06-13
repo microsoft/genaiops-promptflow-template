@@ -48,7 +48,7 @@ pipeline {
         stage('Python code linting') {
             steps {
                 withPythonEnv('/usr/bin/python3.9') {
-                    sh "flake8 ${params.use_case_base_path}/tests"
+                    sh "flake8 ./llmops ./tests"
                 }
             }
         }
