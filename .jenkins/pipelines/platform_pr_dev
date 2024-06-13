@@ -47,9 +47,7 @@ pipeline {
                     // Load .env file using Python
                     sh '''
                     python -c "from dotenv import load_dotenv; load_dotenv('.env')"
-
-                    for key, value in os.environ.items():
-                        print(f"{key}={value}")
+                    sh 'cat $secretFile'
                     '''
                 }
             }
