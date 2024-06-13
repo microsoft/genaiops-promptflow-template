@@ -1,3 +1,4 @@
+"""Tests for the experiment module."""
 from unittest.mock import Mock
 
 import os
@@ -18,18 +19,22 @@ from llmops.common.experiment import (
     _apply_overlay,
     load_experiment,
 )
+from llmops.common.common import resolve_flow_type
+from llmops.common.common import FlowTypeOption
 
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
 
 
 def check_lists_equal(actual: List[Any], expected: List[Any]):
+    """Check two lists are equal regardless of the order of their elements."""
     assert len(actual) == len(expected)
     assert all(any(a == e for a in actual) for e in expected)
     assert all(any(a == e for e in expected) for a in actual)
 
 
 def test_create_datasets_and_default_mappings():
+    """Test _create_datasets_and_default_mappings."""
     # Prepare inputs
     g_name = "groundedness"
     g_version = "9"
@@ -61,7 +66,9 @@ def test_create_datasets_and_default_mappings():
     ]
 
     # Check outputs
-    [datasets, mapped_datasets] = _create_datasets_and_default_mappings(raw_datasets)
+    [datasets, mapped_datasets] = _create_datasets_and_default_mappings(
+        raw_datasets
+    )
     assert datasets == expected_datasets
     check_lists_equal(mapped_datasets, expected_mapped_datasets)
 
@@ -69,7 +76,10 @@ def test_create_datasets_and_default_mappings():
     assert not datasets[g_name].get_local_source()
 
     assert not datasets[r_name].is_eval()
-    assert datasets[r_name].get_local_source() == os.path.join("data", r_source)
+    assert datasets[r_name].get_local_source() == os.path.join(
+        "data",
+        r_source
+    )
 
     # Test get_remote_source
     g_latest_remote_version = "7"
@@ -91,7 +101,9 @@ def test_create_datasets_and_default_mappings():
     mock_ml_client.data.get.side_effect = mock_data_get
 
     assert datasets[g_name].get_remote_source(mock_ml_client) == g_source
-    assert datasets[r_name].get_remote_source(mock_ml_client) == f"azureml:{r_name}:7"
+    assert datasets[r_name].get_remote_source(mock_ml_client) == (
+        f"azureml:{r_name}:7"
+    )
 
 
 @pytest.mark.parametrize(
@@ -124,19 +136,21 @@ def test_create_datasets_and_default_mappings():
                     "reference": "recall",
                 }
             ],
-            "Unexpected parameter found in dataset 'groundedness' description: reference",
+            "Unexpected parameter found in dataset 'groundedness' description",
         ),
     ],
 )
 def test_create_datasets_and_default_mappings_missing_parameters(
     raw_datasets: List[dict], error: str
 ):
+    """Test _create_datasets_and_default_mappings with missing parameters."""
     # Check that datasets with missing parameters raise an exception
     with pytest.raises(ValueError, match=error):
         _create_datasets_and_default_mappings(raw_datasets)
 
 
 def test_create_eval_datasets_and_default_mappings():
+    """Test _create_eval_datasets_and_default_mappings."""
     # Prepare inputs
 
     # Evaluation datasets
@@ -261,7 +275,7 @@ def test_create_eval_datasets_and_default_mappings():
                     "groundedness", "groundedness_source", None, None
                 )
             },
-            "Dataset 'groundedness' config is referencing an existing dataset so it doesn't support parameter: source",
+            "Dataset 'groundedness' config doesn't support parameter",
         ),
         (
             [
@@ -276,7 +290,7 @@ def test_create_eval_datasets_and_default_mappings():
                     "groundedness", "groundedness_source", None, None
                 )
             },
-            "Dataset 'groundedness' config is referencing an existing dataset so it doesn't support parameter: reference",
+            "Dataset 'groundedness' config doesn't support parameter",
         ),
         (
             [
@@ -295,12 +309,14 @@ def test_create_eval_datasets_and_default_mappings():
 def test_create_eval_datasets_and_default_mappings_missing_parameters(
     raw_datasets: List[dict], datasets: dict[str:Dataset], error: str
 ):
+    """Test datasets and mappings with missing parameters."""
     # Check that datasets with missing parameters raise an exception
     with pytest.raises(ValueError, match=error):
         _create_eval_datasets_and_default_mappings(raw_datasets, datasets)
 
 
 def test_create_evaluators():
+    """Test _create_evaluators."""
     # Prepare inputs
     g_eval_name = "groundedness_eval"
     g_eval_flow = "groundedness_eval_flow"
@@ -320,7 +336,10 @@ def test_create_evaluators():
     r_ds_mappings = {"input": "input_mapping", "gt": "gt_mapping"}
     r_ds_dataset = Dataset(r_ds_name, r_ds_source, None, None)
 
-    existing_datasets = {g_ds_reference: g_ds_ref_dataset, r_ds_name: r_ds_dataset}
+    existing_datasets = {
+        g_ds_reference: g_ds_ref_dataset,
+        r_ds_name: r_ds_dataset
+    }
 
     raw_evaluators = [
         {
@@ -354,17 +373,21 @@ def test_create_evaluators():
         Evaluator(
             g_eval_name,
             [MappedDataset(g_ds_mappings, g_ds_dataset)],
-            os.path.join(base_path, "flows", g_eval_flow),
+            os.path.join(base_path, g_eval_flow),
         ),
         Evaluator(
             r_eval_name,
             [MappedDataset(r_ds_mappings, r_ds_dataset)],
-            os.path.join(base_path, "flows", r_eval_name),
+            os.path.join(base_path,  r_eval_name),
         ),
     ]
 
     # Check outputs
-    evaluators = _create_evaluators(raw_evaluators, existing_datasets, base_path)
+    evaluators = _create_evaluators(
+        raw_evaluators,
+        existing_datasets,
+        base_path
+    )
     assert evaluators == expected_evaluators
 
     # Test without base_path
@@ -375,48 +398,65 @@ def test_create_evaluators():
         Evaluator(
             g_eval_name,
             [MappedDataset(g_ds_mappings, g_ds_dataset)],
-            os.path.join("flows", g_eval_flow),
+            g_eval_flow,
         ),
         Evaluator(
             r_eval_name,
             [MappedDataset(r_ds_mappings, r_ds_dataset)],
-            os.path.join("flows", r_eval_name),
+            r_eval_name,
         ),
     ]
 
     # Check outputs
-    evaluators = _create_evaluators(raw_evaluators, existing_datasets, base_path)
+    evaluators = _create_evaluators(
+        raw_evaluators,
+        existing_datasets,
+        base_path
+    )
     assert evaluators == expected_evaluators
 
-    # Asset that the groundedness evaluator can match the standard dataset (g_ds_reference) to the evaluation dataset (g_ds_dataset)
+    # Asset that the groundedness evaluator can match the standard dataset
+    # (g_ds_reference) to the evaluation dataset (g_ds_dataset)
     assert (
         evaluators[0].find_dataset_with_reference(g_ds_reference)
         == evaluators[0].datasets
     )
 
-    # Asset that the recall evaluator can match the standard dataset (r_ds_name) to the standard/evaluation dataset (r_ds_dataset)
+    # Asset that the recall evaluator can match the standard dataset
+    # (r_ds_name) to the standard/evaluation dataset (r_ds_dataset)
     assert (
-        evaluators[1].find_dataset_with_reference(r_ds_name) == evaluators[1].datasets
+        evaluators[1].find_dataset_with_reference(r_ds_name) == (
+            evaluators[1].datasets
+        )
     )
 
 
 @pytest.mark.parametrize(
     ("raw_evaluators", "error"),
     [
-        ([{}], "Evaluator 'None' config missing parameter: name"),
+        ([{}], "Evaluator 'None' config missing: name"),
         (
             [
                 {
                     "name": "groundedness",
                 }
             ],
-            "Evaluator 'groundedness' config missing parameter: datasets",
+            "Evaluator 'groundedness' config missing: datasets",
         ),
     ],
 )
-def test_create_evaluators_missing_parameters(raw_evaluators: List[dict], error: str):
+def test_create_evaluators_missing_parameters(
+        raw_evaluators: List[dict],
+        error: str
+        ):
+    """Test _create_evaluators with missing parameters."""
     available_datasets = {
-        "groundedness": Dataset("groundedness", "groundedness_source", None, None),
+        "groundedness": Dataset(
+            "groundedness",
+            "groundedness_source",
+            None,
+            None
+        ),
     }
     # Check that evaluators with missing parameters raise an exception
     with pytest.raises(ValueError, match=error):
@@ -424,34 +464,44 @@ def test_create_evaluators_missing_parameters(raw_evaluators: List[dict], error:
 
 
 def test_experiment_creation():
+    """Test Experiment creation."""
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
     name = "exp_name"
-    flow = "exp_flow"
+    flow = "flows/exp_flow"
 
     # Prepare expected outputs
     expected_flow_variants = [
         {"var_0": "node_var_0", "var_1": "node_var_0"},
         {"var_3": "node_var_1", "var_4": "node_var_1"},
     ]
-    expected_flow_default_variants = {"node_var_0": "var_0", "node_var_1": "var_3"}
+    expected_flow_default_variants = {
+        "node_var_0": "var_0",
+        "node_var_1": "var_3"
+    }
     expected_flow_llm_nodes = {
         "node_var_0",
         "node_var_1",
     }
+    expected_flow_type = FlowTypeOption.DAG_FLOW
 
     # Check outputs
-    experiment = Experiment(base_path, name, flow, [], [], None)
-    flow_detail = experiment.get_flow_detail()
+    experiment = Experiment(base_path, name, flow, [], [], None, [])
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow
+    )
+    flow_detail = experiment.get_flow_detail(flow_type)
 
-    assert flow_detail.flow_path == os.path.join(base_path, "flows", flow)
+    assert flow_detail.flow_path == os.path.join(base_path, flow)
     assert flow_detail.all_variants == expected_flow_variants
     assert flow_detail.default_variants == expected_flow_default_variants
     assert flow_detail.all_llm_nodes == expected_flow_llm_nodes
+    assert flow_type == expected_flow_type
 
 
 @pytest.fixture(scope="session")
 def prepare_expected_experiment():
+    """Prepare expected experiment data."""
     # Prepare standard datasets
     base_path = str(RESOURCE_PATH)
 
@@ -481,7 +531,9 @@ def prepare_expected_experiment():
             ),
         ],
         [
-            MappedDataset({"ds2_input": "ds2_diff_mapping"}, expected_datasets[1]),
+            MappedDataset(
+                {"ds2_input": "ds2_diff_mapping"}, expected_datasets[1]
+            ),
             MappedDataset({}, Dataset("ds4", "ds4_source", None, "ds1")),
         ],
     ]
@@ -491,12 +543,12 @@ def prepare_expected_experiment():
         Evaluator(
             "eval1",
             expected_evaluator_mapped_datasets[0],
-            os.path.join(base_path, "flows", "eval1"),
+            os.path.join(base_path, "eval1"),
         ),
         Evaluator(
             "eval2",
             expected_evaluator_mapped_datasets[1],
-            os.path.join(base_path, "flows", "eval2"),
+            os.path.join(base_path, "eval2"),
         ),
     ]
 
@@ -505,6 +557,7 @@ def prepare_expected_experiment():
 
 @pytest.fixture(scope="session")
 def prepare_expected_overlay():
+    """Prepare expected overlay data."""
     # Prepare standard datasets
     base_path = str(RESOURCE_PATH)
     expected_dataset = Dataset("dsx", "dsx_source", None, None)
@@ -514,7 +567,9 @@ def prepare_expected_overlay():
 
     # Prepare evaluator datasets
     expected_evaluator_mapped_datasets = [
-        MappedDataset({"dsx_diff_input": "dsx_diff_mapping"}, expected_dataset),
+        MappedDataset(
+            {"dsx_diff_input": "dsx_diff_mapping"}, expected_dataset
+        ),
         MappedDataset({}, Dataset("dsy", "dsy_source", None, "dsx")),
     ]
 
@@ -523,7 +578,7 @@ def prepare_expected_overlay():
         Evaluator(
             "evalx",
             expected_evaluator_mapped_datasets,
-            os.path.join(base_path, "flows", "evalx"),
+            os.path.join(base_path, "evalx"),
         )
     ]
     yield expected_mapped_datasets, expected_evaluators
@@ -531,6 +586,7 @@ def prepare_expected_overlay():
 
 @pytest.fixture(scope="session")
 def prepare_special_overlay_evaluators():
+    """Prepare expected overlay data."""
     # Prepare standard datasets
     base_path = str(RESOURCE_PATH)
 
@@ -547,20 +603,21 @@ def prepare_special_overlay_evaluators():
         Evaluator(
             "evalx",
             expected_evaluator_mapped_datasets,
-            os.path.join(base_path, "flows", "evalx"),
+            os.path.join(base_path,  "evalx"),
         )
     ]
     yield expected_evaluators
 
 
 def test_load_base_experiment(prepare_expected_experiment):
+    """Test _load_base_experiment."""
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
     exp_file_path = os.path.join(base_path, "experiment.yaml")
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
     expected_runtime = "runtime_name"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_experiment
@@ -582,6 +639,7 @@ def test_apply_overlay(
     prepare_expected_overlay,
     prepare_special_overlay_evaluators,
 ):
+    """Test _apply_overlay."""
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
     exp_file_path = os.path.join(base_path, "experiment.yaml")
@@ -589,7 +647,7 @@ def test_apply_overlay(
 
     # Prepare expected results
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
     base_mapped_datasets, base_evaluators = prepare_expected_experiment
     overlay_mapped_datasets, overlay_evaluators = prepare_expected_overlay
 
@@ -647,12 +705,13 @@ def test_apply_overlay(
 
 
 def test_load_experiment(prepare_expected_experiment):
+    """Test load_experiment."""
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_experiment
 
@@ -669,12 +728,13 @@ def test_load_experiment(prepare_expected_experiment):
 
 
 def test_load_experiment_with_overlay(prepare_expected_overlay):
+    """Test load_experiment with overlay."""
     # Prepare inputs
     base_path = str(RESOURCE_PATH)
 
     # Prepare expected outputs
     expected_name = "exp"
-    expected_flow = "exp_flow"
+    expected_flow = "flows/exp_flow"
 
     expected_mapped_datasets, expected_evaluators = prepare_expected_overlay
 

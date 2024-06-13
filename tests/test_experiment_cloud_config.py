@@ -1,3 +1,4 @@
+"""Tests for the ExperimentCloudConfig class."""
 import pytest
 from llmops.common.experiment_cloud_config import (
     ExperimentCloudConfig,
@@ -7,6 +8,7 @@ from llmops.common.experiment_cloud_config import (
 
 
 def test_try_get_env_var(monkeypatch: pytest.MonkeyPatch):
+    """Test _try_get_env_var."""
     env_var_key = "TEST_ENV_VAR"
     env_var_val = "test_value"
 
@@ -16,19 +18,20 @@ def test_try_get_env_var(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv(env_var_key, "")
     with pytest.raises(
         ValueError,
-        match=f"Environment variable '{env_var_key}' is not set or is empty.",
+        match=f"env var '{env_var_key}' is not set or is empty.",
     ):
         _try_get_env_var(env_var_key)
 
     monkeypatch.delenv(env_var_key)
     with pytest.raises(
         ValueError,
-        match=f"Environment variable '{env_var_key}' is not set or is empty.",
+        match=f"env var '{env_var_key}' is not set or is empty.",
     ):
         _try_get_env_var(env_var_key)
 
 
 def test_get_optional_env_var(monkeypatch: pytest.MonkeyPatch):
+    """Test _get_optional_env_var."""
     env_var_key = "TEST_ENV_VAR"
     env_var_val = "test_value"
 
@@ -43,6 +46,7 @@ def test_get_optional_env_var(monkeypatch: pytest.MonkeyPatch):
 
 
 def test_experiment_cloud_config(monkeypatch: pytest.MonkeyPatch):
+    """Test ExperimentCloudConfig."""
     subscription_id = "subscription_id"
     rg_name = "rg_name"
     ws_name = "ws_name"
@@ -62,7 +66,7 @@ def test_experiment_cloud_config(monkeypatch: pytest.MonkeyPatch):
     # Check fails without arguments or environment variables
     with pytest.raises(
         ValueError,
-        match="Environment variable 'SUBSCRIPTION_ID' is not set or is empty.",
+        match="env var 'SUBSCRIPTION_ID' is not set or is empty.",
     ):
         ExperimentCloudConfig()
 
@@ -72,7 +76,9 @@ def test_experiment_cloud_config(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("WORKSPACE_NAME", "")
     with pytest.raises(
         ValueError,
-        match="Environment variable 'RESOURCE_GROUP_NAME' is not set or is empty.",
+        match=(
+            "env var 'RESOURCE_GROUP_NAME' is not set or is empty."
+        ),
     ):
         ExperimentCloudConfig()
 
@@ -82,7 +88,7 @@ def test_experiment_cloud_config(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("WORKSPACE_NAME", "")
     with pytest.raises(
         ValueError,
-        match="Environment variable 'WORKSPACE_NAME' is not set or is empty.",
+        match="env var 'WORKSPACE_NAME' is not set or is empty.",
     ):
         ExperimentCloudConfig()
 
