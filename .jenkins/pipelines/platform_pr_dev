@@ -38,7 +38,7 @@ pipeline {
                     withPythonEnv('/usr/bin/python3.9') {
 
                     // copy env file to .env file
-                    sh 'sudo su'
+                    sh 'chmod -R 777 $WORKSPACE'
                     sh 'echo "secretFile" > .env'
                     echo $secretFile
 
