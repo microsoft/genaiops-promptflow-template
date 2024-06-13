@@ -45,8 +45,7 @@ pipeline {
                     // Load .env file using Python
                     sh 'python -c "from dotenv import load_dotenv; load_dotenv()"'
 
-                    // Optionally, you can verify the presence of specific variables if needed
-                    sh 'grep -E "^registry_username=" .env || echo "VAR_NAME not found in .env"'
+                    echo "$ENV_VARS"
                 }
             }
 
