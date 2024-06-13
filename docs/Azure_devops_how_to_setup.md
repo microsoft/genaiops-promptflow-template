@@ -29,7 +29,7 @@ The template deploys real-time online endpoints for flows. These endpoints have 
 
 ## Execution
 
-This section provides instructions on how to execute a template either locally or on Azure, based on the configuration specified in the `config.py` file within the `llmops` folder.
+This section provides instructions on how to execute template either locally or on Azure, based on the configuration specified in the `config.py` file within the `llmops` folder.
 
 ### config.py
 
@@ -85,7 +85,7 @@ max_total_token=4096
 ```
 The .env file is alreadyadded to the .gitignore file to prevent it from being committed and pushed to the remote repository, keeping the secrets secure.
 
-###Azure DevOps  Secrets
+### Azure DevOps  Secrets
 
 When executing the template through Azure DevOps pipelines, secrets are stored as Azure DevOps variable groups. In this template, a secret named 'ENV_VARS' is used to store the secrets. The 'ENV_VARS' secret should contain the same key-value pairs as the .env file. For example:
 
