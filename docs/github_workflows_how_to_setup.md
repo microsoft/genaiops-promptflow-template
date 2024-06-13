@@ -1,5 +1,7 @@
 # How to setup the repo with Github Workflows
 
+This is a guide to set up the repository with Github workflows for experimenting and evaluating Prompt flows in Azure Machine Learning. The repository contains examples of Prompt flow runs and evaluations for named entity recognition, math coding, and web classification. 
+
 This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Github workflows as a platform for Flow operationalization. LLMOps with Prompt flow provides automation of:
 
 * Experimentation by executing flows
@@ -25,6 +27,122 @@ It is important to understand how [Prompt flow works](https://learn.microsoft.co
 - In case of Kubernetes based deployment, Kubernetes resources and associating it with Azure Machine Learning workspace would be required. More details about using Kubernetes as compute in AzureML is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-attach-kubernetes-anywhere?view=azureml-api-2).
 
 The template deploys real-time online endpoints for flows. These endpoints have Managed ID assigned to them and in many cases they need access to Azure Machine learning workspace and its associated key vault. The template by default provides access to both the key vault and Azure Machine Learning workspace based on this [document](https://learn.microsoft.com/en-ca/azure/machine-learning/prompt-flow/how-to-deploy-for-real-time-inference?view=azureml-api-2#grant-permissions-to-the-endpoint).
+
+
+## Execution
+
+This section provides instructions on how to execute a template either locally or on Azure, based on the configuration specified in the `config.py` file within the `llmops` folder.
+
+### config.py
+
+The `config.py` file located in the `llmops` folder contains the `EXECUTION_TYPE` variable, which determines where the flow will be executed.
+
+- Set `EXECUTION_TYPE = "LOCAL"` to execute the flows on your local machine.
+- Set `EXECUTION_TYPE = "AZURE"` to execute the flows on Azure.
+
+### Local Execution
+
+When the `EXECUTION_TYPE` variable is set to `"LOCAL"`, the templates will be executed on your local machine. This is useful for local development, testing, and debugging.
+
+To execute a template locally, use the following command:
+
+``` bash
+python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
+```
+
+Replace `<example_path>` with the path to the specific example you want to run (e.g., `./web_classification`) and `<template_name>` with the name of the template (e.g., `summarize_text_content.variant_0`). The `--variants` argument is optional and can be used to specify the variant of the template to run.
+
+### Azure Execution
+
+When the `EXECUTION_TYPE` variable is set to `"AZURE"`, the flows will be executed on Azure. This allows you to leverage the scalability and resources provided by Azure for running your experiments and evaluations.
+
+There are two ways to execute templates on Azure:
+
+1. **CI/CD Pipelines**: Set up a CI/CD pipeline in your Azure DevOps/Github/Jenkins. Configure the pipeline to trigger the execution of the template on Azure. Ensure that the `EXECUTION_TYPE` variable in `config.py` is set to `"AZURE"`.
+
+2. **Direct Execution from Local Machine**: You can also execute templates on Azure directly from your local machine. Set the `EXECUTION_TYPE` variable in `config.py` to `"AZURE"` and use the following command:
+
+``` bash
+python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
+```
+
+### Important Considerations
+
+- Make sure to review and modify the `config.py` file based on your specific requirements and environment setup.
+- Ensure that you have the necessary dependencies installed and the required configurations set up for the execution environment you choose LOCAL.
+- When executing templates on Azure, ensure that you have the appropriate permissions and credentials set up to access Azure resources.
+- Be aware of any costs associated with running experiments and evaluations on Azure, as it may incur charges based on resource usage.
+
+## Secrets Management
+
+This template utilizes secrets to securely store sensitive information such as API keys, credentials, and other confidential data. Secrets are managed differently depending on the execution environment, whether it's local execution or execution through GitHub pipelines.
+
+### Local Execution
+
+For local execution, secrets are stored in a .env file located in the template's root directory. The .env file contains key-value pairs representing the secrets. For example:
+
+``` bash
+AOAI_API_KEY=abcdefghijklmnop
+max_total_token=4096
+```
+The .env file is alreadyadded to the .gitignore file to prevent it from being committed and pushed to the remote repository, keeping the secrets secure.
+
+###GitHub Secrets
+
+When executing the template through GitHub workflows, secrets are stored as GitHub repository secrets. In this template, a secret named 'ENV_VARS' is used to store the secrets. The 'ENV_VARS' secret should contain the same key-value pairs as the .env file. For example:
+
+``` bash
+AOAI_API_KEY=abcdefghijklmnop
+AZURE_OPENAI_API_KEY=xxxxxx
+```
+
+GitHub secrets can be accessed and managed in the repository's settings under the "Secrets" tab.
+
+### Referencing Secrets
+Secrets are referenced in the experiment.yaml, flex.flow.yaml, init.json and env.yaml files using a special syntax: ${SECRET_NAME}. Check out Function_flows as an example.
+
+``` yaml
+# experiment.yaml
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_endpoint: https://xxxxx.openai.azure.com/
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
+# env.yaml
+AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+```
+
+During execution, the ${api_key} and ${AZURE_OPENAI_API_KEY} placeholders are replaced with the corresponding values from the secrets.
+
+## Pipeline Execution
+
+When executing the template through GitHub pipelines, the secrets are loaded from the ENV_VARS GitHub secret. The placeholders in experiment.yaml and env.yaml are replaced with the values from the ENV_VARS secret.
+For example, if the ENV_VARS secret contains:
+
+``` bash
+AOAI_API_KEY=abcdefghijklmnop
+AZURE_OPENAI_API_KEY=xxxxxx
+```
+
+The placeholders in experiment.yaml, flow.flex.yaml, init.json and env.yaml will be replaced in the same way as in local execution.
+
+To ensure clarity and avoid naming conflicts, it's important to follow a specific naming convention for secrets used in this template.
+When defining secrets for connections, such as API keys, the secret name should be qualified with the connection name. This helps to distinguish between secrets used for different connections. The naming convention for connection secrets is as follows:
+
+<CONNECTION_NAME>_API_KEY
+
+For example, if you have a connection named AOAI, the corresponding API key secret should be named AOAI_API_KEY. Only API_KEY is supported for connections.
+
+If secrets are used within the init section of the flow.flex.yaml file, the secret name should be qualified with the parent name. This helps to identify the specific flow and context in which the secret is used. The naming convention for flow secrets is as follows:
+
+<PARENT_ELEMENT_NAME>_<SECRET_NAME>
+
+For example, if you have a secret named API_KEY used within the init section of a flow under MODEL_CONFIG, the corresponding secret should be named MODEL_CONFIG_API_KEY.
+
+By adhering to the naming convention for secrets, storing them securely in the .env file or GitHub secrets, and following the best practices for secret security, you can ensure that sensitive information remains protected while allowing seamless execution of the template in different environments.
 
 ## Create Azure service principal
 
@@ -75,128 +193,9 @@ Create one Azure service principal for the purpose of understanding this reposit
 
 ## Setup runtime for Prompt flow
 
-Prompt flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. Both the compute instance and the associated runtime should be created prior to executing the flows. Both the Compute Instance and Prompt flow runtime should be created using the Service Principal. This ensures that Service Principal is the owner of these resources and Flows can be executed on them from both Azure DevOps pipelines and Github workflows. This repo provides Azure CLI commands to create both the compute instance and the runtime using Service Principal.
+Prompt flow 'flows' require runtime associated with compute instance in Azure Machine Learning workspace. The template provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. The first execution might need additional time for provisioning of the runtime.
 
-Compute Instances and Prompt flow runtimes can be created using cloud shell, local shells, or from Azure UI. If your subscription is a part of organization with multiple tenants, ensure that the Service Principal has access across tenants. The steps shown next can be executed from Cloud shell or any shell. The steps mentioned are using Cloud shell and they explicitly mentions any step that should not be executed in cloud shell.
-
-### Steps:
-
-1. Assign values to variables. Copy the following bash commands to your computer and update the variables with the values for your project. Note that there should not be any spaces between both side of "=" operator while assigning values to bash variables.
-
-```bash
-subscriptionId=<your azure subscription id>
-rgname=<your resource group name>                                                                      
-workspace_name=<your Azure machine learning workspace name> 
-userAssignedId=<provide a name to create a new user assigned managed identifier>
-keyvault=<your Azure machine learning workspace associate key vault name>
-compute_name=<provide a name to create a new Azure ML compute>
-location=<your Azure machine learning workspace region>
-runtimeName=<provide a name to create a new Prompt Flow runtime>
-sp_id=<your azure service principal or client id that was recently created>
-sp_password=<your service principal password or clientSecret from previous step>
-tenant_id=<your azure tenant id>
-```
-
-2. This next set of commands should not be performed from Cloud shell. It should be performed if you are using a local terminal. The commands help to interactively log in to Azure and selects a subscription.
-
-```bash
-az login
-az account set -s $subscriptionId
-```
-
-3. Create a user-assigned managed identity
-
-```bash
-az identity create -g $rgname -n $userAssignedId --query "id"
-```
-
-4. Get id, principalId of user-assigned managed identity
-
-```bash
-um_details=$(az identity show -g $rgname -n $userAssignedId --query "[id, clientId, principalId]")
-```
-
-5. Get id of user-assigned managed identity
-
-```bash
-user_managed_id="$(echo $um_details | jq -r '.[0]')"
-```
-
-6. Get principal Id of user-assigned managed identity
-
-```bash
-principalId="$(echo $um_details | jq -r '.[2]')"
-```
-
-7. Grant the user managed identity permission to access the workspace (AzureML Data Scientist)
-
-```bash
-az role assignment create --assignee $principalId --role "AzureML Data Scientist" --scope "/subscriptions/$subscriptionId/resourcegroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name"
-```
-You need to give additional `Azure ML Operator` permissions to the user managed identity for accessing the workspace, if you are using promptflow in AML Pipeline. 
-Note: this will not work in serverless. You shall need a compute cluster.
-
-8. Grant the user managed identity permission to access the workspace keyvault (get and list)
-
-```bash
-az keyvault set-policy --name $keyvault --resource-group $rgname --object-id $principalId --secret-permissions get list
-```
-
-9. login with Service Principal
-
-```bash
-az login --service-principal -u $sp_id -p $sp_password --tenant $tenant_id
-az account set -s $subscriptionId
-```
-
-10. Create compute instance and assign user managed identity to it
-
-```bash
-az ml compute create --name $compute_name --size Standard_E4s_v3 --identity-type UserAssigned --type ComputeInstance --resource-group $rgname --workspace-name $workspace_name --user-assigned-identities $user_managed_id
-```
-
-11. Get Service Principal Azure Entra token for REST API
-
-```bash
-access_token=$(az account get-access-token | jq -r ".accessToken")
-```
-
-12. Construct POST url for runtime
-
-```bash
-runtime_url_post=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName?asyncCall=true")
-```
-
-13. Construct GET url for runtime
-
-```bash
-runtime_url_get=$(echo "https://ml.azure.com/api/$location/flow/api/subscriptions/$subscriptionId/resourceGroups/$rgname/providers/Microsoft.MachineLearningServices/workspaces/$workspace_name/FlowRuntimes/$runtimeName")
-```
-
-14. Create runtime using REST API
-
-```bash
-curl --request POST \
-  --url "$runtime_url_post" \
-  --header "Authorization: Bearer $access_token" \
-  --header 'Content-Type: application/json' \
-  --data "{
-    \"runtimeType\": \"ComputeInstance\",
-    \"computeInstanceName\": \"$compute_name\",
-}"
-```
-
-15. Get runtime creation status using REST API. Execute this step multiple times unless either you get output that shows createdOn with a valid date and time value or failure. In case of failure, troubleshoot the issue before moving forward.
-
-```bash
-curl --request GET \
-  --url "$runtime_url_get" \
-  --header "Authorization: Bearer $access_token"
-```
-
-The template also provides support for 'automatic runtime' where flows are executed within a runtime provisioned automatically during execution. This feature is in preview. The first execution might need additional time for provisioning of the runtime.
-
-The template supports using 'automatic runtime' and dedicated compute instances and runtimes. This is configured in the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)).
+The template supports using 'automatic runtime' and compute instances. There is no configured required for using automatic runtime. However, if you want to use compute instances, you can create a compute instance in Azure Machine Learning workspace. More details about creating compute instances in Azure Machine Learning workspace is available [here](https://learn.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-studio?view=azure-ml-py).
 
 
 ## Set up Github Repo
@@ -225,9 +224,9 @@ Eventually, the default branch in github repo should show `development` as the d
 
 ![make development branch as default branch](images/default-branch.png)
 
-The template comes with a few Github workflow related to Prompt flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 primary workflows and 1 optional workflow. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this pipeline uses a smaller dataset to make sure that the Prompt flow job can be completed fast enough.
+The template comes with a few Github workflow related to Prompt flow flows for providing a jumpstart (named_entity_recognition, web_classification and math_coding). Each scenario has 2 primary workflows and 1 optional workflow. The first one is executed during pull request(PR) e.g. [named_entity_recognition_pr_dev_workflow.yml](../.github/workflows/named_entity_recognition_pr_dev_workflow.yml), and it helps to maintain code quality for all PRs. Usually, this workflow uses a smaller dataset to make sure that the Prompt flow job can be completed fast enough.
 
-The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this pipeline is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
+The second Github workflow [named_entity_recognition_ci_dev_workflow.yml](../.github/workflows/named_entity_recognition_ci_dev_workflow.yml) is executed automatically before a PR is merged into the *development* or *main* branch. The main idea of this workflow is to execute bulk run and evaluation on the full dataset for all prompt variants. The workflow can be modified and extended based on the project's requirements.
 
 The optional third Github workflow [named_entity_recognition_post_prod_eval.yml](../.github/workflows/named_entity_recognition_post_prod_eval.yml) need to be executed manually after the deployment of the Prompt flow flow to production and collecting production logs (example log file - [production_log.jsonl](../named_entity_recognition/data/production_log.jsonl)). This workflow is used to evaluate the Prompt flow flow performance in production.
 
@@ -239,7 +238,7 @@ More details about how to create a basic Github workflows in general can be foun
 
 ## Set up authentication with Azure and GitHub
 
-From your GitHub project, select **Settings** -> **Secrets and  variables**,  **Actions** and **New repository secret**. Create a Github repository secret named 'AZURE_CREDENTIALS' with information related to Azure Service Principal. You can paste the service principal output as the content of the secret and use [this document](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-a-service-principal-secret) as a reference.
+From your GitHub repo, select **Settings** -> **Secrets and  variables**,  **Actions** and **New repository secret**. Create a Github repository secret named 'AZURE_CREDENTIALS' with information related to Azure Service Principal. You can paste the service principal output as the content of the secret and use [this document](https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure?tabs=azure-portal%2Clinux#use-the-azure-login-action-with-a-service-principal-secret) as a reference.
 
 ![Screenshot of GitHub Secrets.](images/github-secrets.png)
 
@@ -247,7 +246,7 @@ From your GitHub project, select **Settings** -> **Secrets and  variables**,  **
 
 There are 3 variables expected as GitHub variables: `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME`. These values are environment specific, so we utilize the `Environments` feature in GitHub. An additional variable name `COMPUTE_TARGET` is needed to use promptflow in AML Pipeline.
 
-From your GitHub project, select **Settings** -> **Environments**, select "New environment" and call it `dev`
+From your GitHub repo, select **Settings** -> **Environments**, select "New environment" and call it `dev`
 ![Screenshot of GitHub environments.](images/github-environments-new-env.png)
 
 Add a new variable for each of `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` with the corresponding values from the `dev` environment. 
@@ -284,39 +283,11 @@ The configuration for connection used while authoring the repo:
 
 ## Set up Secrets in GitHub
 
-### Prompt flow Connection
-
-Create a Github repository secret named 'COMMON_DEV_CONNECTIONS' with information related to Prompt flow connections.  The value for this secret is a json string with given structure as shown next. Create one json object for each connection as shown in example. As of now, Azure Open AI Connections are supported and more will get added soon. Information for each connection can be obtained from respective Azure OpenAI resource.
-
-It is important to note that there can be any number of variables and each storing Prompt flow connection details as shown next and they can be named anything permissible based on your preference. You should use the same variable in your use-case related CI pipelines. The template by default uses 'COMMON_DEV_CONNECTIONS' for this purpose.
-
-```json
-[
-{
-	"name": "aoai",
-	"type": "azure_open_ai",
-    "api_base": "https://xxxxxxxxxxx/",
-    "api_key": "xxxxxxxxxxxx",
-    "api_type": "azure",
-    "api_version": "2023-03-15-preview"
-},
-{
-	"name": "another_connection",
-	"type": "azure_open_ai",
-    "api_base": "https://xxxxxxxxxxxx/",
-    "api_key": "xxxxxxxxxxxx",
-    "api_type": "azure",
-    "api_version": "2023-03-15-preview"
-}
-]
-
-```
-
 ### Azure Container Registry
 
 Create another Github repository secret named 'DOCKER_IMAGE_REGISTRY' with information related to Docker Image Registry. The value for this secret is also a json string with given structure. Create one json object for each registry. As of now, Azure Container Registry are supported and more will get added soon. Information for each registry can be obtained from Azure Container Registry resource.
 
-It is important to note that there can be any number of variables and each storing Azure Container Registry details as shown next and they can be named anything permissible based on your preference. You should use the same variable in your use-case related CI pipelines. The template by default uses 'DOCKER_IMAGE_REGISTRY' for this purpose.
+It is important to note that there can be any number of variables and each storing Azure Container Registry details as shown next and they can be named anything permissible based on your preference. You should use the same variable in your use-case related CI workflows. The template by default uses 'DOCKER_IMAGE_REGISTRY' for this purpose.
 
 ```json
 [
@@ -327,6 +298,29 @@ It is important to note that there can be any number of variables and each stori
 		"registry_password": "xxxxxxxxxxxxxx"
 	}
 ]
+
+```
+
+### Environment Variables
+
+Create another Github repository secret named 'ENV_VARS'. The data for this secret is same as you put in .env file. Each line is a name=value pair and the values are separated by a newline. The values can be anything permissible based on your preference. The keys should be in upper case. You should use the same key in your use-case related CI workflows. This includes you python code, experiment.yaml and workflows. The template by default uses 'ENV_VARS' for this purpose.
+
+The environment variables for Prompt Flow Connections should follow a specific naming convention to ensure clarity and consistency. The format is as follows:
+
+<CONNECTION_NAME>_API_KEY
+
+
+- `<CONNECTION_NAME>`: Replace this with the name of the Prompt Flow Connection for which the API key is associated. The connection name should be in uppercase.
+- `_API_KEY`: This suffix indicates that the environment variable represents an API key.
+
+
+```bash
+
+```.env
+
+AOAI_API_KEY=xxxxxxxxxxxx
+ANY_OTHER_VALUE=xxxxxxxxxxxx
+
 
 ```
 
@@ -351,11 +345,11 @@ git checkout -b featurebranch
 
 ```
 
-The pipeline expects the variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` to be available in a GitHub environment (this should have already been created and set [here](#set-up-github-variables-for-each-environment)). These variables should contain the values of the Azure resources in the dev environment.
+The workflows expects the variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` to be available in a GitHub environment (this should have already been created and set [here](#set-up-github-variables-for-each-environment)). These variables should contain the values of the Azure resources in the dev environment.
 
-The rest of the pipeline configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
+The rest of the workflow configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
 
-Before running the deployment pipelines, you need to make changes to `configs/deployment_config.json`:
+Before running the deployment workflows, you need to make changes to `configs/deployment_config.json`:
 - Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` if you want to deploy to Azure Machine Learning compute
 - Or update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`, and `USER_MANAGED_ID`if you want to deploy to Azure Web App.
 
@@ -385,9 +379,9 @@ Azure Web App deployments do not have similar properties as that of Kubernetes a
 - `CONNECTION_NAMES`: The name of the connections used in standard flow in json aray format. e.g. ["aoai", "another_connection"],
 - `REGISTRY_NAME`: This is the name of the Container Registry that is available in the `DOCKER_IMAGE_REGISTRY` secret. Based on this name, appropriate registry details will be used for `Docker` image management.
 - `REGISTRY_RG_NAME`: This is the name of the resource group related to the Container Registry. It is used for downloading the Docker Image.
-- `APP_PLAN_NAME`: Name of the App Services plan. It will be provisioned by the pipeline.
-- `WEB_APP_NAME`: Name of the Web App. It will be provisioned by the pipeline.
-- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and Web App. It will be provisioned by the pipeline.
+- `APP_PLAN_NAME`: Name of the App Services plan. It will be provisioned by the workflow.
+- `WEB_APP_NAME`: Name of the Web App. It will be provisioned by the workflow.
+- `WEB_APP_RG_NAME`:  Name of the resource group related to App Service plan and Web App. It will be provisioned by the workflow.
 - `WEB_APP_SKU`: This is the `SKU` (size) of the Web App. e.g. "B3"
 - `USER_MANAGED_ID`: This is the name of the user defined managed id created during deployment associated with the Web App.
 
@@ -407,13 +401,13 @@ Raise a new PR to merge code from `feature branch` to the `development` branch. 
 
 ![raise a new PR](images/pr.png)
 
-This should start the process of executing the Math_coding PR pipeline.
+This should start the process of executing the Math_coding PR workflow.
 
-![PR pipeline execution](images/pr-workflow-execution.png)
+![PR workflow execution](images/pr-workflow-execution.png)
 
 After the execution is complete, the code can be merged to the `development` branch.
 
-Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI pipeline.
+Now a new PR can be opened from `development` branch to the `main` branch. This should execute both the PR as well as the CI workflow.
 
 ## Update configurations for Prompt flow and GitHub Actions
 
@@ -437,7 +431,7 @@ The `environment folder` contains dockerfile file for webapp and function app de
 
 ### Update test data
 
-The `sample-request.json` file contains a single test data used for testing the online endpoint after deployment in the pipeline. Each example has its own `sample-request.json` file and for custom flows, it should be updated to reflect test data needed for testing.
+The `sample-request.json` file contains a single test data used for testing the online endpoint after deployment in the workflow. Each example has its own `sample-request.json` file and for custom flows, it should be updated to reflect test data needed for testing.
 
 ## Example Prompt Run, Evaluation and Deployment Scenario
 
@@ -477,18 +471,18 @@ This Github CI workflow contains the following steps:
 
 ### Online Endpoint
 
-1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
+1. After the CI workflow for an example scenario has run successfully, depending on the configuration it will either deploy to
 
      ![Managed online endpoint](./images/online-endpoint.png) or to a Kubernetes compute type
 
      ![Managed online endpoint](./images/kubernetes.png)
 
-2. Once pipeline execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
+2. Once workflow execution completes, it would have successfully completed the test using data from `sample-request.json` file as well.
 
-     ![online endpoint test in pipeline](./images/pipeline-test.png)
+     ![online endpoint test in workflow](./images/pipeline-test.png)
 
 ## Moving to production
 
-The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation pipeline, Prompt flow model, and deployment in development, additional pipelines similar to `dev` pipelines can be replicated and deployed in the Production environment.
+The example scenario can be run and deployed both for Dev environments. When you are satisfied with the performance of the prompt evaluation workflow, Prompt flow model, and deployment in development, additional workflow's similar to `dev` workflow can be replicated and used for the Production environment.
 
 The sample Prompt flow run & evaluation and GitHub workflows can be used as a starting point to adapt your own prompt engineering code and data.
