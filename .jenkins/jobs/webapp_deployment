@@ -4,6 +4,7 @@ pipeline {
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
+        string(name: 'env_vars', description: 'The API key for authentication')
     }
 
     environment {
@@ -12,22 +13,28 @@ pipeline {
     }
 
     stages {
-    
-    // Create local promptflow connections
-    stage('Create local promptflow connections') {
+
+    stage('Setup Environment') {
             steps {
-                installRequirements('execute_job_requirements')
-                installRequirements('build_validation_requirements')
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
-                    python -m llmops.common.prompt_local_connections \\
-                        --base_path ${use_case_base_path} \\
-                        --env_name ${deploy_environment} \\
-                        --connection_details "$dev_connections"
-                    '''
+                script {
+                    // Read env_vars content
+                    def envFileContent = params.env_vars.trim()
+
+                    // Split content into lines
+                    def lines = envFileContent.readLines()
+
+                    // Iterate through each line
+                    lines.each { line ->
+                        // Split line by '=' to get key and value
+                        def (key, value) = line.split('=')
+
+
+                        // Set environment variable
+                        echo "env variables for webapp"
+                        echo value
+                        env."$key" = value
+                    }
                 }
-            }
             }
         }
 

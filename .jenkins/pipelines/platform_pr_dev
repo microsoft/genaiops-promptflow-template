@@ -16,13 +16,6 @@ pipeline {
     }
 
     stages {
-        stage('Install Dependencies') {
-            steps {
-                script {
-                    sh 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash'
-                }
-            }
-        }
 
         //Configure AzureML agent which process necessary requirements
         stage('Configure Azure ML Agent') {
@@ -51,11 +44,8 @@ pipeline {
                     // Load .env file using Python
                     sh 'python -c "from dotenv import load_dotenv; load_dotenv()"'
 
-                    // Load the current Azure subscription details
-                    sh '''
-                    subscriptionId=$(az account show --query id -o tsv)
-                    echo "SUBSCRIPTION_ID=$subscriptionId" >> .env
-                    '''
+                     // Echo the contents of the .env file again to show the added subscription ID
+                    sh 'cat .env'
                 }
             }
 
@@ -87,6 +77,25 @@ pipeline {
                     """
                     }
                 }
+            }
+        }
+
+        // Install requirements for build validation and execute prompt flow bulk run
+        stage('Execute prompt flow bulk run') {
+            steps {
+                installRequirements('build_validation_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.prompt_pipeline \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --build_id $BUILD_NUMBER \\
+                    --env_name $env_name \\
+                    --output_file run_id.txt
+                    '''
+                }
+            }
             }
         }
     }
