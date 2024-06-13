@@ -53,7 +53,7 @@ pipeline {
                     // Load .env file using Python
                     sh '''
                     python -c "from dotenv import load_dotenv; load_dotenv('.env')"
-                    sh 'cat .env'
+                    sh 'cat '.env'
                     '''
                 }
             }
