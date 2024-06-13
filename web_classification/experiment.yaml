@@ -1,6 +1,21 @@
 name: web_classification
 flow: flows/experiment
 
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_endpoint: https://demoopenaiexamples.openai.azure.com/
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
+- name: aoai1
+  connection_type: AzureOpenAIConnection
+  api_endpoint: https://demoopenaiexamples.openai.azure.com/
+  api_type: azure
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+
 datasets:
 - name: web_classification_train
   source: data/data.jsonl
