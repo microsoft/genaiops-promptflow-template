@@ -11,16 +11,6 @@ pipeline {
     }
 
     stages {
-        stage('Configure Azure ML Agent') {
-            steps {
-                azureLogin()
-                script {
-                    build job: 'jobs/configure_azureml_agent', parameters: [
-                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
-                    ]
-                }
-            }
-        }
 
         stage('Load all prompt flow and related dependencies') {
             steps {
