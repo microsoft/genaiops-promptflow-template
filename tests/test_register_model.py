@@ -1,3 +1,4 @@
+"""Tests for the register_model module."""
 from pathlib import Path
 from unittest.mock import ANY, Mock, patch
 
@@ -10,6 +11,7 @@ RESOURCE_PATH = THIS_PATH / "resources"
 
 @pytest.fixture(scope="module", autouse=True)
 def _set_required_env_vars():
+    """Set required environment variables."""
     monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("SUBSCRIPTION_ID", "TEST_SUBSCRIPTION_ID")
     monkeypatch.setenv("RESOURCE_GROUP_NAME", "TEST_RESOURCE_GROUP_NAME")
@@ -17,9 +19,12 @@ def _set_required_env_vars():
 
 
 def test_register_model():
+    """Test register_model."""
     model_path = str(RESOURCE_PATH / "flows/exp_flow")
     model_hash = hash_folder(model_path)
-    with patch("llmops.common.deployment.register_model.MLClient") as mock_ml_client:
+    with patch(
+        "llmops.common.deployment.register_model.MLClient"
+    ) as mock_ml_client:
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
@@ -35,20 +40,28 @@ def test_register_model():
         # Assert that ml_client.models.create_or_update is called
         ml_client_instance.models.create_or_update.assert_called_with(ANY)
 
-        # Assert that ml_client.models.create_or_update is called with the correct argument
-        created_model = ml_client_instance.models.create_or_update.call_args.args[0]
+        # Assert that ml_client.models.create_or_update is called with
+        # the correct argument
+        created_model = (
+            ml_client_instance.models.create_or_update.call_args.args[0]
+        )
         assert created_model.name == "exp_dev"
         assert created_model.path == model_path
         assert (
-            created_model.properties["azureml.promptflow.source_flow_id"] == model_path
+            created_model.properties["azureml.promptflow.source_flow_id"] == (
+                model_path
+            )
         )
         assert created_model.tags["model_hash"] == model_hash
 
 
 def test_register_existing_model():
+    """Test register_model with an existing model."""
     model_path = str(RESOURCE_PATH / "flows/exp_flow")
     model_hash = hash_folder(model_path)
-    with patch("llmops.common.deployment.register_model.MLClient") as mock_ml_client:
+    with patch(
+        "llmops.common.deployment.register_model.MLClient"
+    ) as mock_ml_client:
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
