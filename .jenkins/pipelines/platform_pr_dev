@@ -45,8 +45,8 @@ pipeline {
                     // Load .env file using Python
                     sh 'python -c "from dotenv import load_dotenv; load_dotenv()"'
 
-                    // Echo the contents of the .env file again to show the added subscription ID
-                    sh 'cat .env'
+                    // Optionally, you can verify the presence of specific variables if needed
+                    sh 'grep -E "^registry_username=" .env || echo "VAR_NAME not found in .env"'
                 }
             }
 
