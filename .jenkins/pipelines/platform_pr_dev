@@ -37,7 +37,13 @@ pipeline {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh 'echo "$ENV_VARS" > .env'
-                    echo "$ENV_VARS" | base64
+                    // Use Python to read and echo the contents of the .env file
+                    def readEnvScript =
+                    '''
+                    with open('.env', 'r') as file:
+                        content = file.read()
+                        print(content)
+                    '''
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
