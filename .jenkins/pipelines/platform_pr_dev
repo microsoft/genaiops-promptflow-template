@@ -54,11 +54,11 @@ pipeline {
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
+                    sh 'cat .env'
 
                     // Load .env file using Python
                     sh '''
                     python -c "from dotenv import load_dotenv; load_dotenv('.env')"
-                    sh 'cat .env'
                     '''
                 }
             }
