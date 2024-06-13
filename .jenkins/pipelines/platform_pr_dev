@@ -29,42 +29,46 @@ pipeline {
             }
         }
 
-        // Create .env file and load the current Azure subscription details
-        stage('Prepare Environment and Azure Subscription Details') {
+               // Create .env file
+        stage('Load .env file from ENV VARs') {
             steps {
-            script{
-                installRequirements('execute_job_requirements')
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                 withCredentials([file(credentialsId: 'ENV_VARS', variable: 'secretFile')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
-
-                    // copy env file to .env file
+                script {
+                    // Ensure the workspace directory is writable
                     sh 'chmod -R 777 $WORKSPACE'
 
-                    sh 'ls -l $secretFile'
+                    // Use the secret file credentials
+                    withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
+                        // Check if the secret file exists and read its content
+                        sh 'ls -l $ENV_FILE'
+                        def envContent = readFile(file: ENV_FILE)
 
-                    // Read the content of the secret file
-                    def envContent = readFile(file:secretFile)
+                        // Write the content to .env file in the workspace
+                        writeFile file: '.env', text: envContent
 
-                    // Write the content to .env file in the workspace
-                    writeFile file: '.env', text: envContent
+                        // Check if the .env file was created
+                        sh 'ls -l .env'
 
-                    // Check if the .env file was created
-                    sh 'ls -l .env'
+                        // Echo the contents of the .env file
+                        //sh 'cat .env'
 
-                    // Ensure the dotenv library is installed
-                    sh 'pip install python-dotenv'
-                    sh 'cat .env'
+                        // Optionally, load the .env file using Python
+                        def loadEnvScript = """
+                        import os
+                        from dotenv import load_dotenv
 
-                    // Load .env file using Python
-                    sh '''
-                    python -c "from dotenv import load_dotenv; load_dotenv('.env')"
-                    '''
+                        # Load the .env file
+                        load_dotenv('.env')
+
+                        # Print all environment variables for debugging purposes (optional)
+                        for key, value in os.environ.items():
+                            print(f"Value:{key}={value}")
+                        """
+
+                        // Execute the Python script
+                        writeFile file: 'load_env.py', text: loadEnvScript
+                        sh 'python3 load_env.py'
+                    }
                 }
-            }
-            }
-            }
-
             }
         }
 
