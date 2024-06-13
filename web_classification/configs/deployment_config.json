@@ -45,11 +45,11 @@
             "CONNECTION_NAMES": ["aoai"],
             "REGISTRY_NAME": "researchmlops",
             "REGISTRY_RG_NAME": "mlops",
-            "APP_PLAN_NAME": "wc0000001p",
-            "WEB_APP_NAME": "wc0000001w",
-            "WEB_APP_RG_NAME": "wc0000001",
+            "APP_PLAN_NAME": "wc0000001f",
+            "WEB_APP_NAME": "wc0000001f",
+            "WEB_APP_RG_NAME": "wc0000001f",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "wc0000001p"
+            "USER_MANAGED_ID": "wc0000001f"
             
         }
     ]
