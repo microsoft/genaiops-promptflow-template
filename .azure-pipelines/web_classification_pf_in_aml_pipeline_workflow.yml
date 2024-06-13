@@ -15,6 +15,8 @@ stages:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
+          parameters:
+            base_path: ${{ parameters.use_case_base_path }}
      
         - template: templates/execute_python_code.yml
           parameters:

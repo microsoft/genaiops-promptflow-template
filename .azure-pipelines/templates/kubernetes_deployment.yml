@@ -13,6 +13,8 @@ parameters:
   type: string
 - name: WORKSPACE_NAME
   type: string
+- name: ENV_VARS
+  type: string
 
 steps:
 - template: execute_python_code.yml
