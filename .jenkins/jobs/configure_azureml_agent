@@ -22,31 +22,36 @@ pipeline {
             }
         }
 
-        stage('Prepare build environment') {
+        stage('Load all prompt flow and related dependencies') {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal(credentialsId: 'AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                         sh '''
-                        python --version
-                        pip list
+                        set -e # fail on error
+
                         process_requirements() {
                             local folder=$1
+
                             # Loop through all files in the current folder
                             for file in "$folder"/*; do
                                 if [ -d "$file" ]; then
-                                    # If the file is a directory, recursively process it
+                                # If the file is a directory, recursively process it
                                     process_requirements "$file"
                                 elif [ -f "$file" ] && [ "$(basename "$file")" == "requirements.txt" ]; then
-                                    # If the file is requirements.txt, install the dependencies
+                                # If the file is requirements.txt, install the dependencies
                                     echo "Installing dependencies from $file"
                                     python -m pip install -r "$file"
-                                fi
-                            done
-                        }
-                        process_requirements "${params.use_case_base_path}"
-                        az version
-                        '''
+                          fi
+                      done
+                    }
+
+                    python -m pip install --upgrade pip
+
+                    process_requirements "${use_case_base_path}"
+
+                    az version
+                    '''
                     }
                 }
             }
