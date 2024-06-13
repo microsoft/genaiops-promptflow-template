@@ -36,8 +36,8 @@ pipeline {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                    // Create .env file with environment variables
-                    sh 'echo "$env.ENV_VARS" > .env'
+                    // Write the ENV_VARS content to a .env file
+                    writeFile file: '.env', text: ENV_VARS
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
