@@ -34,10 +34,11 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                 withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
+                 withCredentials([file(credentialsId: 'ENV_VARS', variable: 'secretFile')]) {
                     withPythonEnv('/usr/bin/python3.9') {
 
                     // copy env file to .env file
+                    sh 'cat $secretFile'
                     sh 'cp $ENV_FILE .env'
                     echo $ENV_FILE
 
