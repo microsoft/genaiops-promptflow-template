@@ -27,6 +27,7 @@ from typing import Optional
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
+from llmops.common.common import resolve_flow_type
 
 logger = llmops_logger("register_flow")
 
@@ -58,12 +59,19 @@ def register_model(
     build_id: Optional[str] = None,
     output_file: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Register model in Azure ML."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
+
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow
+    )
 
     logger.info(f"Model name: {model_name}")
 
@@ -74,7 +82,7 @@ def register_model(
         config.workspace_name,
     )
 
-    model_path = experiment.get_flow_detail().flow_path
+    model_path = experiment.get_flow_detail(flow_type).flow_path
     model_hash = hash_folder(model_path)
     model_tags = {"model_hash": model_hash}
     if build_id:
@@ -85,7 +93,9 @@ def register_model(
         name=model_name,
         path=model_path,
         stage="Production",
-        description=(f"{experiment_name} model registered for prompt flow deployment"),
+        description=(
+            f"{experiment_name} model registered for prompt flow deployment"
+        ),
         properties={"azureml.promptflow.source_flow_id": model_path},
         tags=model_tags,
     )
@@ -109,6 +119,7 @@ def register_model(
 
 
 def main():
+    """Entry main function to register model."""
     parser = argparse.ArgumentParser("register Flow")
     parser.add_argument(
         "--file",
@@ -120,7 +131,7 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID",
         default=None,
     )
     parser.add_argument(
@@ -132,7 +143,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
     parser.add_argument(
@@ -142,7 +153,7 @@ def main():
         default=None,
     )
     parser.add_argument(
-        "--output_file", type=str, required=False, help="A file to save model version"
+        "--output_file", type=str, required=False, help="save model version"
     )
 
     args = parser.parse_args()

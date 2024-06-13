@@ -17,7 +17,9 @@ logger = llmops_logger("test local container endpoint")
 parser = argparse.ArgumentParser("test local container endpoint")
 
 
-parser.add_argument("--base_path", type=str, help="flow to test", required=True)
+parser.add_argument(
+    "--base_path", type=str, help="flow to test", required=True
+)
 
 
 args = parser.parse_args()
@@ -44,7 +46,9 @@ for attempt in range(max_retries):
             # Print the response content
             logger.info("Response:", response.json())
         else:
-            logger.info("POST request failed with status code:", response.status_code)
+            logger.info(
+                "POST request failed with status code:", response.status_code
+            )
     except (requests.exceptions.RequestException, ConnectionResetError) as e:
         logger.info(f"Error occurred: {e}")
         time.sleep(retry_delay)

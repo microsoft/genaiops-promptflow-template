@@ -14,12 +14,13 @@ for execution or deployment.
 
 import argparse
 import hashlib
+from dotenv import load_dotenv
+from typing import Optional
+
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 from azure.identity import DefaultAzureCredential
-from dotenv import load_dotenv
-from typing import Optional
 
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
@@ -51,10 +52,15 @@ def register_data_asset(
     subscription_id: Optional[str] = None,
     env_name: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Register data assets in Azure ML."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
+
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
+
     ml_client = MLClient(
         DefaultAzureCredential(),
         config.subscription_id,
@@ -66,7 +72,9 @@ def register_data_asset(
     all_datasets = {ds.dataset.name: ds.dataset for ds in experiment.datasets}
 
     for evaluator in experiment.evaluators:
-        all_datasets.update({ds.dataset.name: ds.dataset for ds in evaluator.datasets})
+        all_datasets.update(
+            {ds.dataset.name: ds.dataset for ds in evaluator.datasets}
+        )
 
     # Register local dataset as remote datasets in Azure ML
     for ds in all_datasets.values():
@@ -91,7 +99,8 @@ def register_data_asset(
                 if m_hash is not None:
                     if m_hash != data_hash:
                         logger.info(
-                            f"Updating dataset. Old hash: {m_hash}; New hash: {data_hash}"
+                            f"Updating dataset. Old hash: {m_hash};"
+                            f" New hash: {data_hash}"
                         )
                         ml_client.data.create_or_update(aml_dataset)
                 else:
@@ -108,6 +117,7 @@ def register_data_asset(
 
 
 def main():
+    """Entry main function to register data assets."""
     parser = argparse.ArgumentParser("register data assets")
     parser.add_argument(
         "--file",
@@ -119,7 +129,7 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID",
         default=None,
     )
     parser.add_argument(
@@ -131,13 +141,18 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
 
     args = parser.parse_args()
 
-    register_data_asset(args.base_path, args.file, args.subscription_id, args.env_name)
+    register_data_asset(
+        args.base_path,
+        args.file,
+        args.subscription_id,
+        args.env_name
+    )
 
 
 if __name__ == "__main__":
