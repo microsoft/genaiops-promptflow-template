@@ -41,7 +41,7 @@ pipeline {
                     // copy env file to .env file
                     sh 'chmod -R 777 $WORKSPACE'
 
-                    sh 'ls -l $'secretFile'
+                    sh 'ls -l $secretFile'
 
                     // Read the content of the secret file
                     def envContent = readFile(file:secretFile)
