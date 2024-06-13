@@ -13,7 +13,6 @@ pipeline {
         RESOURCE_GROUP_NAME = "${rg_name}"
         WORKSPACE_NAME = "${ws_name}"
         AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
-        ENV_VARS = credentials('ENV_VARS')
     }
 
     stages {
@@ -35,22 +34,25 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                 withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                    sh 'echo "$ENV_VARS" > .env'
-                    // Use Python to read and echo the contents of the .env file
-                    def readEnvScript =
-                    '''
-                    with open('.env', 'r') as file:
-                        content = file.read()
-                        print(content)
-                    '''
+
+                    // copy env file to .env file
+                    sh 'cp $ENV_FILE .env'
+                    echo $ENV_FILE
 
                     // Ensure the dotenv library is installed
                     sh 'pip install python-dotenv'
 
                     // Load .env file using Python
-                    sh 'python -c "from dotenv import load_dotenv; load_dotenv()"'
+                    sh '''
+                    python -c "from dotenv import load_dotenv; load_dotenv('.env')"
+
+                    for key, value in os.environ.items():
+                        print(f"{key}={value}")
+                    '''
                 }
+            }
             }
 
             }
