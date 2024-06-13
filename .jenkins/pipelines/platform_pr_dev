@@ -38,9 +38,7 @@ pipeline {
                     withPythonEnv('/usr/bin/python3.9') {
 
                     // copy env file to .env file
-                    // Read the content of the secret file and write it to .env file
-                    def envContent = readFile(secretFile)
-                    writeFile file: '.env', text: envContent
+                    sh 'echo "secretFile" > .env'
                     echo $secretFile
 
                     // Ensure the dotenv library is installed
