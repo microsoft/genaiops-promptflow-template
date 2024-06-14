@@ -1,11 +1,6 @@
 @Library('shared-library') _
 pipeline {
-    agent {
-        docker {
-            image 'node:14-alpine'
-            args '-v $HOME:/home/jenkins'
-        }
-    }
+    agent any
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')

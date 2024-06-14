@@ -37,6 +37,7 @@ pipeline {
                     }
 
                     python -m pip install --upgrade pip
+                    python -m pip install python-dotenv
 
                     process_requirements "${use_case_base_path}"
 
