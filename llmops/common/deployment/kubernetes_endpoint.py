@@ -77,6 +77,9 @@ def create_kubernetes_endpoint(
                     compute=compute_name,
                     auth_mode="key",
                     tags={"build_id": build_id} if build_id else {},
+                    properties={
+                        "enforce_access_to_default_secret_stores": True,
+                    },
                 )
 
                 logger.info(f"Creating endpoint {endpoint.name}")

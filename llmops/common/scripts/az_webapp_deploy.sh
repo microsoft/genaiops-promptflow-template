@@ -132,7 +132,12 @@ do
     echo "$element"
 done
 
-# Assign user managed identifier to Web APp
+az webapp config appsettings set \
+        --resource-group $rgname \
+        --name $appserviceweb \
+        --settings PROMPTFLOW_SERVING_ENGINE=fastapi
+
+# Assign user managed identifier to Web APP
 id=$(az identity show --resource-group $rgname --name $udmid --query id --output tsv)
 
 az webapp identity assign --resource-group $rgname --name $appserviceweb --identities $id
