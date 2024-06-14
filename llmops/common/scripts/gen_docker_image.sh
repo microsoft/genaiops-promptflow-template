@@ -52,7 +52,6 @@ fi
 source .env
 . .env
 if [ -e "$config_path" ]; then
-   echo "1"
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
@@ -71,7 +70,7 @@ if [ -e "$config_path" ]; then
     fi
     echo "$env_output"
  
-
+    echo "4"
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
