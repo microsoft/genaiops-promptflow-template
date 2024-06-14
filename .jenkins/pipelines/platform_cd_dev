@@ -140,7 +140,7 @@ for key, value in os.environ.items():
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${param.env_values}")
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
@@ -162,7 +162,7 @@ for key, value in os.environ.items():
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${param.env_values}")
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
@@ -179,7 +179,7 @@ for key, value in os.environ.items():
                     build job: 'jobs/webapp_deployment', parameters: [
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${env_name_quoted}"),
-                        string(name: 'env_vars', value: "${param.env_values}")
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
