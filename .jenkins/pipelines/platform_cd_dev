@@ -43,6 +43,8 @@ pipeline {
         stage('Load .env file') {
             steps {
                 script {
+                     // install dotenv
+                     python -m pip install python-dotenv
                     // Ensure the workspace directory is writable
                     sh 'chmod -R 777 $WORKSPACE'
 
