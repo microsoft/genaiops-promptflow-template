@@ -39,39 +39,26 @@ set -e # fail on error
 config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
-##remove
-cat "$config_path"
-if [[ -f "$config_path" ]]; then
-    echo "File exists"
-else
-    echo "File does not exist"
-fi
-
-##remove
-
 source .env
-. .env
-if [[ -f "$config_path" ]]; then
+#. .env
+if [[ -e "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
-    echo "1"
     if [ -e "$init_file_path" ]; then
-        echo "2"
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
     fi
     echo "$init_output"
 
     env_output=""
     if [ -e "$env_var_file_path" ]; then
-       echo "3"
         env_output=$(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "true")
     fi
     echo "$env_output"
- 
-    echo "4"
+
+
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
     pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
 
