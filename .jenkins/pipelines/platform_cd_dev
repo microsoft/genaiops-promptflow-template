@@ -56,11 +56,11 @@ pipeline {
                         writeFile file: '.env', text: envContent
 
                         //Assign the content to the env_values parameter
-                        env.env_values = envContent
+                        param.env_values = envContent
 
                         //Print the content of the env_values parameter
                         echo "env_values content:"
-                        echo $param.env_values
+                        echo param.env_values
 
                         // Check if the .env file was created
                         sh 'ls -l .env'
