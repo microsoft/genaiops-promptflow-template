@@ -39,24 +39,15 @@ set -e # fail on error
 config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
-##remove
-if [[ -e "${config_path}" ]]; then
-  echo "Config path exists: ${config_path}"
-else
-  echo "Config path does not exist: ${config_ath}"
-fi
-##
-
 source .env
 . .env
-
-if [ -f "${config_path}" ]; then
+if [[ -f "${config_path}" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "${config_path}")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
-    if [ -f "${init_file_path}" ]; then
+    if [ -e "${init_file_path}" ]; then
         init_output=$(python llmops/common/deployment/generate_config.py "${init_file_path}" "true")
     fi
     echo "$init_output"
@@ -69,14 +60,14 @@ if [ -f "${config_path}" ]; then
 
 
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
-    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
+    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker
 
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
-   
+
     python -m llmops.common.deployment.migrate_connections --base_path $use_case_base_path --env_name $deploy_environment
     # docker build the prompt flow based image
-    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker" 
-        
+    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker"
+
     docker images
 
     deploy_config="./$use_case_base_path/configs/deployment_config.json"
@@ -94,18 +85,18 @@ if [ -f "${config_path}" ]; then
     echo "$result_string"
     docker_args=$result_string
 
-    if [ -n "${init_output}" ]; then
-        docker_args+=" ${init_output}"
+    if [ -n "$init_output" ]; then
+        docker_args+=" $init_output"
     fi
 
-    if [ -n "${env_output}" ]; then
-        docker_args+=" ${env_output}"
+    if [ -n "$env_output" ]; then
+        docker_args+=" $env_output"
     fi
-    
+
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo "$docker_args"
 
-    docker run $(echo "${docker_args}")
+    docker run $(echo "$docker_args")
 
     sleep 15
 
@@ -129,5 +120,5 @@ if [ -f "${config_path}" ]; then
     docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
 
 else
-    echo ${config_path} "not found"
+    echo $config_path "not found"
 fi
