@@ -12,3 +12,4 @@ pandas==2.2.1
 python-dotenv>=0.10.3
 promptflow>=1.11.0
 promptflow-azure>=1.11.0
+SQLAlchemy

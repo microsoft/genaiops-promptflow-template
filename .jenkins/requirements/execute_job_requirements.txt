@@ -8,3 +8,4 @@ python-dotenv>=1.0.0
 azureml-mlflow>=1.56.0
 keyrings.alt
 python-dotenv
+SQLAlchemy
