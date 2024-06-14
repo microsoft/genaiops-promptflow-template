@@ -39,6 +39,10 @@ set -e # fail on error
 config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
+##remove
+echo ls -a .
+##remove
+
 source .env
 . .env
 if [[ -e "$config_path" ]]; then
