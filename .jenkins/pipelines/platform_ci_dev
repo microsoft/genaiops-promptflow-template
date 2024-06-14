@@ -68,9 +68,6 @@ from dotenv import load_dotenv
 # Load the .env file
 load_dotenv('.env')
 
-# Print all environment variables for debugging purposes (optional)
-for key, value in os.environ.items():
-    print(f"VALUE:--->{key}={value}")
                         """
 
                         // Execute the Python script
@@ -82,20 +79,20 @@ for key, value in os.environ.items():
         }
 
         // Install requirements for job execution and register the training data asset in AzureML
+        // Register PR data asset in AzureML
         stage('Register experiment data asset') {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
+                    sh """
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --base_path $use_case_base_path \\
                     --env_name $env_name
-                    '''
+                    """
+                    }
                 }
-            }
-
             }
         }
 

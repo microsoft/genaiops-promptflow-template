@@ -59,9 +59,6 @@ from dotenv import load_dotenv
 # Load the .env file
 load_dotenv('.env')
 
-# Print all environment variables for debugging purposes (optional)
-for key, value in os.environ.items():
-    print(f"VALUE:--->{key}={value}")
                         """
 
                         // Execute the Python script
