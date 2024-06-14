@@ -91,6 +91,8 @@ for key, value in os.environ.items():
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
                     sh '''
+                    pip uninstall -y promptflow promptflow-core promptflow-devkit promptflow-azure
+                    pip install promptflow>=1.11.0
                     python -m llmops.common.prompt_local_connections \\
                         --base_path ${use_case_base_path} \\
                         --env_name ${deploy_environment}
