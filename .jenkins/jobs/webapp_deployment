@@ -84,21 +84,7 @@ for key, value in os.environ.items():
         }
 
     // Create local promptflow connections
-    stage('Create local promptflow connections') {
-            steps {
-                installRequirements('execute_job_requirements')
-                installRequirements('build_validation_requirements')
-                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
-                    python -m llmops.common.prompt_local_connections \\
-                        --base_path ${use_case_base_path} \\
-                        --env_name ${deploy_environment}
-                    '''
-                }
-            }
-            }
-        }
+
 
     // Create Docker image and push to Azure Container Registry
     stage('Create Docker Image') {
