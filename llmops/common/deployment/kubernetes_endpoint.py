@@ -26,6 +26,8 @@ from azure.identity import DefaultAzureCredential
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
+from azure.ai.resources.client import AIClient
+from llmops.config import SERVICE_TYPE
 
 logger = llmops_logger("provision_endpoint")
 
@@ -44,12 +46,20 @@ def create_kubernetes_endpoint(
 
     real_config = f"{base_path}/configs/deployment_config.json"
 
-    ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
-    )
+    if SERVICE_TYPE == "AISTUDIO":
+        ml_client = AIClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            project_name=config.workspace_name,
+            credential=DefaultAzureCredential(),
+        )._ml_client
+    else:
+        ml_client = MLClient(
+            DefaultAzureCredential(),
+            config.subscription_id,
+            config.resource_group_name,
+            config.workspace_name,
+        )
 
     config_file = open(real_config)
     endpoint_config = json.load(config_file)

@@ -11,7 +11,7 @@ import os
 
 
 def create_pf_connections(
-            subscription_id, exp_filename, base_path, env_name
+            exp_filename, base_path, env_name
         ):
     """Create local connections for local run."""
     # config = ExperimentCloudConfig(

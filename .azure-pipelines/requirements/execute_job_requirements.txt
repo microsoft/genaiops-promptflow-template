@@ -1,5 +1,7 @@
-promptflow>=1.11.0
+azure-ai-resources>=1.0.0b8
+azure-ai-generative[promptflow]>=1.0.0b8
 promptflow-azure>=1.11.0
+promptflow>=1.11.0
 promptflow-tools>=1.4.0
 promptflow-evals>=0.3.0
 azure-ai-ml>=1.16.0

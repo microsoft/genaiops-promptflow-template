@@ -20,10 +20,10 @@ import datetime
 import json
 import os
 import pandas as pd
-import importlib
-import inspect
 from dotenv import load_dotenv
 from typing import Optional
+import inspect
+import importlib
 
 from azure.identity import DefaultAzureCredential
 
@@ -38,12 +38,32 @@ from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 from llmops.common.create_connections import create_pf_connections
 from llmops.config import EXECUTION_TYPE
-
+from llmops.config import SERVICE_TYPE
 from promptflow.client import PFClient as PFClientLocal
 from promptflow.azure import PFClient as PFClientAzure
 from promptflow._sdk.entities import Run
+from azure.ai.resources.client import AIClient
 
 logger = llmops_logger("prompt_eval")
+
+
+class ObjectWrapper:
+    """Wrapper class for the MLClient object."""
+
+    def __init__(self, pf=None, ml_client=None):
+        """Initialize the ObjectWrapper class."""
+        self.pf = pf
+        self.ml_client = ml_client
+
+    def get_property_value(self):
+        """Get the property value."""
+        if self.ml_client is not None:
+            return getattr(self.ml_client, "_ml_client")
+        elif self.pf is not None:
+            return getattr(self.pf, "ml_client")
+        else:
+            raise ValueError("Neither 'pf' nor 'ml_client' is available")
+
 
 files_to_check = [
     'flow.flex.yaml',
@@ -91,21 +111,33 @@ def prepare_and_execute(
                                                experiment.flow
                                                )
 
+    wrapper = None
+    ml_client = None
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
         create_pf_connections(
-            subscription_id,
             exp_filename,
             base_path,
             env_name
         )
+        wrapper = ObjectWrapper(pf=pf)
     else:
+        if SERVICE_TYPE == "AISTUDIO":
+            ml_client = AIClient(
+                subscription_id=config.subscription_id,
+                resource_group_name=config.resource_group_name,
+                project_name=config.workspace_name,
+                credential=DefaultAzureCredential(),
+            )
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
+
+        wrapper = ObjectWrapper(pf=pf, ml_client=ml_client)
+        print(wrapper)
 
     standard_flow_detail = experiment.get_flow_detail(flow_type)
     default_variants = standard_flow_detail.default_variants

@@ -93,6 +93,7 @@ if [[ -e "$config_path" ]]; then
         docker_args+=" $env_output"
     fi
     
+    docker_args+=" -e PROMPTFLOW_SERVING_ENGINE=fastapi "
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo "$docker_args"
 

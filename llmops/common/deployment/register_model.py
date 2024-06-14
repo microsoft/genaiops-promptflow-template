@@ -28,6 +28,8 @@ from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.common import resolve_flow_type
+from azure.ai.resources.client import AIClient
+from llmops.config import SERVICE_TYPE
 
 logger = llmops_logger("register_flow")
 
@@ -75,12 +77,21 @@ def register_model(
 
     logger.info(f"Model name: {model_name}")
 
-    ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
-    )
+    if SERVICE_TYPE == "AISTUDIO":
+        ml_client = AIClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            project_name=config.workspace_name,
+            credential=DefaultAzureCredential(),
+        )._ml_client
+
+    else:
+        ml_client = MLClient(
+            DefaultAzureCredential(),
+            config.subscription_id,
+            config.resource_group_name,
+            config.workspace_name,
+        )
 
     model_path = experiment.get_flow_detail(flow_type).flow_path
     model_hash = hash_folder(model_path)

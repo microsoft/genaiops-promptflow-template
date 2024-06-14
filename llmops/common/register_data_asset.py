@@ -18,9 +18,14 @@ from dotenv import load_dotenv
 from typing import Optional
 
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Data
-from azure.ai.ml.constants import AssetTypes
+from azure.ai.ml.entities import Data as AMLData
+from azure.ai.ml.constants import AssetTypes as AMLAssetTypes
 from azure.identity import DefaultAzureCredential
+
+from llmops.config import SERVICE_TYPE
+from azure.ai.resources.client import AIClient
+from azure.ai.resources.entities import Data as StudioData
+from azure.ai.resources.constants import AssetTypes as StudioAssetTypes
 
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
@@ -61,12 +66,20 @@ def register_data_asset(
         filename=exp_filename, base_path=base_path, env=config.environment_name
     )
 
-    ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
-    )
+    if SERVICE_TYPE == "AISTUDIO":
+        ml_client = AIClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            project_name=config.workspace_name,
+            credential=DefaultAzureCredential(),
+        )
+    else:
+        ml_client = MLClient(
+            DefaultAzureCredential(),
+            config.subscription_id,
+            config.resource_group_name,
+            config.workspace_name,
+        )
 
     # Get all used datasets
     all_datasets = {ds.dataset.name: ds.dataset for ds in experiment.datasets}
@@ -85,13 +98,22 @@ def register_data_asset(
             data_hash = generate_file_hash(local_data_path)
             logger.info(f"Hash of the folder: {data_hash}")
 
-            aml_dataset = Data(
-                path=local_data_path,
-                type=AssetTypes.URI_FILE,
-                description=ds.description,
-                name=ds.name,
-                tags={"data_hash": data_hash},
-            )
+            if SERVICE_TYPE == "AISTUDIO":
+                aml_dataset = StudioData(
+                    path=local_data_path,
+                    type=StudioAssetTypes.FILE,
+                    description=ds.description,
+                    name=ds.name,
+                    tags={"data_hash": data_hash},
+                )
+            else:
+                aml_dataset = AMLData(
+                    path=local_data_path,
+                    type=AMLAssetTypes.URI_FILE,
+                    description=ds.description,
+                    name=ds.name,
+                    tags={"data_hash": data_hash},
+                )
 
             try:
                 data_info = ml_client.data.get(name=ds.name, label="latest")
@@ -113,7 +135,7 @@ def register_data_asset(
             aml_dataset = ml_client.data.get(name=ds.name, label="latest")
 
             logger.info(aml_dataset.version)
-            logger.info(aml_dataset.id)
+            logger.info(aml_dataset.path)
 
 
 def main():

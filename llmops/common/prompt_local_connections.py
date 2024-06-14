@@ -51,7 +51,6 @@ def prepare_and_execute(
     print(experiment.connections)
 
     create_pf_connections(
-        "",
         "experiment.yaml",
         base_path,
         env_name

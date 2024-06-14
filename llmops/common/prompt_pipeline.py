@@ -62,13 +62,31 @@ from llmops.common.logger import llmops_logger
 from llmops.common.create_connections import create_pf_connections
 from llmops.common.common import FlowTypeOption
 from llmops.config import EXECUTION_TYPE
-
+from llmops.config import SERVICE_TYPE
 from promptflow.client import PFClient as PFClientLocal
 from promptflow.azure import PFClient as PFClientAzure
-
+from azure.ai.resources.client import AIClient
 from azure.identity import DefaultAzureCredential
 
 logger = llmops_logger("prompt_pipeline")
+
+
+class ObjectWrapper:
+    """Wrapper class for the MLClient object."""
+
+    def __init__(self, pf=None, ml_client=None):
+        """Initialize the ObjectWrapper class."""
+        self.pf = pf
+        self.ml_client = ml_client
+
+    def get_property_value(self):
+        """Get the property value."""
+        if self.ml_client is not None:
+            return getattr(self.ml_client, "_ml_client")
+        elif self.pf is not None:
+            return getattr(self.pf, "ml_client")
+        else:
+            raise ValueError("Neither 'pf' nor 'ml_client' is available")
 
 
 def check_dictionary_contained(ref_dict, dict_list):
@@ -168,21 +186,35 @@ def prepare_and_execute(
 
     print(params_dict)
     print(experiment.connections)
+    ml_client = None
+    wrapper = None
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
         create_pf_connections(
-            subscription_id,
             exp_filename,
             base_path,
             env_name
         )
+        wrapper = ObjectWrapper(pf=pf)
     else:
+        if SERVICE_TYPE == "AISTUDIO":
+            ml_client = AIClient(
+                subscription_id=config.subscription_id,
+                resource_group_name=config.resource_group_name,
+                project_name=config.workspace_name,
+                credential=DefaultAzureCredential(),
+            )
+
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
+        if ml_client is not None:
+            wrapper = ObjectWrapper(pf=pf, ml_client=ml_client)
+        else:
+            wrapper = ObjectWrapper(pf=pf)
 
     flow_detail = experiment.get_flow_detail(flow_type)
     print(flow_detail.flow_path)
@@ -266,7 +298,7 @@ def prepare_and_execute(
                                     dataset.get_local_source(base_path)
                                     if EXECUTION_TYPE == "LOCAL"
                                     else dataset.get_remote_source(
-                                        pf.ml_client
+                                        wrapper.get_property_value()
                                     )
                                 ),
                                 variant=variant_string,
@@ -288,7 +320,7 @@ def prepare_and_execute(
                                     dataset.get_local_source(base_path)
                                     if EXECUTION_TYPE == "LOCAL"
                                     else dataset.get_remote_source(
-                                        pf.ml_client
+                                        wrapper.get_property_value()
                                     )
                                 ),
                                 variant=variant_string,
@@ -359,7 +391,9 @@ def prepare_and_execute(
                     data=(
                         dataset.get_local_source(base_path)
                         if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(pf.ml_client)
+                        else dataset.get_remote_source(
+                            wrapper.get_property_value()
+                            )
                     ),
                     name=run_name,
                     display_name=run_name,
@@ -376,7 +410,9 @@ def prepare_and_execute(
                     data=(
                         dataset.get_local_source(base_path)
                         if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(pf.ml_client)
+                        else dataset.get_remote_source(
+                                wrapper.get_property_value()
+                            )
                     ),
                     name=run_name,
                     display_name=run_name,
