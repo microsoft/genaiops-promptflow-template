@@ -49,7 +49,7 @@
             "WEB_APP_NAME": "class_flows",
             "WEB_APP_RG_NAME": "rg-llmops-demo",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": ""
+            "USER_MANAGED_ID": "uami-llmops-demo"
             
         }
     ]
