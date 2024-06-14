@@ -57,6 +57,7 @@ if [ -e "$config_path" ]; then
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
+    echo "1"
     if [ -e "$init_file_path" ]; then
         echo "2"
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
