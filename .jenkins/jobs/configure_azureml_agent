@@ -16,7 +16,7 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal(credentialsId: 'AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh '''
                         set -e # fail on error
 

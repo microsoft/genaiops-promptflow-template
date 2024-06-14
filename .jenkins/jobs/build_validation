@@ -47,7 +47,7 @@ pipeline {
         // Python Code Linting
         stage('Python code linting') {
             steps {
-                withPythonEnv('/usr/bin/python3.11') {
+                withPythonEnv('/usr/bin/python3.9') {
                     sh "flake8 ./llmops ./tests"
                 }
             }
@@ -56,7 +56,7 @@ pipeline {
         // Execute unit tests and publish results
         stage('Execute Unit Tests') {
             steps {
-                withPythonEnv('/usr/bin/python3.11') {
+                withPythonEnv('/usr/bin/python3.9') {
                     sh "pytest ${params.use_case_base_path}/tests --junitxml=junit/test-results.xml --cov=. --cov-report=xml"
                 }
             }

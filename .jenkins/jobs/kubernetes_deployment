@@ -25,7 +25,7 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         script {
                             // Create .env file with environment variables from parameters
                             sh 'echo "${params.env_vars}" > .env'
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.kubernetes_endpoint \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
@@ -95,7 +95,7 @@ pipeline {
         stage('Provision Kubernetes Online Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.kubernetes_deployment \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
@@ -113,7 +113,7 @@ pipeline {
         stage('Test Kubernetes Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.test_model_on_kubernetes \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \

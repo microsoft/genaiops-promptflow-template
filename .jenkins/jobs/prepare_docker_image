@@ -18,7 +18,7 @@ pipeline {
                 installRequirements('execute_job_requirements')
                 installRequirements('build_validation_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                     sh '''
                     python -m llmops.common.prompt_local_connections \\
                     --base_path ${use_case_base_path} \\
@@ -36,7 +36,7 @@ pipeline {
                     installRequirements('build_validation_requirements')
                     withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
                     string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                             # Your Docker image creation command here
                             echo "build no script:"

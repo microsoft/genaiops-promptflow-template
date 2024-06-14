@@ -26,7 +26,7 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         script {
                             // Create .env file with environment variables from parameters
                             sh 'echo "${params.env_vars}" > .env'
@@ -52,7 +52,7 @@ pipeline {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """               
                         python -m llmops.common.deployment.provision_endpoint \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
@@ -97,7 +97,7 @@ pipeline {
         stage('Provision AML Online Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.provision_deployment \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
@@ -115,7 +115,7 @@ pipeline {
         stage('Test AML Deployment') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.11') {
+                    withPythonEnv('/usr/bin/python3.9') {
                         sh """
                         python -m llmops.common.deployment.test_model_on_aml \
                             --subscription_id $AZURE_SUBSCRIPTION_ID \
