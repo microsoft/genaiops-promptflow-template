@@ -51,7 +51,7 @@ fi
 
 source .env
 . .env
-if [ -e "$config_path" ]; then
+if [[ -f "$config_path" ]]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
