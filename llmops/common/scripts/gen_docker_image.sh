@@ -41,7 +41,15 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 source .env
 . .env
-if [[ -f "${config_path}" ]]; then
+
+if [[ -e "${config_path}" ]]; then
+  echo "Config path exists: ${config_path}"
+else
+  echo "Config path does not exist: ${config_path}"
+fi
+
+if [[ -e "${config_path}" ]]; then
+  echo "entering"
     STANDARD_FLOW=$(yq eval '.flow // .name' "${config_path}")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
