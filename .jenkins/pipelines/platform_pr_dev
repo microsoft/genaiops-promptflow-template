@@ -61,7 +61,7 @@ load_dotenv('.env')
 
 # Print all environment variables for debugging purposes (optional)
 for key, value in os.environ.items():
-    print(f"{key}={value}")
+    print(f"VALUE:--->{key}={value}")
                         """
 
                         // Execute the Python script
