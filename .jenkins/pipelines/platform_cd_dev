@@ -95,7 +95,7 @@ for key, value in os.environ.items():
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
+                    withPythonEnv('/usr/bin/python3.11') {
                     sh """
                     python -m llmops.common.deployment.register_model \
                     --subscription_id $AZURE_SUBSCRIPTION_ID \

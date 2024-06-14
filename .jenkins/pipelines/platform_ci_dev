@@ -83,7 +83,7 @@ load_dotenv('.env')
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
+                    withPythonEnv('/usr/bin/python3.11') {
                     sh """
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
@@ -100,7 +100,7 @@ load_dotenv('.env')
             steps {
                 installRequirements('build_validation_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
+                    withPythonEnv('/usr/bin/python3.11') {
                     sh '''
                     python -m llmops.common.prompt_pipeline \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
@@ -118,7 +118,7 @@ load_dotenv('.env')
         stage('Register evaluation data asset') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
+                    withPythonEnv('/usr/bin/python3.11') {
                     sh '''
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
@@ -146,7 +146,7 @@ load_dotenv('.env')
         stage('Read prompt flow runs & Execute bulk run evaluations') {
             steps {
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
-                    withPythonEnv('/usr/bin/python3.9') {
+                    withPythonEnv('/usr/bin/python3.11') {
                     sh '''
                     run_id=$(cat run_id.txt)
                     echo $run_id
