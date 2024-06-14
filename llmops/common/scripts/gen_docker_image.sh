@@ -40,8 +40,7 @@ config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 ##remove
-cd ./
-ls -a
+ls -a ./chat_with_pdf
 ##remove
 
 source .env
