@@ -41,6 +41,8 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 ##remove
 ls -a ./chat_with_pdf
+cat ./chat_with_pdf/experiment.yaml
+cat .env
 ##remove
 
 source .env
