@@ -52,18 +52,21 @@ fi
 source .env
 . .env
 if [ -e "$config_path" ]; then
+   echo "1"
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
     if [ -e "$init_file_path" ]; then
+        echo "2"
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
     fi
     echo "$init_output"
 
     env_output=""
     if [ -e "$env_var_file_path" ]; then
+       echo "3"
         env_output=$(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "true")
     fi
     echo "$env_output"
