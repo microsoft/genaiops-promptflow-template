@@ -40,7 +40,8 @@ config_path="./$use_case_base_path/experiment.yaml"
 env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 ##remove
-ls -a .
+cd ./
+ls -a
 ##remove
 
 source .env
