@@ -1,6 +1,11 @@
 @Library('shared-library') _
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:14-alpine'
+            args '-v $HOME:/home/jenkins'
+        }
+    }
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'deploy_environment', defaultValue: 'dev', description: 'Execution Environment')
@@ -82,8 +87,6 @@ for key, value in os.environ.items():
                 }
             }
         }
-
-    // Create local promptflow connections
 
 
     // Create Docker image and push to Azure Container Registry
