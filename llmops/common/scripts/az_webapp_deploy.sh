@@ -33,6 +33,9 @@ while [[ $# -gt 0 ]]; do
 done
 source .env
 . .env
+
+echo ".env file"
+cat .env
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
