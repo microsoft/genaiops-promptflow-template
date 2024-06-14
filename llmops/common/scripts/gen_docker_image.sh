@@ -93,7 +93,7 @@ if [[ -e "$config_path" ]]; then
         docker_args+=" $env_output"
     fi
 
-    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
+    docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8081:8081 localpf:latest"
     echo "$docker_args"
 
     docker run $(echo "$docker_args")
