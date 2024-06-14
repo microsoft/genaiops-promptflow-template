@@ -10,6 +10,7 @@ pipeline {
         string(name: 'rg_name', description: 'Azure Resource Group Name')
         string(name: 'ws_name', description: 'AzureML Workspace Name')
         string(name: 'kv_name', description: 'Azure Key Vault Name')
+        string(name: 'env_values', description: 'Values of environment variables')
     }
 
     environment {
@@ -17,7 +18,6 @@ pipeline {
         RESOURCE_GROUP_NAME = "${rg_name}"
         WORKSPACE_NAME = "${ws_name}"
         JENKINS_OUTPUT = ''  // Initialize this global variable
-        env_values = ''
     }
 
     stages {
@@ -60,7 +60,7 @@ pipeline {
 
                         //Print the content of the env_values parameter
                         echo "env_values content:"
-                        echo $env.env_values
+                        echo $param.env_values
 
                         // Check if the .env file was created
                         sh 'ls -l .env'
@@ -140,7 +140,7 @@ for key, value in os.environ.items():
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${$env.env_values}")
+                        string(name: 'env_vars', value: "${param.env_values}")
                     ]
                 }
             }
@@ -162,7 +162,7 @@ for key, value in os.environ.items():
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${$env.env_values}")
+                        string(name: 'env_vars', value: "${param.env_values}")
                     ]
                 }
             }
@@ -179,7 +179,7 @@ for key, value in os.environ.items():
                     build job: 'jobs/webapp_deployment', parameters: [
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'env_name', value: "${env_name_quoted}"),
-                        string(name: 'env_vars', value: "${env.env_values}")
+                        string(name: 'env_vars', value: "${param.env_values}")
                     ]
                 }
             }
