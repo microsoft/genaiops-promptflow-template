@@ -41,7 +41,7 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 ##remove
 cat "$config_path"
-cat "[ -e $config_path ]"
+cat test -e "config_path"
 ##remove
 
 source .env
