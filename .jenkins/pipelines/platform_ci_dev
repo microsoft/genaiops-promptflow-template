@@ -15,7 +15,6 @@ pipeline {
         string(name: 'rg_name', description: 'Azure Resource Group Name')
         string(name: 'ws_name', description: 'AzureML Workspace Name')
         string(name: 'kv_name', description: 'Azure Key Vault Name')
-        string(name: 'env_vars', description: 'Env vars')
     }
 
     stages {
@@ -183,8 +182,7 @@ load_dotenv('.env')
                         string(name: 'run_id', value: "${run_id}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
                         string(name: 'ws_name', value: "${params.ws_name}"),
-                        string(name: 'kv_name', value: "${params.kv_name}"),
-                        string(name: 'env_vars', value: "${env.ENV_VARS}")
+                        string(name: 'kv_name', value: "${params.kv_name}")
                     ]
                 }
             }
