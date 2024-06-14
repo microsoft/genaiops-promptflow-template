@@ -41,13 +41,13 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 
 source .env
 . .env
-if [[ -f "$config_path" ]]; then
+if [ -f "$config_path" ]; then
     STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
-    if [ -e "$init_file_path" ]; then
+    if [ -f "$init_file_path" ]; then
         init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
     fi
     echo "$init_output"
