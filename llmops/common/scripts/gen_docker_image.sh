@@ -43,27 +43,27 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 if [[ -e "${config_path}" ]]; then
   echo "Config path exists: ${config_path}"
 else
-  echo "Config path does not exist: ${configPath}"
+  echo "Config path does not exist: ${config_ath}"
 fi
 ##
 
 source .env
 . .env
 
-if [ -f "$config_path" ]; then
-    STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+if [ -f "${config_path}" ]; then
+    STANDARD_FLOW=$(yq eval '.flow // .name' "${config_path}")
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
     init_output=""
-    if [ -f "$init_file_path" ]; then
-        init_output=$(python llmops/common/deployment/generate_config.py "$init_file_path" "true")
+    if [ -f "${init_file_path}" ]; then
+        init_output=$(python llmops/common/deployment/generate_config.py "${init_file_path}" "true")
     fi
     echo "$init_output"
 
     env_output=""
-    if [ -e "$env_var_file_path" ]; then
-        env_output=$(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "true")
+    if [ -e "${env_var_file_path}" ]; then
+        env_output=$(python llmops/common/deployment/generate_env_vars.py "${env_var_file_path}" "true")
     fi
     echo "$env_output"
 
@@ -94,18 +94,18 @@ if [ -f "$config_path" ]; then
     echo "$result_string"
     docker_args=$result_string
 
-    if [ -n "$init_output" ]; then
-        docker_args+=" $init_output"
+    if [ -n "${init_output}" ]; then
+        docker_args+=" ${init_output}"
     fi
 
-    if [ -n "$env_output" ]; then
-        docker_args+=" $env_output"
+    if [ -n "${env_output}" ]; then
+        docker_args+=" ${env_output}"
     fi
     
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo "$docker_args"
 
-    docker run $(echo "$docker_args")
+    docker run $(echo "${docker_args}")
 
     sleep 15
 
@@ -129,5 +129,5 @@ if [ -f "$config_path" ]; then
     docker push "$registry_server"/"$use_case_base_path"_"$deploy_environment":"$build_id"
 
 else
-    echo $config_path "not found"
+    echo ${config_path} "not found"
 fi
