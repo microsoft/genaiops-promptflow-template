@@ -100,8 +100,6 @@ for name in "${connection_names[@]}"; do
     env_var_key="${uppercase_name}_API_KEY"
     api_key=${!env_var_key}
 
-    echo "API_KEY"
-    echo ${api_key}
     #uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     #modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
