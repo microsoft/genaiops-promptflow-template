@@ -4,7 +4,7 @@ flow: flows/standard
 connections:
 - name: aoai
   connection_type: AzureOpenAIConnection
-  api_endpoint: https://demoopenaiexamples.openai.azure.com/
+  api_endpoint: https://aoai-llmops-demo.openai.azure.com/
   api_version: 2023-07-01-preview
   api_key: ${api_key}
   api_type: azure
