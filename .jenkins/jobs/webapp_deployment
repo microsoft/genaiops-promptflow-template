@@ -8,7 +8,6 @@ pipeline {
     }
 
     environment {
-        dev_connections = credentials('COMMON_DEV_CONNECTIONS')
         registry_details = credentials('DOCKER_IMAGE_REGISTRY')
     }
 
@@ -69,9 +68,6 @@ from dotenv import load_dotenv
 # Load the .env file
 load_dotenv('.env')
 
-# Print all environment variables for debugging purposes (optional)
-for key, value in os.environ.items():
-    print(f"WEBAPP READING VALUES:--->{key}={value}")
 
                         """
 
@@ -106,7 +102,6 @@ for key, value in os.environ.items():
             steps {
                 installRequirements('build_validation_requirements')
                 withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
-                string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
                 withPythonEnv('/usr/bin/python3.9') {
                     sh """
                         # Your Docker image creation command here
@@ -116,18 +111,15 @@ for key, value in os.environ.items():
                         ./llmops/common/scripts/gen_docker_image.sh --use_case_base_path $use_case_base_path --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}'
                     """
                     }
-                }
             }
         }
 
         // Deploy Docker image to Azure Webapp
         stage('Create Webapp') {
             steps {
-                withCredentials([string(credentialsId: 'COMMON_DEV_CONNECTIONS', variable: 'connection_details')]) {
                     sh """
                     /bin/bash ./llmops/common/scripts/az_webapp_deploy.sh --use_case_base_path $use_case_base_path --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER}
                     """
-                }
             }
         }
     }
