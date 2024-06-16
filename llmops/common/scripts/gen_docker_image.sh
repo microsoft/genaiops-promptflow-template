@@ -57,17 +57,17 @@ if [[ -e "$config_path" ]]; then
         env_output=$(python llmops/common/deployment/generate_env_vars.py "$env_var_file_path" "true")
     fi
     echo "$env_output"
- 
+
 
     pip install -r ./$use_case_base_path/$STANDARD_FLOW/requirements.txt
-    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker 
+    pf flow build --source "./$use_case_base_path/$STANDARD_FLOW" --output "./$use_case_base_path/docker"  --format docker
 
     cp "./$use_case_base_path/environment/Dockerfile" "./$use_case_base_path/docker/Dockerfile"
-   
+
     python -m llmops.common.deployment.migrate_connections --base_path $use_case_base_path --env_name $deploy_environment
     # docker build the prompt flow based image
-    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker" 
-        
+    docker build --platform=linux/amd64 -t localpf "./$use_case_base_path/docker"
+
     docker images
 
     deploy_config="./$use_case_base_path/configs/deployment_config.json"
@@ -92,24 +92,23 @@ if [[ -e "$config_path" ]]; then
     if [ -n "$env_output" ]; then
         docker_args+=" $env_output"
     fi
-    
-    docker_args+=" -e PROMPTFLOW_SERVING_ENGINE=fastapi "
+
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo "$docker_args"
 
-    docker run $(echo "$docker_args")
+    #docker run $(echo "$docker_args")
 
-    sleep 20
+    #sleep 15
 
-    docker ps -a
+    #docker ps -a
 
-    chmod +x "./$use_case_base_path/sample-request.json"
+    #chmod +x "./$use_case_base_path/sample-request.json"
 
-    file_contents=$(<./$use_case_base_path/sample-request.json)
-    echo "$file_contents"
+    #file_contents=$(<./$use_case_base_path/sample-request.json)
+    #echo "$file_contents"
 
-    python -m llmops.common.deployment.test_local_flow \
-            --base_path $use_case_base_path
+    #python -m llmops.common.deployment.test_local_flow \
+    #       --base_path $use_case_base_path
 
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')

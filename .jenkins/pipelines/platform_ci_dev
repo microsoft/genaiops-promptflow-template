@@ -11,7 +11,7 @@ pipeline {
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
-        string(name: 'deployment_type', defaultValue: 'aml', description: 'Determine type of deployment - aml, aks, webapp')
+        string(name: 'deployment_type', defaultValue: 'webapp', description: 'Determine type of deployment - aml, aks, webapp')
         string(name: 'rg_name', description: 'Azure Resource Group Name')
         string(name: 'ws_name', description: 'AzureML Workspace Name')
         string(name: 'kv_name', description: 'Azure Key Vault Name')
@@ -25,21 +25,73 @@ pipeline {
             }
         }
 
+        //Configure AzureML agent which process necessary requirements
+        stage('Configure Azure ML Agent') {
+            steps {
+                azureLogin()
+                script {
+                    build job: 'jobs/configure_azureml_agent', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
+                    ]
+                }
+            }
+        }
+
+        // Create .env file
+        stage('Load .env file') {
+            steps {
+                script {
+                    // Ensure the workspace directory is writable
+                    sh 'chmod -R 777 $WORKSPACE'
+
+                    // Use the secret file credentials
+                    withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
+                        // Check if the secret file exists and read its content
+                        sh 'ls -l $ENV_FILE'
+                        def envContent = readFile(file: ENV_FILE)
+
+                        // Write the content to .env file in the workspace
+                        writeFile file: '.env', text: envContent
+
+                        // Check if the .env file was created
+                        sh 'ls -l .env'
+
+                        // Echo the contents of the .env file
+                        sh 'cat .env'
+
+                        // Optionally, load the .env file using Python
+                        def loadEnvScript = """
+import os
+from dotenv import load_dotenv
+
+# Load the .env file
+load_dotenv('.env')
+
+                        """
+
+                        // Execute the Python script
+                        writeFile file: 'load_env.py', text: loadEnvScript
+                        sh 'python3 load_env.py'
+                    }
+                }
+            }
+        }
+
         // Install requirements for job execution and register the training data asset in AzureML
+        // Register PR data asset in AzureML
         stage('Register experiment data asset') {
             steps {
                 installRequirements('execute_job_requirements')
                 withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
                     withPythonEnv('/usr/bin/python3.9') {
-                    sh '''
+                    sh """
                     python -m llmops.common.register_data_asset \\
                     --subscription_id $AZURE_SUBSCRIPTION_ID \\
                     --base_path $use_case_base_path \\
                     --env_name $env_name
-                    '''
+                    """
+                    }
                 }
-            }
-
             }
         }
 
@@ -86,7 +138,7 @@ pipeline {
                     env.run_id = run_id
                     sh 'echo $run_id'
 
-                }    
+                }
             }
         }
 
@@ -137,4 +189,3 @@ pipeline {
         }
     }
 }
-

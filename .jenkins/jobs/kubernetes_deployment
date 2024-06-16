@@ -10,6 +10,7 @@ pipeline {
         string(name: 'kv_name', description: 'Key Vault name')
         string(name: 'ws_name', description: 'Workspace name')
         string(name: 'rg_name', description: 'Resource group name')
+        string(name: 'env_vars', description: 'The API key for authentication')
     }
 
     environment {
@@ -20,6 +21,32 @@ pipeline {
 
     // Install requirements and provision Kubernetes Online Endpoint
     stages {
+        stage('Prepare Environment and Azure Subscription Details') {
+            steps {
+                installRequirements('execute_job_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                        script {
+                            // Create .env file with environment variables from parameters
+                            sh 'echo "${params.env_vars}" > .env'
+
+                            // Ensure the dotenv library is installed
+                            sh 'pip install python-dotenv'
+
+                            // Load .env file using Python
+                            sh 'python -c "from dotenv import load_dotenv; load_dotenv()"'
+
+                            // Load the current Azure subscription details
+                            sh '''
+                            subscriptionId=$(az account show --query id -o tsv)
+                            echo "SUBSCRIPTION_ID=$subscriptionId" >> .env
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Provision Kubernetes Online Endpoint') {
             steps {
                 installRequirements('execute_job_requirements')

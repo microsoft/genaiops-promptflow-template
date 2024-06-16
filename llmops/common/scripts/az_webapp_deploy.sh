@@ -33,6 +33,7 @@ while [[ $# -gt 0 ]]; do
 done
 source .env
 . .env
+
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
@@ -69,17 +70,17 @@ read -r -a connection_names <<< "$(echo "$con_object" | jq -r '.CONNECTION_NAMES
 # create a resource group
 az group create --name $rgname --location westeurope
 
-# create a user managed identifier      
+# create a user managed identifier
 az identity create --name $udmid --resource-group $rgname
 sleep 15
-      
+
 principalId=$(az identity show --resource-group $rgname \
     --name $udmid --query principalId --output tsv)
-      
+
 registryId=$(az acr show --resource-group $acr_rg \
     --name $REGISTRY_NAME --query id --output tsv)
 
-# provide permissions to user managed identifier      
+# provide permissions to user managed identifier
 az role assignment create --assignee $principalId --scope $registryId --role "AcrPull"
 az appservice plan create --name $appserviceplan --resource-group $rgname --is-linux --sku $websku
 
@@ -98,6 +99,7 @@ for name in "${connection_names[@]}"; do
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     env_var_key="${uppercase_name}_API_KEY"
     api_key=${!env_var_key}
+
     #uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     #modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
