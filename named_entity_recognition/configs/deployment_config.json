@@ -46,7 +46,7 @@
             "REGISTRY_NAME": "acrllmopsdemo",
             "REGISTRY_RG_NAME": "rg-llmops-demo",
             "APP_PLAN_NAME": "app-plan-llmops-demo",
-            "WEB_APP_NAME": "web-app-llmops-demo",
+            "WEB_APP_NAME": "web-app-llmops-demo-v2",
             "WEB_APP_RG_NAME": "rg-llmops-demo",
             "WEB_APP_SKU": "B3",
             "USER_MANAGED_ID": "uami-llmops-demo"
