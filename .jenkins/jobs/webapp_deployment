@@ -68,6 +68,9 @@ from dotenv import load_dotenv
 # Load the .env file
 load_dotenv('.env')
 
+# Print all environment variables for debugging purposes (optional)
+for key, value in os.environ.items():
+    print(f"WEBAPP READING VALUES:--->{key}={value}")
 
                         """
 
@@ -101,7 +104,7 @@ load_dotenv('.env')
     stage('Create Docker Image') {
             steps {
                 installRequirements('build_validation_requirements')
-                withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details'),
+                withCredentials([string(credentialsId: 'DOCKER_IMAGE_REGISTRY', variable: 'registry_details')]) {
                 withPythonEnv('/usr/bin/python3.9') {
                     sh """
                         # Your Docker image creation command here
@@ -111,6 +114,7 @@ load_dotenv('.env')
                         ./llmops/common/scripts/gen_docker_image.sh --use_case_base_path $use_case_base_path --deploy_environment $deploy_environment --build_id ${BUILD_NUMBER} --REGISTRY_DETAILS '${registry_details}'
                     """
                     }
+                }
             }
         }
 
