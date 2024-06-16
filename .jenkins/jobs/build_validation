@@ -44,6 +44,15 @@ pipeline {
             }
         }
 
+        // Python Code Linting
+        stage('Python code linting') {
+            steps {
+                withPythonEnv('/usr/bin/python3.9') {
+                    sh "flake8 ./llmops ./tests"
+                }
+            }
+        }
+
         // Execute unit tests and publish results
         stage('Execute Unit Tests') {
             steps {

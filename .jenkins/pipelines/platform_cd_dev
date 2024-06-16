@@ -5,22 +5,80 @@ pipeline {
     parameters {
         string(name: 'env_name', description: 'Execution Environment', defaultValue: 'dev')
         string(name: 'use_case_base_path', description: 'The flow use-case to execute', defaultValue: 'named_entity_recognition')
-        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'aml')
+        string(name: 'deployment_type', description: 'Determine type of deployment - aml, aks, webapp', defaultValue: 'webapp')
         string(name: 'run_id', description: 'run id of the flow to be deployed')
         string(name: 'rg_name', description: 'Azure Resource Group Name')
         string(name: 'ws_name', description: 'AzureML Workspace Name')
         string(name: 'kv_name', description: 'Azure Key Vault Name')
+        string(name: 'env_values', description: 'Values of environment variables')
     }
 
     environment {
+        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
         RESOURCE_GROUP_NAME = "${rg_name}"
         WORKSPACE_NAME = "${ws_name}"
+        JENKINS_OUTPUT = ''  // Initialize this global variable
     }
 
     stages {
         stage('Checkout Git') {
             steps {
                 checkout scm
+            }
+        }
+
+        //Configure AzureML agent which process necessary requirements
+        stage('Configure Azure ML Agent') {
+            steps {
+                azureLogin()
+                script {
+                    build job: 'jobs/configure_azureml_agent', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
+                    ]
+                }
+            }
+        }
+
+       // Create .env file
+        stage('Load .env file') {
+            steps {
+                script {
+                    // Ensure the workspace directory is writable
+                    sh 'chmod -R 777 $WORKSPACE'
+
+                    // Use the secret file credentials
+                    withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
+                        // Check if the secret file exists and read its content
+                        sh 'ls -l $ENV_FILE'
+                        def envContent = readFile(file: ENV_FILE)
+
+                        // Write the content to .env file in the workspace
+                        writeFile file: '.env', text: envContent
+
+                        //Assign the content to the env_values parameter
+                        env.env_values = envContent
+
+                        // Check if the .env file was created
+                        sh 'ls -l .env'
+
+                        // Echo the contents of the .env file
+                        sh 'cat .env'
+
+                        // Optionally, load the .env file using Python
+                        def loadEnvScript = """
+import os
+from dotenv import load_dotenv
+
+# Load the .env file
+load_dotenv('.env')
+
+                        """
+
+                        // Execute the Python script
+                        writeFile file: 'load_env.py', text: loadEnvScript
+                        sh 'python3 load_env.py'
+                    }
+                }
             }
         }
 
@@ -53,7 +111,7 @@ pipeline {
                     env.model_version = model_version
                     sh 'echo $model_version'
 
-                }    
+                }
             }
         }
 
@@ -73,7 +131,8 @@ pipeline {
                         string(name: 'run_id', value: "${params.run_id}"),
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
-                        string(name: 'kv_name', value: "${params.kv_name}")
+                        string(name: 'kv_name', value: "${params.kv_name}"),
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
@@ -94,7 +153,8 @@ pipeline {
                         string(name: 'run_id', value: "${params.run_id}"),
                         string(name: 'ws_name', value: "${params.ws_name}"),
                         string(name: 'rg_name', value: "${params.rg_name}"),
-                        string(name: 'kv_name', value: "${params.kv_name}")
+                        string(name: 'kv_name', value: "${params.kv_name}"),
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
@@ -110,11 +170,11 @@ pipeline {
                 script {
                     build job: 'jobs/webapp_deployment', parameters: [
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
-                        string(name: 'env_name', value: "${env_name_quoted}")
+                        string(name: 'env_name', value: "${env_name_quoted}"),
+                        string(name: 'env_vars', value: "${env.env_values}")
                     ]
                 }
             }
         }
     }
 }
-
