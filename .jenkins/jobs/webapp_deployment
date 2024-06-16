@@ -83,6 +83,7 @@ for key, value in os.environ.items():
             }
         }
 
+    // Create local promptflow connections
     stage('Create local promptflow connections') {
         steps {
             installRequirements('execute_job_requirements')

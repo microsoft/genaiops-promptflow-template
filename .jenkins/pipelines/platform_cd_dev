@@ -58,10 +58,6 @@ pipeline {
                         //Assign the content to the env_values parameter
                         env.env_values = envContent
 
-                        //Print the content of the env_values parameter
-                        echo "env_values content:"
-                        echo env.env_values
-
                         // Check if the .env file was created
                         sh 'ls -l .env'
 
@@ -75,10 +71,6 @@ from dotenv import load_dotenv
 
 # Load the .env file
 load_dotenv('.env')
-
-# Print all environment variables for debugging purposes (optional)
-for key, value in os.environ.items():
-    print(f"VALUE:--->{key}={value}")
 
                         """
 
