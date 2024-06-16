@@ -92,7 +92,7 @@ sleep 30
 
 # create/update Web App config settings
 az webapp config appsettings set --resource-group $rgname --name $appserviceweb \
-    --settings WEBSITES_PORT=8081
+    --settings WEBSITES_PORT=8080
 
 for name in "${connection_names[@]}"; do
     #api_key=$(echo ${CONNECTION_DETAILS} | jq -r --arg name "$name" '.[] | select(.name == $name) | .api_key')
