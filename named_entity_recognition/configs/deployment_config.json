@@ -42,14 +42,14 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai"],
-            "REGISTRY_NAME": "acrllmopsdemo",
-            "REGISTRY_RG_NAME": "rg-llmops-demo",
-            "APP_PLAN_NAME": "app-plan-llmops-demo",
-            "WEB_APP_NAME": "web-app-llmops-demo-v2",
-            "WEB_APP_RG_NAME": "rg-llmops-demo",
+            "CONNECTION_NAMES": [""],
+            "REGISTRY_NAME": "",
+            "REGISTRY_RG_NAME": "",
+            "APP_PLAN_NAME": "",
+            "WEB_APP_NAME": "",
+            "WEB_APP_RG_NAME": "",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "uami-llmops-demo"
+            "USER_MANAGED_ID": ""
             
         }
     ]

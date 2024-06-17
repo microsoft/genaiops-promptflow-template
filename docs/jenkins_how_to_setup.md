@@ -259,7 +259,32 @@ The configuration for connection used while authoring the repo:
 
 ### Prompt flow Connection
 
-Create Jenkins Credentials of the type **Secret Text** named `COMMON_DEV_CONNECTIONS` with information related to Prompt flow connections.  The value for this secret is a json string with given structure as shown next. Create one json object for each connection as shown in the example. As of now, Azure Open AI Connections are supported and more will get added soon. Information for each connection can be obtained from respective Azure OpenAI resource.
+Create Jenkins Credentials of the type **Secret File** named `ENV_VARS` with information related to Prompt flow connections.  The values for this secret with given structure is shown next.The 'ENV_VARS' secret should contain the same key-value pairs as the .env file.
+
+``` bash
+AOAI_API_KEY=abcdefghijklmnop
+AOAI_API_TYPE=azure
+AOAI_API_BASE=https://demoopenaiexamples.openai.azure.com/
+AOAI_API_VERSION=2023-05-15
+AZURE_OPENAI_API_KEY=xxxxxx
+```
+
+The placeholders in experiment.yaml, flow.flex.yaml, init.json and env.yaml will be replaced in the same way as in local execution.
+
+To ensure clarity and avoid naming conflicts, it's important to follow a specific naming convention for secrets used in this template.
+When defining secrets for connections, such as API keys, the secret name should be qualified with the connection name. This helps to distinguish between secrets used for different connections. The naming convention for connection secrets is as follows:
+
+<CONNECTION_NAME>_API_KEY
+
+For example, if you have a connection named AOAI, the corresponding API key secret should be named AOAI_API_KEY. Only API_KEY is supported for connections.
+
+If secrets are used within the init section of the flow.flex.yaml file, the secret name should be qualified with the parent name. This helps to identify the specific flow and context in which the secret is used. The naming convention for flow secrets is as follows:
+
+<PARENT_ELEMENT_NAME>_<SECRET_NAME>
+
+For example, if you have a secret named API_KEY used within the init section of a flow under MODEL_CONFIG, the corresponding secret should be named MODEL_CONFIG_API_KEY.
+
+By adhering to the naming convention for secrets, storing them securely in the secrets file and following the best practices for secret security, you can ensure that sensitive information remains protected while allowing seamless execution of the template in different environments.
 
 ![Jenkins Secret Text Credential for common dev connections](images/jenkins-credentials-dev-conn.png)
 
