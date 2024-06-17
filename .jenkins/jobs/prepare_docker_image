@@ -30,8 +30,6 @@ pipeline {
 
 
                         // Set environment variable
-                        echo "env variables for webapp"
-                        echo value
                         env."$key" = value
                     }
                 }
@@ -56,9 +54,6 @@ pipeline {
 
                         // Check if the .env file was created
                         sh 'ls -l .env'
-
-                        // Echo the contents of the .env file
-                        sh 'cat .env'
 
                         // Optionally, load the .env file using Python
                         def loadEnvScript = """
