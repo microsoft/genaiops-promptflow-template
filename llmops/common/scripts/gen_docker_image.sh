@@ -96,19 +96,19 @@ if [[ -e "$config_path" ]]; then
     docker_args+=" -m 512m --memory-reservation=256m --cpus=2 -dp 8080:8080 localpf:latest"
     echo "$docker_args"
 
-    #docker run $(echo "$docker_args")
+    docker run $(echo "$docker_args")
 
-    #sleep 15
+    sleep 15
 
-    #docker ps -a
+    docker ps -a
 
-    #chmod +x "./$use_case_base_path/sample-request.json"
+    chmod +x "./$use_case_base_path/sample-request.json"
 
-    #file_contents=$(<./$use_case_base_path/sample-request.json)
-    #echo "$file_contents"
+    file_contents=$(<./$use_case_base_path/sample-request.json)
+    echo "$file_contents"
 
-    #python -m llmops.common.deployment.test_local_flow \
-    #       --base_path $use_case_base_path
+    python -m llmops.common.deployment.test_local_flow \
+            --base_path $use_case_base_path
 
     registry_name=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_name')
     registry_server=$(echo "${REGISTRY_DETAILS}" | jq -r '.[0].registry_server')
