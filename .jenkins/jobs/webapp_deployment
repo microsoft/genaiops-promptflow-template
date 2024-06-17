@@ -53,7 +53,7 @@ pipeline {
                         writeFile file: '.env', text: envContent
 
                         // Check if the .env file was created
-                        sh 'ls -l .env''
+                        sh 'ls -l .env'
 
                         // Optionally, load the .env file using Python
                         def loadEnvScript = """
