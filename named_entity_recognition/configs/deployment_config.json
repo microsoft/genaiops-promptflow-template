@@ -4,7 +4,7 @@
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "ENDPOINT_NAME": "",
-            "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow",
+            "ENDPOINT_DESC": "An online endpoint serving a flow for named entity flow for named entity",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "",
