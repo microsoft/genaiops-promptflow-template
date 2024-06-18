@@ -146,7 +146,7 @@ By adhering to the naming convention for secrets, storing them securely in the .
 
 ## Create Azure service principal
 
-Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI.  If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
+Create one Azure service principal for the purpose of understanding this repository. You can add more depending on how many environments, you want to work on (Dev or Prod or Both). Service principals can be created using cloud shell, bash, powershell or from Azure UI. If you run into issues creating service principals using bash or powershell, Azure cloud shell is a typically reliable alternative. If your subscription is part of an organization with multiple tenants, ensure that the Service Principal has access across tenants.
 
 1. Copy the following bash commands to your computer and update the **spname** and **subscriptionId** variables with the values for your project. This command will also grant the **owner** role to the service principal in the subscription provided. This is required for GitHub Actions to properly use resources in that subscription.
 
@@ -316,8 +316,6 @@ The environment variables for Prompt Flow Connections should follow a specific n
 
 ```bash
 
-```.env
-
 AOAI_API_KEY=xxxxxxxxxxxx
 ANY_OTHER_VALUE=xxxxxxxxxxxx
 
@@ -350,7 +348,7 @@ The workflows expects the variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and 
 The rest of the workflow configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
 
 Before running the deployment workflows, you need to make changes to `configs/deployment_config.json`:
-- Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` if you want to deploy to Azure Machine Learning compute
+- Update the `ENDPOINT_NAME` and `CURRENT_DEPLOYMENT_NAME` if you want to deploy to Azure Machine Learning compute. These names do not need to be looked up as the endpoint and deployment may not already exist; if they don't exist, the names are used to create a new endpoint and deployment. Names for endpoints and deployments should be unique, less than 32 characters; must begin with lowercase letter, followed by lowercase letters, hyphen or numbers and end with a lowercase letter or number.
 - Or update the `CONNECTION_NAMES`, `REGISTRY_NAME`, `REGISTRY_RG_NAME`, `APP_PLAN_NAME`, `WEB_APP_NAME`, `WEB_APP_RG_NAME`, `WEB_APP_SKU`, and `USER_MANAGED_ID`if you want to deploy to Azure Web App.
 
 ### Update deployment_config.json in config folder
