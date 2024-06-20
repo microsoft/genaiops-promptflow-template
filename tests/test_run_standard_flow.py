@@ -69,9 +69,13 @@ def test_run_standard_flow_all():
         "llmops.common.prompt_pipeline.PFClientLocal"
     ), patch(
         "llmops.common.prompt_pipeline.PFClientAzure"
-    ) as mock_pf_client:
+    ) as mock_pf_client, patch(
+        "llmops.common.prompt_pipeline.MLClient"
+    ) as mock_ml_client:
         # Mock the PFClient
         pf_client_instance = Mock()
+        mock_ml_client_instance = Mock()
+        mock_ml_client.return_value = mock_ml_client_instance
         mock_pf_client.return_value = pf_client_instance
 
         ds1_name = "ds1"
@@ -154,10 +158,14 @@ def test_run_standard_flow_default():
         "llmops.common.prompt_pipeline.PFClientLocal"
     ), patch(
         "llmops.common.prompt_pipeline.PFClientAzure"
-    ) as mock_pf_client:
+    ) as mock_pf_client, patch(
+        "llmops.common.prompt_pipeline.MLClient"
+    ) as mock_ml_client:
         # Mock the PFClient
         pf_client_instance = Mock()
         mock_pf_client.return_value = pf_client_instance
+        mock_ml_client_instance = Mock()
+        mock_ml_client.return_value = mock_ml_client_instance
 
         ds1_name = "ds1"
         ds1_version = "3"
@@ -214,10 +222,14 @@ def test_run_standard_flow_custom():
         "llmops.common.prompt_pipeline.PFClientLocal"
     ), patch(
         "llmops.common.prompt_pipeline.PFClientAzure"
-    ) as mock_pf_client:
+    ) as mock_pf_client, patch(
+        "llmops.common.prompt_pipeline.MLClient"
+    ) as mock_ml_client:
         # Mock the PFClient
         pf_client_instance = Mock()
         mock_pf_client.return_value = pf_client_instance
+        mock_ml_client_instance = Mock()
+        mock_ml_client.return_value = mock_ml_client_instance
 
         ds1_name = "ds1"
         ds1_version = "3"

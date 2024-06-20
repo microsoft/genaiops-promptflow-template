@@ -55,17 +55,20 @@ from dotenv import load_dotenv
 from enum import Enum
 from typing import Optional
 
-from llmops.common.common import resolve_flow_type, resolve_env_vars
+from llmops.common.common import (
+    resolve_flow_type,
+    resolve_env_vars,
+    ClientObjectWrapper as ObjectWrapper,
+)
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 from llmops.common.create_connections import create_pf_connections
 from llmops.common.common import FlowTypeOption
 from llmops.config import EXECUTION_TYPE
-
 from promptflow.client import PFClient as PFClientLocal
 from promptflow.azure import PFClient as PFClientAzure
-
+from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 
 logger = llmops_logger("prompt_pipeline")
@@ -166,23 +169,35 @@ def prepare_and_execute(
     flow_type, params_dict = resolve_flow_type(
         experiment.base_path, experiment.flow)
 
-    print(params_dict)
-    print(experiment.connections)
+    ml_client = None
+    wrapper = None
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
         create_pf_connections(
-            subscription_id,
             exp_filename,
             base_path,
             env_name
         )
+        wrapper = ObjectWrapper(pf=pf)
     else:
+
+        ml_client = MLClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            workspace_name=config.workspace_name,
+            credential=DefaultAzureCredential(),
+        )
+
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
+        if ml_client is not None:
+            wrapper = ObjectWrapper(pf=pf, ml_client=ml_client)
+        else:
+            wrapper = ObjectWrapper(pf=pf)
 
     flow_detail = experiment.get_flow_detail(flow_type)
     print(flow_detail.flow_path)
@@ -266,7 +281,7 @@ def prepare_and_execute(
                                     dataset.get_local_source(base_path)
                                     if EXECUTION_TYPE == "LOCAL"
                                     else dataset.get_remote_source(
-                                        pf.ml_client
+                                        wrapper.get_property_value()
                                     )
                                 ),
                                 variant=variant_string,
@@ -288,7 +303,7 @@ def prepare_and_execute(
                                     dataset.get_local_source(base_path)
                                     if EXECUTION_TYPE == "LOCAL"
                                     else dataset.get_remote_source(
-                                        pf.ml_client
+                                        wrapper.get_property_value()
                                     )
                                 ),
                                 variant=variant_string,
@@ -359,7 +374,9 @@ def prepare_and_execute(
                     data=(
                         dataset.get_local_source(base_path)
                         if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(pf.ml_client)
+                        else dataset.get_remote_source(
+                            wrapper.get_property_value()
+                            )
                     ),
                     name=run_name,
                     display_name=run_name,
@@ -376,7 +393,9 @@ def prepare_and_execute(
                     data=(
                         dataset.get_local_source(base_path)
                         if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(pf.ml_client)
+                        else dataset.get_remote_source(
+                                wrapper.get_property_value()
+                            )
                     ),
                     name=run_name,
                     display_name=run_name,
@@ -389,7 +408,7 @@ def prepare_and_execute(
                     stream=True,
                 )
             run._experiment_name = experiment.name
-            print(run.name)
+            print(run)
 
             # Execute the run
             logger.info(

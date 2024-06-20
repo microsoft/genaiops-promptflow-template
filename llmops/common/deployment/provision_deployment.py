@@ -1,7 +1,7 @@
 """
-This module does deployment of flows to AML Managed compute.
+This module does deployment of flows to Managed compute.
 
-The code used AML compute as deployment target.
+The code uses compute as deployment target.
 It configures Managed Online deployments for Prompt Flow 'flows'
 
 Args:
@@ -29,6 +29,8 @@ from azure.ai.ml.entities import (
     Environment,
     OnlineRequestSettings,
     BuildContext,
+    DataCollector,
+    DeploymentCollection
 )
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
@@ -38,6 +40,7 @@ from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.common import resolve_flow_type, resolve_env_vars
+
 
 logger = llmops_logger("provision_deployment")
 
@@ -118,10 +121,10 @@ def create_deployment(
     logger.info(f"Model name: {model_name}")
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     model = ml_client.models.get(model_name, model_version)
@@ -131,6 +134,20 @@ def create_deployment(
     for elem in endpoint_config["azure_managed_endpoint"]:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
+                data_collector = None
+
+                data_collector = DataCollector(
+                    collections={
+                        "model_inputs": DeploymentCollection(
+                            enabled="true",
+                        ),
+                        "model_outputs": DeploymentCollection(
+                            enabled="true",
+                        )
+                    },
+                    sampling_rate=1,
+                )
+
                 endpoint_name = elem["ENDPOINT_NAME"]
                 deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
                 deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
@@ -144,6 +161,17 @@ def create_deployment(
                 # ]
                 deployment_desc = elem["DEPLOYMENT_DESC"]
                 environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
+
+                if os.environ.get(
+                    "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    None
+                ):
+                    environment_variables[
+                        "APPLICATIONINSIGHTS_CONNECTION_STRING"
+                    ] = (
+                        os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING")
+                    )
+
                 if isinstance(env_vars, dict):
                     if env_vars:
                         for key, value in env_vars.items():
@@ -151,6 +179,7 @@ def create_deployment(
                 for key, value in params_dict.items():
                     environment_variables[key] = value
                 environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
+                environment_variables["PROMPTFLOW_SERVING_ENGINE"] = "fastapi"
                 environment_variables["PRT_CONFIG_OVERRIDE"] = (
                     f"deployment.subscription_id={config.subscription_id},"
                     f"deployment.resource_group={config.resource_group_name},"
@@ -202,8 +231,9 @@ def create_deployment(
                     tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
                     request_settings=OnlineRequestSettings(
-                        request_timeout_ms=90000
+                        request_timeout_ms=180000
                     ),
+                    data_collector=data_collector
                 )
 
                 ml_client.online_deployments.begin_create_or_update(

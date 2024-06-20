@@ -1,5 +1,5 @@
 """
-This module tests a standard flow deployed on AML Kubernetes attached compute.
+This module tests a standard flow deployed on Kubernetes attached compute.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
@@ -30,17 +30,17 @@ def test_aml_model(
     env_name: Optional[str],
     subscription_id: Optional[str],
 ):
-    """Test the model on AML managed compute."""
+    """Test the model on managed compute."""
     config = ExperimentCloudConfig(
         subscription_id=subscription_id, env_name=env_name
     )
     real_config = f"{base_path}/configs/deployment_config.json"
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     config_file = open(real_config)
@@ -69,7 +69,7 @@ def test_aml_model(
 
 
 def main():
-    """Entry main function to test the model on AML managed compute."""
+    """Entry main function to test the model on managed compute."""
     parser = argparse.ArgumentParser("test_flow")
     parser.add_argument(
         "--subscription_id",

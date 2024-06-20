@@ -154,7 +154,7 @@ stages:
     # - configure build agent by installing all dependencies
     # - registers the flow with Azure ML registry
     # - gets the latest flow version from registry
-    # - deploys the flow to either Kubernetes or AML Compute as real time endpoint.
+    # - deploys the flow to either Kubernetes or Managed Compute as real time endpoint.
     #=====================================
     - stage: deploy_prompts
       displayName: deploy_prompts
@@ -265,7 +265,7 @@ stages:
               ENV_VARS: ${{ parameters.env_vars }}
 
         #=====================================
-        # Executes AML Compute deployment when parameter deployment_type == 'aml'
+        # Executes Managed Compute deployment when parameter deployment_type == 'aml'
         # Reads 'azure_managed_endpoint' field values from deployment_config.json
         #=====================================     
         - ${{ if eq(lower(parameters.deployment_type), 'aml') }}:

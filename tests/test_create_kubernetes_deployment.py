@@ -115,7 +115,7 @@ def test_create_kubernetes_deployment():
             deployment_config
         )
 
-        assert created_deployment.request_settings.request_timeout_ms == 90000
+        assert created_deployment.request_settings.request_timeout_ms == 180000
         assert created_deployment.resources.requests.cpu == deployment_cpu
         assert created_deployment.resources.requests.memory == deployment_mem
 

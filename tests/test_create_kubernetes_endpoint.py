@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 import pytest
 from pathlib import Path
 from llmops.common.deployment.kubernetes_endpoint import (
-    create_kubernetes_endpoint
+    create_kubernetes_endpoint,
 )
 
 THIS_PATH = Path(__file__).parent
@@ -32,15 +32,16 @@ def test_create_kubernetes_endpoint():
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
-
         # Create the endpoint
         create_kubernetes_endpoint(env_name, str(RESOURCE_PATH))
 
         # Assert that ml_client.online_endpoints.begin_create_or_update
         # is called once
+
         create_endpoint_calls = (
             ml_client_instance.online_endpoints.begin_create_or_update
         )
+
         assert create_endpoint_calls.call_count == 1
 
         # Assert that ml_client.online_endpoints.begin_create_or_update

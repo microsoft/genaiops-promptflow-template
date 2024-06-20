@@ -1,5 +1,5 @@
 """
-This module registers a flow in AML workspace model registry.
+This module registers a flow in model registry.
 
 Args:
 --file: The name of the experiment file. Default is 'experiment.yaml'.
@@ -28,6 +28,7 @@ from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.common import resolve_flow_type
+
 
 logger = llmops_logger("register_flow")
 
@@ -76,10 +77,10 @@ def register_model(
     logger.info(f"Model name: {model_name}")
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     model_path = experiment.get_flow_detail(flow_type).flow_path
