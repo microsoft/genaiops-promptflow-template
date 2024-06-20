@@ -10,8 +10,8 @@ import json
 
 pipeline_components = []
 """
-This function creates and returns an Azure Machine Learning (AML) client.
-The AML client is used to interact with Azure Machine Learning services.
+This function creates and returns a ml client.
+The client is used to interact with Azure Machine Learning services.
 
 Args:
 --subscription_id: The Azure subscription ID.

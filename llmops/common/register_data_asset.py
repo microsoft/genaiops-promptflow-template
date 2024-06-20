@@ -18,8 +18,8 @@ from dotenv import load_dotenv
 from typing import Optional
 
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Data
-from azure.ai.ml.constants import AssetTypes
+from azure.ai.ml.entities import Data as AMLData
+from azure.ai.ml.constants import AssetTypes as AMLAssetTypes
 from azure.identity import DefaultAzureCredential
 
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
@@ -62,10 +62,10 @@ def register_data_asset(
     )
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     # Get all used datasets
@@ -85,9 +85,9 @@ def register_data_asset(
             data_hash = generate_file_hash(local_data_path)
             logger.info(f"Hash of the folder: {data_hash}")
 
-            aml_dataset = Data(
+            aml_dataset = AMLData(
                 path=local_data_path,
-                type=AssetTypes.URI_FILE,
+                type=AMLAssetTypes.URI_FILE,
                 description=ds.description,
                 name=ds.name,
                 tags={"data_hash": data_hash},
@@ -113,7 +113,7 @@ def register_data_asset(
             aml_dataset = ml_client.data.get(name=ds.name, label="latest")
 
             logger.info(aml_dataset.version)
-            logger.info(aml_dataset.id)
+            logger.info(aml_dataset.path)
 
 
 def main():

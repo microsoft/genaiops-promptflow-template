@@ -16,7 +16,7 @@ The module contains the following functions:
 
 import os
 import yaml
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, Dict
 
 from azure.ai.ml import MLClient
 
@@ -77,7 +77,7 @@ class Dataset:
                 ml_client.data.get(name=name, version=version)
             except Exception:
                 raise ValueError(
-                    f"Azure ML dataset {name} not found"
+                    f"dataset {name} not found"
                     f" in workspace {ml_client.workspace_name}"
                 )
             return self.source
@@ -86,7 +86,7 @@ class Dataset:
             ds = ml_client.data.get(name=self.name, label="latest")
         except Exception:
             raise ValueError(
-                f"Azure ML dataset {self.name} not found"
+                f"Dataset {self.name} not found"
                 f" in workspace {ml_client.workspace_name}"
             )
         return f"azureml:{self.name}:{ds.version}"
@@ -162,18 +162,12 @@ class Connection:
         self,
         name: str,
         connection_type: str,
-        api_key: str,
-        api_version: str,
-        api_endpoint: str,
-        api_type: str
+        connection_properties: Dict[str, Any]
     ):
         """Initialize Evaluator object."""
         self.name = name
         self.connection_type = connection_type
-        self.api_key = api_key
-        self.api_version = api_version
-        self.api_endpoint = api_endpoint
-        self.api_type = api_type
+        self.connection_properties: Dict[str, Any] = connection_properties
 
 
 class Evaluator:
@@ -627,25 +621,27 @@ def _create_connections(
     for raw_connection in raw_connections:
         # Raise error if expected evaluator configuration missing
         _raise_error_if_missing_keys(
-            ["name", "api_key", "api_endpoint", "api_type", "api_version"],
+            ["name", "api_key", "api_base", "api_type", "api_version"],
             raw_connection,
             message=f"Connection '{raw_connection.get('name')}' config missing"
         )
 
-        connection_name = raw_connection["name"]
-        connection_type = raw_connection["connection_type"]
-        api_key = raw_connection.get("api_key")
-        api_version = raw_connection.get("api_version")
-        api_type = raw_connection.get("api_type")
-        api_endpoint = raw_connection.get("api_endpoint")
+        connection_name = None
+        connection_type = None
+        connection_properties = {}
+
+        for name, value in raw_connection.items():
+            if name == "name":
+                connection_name = raw_connection["name"]
+            elif name == "connection_type":
+                connection_type = raw_connection["connection_type"]
+            else:
+                connection_properties[name] = value
 
         connection = Connection(
             name=connection_name,
             connection_type=connection_type,
-            api_key=api_key,
-            api_version=api_version,
-            api_type=api_type,
-            api_endpoint=api_endpoint
+            connection_properties=connection_properties
         )
         connections.append(connection)
     return connections

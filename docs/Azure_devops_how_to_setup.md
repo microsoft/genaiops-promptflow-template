@@ -104,7 +104,7 @@ Secrets are referenced in the experiment.yaml, flex.flow.yaml, init.json and env
 connections:
 - name: aoai
   connection_type: AzureOpenAIConnection
-  api_endpoint: https://xxxxx.openai.azure.com/
+  api_base: https://xxxxx.openai.azure.com/
   api_version: 2023-07-01-preview
   api_key: ${api_key}
   api_type: azure

@@ -20,14 +20,17 @@ import datetime
 import json
 import os
 import pandas as pd
-import importlib
-import inspect
 from dotenv import load_dotenv
 from typing import Optional
+import inspect
+import importlib
 
 from azure.identity import DefaultAzureCredential
 
-from llmops.common.common import FlowTypeOption
+from llmops.common.common import (
+    FlowTypeOption,
+    ClientObjectWrapper as ObjectWrapper
+)
 from llmops.common.common import (
     resolve_run_ids,
     resolve_flow_type,
@@ -38,10 +41,10 @@ from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 from llmops.common.create_connections import create_pf_connections
 from llmops.config import EXECUTION_TYPE
-
 from promptflow.client import PFClient as PFClientLocal
 from promptflow.azure import PFClient as PFClientAzure
 from promptflow._sdk.entities import Run
+from azure.ai.ml import MLClient
 
 logger = llmops_logger("prompt_eval")
 
@@ -82,8 +85,8 @@ def prepare_and_execute(
     experiment_name = experiment.name
 
     run_ids = resolve_run_ids(run_id)
-    if run_ids is None or len(run_ids) == 0:
-        raise ValueError("No run ids found.")
+    # if run_ids is None or len(run_ids) == 0:
+    #    raise ValueError("No run ids found.")
 
     eval_flows = experiment.evaluators
 
@@ -91,21 +94,33 @@ def prepare_and_execute(
                                                experiment.flow
                                                )
 
+    wrapper = None
+    ml_client = None
     if EXECUTION_TYPE == "LOCAL":
         pf = PFClientLocal()
         create_pf_connections(
-            subscription_id,
             exp_filename,
             base_path,
             env_name
         )
+        wrapper = ObjectWrapper(pf=pf)
     else:
+
+        ml_client = MLClient(
+            subscription_id=config.subscription_id,
+            resource_group_name=config.resource_group_name,
+            workspace_name=config.workspace_name,
+            credential=DefaultAzureCredential(),
+        )
         pf = PFClientAzure(
             credential=DefaultAzureCredential(),
             subscription_id=config.subscription_id,
             workspace_name=config.workspace_name,
             resource_group_name=config.resource_group_name
         )
+
+        wrapper = ObjectWrapper(pf=pf, ml_client=ml_client)
+        print(wrapper)
 
     standard_flow_detail = experiment.get_flow_detail(flow_type)
     default_variants = standard_flow_detail.default_variants
@@ -254,81 +269,12 @@ def prepare_and_execute(
                         )
                     else:
                         raise ValueError("Invalid flow type")
-                elif flow_type == FlowTypeOption.NO_FLOW:
-                    service_path = evaluator.path
-
-                    service_module = None
-                    for file in os.listdir(service_path):
-                        if (
-                            file.endswith('.py') and
-                            file.lower().startswith('eval_')
-                        ):
-                            module_name = file[:-3]
-                            flow_components = service_path.split('/')
-                            flow_formatted = '.'.join(flow_components)
-                            module_path = (
-                                f'{flow_formatted}.'
-                                f'{module_name}'
-                            )
-                            import sys
-                            dependent_modules_dir = os.path.join(
-                                experiment.base_path, experiment.flow
-                                )
-                            sys.path.append(dependent_modules_dir)
-
-                            service_module = importlib.import_module(
-                                module_path
-                                )
-
-                            print(service_module)
-                            module_names = dir(service_module)
-
-                            # Filter names to get classes defined in the module
-                            # class_names = [
-                            #    name for name in module_names
-                            #    if inspect.isclass
-                            #    (
-                            #        getattr(
-                            #            service_module,
-                            #            name
-                            #            )
-                            #        )
-                            #    ]
-
-                            # Filter names to get functions defined in module
-                            function_names = [
-                                name for name in module_names
-                                if inspect.isfunction
-                                (
-                                    getattr(
-                                        service_module,
-                                        name
-                                        )
-                                    )
-                                ]
-
-                            print("\nAvailable functions:")
-                            for function_name in function_names:
-                                if (
-                                    function_name.lower().startswith('eval_')
-                                ):
-                                    service_function = getattr(
-                                        service_module,
-                                        function_name
-                                        )
-                                    for ds in evaluator.datasets:
-                                        result = service_function(
-                                            run_name,
-                                            run_data_id,
-                                            column_mapping
-                                        )
-                                        print(result)
 
                 run._experiment_name = experiment_name
 
                 # Execute the run
                 logger.info(
-                    f"Starting run '{run.name}' inAML. This can be long.",
+                    f"Starting run '{run.name}'. This can be long.",
                 )
 
                 eval_run_ids.append(run.name)
@@ -402,6 +348,93 @@ def prepare_and_execute(
 
             all_eval_df.append(combined_results_df)
             all_eval_metrics.append(combined_metrics_df)
+
+        if flow_type == FlowTypeOption.NO_FLOW:
+            service_path = evaluator.path
+
+            service_module = None
+            for file in os.listdir(service_path):
+                if (
+                    file.endswith('.py') and
+                    file.lower().startswith('eval_')
+                ):
+                    module_name = file[:-3]
+                    flow_components = service_path.split('/')
+                    flow_formatted = '.'.join(flow_components)
+                    module_path = (
+                        f'{flow_formatted}.'
+                        f'{module_name}'
+                    )
+                    import sys
+                    dependent_modules_dir = os.path.join(
+                        experiment.base_path, experiment.flow
+                        )
+                    sys.path.append(dependent_modules_dir)
+
+                    service_module = importlib.import_module(
+                        module_path
+                        )
+
+                    print(service_module)
+                    module_names = dir(service_module)
+
+                    # Filter names to get functions defined in module
+                    function_names = [
+                        name for name in module_names
+                        if inspect.isfunction
+                        (
+                            getattr(
+                                service_module,
+                                name
+                                )
+                            )
+                        ]
+
+                    for function_name in function_names:
+                        if (
+                            function_name.lower().startswith('eval_')
+                        ):
+                            service_function = getattr(
+                                service_module,
+                                function_name
+                                )
+                            for ds in evaluator.datasets:
+                                timestamp = datetime.datetime.now().strftime(
+                                    "%Y%m%d_%H%M%S"
+                                    )
+                                if EXECUTION_TYPE == "LOCAL":
+                                    result = service_function(
+                                        f"{experiment_name}_eval_{timestamp}",
+                                        os.path.join(
+                                            experiment.base_path,
+                                            ds.dataset.source
+                                        ),
+                                        ds.mappings,
+                                        f"{report_dir}/"
+                                    )
+                                else:
+                                    result = service_function(
+                                        f"{experiment_name}_eval_{timestamp}",
+                                        os.path.join(
+                                            experiment.base_path,
+                                            ds.dataset.source
+                                        ),
+                                        ds.mappings,
+                                        f"{report_dir}/",
+                                        {
+                                            "subscription_id": (
+                                                config.subscription_id
+                                            ),
+                                            "resource_group_name": (
+                                                config.resource_group_name
+                                            ),
+                                            "project_name": (
+                                                config.workspace_name
+                                            ),
+                                        }
+                                    )
+
+                                print(result)
 
     if len(all_eval_df) > 0:
         final_results_df = pd.concat(all_eval_df, ignore_index=True)

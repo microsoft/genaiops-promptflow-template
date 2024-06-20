@@ -13,6 +13,8 @@ from promptflow.entities import Run
 _FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
 _FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
+yaml_base_name = "config"
+
 
 class FlowTypeOption(Enum):
     """Flow type options."""
@@ -23,7 +25,22 @@ class FlowTypeOption(Enum):
     NO_FLOW = 4
 
 
-yaml_base_name = "config"
+class ClientObjectWrapper:
+    """Wrapper class for the MLClient object."""
+
+    def __init__(self, pf=None, ml_client=None):
+        """Initialize the ObjectWrapper class."""
+        self.pf = pf
+        self.ml_client = ml_client
+
+    def get_property_value(self):
+        """Get the property value."""
+        if self.ml_client is not None:
+            return self.ml_client
+        elif self.pf is not None:
+            return getattr(self.pf, "ml_client")
+        else:
+            raise ValueError("Neither 'pf' nor 'ml_client' is available")
 
 
 def resolve_env_vars(base_path: str) -> Dict:
@@ -42,7 +59,15 @@ def resolve_env_vars(base_path: str) -> Dict:
             temp_val = os.environ.get(key, None)
             if temp_val is not None:
                 env_vars[key] = os.environ.get(key, None)
-                print(os.environ.get(key, None))
+            else:
+                if (
+                    isinstance(value, str)
+                    and value.startswith('${')
+                    and value.endswith('}')
+                ):
+                    raise ValueError("values in env.yaml not resolved")
+                else:
+                    os.environ[key] = value
     else:
         env_vars = {}
         print("no values")
@@ -206,6 +231,8 @@ def resolve_run_ids(run_id: str) -> list[str]:
                 raw_runs_ids
             )
     else:
-        run_ids = [] if run_id is None else ast.literal_eval(run_id)
+        run_ids = [] if run_id is None or run_id is [] else ast.literal_eval(
+            run_id
+            )
 
     return run_ids

@@ -3,7 +3,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 from pathlib import Path
-from llmops.common.deployment.provision_endpoint import create_endpoint
+from llmops.common.deployment.provision_endpoint import (
+    create_endpoint
+)
 
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
@@ -29,7 +31,6 @@ def test_create_provision_endpoint():
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
-
         # Create the endpoint
         create_endpoint(env_name, str(RESOURCE_PATH))
 

@@ -1,12 +1,12 @@
 """
-This module returns a AML workspace object after authentication.
+This module returns a workspace object after authentication.
 
 Args:
 --subscription_id: The Azure subscription ID.
 This argument is required for identifying the Azure subscription.
 --resource_group_name: The name of the resource group associated with
-AML workspace.
---workspace_name: The AML workspace name.
+workspace or project.
+--workspace_name: The service in Azure.
 """
 
 import argparse
@@ -37,7 +37,7 @@ def get_workspace(
         If not provided, uses SUBSCRIPTION_ID environment variable.
         resource_group_name (Optional[str]): user provided resource group name.
         If not provided, uses RESOURCE_GROUP_NAME environment variable.
-        workspace_name (Optional[str]): user provided azure AML workspace name.
+        workspace_name (Optional[str]): user provided azure workspace name.
         If not provided, uses WORKSPACE_NAME environment variable.
 
     Returns:
@@ -82,13 +82,13 @@ def main():
     parser.add_argument(
         "--resource_group_name",
         type=str,
-        help="AML RG, overrides the RESOURCE_GROUP_NAME env variable",
+        help="RG, overrides the RESOURCE_GROUP_NAME env variable",
         default=None,
     )
     parser.add_argument(
         "--workspace_name",
         type=str,
-        help="AML Workspace name, overrides the WORKSPACE_NAME env var",
+        help="Workspace or project name, overrides the WORKSPACE_NAME env var",
         default=None,
     )
 

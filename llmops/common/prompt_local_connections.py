@@ -47,11 +47,7 @@ def prepare_and_execute(
     flow_type, params_dict = resolve_flow_type(
         experiment.base_path, experiment.flow)
 
-    print(params_dict)
-    print(experiment.connections)
-
     create_pf_connections(
-        "",
         "experiment.yaml",
         base_path,
         env_name

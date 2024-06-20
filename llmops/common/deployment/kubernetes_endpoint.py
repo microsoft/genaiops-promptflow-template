@@ -1,5 +1,5 @@
 """
-This module creates Kubernetes AML online endpoint as flow deployment process.
+This module creates Kubernetes managed endpoint as flow deployment process.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
@@ -45,10 +45,10 @@ def create_kubernetes_endpoint(
     real_config = f"{base_path}/configs/deployment_config.json"
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     config_file = open(real_config)
@@ -67,6 +67,9 @@ def create_kubernetes_endpoint(
                     compute=compute_name,
                     auth_mode="key",
                     tags={"build_id": build_id} if build_id else {},
+                    properties={
+                        "enforce_access_to_default_secret_stores": True,
+                    },
                 )
 
                 logger.info(f"Creating endpoint {endpoint.name}")

@@ -49,7 +49,8 @@ acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
 websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
 
 config_path="./$use_case_base_path/experiment.yaml"
-STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+#STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
+STANDARD_FLOW=$(yq '.flow' "$config_path" |  sed 's/"//g')
 init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
 init_output=()
@@ -132,7 +133,12 @@ do
     echo "$element"
 done
 
-# Assign user managed identifier to Web APp
+az webapp config appsettings set \
+        --resource-group $rgname \
+        --name $appserviceweb \
+        --settings PROMPTFLOW_SERVING_ENGINE=fastapi
+
+# Assign user managed identifier to Web APP
 id=$(az identity show --resource-group $rgname --name $udmid --query id --output tsv)
 
 az webapp identity assign --resource-group $rgname --name $appserviceweb --identities $id

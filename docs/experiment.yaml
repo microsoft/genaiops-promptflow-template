@@ -39,14 +39,14 @@ flow: <flow_name>
 connections:
 - name: <connection_0_name>
   connection_type: <connection_type>
-  api_endpoint: <api_endpoint>
+  api_base: <api_base>
   api_version: <api_version>
   api_key: ${api_key}
   api_type: <api_type>
 
 - name: <connection_1_name>
   connection_type: <connection_type>
-  api_endpoint: <api_endpoint>
+  api_base: <api_base>
   api_version: <api_version>
   api_key: ${api_key}
   api_type: <api_type>
@@ -57,7 +57,7 @@ connections:
 # Properties of a connection:
 # - name: the unique name used to reference the connection.
 #   connection_type: the type of connection. AzureOpenAIConnection is the only supported connection type.
-#   api_endpoint: the endpoint of the API.
+#   api_base: the endpoint of the API.
 #   api_version: the version of the API.
 #   api_key: the key of the API. This is used to authenticate the API calls.
 #   api_type: the type of API. This is used to determine the type of authentication required.
