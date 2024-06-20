@@ -33,7 +33,6 @@ while [[ $# -gt 0 ]]; do
 done
 source .env
 . .env
-
 set -e # fail on error
 
 # read values from deployment_config.json related to `webapp_endpoint`
@@ -99,7 +98,6 @@ for name in "${connection_names[@]}"; do
     uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     env_var_key="${uppercase_name}_API_KEY"
     api_key=${!env_var_key}
-
     #uppercase_name=$(echo "$name" | tr '[:lower:]' '[:upper:]')
     #modified_name="${uppercase_name}_API_KEY"
     az webapp config appsettings set \
