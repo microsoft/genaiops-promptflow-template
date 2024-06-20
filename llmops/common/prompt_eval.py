@@ -85,8 +85,6 @@ def prepare_and_execute(
     experiment_name = experiment.name
 
     run_ids = resolve_run_ids(run_id)
-    # if run_ids is None or len(run_ids) == 0:
-    #    raise ValueError("No run ids found.")
 
     eval_flows = experiment.evaluators
 
@@ -274,7 +272,7 @@ def prepare_and_execute(
 
                 # Execute the run
                 logger.info(
-                    f"Starting run '{run.name}'. This can be long.",
+                    f"Starting run '{run.name}'. This can take a long time.",
                 )
 
                 eval_run_ids.append(run.name)
@@ -375,7 +373,6 @@ def prepare_and_execute(
                         module_path
                         )
 
-                    print(service_module)
                     module_names = dir(service_module)
 
                     # Filter names to get functions defined in module

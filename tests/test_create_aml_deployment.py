@@ -12,6 +12,8 @@ WORKSPACE_NAME = "TEST_WORKSPACE_NAME"
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
 
+REQUEST_TIMEOUT_MS = 3 * 60 * 1000
+
 
 @pytest.fixture(scope="module", autouse=True)
 def _set_required_env_vars():
@@ -111,7 +113,7 @@ def test_create_kubernetes_deployment():
             deployment_config
         )
 
-        assert created_deployment.request_settings.request_timeout_ms == 180000
+        assert created_deployment.request_settings.request_timeout_ms == REQUEST_TIMEOUT_MS
 
         env_vars = created_deployment.environment_variables
         assert env_vars["test-key"] == "test-value"

@@ -42,7 +42,6 @@ env_var_file_path="./$use_case_base_path/environment/env.yaml"
 source .env
 . .env
 if [[ -e "$config_path" ]]; then
-    #STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
     STANDARD_FLOW=$(yq '.flow' "$config_path" |  sed 's/"//g')
 
     init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"

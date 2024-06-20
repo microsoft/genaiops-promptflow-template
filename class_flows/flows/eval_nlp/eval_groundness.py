@@ -14,20 +14,11 @@ def eval_use_case(
         output_path,
         azure_service={},
 ):
-    print("Implement your custom evaluation here")
-    print("invoke evaluate function withe valuators and evaluator_config")
-    print("from promptflow.evals.evaluate import evaluate")
-    print("from promptflow.evals.evaluators import  SimilarityEvaluator")
-    print(column_mapping)
-    print(os.environ.get("AZURE_OPENAI_API_KEY"))
-
     model_config = AzureOpenAIModelConfiguration(
         azure_endpoint=os.environ.get("AZURE_OPENAI_ENDPOINT"),
         api_key=os.environ.get("AZURE_OPENAI_API_KEY"),
         azure_deployment=os.environ.get("DEPLOYMENT_NAME"),
     )
-    print(data_id)
-    print(os.environ.get("DEPLOYMENT_NAME"))
     chat_flow = ChatFlow(model_config=model_config, max_total_token=4096)
 
     groundness_eval = GroundednessEvaluator(model_config=model_config)

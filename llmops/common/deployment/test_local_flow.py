@@ -43,6 +43,7 @@ def test_local_container_endpoint(flow_name: str):
                 logger.info("POST request successful!")
                 # Print the response content
                 logger.info("Response:", response.json())
+                break
             else:
                 logger.info(
                     "POST request failed with status code:",
