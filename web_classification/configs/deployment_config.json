@@ -3,12 +3,12 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "wc01eee",
+            "ENDPOINT_NAME": "",
             "ENDPOINT_DESC": "A Managed compute based endpoint serving a flow for web classification",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
             "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION": "0",
-            "CURRENT_DEPLOYMENT_NAME": "wc01ddd",
+            "CURRENT_DEPLOYMENT_NAME": "",
             "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION": "100",
             "DEPLOYMENT_VM_SIZE": "Standard_E16s_v3",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
@@ -42,14 +42,14 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai"],
-            "REGISTRY_NAME": "researchmlops",
-            "REGISTRY_RG_NAME": "mlops",
-            "APP_PLAN_NAME": "wqeqewew11",
-            "WEB_APP_NAME": "sadadwe11",
-            "WEB_APP_RG_NAME": "sdaasdaa111",
+            "CONNECTION_NAMES": [""],
+            "REGISTRY_NAME": "",
+            "REGISTRY_RG_NAME": "",
+            "APP_PLAN_NAME": "",
+            "WEB_APP_NAME": "",
+            "WEB_APP_RG_NAME": "",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "cvxvvcwe11"
+            "USER_MANAGED_ID": ""
             
         }
     ]
