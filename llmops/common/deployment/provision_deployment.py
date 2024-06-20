@@ -34,6 +34,7 @@ from azure.ai.ml.entities import (
 )
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
+from llmops.common.common import REQUEST_TIMEOUT_MS
 
 
 from llmops.common.logger import llmops_logger
@@ -231,7 +232,7 @@ def create_deployment(
                     tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
                     request_settings=OnlineRequestSettings(
-                        request_timeout_ms=180000
+                        request_timeout_ms=REQUEST_TIMEOUT_MS
                     ),
                     data_collector=data_collector
                 )

@@ -71,7 +71,7 @@ if __name__ == "__main__":
     researchers to build applications and tools that leverage its capabilities."""
     statements = {
         "correctness": "It contains a detailed explanation of ChatGPT.",
-        "consise": "It is a consise statement.",
+        "concise": "It is a concise statement.",
     }
 
     config = AzureOpenAIModelConfiguration(

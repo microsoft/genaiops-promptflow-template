@@ -10,7 +10,7 @@ import json
 
 pipeline_components = []
 """
-This function creates and returns a ml client.
+This function creates and returns an ml client.
 The client is used to interact with Azure Machine Learning services.
 
 Args:

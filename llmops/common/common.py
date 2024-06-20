@@ -13,6 +13,8 @@ from promptflow.entities import Run
 _FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
 _FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
+REQUEST_TIMEOUT_MS = 3 * 60 * 1000
+
 yaml_base_name = "config"
 
 

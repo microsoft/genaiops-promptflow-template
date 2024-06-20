@@ -40,6 +40,7 @@ from azure.ai.ml.entities._deployment.resource_requirements_settings import (
 from azure.ai.ml.entities._deployment.container_resource_settings import (
     ResourceSettings,
 )
+from llmops.common.common import REQUEST_TIMEOUT_MS
 from dotenv import load_dotenv
 
 
@@ -232,7 +233,7 @@ def create_kubernetes_deployment(
                     tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
                     request_settings=OnlineRequestSettings(
-                        request_timeout_ms=180000
+                        request_timeout_ms=REQUEST_TIMEOUT_MS
                     ),
                     data_collector=data_collector,
                     resources=ResourceRequirementsSettings(

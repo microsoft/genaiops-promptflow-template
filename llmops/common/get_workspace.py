@@ -82,7 +82,7 @@ def main():
     parser.add_argument(
         "--resource_group_name",
         type=str,
-        help="RG, overrides the RESOURCE_GROUP_NAME env variable",
+        help="Overrides the RESOURCE_GROUP_NAME env variable",
         default=None,
     )
     parser.add_argument(

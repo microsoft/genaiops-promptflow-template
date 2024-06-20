@@ -49,7 +49,6 @@ acr_rg=$(echo "$con_object" | jq -r '.REGISTRY_RG_NAME')
 websku=$(echo "$con_object" | jq -r '.WEB_APP_SKU')
 
 config_path="./$use_case_base_path/experiment.yaml"
-#STANDARD_FLOW=$(yq eval '.flow // .name' "$config_path")
 STANDARD_FLOW=$(yq '.flow' "$config_path" |  sed 's/"//g')
 init_file_path="./$use_case_base_path/$STANDARD_FLOW/flow.flex.yaml"
 
