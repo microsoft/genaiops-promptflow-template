@@ -49,7 +49,11 @@ jobs:
           versionSpec: "3.9"
           base_path: ${{ inputs.use_case_base_path }}
       - name: Create .env file
-        run: echo "${{ secrets.env_vars }}" > .env
+        run: |
+          echo "${{ secrets.env_vars }}" >> .env
+          for var in $(cat .env); do
+            echo "$var" >> $GITHUB_ENV
+          done
       - name: load .env file
         run: python -c "from dotenv import load_dotenv; load_dotenv()"
 

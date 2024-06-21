@@ -33,7 +33,11 @@ runs:
   steps:
     - name: Create .env file
       shell: bash
-      run: echo "${{ inputs.ENV_VARS }}" > .env
+      run: |
+        echo "${{ secrets.env_vars }}" >> .env
+        for var in $(cat .env); do
+          echo "$var" >> $GITHUB_ENV
+        done
     - name: load .env file
       shell: bash
       run: python -c "from dotenv import load_dotenv; load_dotenv()"
