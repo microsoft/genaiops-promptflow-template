@@ -255,11 +255,49 @@ The configuration for connection used while authoring the repo:
 
 ![connection details](images/connection-details.png)
 
-## Set up Jenkins Credentials for Prompt Flow and ACR
+## Execution
 
-### Prompt flow Connection
+### config.py
 
-Create Jenkins Credentials of the type **Secret File** named `ENV_VARS` with information related to Prompt flow connections.  The values for this secret with given structure is shown next.The 'ENV_VARS' secret should contain the same key-value pairs as the .env file.
+The `config.py` file located in the `llmops` folder contains the `EXECUTION_TYPE` variable, which determines where the flow will be executed.
+
+- Set `EXECUTION_TYPE = "LOCAL"` to execute the flows on your local machine.
+- Set `EXECUTION_TYPE = "AZURE"` to execute the flows on Azure.
+
+### Local Execution
+
+When the `EXECUTION_TYPE` variable is set to `"LOCAL"`, the templates will be executed on your local machine. This is useful for local development, testing, and debugging.
+
+To execute a template locally, use the following command:
+
+``` bash
+python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
+```
+
+Replace `<example_path>` with the path to the specific example you want to run (e.g., `./web_classification`) and `<template_name>` with the name of the template (e.g., `summarize_text_content.variant_0`). The `--variants` argument is optional and can be used to specify the variant of the template to run.
+
+Ensure that you have a .env file with valid values for the required environment variables. The .env file should be located in the root directory of the example you are running. An example .env.sample file is provided which can be renamed to .env file.
+
+### Azure Execution
+
+When the `EXECUTION_TYPE` variable is set to `"AZURE"`, the flows will be executed on Azure. This allows you to leverage the scalability and resources provided by Azure for running your experiments and evaluations.
+
+There are two ways to execute templates on Azure:
+
+1. **CI/CD Pipelines**: Set up a CI/CD pipeline in your Azure DevOps/Github/Jenkins. Configure the pipeline to trigger the execution of the template on Azure. Ensure that the `EXECUTION_TYPE` variable in `config.py` is set to `"AZURE"`.
+
+2. **Direct Execution from Local Machine**: You can also execute templates on Azure directly from your local machine. Set the `EXECUTION_TYPE` variable in `config.py` to `"AZURE"` and use the following command:
+
+``` bash
+python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
+```
+
+Ensure that you have a .env file with valid values for the required environment variables. The .env file should be located in the root directory of the example you are running. An example .env.sample file is provided which can be renamed to .env file.
+
+### Jenkins Pipeline Execution
+
+When executing the template through Jenkins Pipelines, secrets are stored as a secret file within Jenkins environment. In this template, a secret named 'ENV_VARS' is used to store the secrets. The 'ENV_VARS' secret should contain the same key-value pairs as the .env file.
+Create Jenkins Credentials of the type **Secret File** named `ENV_VARS` with information related to Prompt flow connections.  The values for this secret with given structure is shown next.
 
 ``` bash
 AOAI_API_KEY=abcdefghijklmnop
