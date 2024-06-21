@@ -69,7 +69,7 @@ def resolve_env_vars(base_path: str) -> Dict:
                 ):
                     raise ValueError("values in env.yaml not resolved")
                 else:
-                    os.environ[key] = value
+                    os.environ[key] = str(value)
     else:
         env_vars = {}
         print("no values")

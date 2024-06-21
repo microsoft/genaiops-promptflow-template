@@ -50,6 +50,8 @@ python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants 
 
 Replace `<example_path>` with the path to the specific example you want to run (e.g., `./web_classification`) and `<template_name>` with the name of the template (e.g., `summarize_text_content.variant_0`). The `--variants` argument is optional and can be used to specify the variant of the template to run.
 
+Ensure that you have a .env file with valid values for the required environment variables. The .env file should be located in the root directory of the example you are running. An example .env.sample file is provided which can be renamed to .env file.
+
 ### Azure Execution
 
 When the `EXECUTION_TYPE` variable is set to `"AZURE"`, the flows will be executed on Azure. This allows you to leverage the scalability and resources provided by Azure for running your experiments and evaluations.
@@ -63,6 +65,7 @@ There are two ways to execute templates on Azure:
 ``` bash
 python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
 ```
+Ensure that you have a .env file with valid values for the required environment variables. The .env file should be located in the root directory of the example you are running. An example .env.sample file is provided which can be renamed to .env file.
 
 ### Important Considerations
 

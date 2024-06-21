@@ -129,6 +129,10 @@ def prepare_and_execute(
     for run in run_ids:
         runs[run] = pf.runs.get(run)
 
+    if report_dir:
+        if not os.path.exists(report_dir):
+            os.makedirs(report_dir)
+
     all_eval_df = []
     all_eval_metrics = []
 
