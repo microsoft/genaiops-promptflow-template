@@ -42,6 +42,16 @@ The `config.py` file located in the `llmops` folder contains the `EXECUTION_TYPE
 
 When the `EXECUTION_TYPE` variable is set to `"LOCAL"`, the templates will be executed on your local machine. This is useful for local development, testing, and debugging.
 
+Setup the environment by installing the required dependencies using the following command:
+
+``` bash
+pip install -r ./github/requirements/execute_job_requirements.txt
+
+# select the requirements file based on the usecase you are working on e.g. for web_classification
+pip install -r ./web_classification/flows/experiment/requirements.txt
+
+```
+
 To execute a template locally, use the following command:
 
 ``` bash
@@ -61,6 +71,16 @@ There are two ways to execute templates on Azure:
 1. **CI/CD Pipelines**: Set up a CI/CD pipeline in your Azure DevOps/Github/Jenkins. Configure the pipeline to trigger the execution of the template on Azure. Ensure that the `EXECUTION_TYPE` variable in `config.py` is set to `"AZURE"`.
 
 2. **Direct Execution from Local Machine**: You can also execute templates on Azure directly from your local machine. Set the `EXECUTION_TYPE` variable in `config.py` to `"AZURE"` and use the following command:
+
+Setup the environment by installing the required dependencies using the following command:
+
+``` bash
+pip install -r ./github/requirements/execute_job_requirements.txt
+
+# select the requirements file based on the usecase you are working on e.g. for web_classification
+pip install -r ./web_classification/flows/experiment/requirements.txt
+
+```
 
 ``` bash
 python -m llmops.common.prompt_pipeline --base_path ./<example_path> --variants <template_name>
