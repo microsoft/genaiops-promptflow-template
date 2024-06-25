@@ -109,10 +109,10 @@ jobs:
           echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
 
       #=====================================
-      # Executes Kubernetes deployment when parameter deployment_type == 'aml'
-      # Reads 'kubernetes_endpoint' field values from deployment_config.json
+      # Executes managed deployment when parameter deployment_type == 'aml'
+      # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================             
-      - name: Deploy to Managed Kubernetes endpoint
+      - name: Deploy to Managed endpoint
         if: ${{ inputs.deployment_type == 'aml'  }}
         uses: ./.github/actions/aml_real_deployment
         with:
@@ -126,8 +126,8 @@ jobs:
           ENV_VARS: ${{ secrets.env_vars }}
 
       #=====================================
-      # Executes Managed deployment when parameter deployment_type == 'aks'
-      # Reads 'azure_managed_endpoint' field values from deployment_config.json
+      # Executes Managed kubernetes deployment when parameter deployment_type == 'aks'
+      # Reads 'kubernetes_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
         if: ${{ inputs.deployment_type == 'aks'  }}  
