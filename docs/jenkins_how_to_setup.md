@@ -1,7 +1,6 @@
 # How to setup the repo with Jenkins
 
-This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Jenkins as a platform for Flow operationalization. LLMOps with Prompt flow provides automation of:
-
+This is a guide to set up the repository with Jenkins Pipelines for experimenting and evaluating Prompt flows in Azure Machine Learning. The repository contains examples of Prompt flow runs and evaluations for named entity recognition, math coding, and web classification. 
 
 This template supports Azure Machine Learning (ML) as a platform for LLMOps, and Jenkins Pipelines as a platform for Flow operationalization. LLMOps with Prompt flow provides automation of:
 
@@ -198,8 +197,6 @@ Create one Azure service principal for the purpose of understanding this reposit
 1. Copy the output, braces included. It will be used later in the demo to configure the Jenkins environment credentials.
 
 1. Close the Cloud Shell once the service principals are created.
-
-## Setup runtime for Prompt flow
 
 ## Setup runtime for Prompt flow
 
