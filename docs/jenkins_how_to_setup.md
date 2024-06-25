@@ -284,6 +284,8 @@ The configuration for connection used while authoring the repo:
 
 ![connection details](images/connection-details.png)
 
+## Set up Secrets in Jenkins
+
 ### Azure Container Registry
 
 Create Jenkins Credentials of the type **Secret Text** named `DOCKER_IMAGE_REGISTRY` with information related to Docker Image Registry. The value for this secret is also a json string with given structure. Create one json object for each registry. As of now, Azure Container Registry are supported and more will get added soon. Information for each registry can be obtained from Azure Container Registry resource.
@@ -345,7 +347,7 @@ git checkout -b featurebranch
 
 ```
 
-The pipeline expects the variables `RESOURCE_GROUP_NAME_dev`, `WORKSPACE_NAME_dev` and `KEY_VAULT_NAME_dev` to be available as environment variable (this should have already been created and set [here](#set-up-jenkins-global-variables-for-each-environment)). These variables should contain the values of the Azure resources in the dev environment. To add a new environment, you must create the variables for that staging environment with the correct environment suffix. These variable names can then be used in the new pipelines created for that environment.
+The pipeline expects the variables `RESOURCE_GROUP_NAME`, `WORKSPACE_NAME` and `KEY_VAULT_NAME` to be available as environment variable (this should have already been created and set [here](#set-up-jenkins-global-variables-for-each-environment)). These variables should contain the values of the Azure resources in the dev environment. To add a new environment, you must create the variables for that staging environment with the correct environment suffix. These variable names can then be used in the new pipelines created for that environment.
 
 The rest of the pipeline configurations will be read from the `experiment.yaml` file (see file [description](./the_experiment_file.md) and [specs](./experiment.yaml)); and from the `configs/deployment_config.json` file for the deployment.
 
