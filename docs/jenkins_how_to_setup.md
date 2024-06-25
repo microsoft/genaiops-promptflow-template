@@ -529,6 +529,11 @@ This Jenkins CI workflow contains the following steps:
 - Execute the evaluation flow on the production log dataset
 - Generate the evaluation report
 
+**Run promptflow in AML Pipeline as parallel component**
+- It reuses the already registered data assets for input.
+- Runs the promptflow in AML Pipeline as a parallel component, where we can control the concurrency and parallelism of the promptflow execution. For more details refer [here](https://microsoft.github.io/promptflow/tutorials/pipeline.html).
+- The output of the promptflow is stored in the Azure ML workspace.
+
 ### Online Endpoint
 
 1. After the CI pipeline for an example scenario has run successfully, depending on the configuration it will either deploy to
