@@ -48,7 +48,7 @@ To execute a template locally, use the following command:
 Setup the environment by installing the required dependencies using the following command:
 
 ``` bash
-pip install -r ./.jenkins/requirements/execute_job_requirements.txt
+pip install -r ./github/requirements/execute_job_requirements.txt
 
 # select the requirements file based on the usecase you are working on e.g. for web_classification
 pip install -r ./web_classification/flows/experiment/requirements.txt
