@@ -1,4 +1,16 @@
-# LLMOps with Prompt flow
+# LLMOps with Prompt flow (Supports both AI Studio and Azure Machine Learning)
+- `This template can be used for both Azure AI Studio and Azure Machine Learning.`
+- `It can be used for both AZURE and LOCAL execution.`
+- `It supports all types of flow - python Class flows, Function flows and YAML flows.`
+- `It supports Github, Azure DevOps and Jenkins CI/CD orchestration.`
+- `It supports pure python based Evaluation as well using promptflow-evals package.`
+- `It should be used for INNER-LOOP Experimentation and Evaluation.`
+- `It should be used for OUTER-LOOP Deployment and Inferencing.`
+
+`NOTE: A new FAQ section is added to help Engineers, Data Scientist and developers find answers to general questions on configuring and using this template.`
+
+[***FAQS HERE***](./docs/faqs.md)
+
 Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
