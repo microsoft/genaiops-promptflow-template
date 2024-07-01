@@ -45,7 +45,7 @@ When the `EXECUTION_TYPE` variable is set to `"LOCAL"`, the templates will be ex
 Setup the environment by installing the required dependencies using the following command:
 
 ``` bash
-pip install -r ./github/requirements/execute_job_requirements.txt
+pip install -r ./.azure-pipelines/requirements/execute_job_requirements.txt
 
 # select the requirements file based on the usecase you are working on e.g. for web_classification
 pip install -r ./web_classification/flows/experiment/requirements.txt
