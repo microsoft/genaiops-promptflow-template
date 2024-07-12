@@ -14,6 +14,7 @@ for execution or deployment.
 
 import argparse
 import hashlib
+import os
 from dotenv import load_dotenv
 from typing import Optional
 
@@ -22,14 +23,18 @@ from azure.ai.ml.entities import Data as AMLData
 from azure.ai.ml.constants import AssetTypes as AMLAssetTypes
 from azure.identity import DefaultAzureCredential
 
+import agentops
+
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
 from llmops.common.logger import llmops_logger
 
-
 logger = llmops_logger("register_data_asset")
 
+# Initialize AgentOps
+agentops.init(os.getenv("AGENTOPS_API_KEY"))
 
+@agentops.record_function('generate_file_hash')
 def generate_file_hash(file_path):
     """
     Generate hash of a file.
@@ -45,7 +50,7 @@ def generate_file_hash(file_path):
 
     return sha256.hexdigest()
 
-
+@agentops.record_function('register_data_asset')
 def register_data_asset(
     base_path: str,
     exp_filename: Optional[str] = None,
@@ -115,7 +120,7 @@ def register_data_asset(
             logger.info(aml_dataset.version)
             logger.info(aml_dataset.path)
 
-
+@agentops.record_function('main')
 def main():
     """Entry main function to register data assets."""
     parser = argparse.ArgumentParser("register data assets")
@@ -154,9 +159,11 @@ def main():
         args.env_name
     )
 
-
 if __name__ == "__main__":
     # Load variables from .env file into the environment
     load_dotenv(override=True)
 
     main()
+
+    # End the AgentOps session
+    agentops.end_session('Success')

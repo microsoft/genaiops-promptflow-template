@@ -10,18 +10,24 @@ workspace or project.
 """
 
 import argparse
+import os
 from dotenv import load_dotenv
 from typing import Optional
 
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 
+import agentops
+
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 
 logger = llmops_logger("get_workspace")
 
+# Initialize AgentOps
+agentops.init(os.getenv("AGENTOPS_API_KEY"))
 
+@agentops.record_function('get_workspace')
 def get_workspace(
     subscription_id: Optional[str],
     resource_group_name: Optional[str],
@@ -63,7 +69,7 @@ def get_workspace(
         logger.error(ex)
         raise
 
-
+@agentops.record_function('main')
 def main():
     """
     Run the main function to get the workspace object.
@@ -99,9 +105,11 @@ def main():
                   args.workspace_name
                   )
 
-
 if __name__ == "__main__":
     # Load variables from .env file into the environment
     load_dotenv(override=True)
 
     main()
+    
+    # End the AgentOps session
+    agentops.end_session('Success')
