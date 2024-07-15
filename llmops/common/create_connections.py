@@ -44,7 +44,7 @@ def create_pf_connections(
         connection_type = connection_details.connection_type.lower()
 
         if connection_type in CONNECTION_CLASSES:
-            connection_class = CONNECTION_CLASSES[connection_type]  
+            connection_class = CONNECTION_CLASSES[connection_type]
 
             connection_properties = {}
             for property_name, property_value in (

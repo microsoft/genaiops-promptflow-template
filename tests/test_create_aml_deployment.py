@@ -113,7 +113,10 @@ def test_create_kubernetes_deployment():
             deployment_config
         )
 
-        assert created_deployment.request_settings.request_timeout_ms == REQUEST_TIMEOUT_MS
+        assert (
+            created_deployment.request_settings.request_timeout_ms
+            == REQUEST_TIMEOUT_MS
+        )
 
         env_vars = created_deployment.environment_variables
         assert env_vars["test-key"] == "test-value"

@@ -16,6 +16,7 @@ RESOURCE_PATH = THIS_PATH / "resources"
 
 REQUEST_TIMEOUT_MS = 3 * 60 * 1000
 
+
 @pytest.fixture(scope="module", autouse=True)
 def _set_required_env_vars():
     """Set required environment variables."""
@@ -116,7 +117,10 @@ def test_create_kubernetes_deployment():
             deployment_config
         )
 
-        assert created_deployment.request_settings.request_timeout_ms == REQUEST_TIMEOUT_MS
+        assert (
+            created_deployment.request_settings.request_timeout_ms
+            == REQUEST_TIMEOUT_MS
+        )
         assert created_deployment.resources.requests.cpu == deployment_cpu
         assert created_deployment.resources.requests.memory == deployment_mem
 
