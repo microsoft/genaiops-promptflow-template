@@ -1,5 +1,5 @@
 """
-This module creates Managed endpoint as flow deployment process.
+This module creates Managed endpoint as flow deployment process if it does not already exist.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
@@ -51,6 +51,8 @@ def create_endpoint(
         credential=DefaultAzureCredential(),
     )
 
+    existing_endpoints = ml_client.online_endpoints.list(local=False)
+
     config_file = open(real_config)
     endpoint_config = json.load(config_file)
 
@@ -59,21 +61,26 @@ def create_endpoint(
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]
                 endpoint_desc = elem["ENDPOINT_DESC"]
-                endpoint = ManagedOnlineEndpoint(
-                    name=endpoint_name,
-                    description=endpoint_desc,
-                    auth_mode="key",
-                    tags={"build_id": build_id} if build_id else {},
-                    properties={
-                        "enforce_access_to_default_secret_stores": True,
-                    },
 
-                )
+                # See if endpoint with name endpoint_name already exists
+                endpoint = next((e for e in existing_endpoints if e.name == endpoint_name), None)
 
-                logger.info(f"Creating endpoint {endpoint.name}")
-                ml_client.online_endpoints.begin_create_or_update(
-                    endpoint=endpoint
-                ).result()
+                if endpoint is None:
+                    logger.info(f"Creating endpoint {endpoint_name}")
+                    endpoint = ManagedOnlineEndpoint(
+                        name=endpoint_name,
+                        description=endpoint_desc,
+                        auth_mode="key",
+                        tags={"build_id": build_id} if build_id else {},
+                        properties={
+                            "enforce_access_to_default_secret_stores": True,
+                        })
+
+                    ml_client.online_endpoints.begin_create_or_update(
+                        endpoint=endpoint
+                    ).result()
+                else:
+                    logger.info(f"Skipping create as endpoint {endpoint.name} already exists")    
 
                 logger.info(f"Obtaining endpoint {endpoint.name} identity")
                 principal_id = ml_client.online_endpoints.get(

@@ -20,7 +20,7 @@ def _set_required_env_vars():
     monkeypatch.setenv("WORKSPACE_NAME", "TEST_WORKSPACE_NAME")
 
 
-def test_create_provision_endpoint():
+def test_create_provision_endpoint_when_not_exists():
     """Test create_provision_endpoint."""
     env_name = "dev"
     endpoint_name = "test-endpoint"
@@ -31,6 +31,8 @@ def test_create_provision_endpoint():
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
+        ml_client_instance.online_endpoints.list.return_value = []
+
         # Create the endpoint
         create_endpoint(env_name, str(RESOURCE_PATH))
 
@@ -56,3 +58,33 @@ def test_create_provision_endpoint():
         assert created_endpoint.name == endpoint_name
         assert created_endpoint.description == endpoint_description
         assert created_endpoint.auth_mode == "key"
+
+def test_create_provision_endpoint_when_exists():
+    """Test create_provision_endpoint."""
+    env_name = "dev"
+    endpoint_name = "test-endpoint"
+    with patch(
+        "llmops.common.deployment.provision_endpoint.MLClient"
+    ) as mock_ml_client:
+        # Mock the MLClient
+        ml_client_instance = Mock()
+        mock_ml_client.return_value = ml_client_instance
+
+        mock_endpoint = Mock()
+        mock_endpoint.name = endpoint_name
+        ml_client_instance.online_endpoints.list.return_value = [
+            mock_endpoint
+        ]
+
+        # Create the endpoint
+        create_endpoint(env_name, str(RESOURCE_PATH))
+
+        # Assert online_endpoints.begin_create_or_update is called once
+        create_endpoint_calls = (
+            ml_client_instance.online_endpoints.begin_create_or_update
+        )
+
+        # Endpoint should not be created if it already exists as it would
+        # set the traffic to zero for existing deployments and there are 
+        # no properties we need to update on the endpoint
+        assert create_endpoint_calls.call_count == 0
