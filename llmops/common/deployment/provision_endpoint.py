@@ -1,6 +1,5 @@
 """
-This module creates Managed endpoint as flow deployment process if it does
-not already exist.
+This module creates Managed endpoint if it does not already exist.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
