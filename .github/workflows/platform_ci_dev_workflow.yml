@@ -24,7 +24,7 @@ on:
       registry_details:
         description: "prompt flow registry details"
         required: false
-      env_vars:
+      ENV_VARS:
         description: "env vars for the flow"
         required: false
 
@@ -54,7 +54,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ secrets.env_vars }}" >> .env
+          echo "${{ secrets.ENV_VARS }}" >> .env
           for var in $(cat .env); do
             echo "$var" >> $GITHUB_ENV
           done
@@ -174,4 +174,4 @@ jobs:
     secrets:
       azure_credentials: ${{ secrets.azure_credentials }}  
       registry_details: ${{ secrets.registry_details }}
-      env_vars: ${{ secrets.env_vars }}
+      ENV_VARS: "${{ secrets.ENV_VARS }}"
