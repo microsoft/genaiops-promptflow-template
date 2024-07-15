@@ -34,7 +34,7 @@ runs:
     - name: Create .env file
       shell: bash
       run: |
-        echo "${{ secrets.env_vars }}" >> .env
+        echo "${{ inputs.ENV_VARS }}" >> .env
         for var in $(cat .env); do
           echo "$var" >> $GITHUB_ENV
         done
