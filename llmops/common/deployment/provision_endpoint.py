@@ -1,5 +1,5 @@
 """
-This module creates Managed endpoint as flow deployment process if it does not already exist.
+This module creates Managed endpoint if it does not already exist.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
@@ -63,7 +63,12 @@ def create_endpoint(
                 endpoint_desc = elem["ENDPOINT_DESC"]
 
                 # See if endpoint with name endpoint_name already exists
-                endpoint = next((e for e in existing_endpoints if e.name == endpoint_name), None)
+                endpoint = next(
+                    (
+                        e for e in existing_endpoints
+                        if e.name == endpoint_name
+                        ),
+                    None)
 
                 if endpoint is None:
                     logger.info(f"Creating endpoint {endpoint_name}")
@@ -80,7 +85,10 @@ def create_endpoint(
                         endpoint=endpoint
                     ).result()
                 else:
-                    logger.info(f"Skipping create as endpoint {endpoint.name} already exists")    
+                    logger.info(
+                        f"Skipping create as endpoint"
+                        f"{endpoint.name} already exists"
+                        )
 
                 logger.info(f"Obtaining endpoint {endpoint.name} identity")
                 principal_id = ml_client.online_endpoints.get(

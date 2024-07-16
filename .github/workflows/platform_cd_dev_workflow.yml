@@ -22,8 +22,8 @@ on:
       registry_details:
         description: "prompt flow registry details"
         required: false
-      env_vars:
-        description: "prompt flow registry details"
+      ENV_VARS:
+        description: "prompt flow environment variables details"
         required: false
   workflow_dispatch:
     inputs:
@@ -66,7 +66,7 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "${{ secrets.env_vars }}" >> .env
+          echo "${{ secrets.ENV_VARS }}" >> .env
             for var in $(cat .env); do
               echo "$var" >> $GITHUB_ENV
             done
@@ -123,7 +123,7 @@ jobs:
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
           KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
-          ENV_VARS: ${{ secrets.env_vars }}
+          ENV_VARS: "${{ secrets.ENV_VARS }}"
 
       #=====================================
       # Executes Managed kubernetes deployment when parameter deployment_type == 'aks'

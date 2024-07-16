@@ -39,4 +39,4 @@ jobs:
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
-      env_vars: ${{ secrets.ENV_VARS }}
+      ENV_VARS: "${{ secrets.ENV_VARS }}"
