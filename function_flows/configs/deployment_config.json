@@ -45,11 +45,11 @@
             "CONNECTION_NAMES": [""],
             "REGISTRY_NAME": "researchmlops",
             "REGISTRY_RG_NAME": "mlops",
-            "APP_PLAN_NAME": "cflow_app_plan_zz",
-            "WEB_APP_NAME": "cflow_app_web_zz",
-            "WEB_APP_RG_NAME": "cflow_rg",
+            "APP_PLAN_NAME": "cflowappplanzz",
+            "WEB_APP_NAME": "cflowappwebzz",
+            "WEB_APP_RG_NAME": "cflowrg",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": "cflow-umid_zz"
+            "USER_MANAGED_ID": "cflowumidzz"
             
         }
     ]
