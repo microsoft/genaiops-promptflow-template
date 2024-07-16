@@ -170,6 +170,32 @@ class Connection:
         self.connection_properties: Dict[str, Any] = connection_properties
 
 
+class CustomConnection(Connection):
+    """
+    Defines a Connection class.
+
+    :param name: Name of the evaluation flow.
+    :type name: str
+    :param path: Path to the evaluation flow. Default value is "flows".
+    :type path: str
+    :param datasets: List of mapped datasets used for the evaluator flow.
+    :type datasets: List[MappedDataset]
+    """
+
+    def __init__(
+        self,
+        name: str,
+        connection_type: str,
+        connection_properties: Dict[str, Any],
+        configs: Dict[str, str],
+        secrets: Dict[str, str]
+    ):
+        """Initialize Evaluator object."""
+        super().__init__(name, connection_type, connection_properties)
+        self.configs = configs
+        self.secrets = secrets
+
+
 class Evaluator:
     """
     Defines a prompt flow evaluator flow.
@@ -621,7 +647,7 @@ def _create_connections(
     for raw_connection in raw_connections:
         # Raise error if expected evaluator configuration missing
         _raise_error_if_missing_keys(
-            ["name", "api_key", "api_base", "api_type", "api_version"],
+            ["name", "connection_type"],
             raw_connection,
             message=f"Connection '{raw_connection.get('name')}' config missing"
         )
@@ -629,20 +655,34 @@ def _create_connections(
         connection_name = None
         connection_type = None
         connection_properties = {}
-
+        configs = {}
+        secrets = {}
         for name, value in raw_connection.items():
             if name == "name":
                 connection_name = raw_connection["name"]
             elif name == "connection_type":
                 connection_type = raw_connection["connection_type"]
+            elif isinstance(value, dict) and "configs" in name:
+                configs = value
+            elif isinstance(value, dict) and "secrets" in name:
+                secrets = value
             else:
                 connection_properties[name] = value
 
-        connection = Connection(
-            name=connection_name,
-            connection_type=connection_type,
-            connection_properties=connection_properties
-        )
+        if connection_type.lower() == "customconnection":
+            connection = CustomConnection(
+                name=connection_name,
+                connection_type=connection_type,
+                connection_properties=connection_properties,
+                configs=configs,
+                secrets=secrets
+            )
+        else:
+            connection = Connection(
+                name=connection_name,
+                connection_type=connection_type,
+                connection_properties=connection_properties
+            )
         connections.append(connection)
     return connections
 

@@ -43,13 +43,13 @@
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
             "CONNECTION_NAMES": [""],
-            "REGISTRY_NAME": "",
-            "REGISTRY_RG_NAME": "",
-            "APP_PLAN_NAME": "",
-            "WEB_APP_NAME": "",
-            "WEB_APP_RG_NAME": "",
+            "REGISTRY_NAME": "researchmlops",
+            "REGISTRY_RG_NAME": "mlops",
+            "APP_PLAN_NAME": "cflow_app_plan_zz",
+            "WEB_APP_NAME": "cflow_app_web_zz",
+            "WEB_APP_RG_NAME": "cflow_rg",
             "WEB_APP_SKU": "B3",
-            "USER_MANAGED_ID": ""
+            "USER_MANAGED_ID": "cflow-umid_zz"
             
         }
     ]

@@ -8,4 +8,4 @@ It contains the following configuration:
   Valid values: LOCAL, AZURE
 """
 
-EXECUTION_TYPE = "AZURE"
+EXECUTION_TYPE = "LOCAL"

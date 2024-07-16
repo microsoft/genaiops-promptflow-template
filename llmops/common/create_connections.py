@@ -10,6 +10,9 @@ from promptflow.entities import (
     CognitiveSearchConnection,
     CustomConnection,
     FormRecognizerConnection,
+    SerpConnection,
+    AzureContentSafetyConnection
+
 )
 from promptflow.client import PFClient
 
@@ -22,6 +25,8 @@ CONNECTION_CLASSES: Dict[str, Any] = {
     "cognitivesearchconnection": CognitiveSearchConnection,
     "customconnection": CustomConnection,
     "formrecognizerconnection": FormRecognizerConnection,
+    "serpconnection": SerpConnection,
+    "azurecontentsafetyconnection": AzureContentSafetyConnection,
 }
 
 
@@ -47,23 +52,51 @@ def create_pf_connections(
             connection_class = CONNECTION_CLASSES[connection_type]
 
             connection_properties = {}
-            for property_name, property_value in (
-                connection_details.connection_properties.items()
-            ):
-                if property_name != "connection_type":
-                    connection_properties[property_name] = (
+            secret_properties = {}
+            config_properties = {}
+            if connection_type == "customconnection":
+                for property_name, property_value in (
+                    connection_details.configs.items()
+                ):
+                    config_properties[property_name] = (
                         _get_valid_connection_values
                         (
                             connection_details.name, str(property_value)
                         )
                     )
+                for property_name, property_value in (
+                    connection_details.secrets.items()
+                ):
+                    secret_properties[property_name] = (
+                        _get_valid_connection_values
+                        (
+                            connection_details.name, str(property_value)
+                        )
+                    )
+                connection_properties["name"] = connection_details.name
+                connection = connection_class(
+                    **connection_properties,
+                    configs=config_properties,
+                    secrets=secret_properties
+                )
+            else:
+                for property_name, property_value in (
+                    connection_details.connection_properties.items()
+                ):
+                    if property_name.lower() != "connection_type":
+                        connection_properties[property_name] = (
+                            _get_valid_connection_values
+                            (
+                                connection_details.name, str(property_value)
+                            )
+                        )
+                    # Create connection object with populated properties
+                connection_properties["name"] = connection_details.name
+                connection = connection_class(**connection_properties)
 
-            connection_properties["name"] = connection_details.name
-
-            # Create connection object with populated properties
-            connection = connection_class(**connection_properties)
             try:
                 pf.connections.create_or_update(connection)
+                pass
             except Exception as e:
                 print(f"Error creating connection: {e}")
                 raise e

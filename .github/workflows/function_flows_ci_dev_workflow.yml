@@ -35,7 +35,7 @@ jobs:
     with:
       env_name: ${{ inputs.env_name || 'dev'}}
       use_case_base_path: ${{ inputs.use_case_base_path || 'function_flows' }}
-      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
+      deployment_type: ${{ inputs.deployment_type|| 'webapp' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
       registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
