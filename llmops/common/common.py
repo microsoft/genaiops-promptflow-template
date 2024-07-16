@@ -58,8 +58,8 @@ def resolve_env_vars(base_path: str) -> Dict:
         with open(yaml_file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
         for key, value in yaml_data.items():
-            key = key.strip().upper()
-            value = value.strip().upper()
+            key = str(key).strip().upper()
+            value = str(value).strip().upper()
 
             temp_val = os.environ.get(key, None)
             if temp_val is not None:
