@@ -339,6 +339,8 @@ This template supports all the major connections provided by the Prompt Flow ser
 - CognitiveSearchConnection
 - CustomConnection
 - FormRecognizerConnection
+- SerpConnection
+- AzureContentSafetyConnection
 
 ### How to configure connections?
 To configure a connection, add the following yaml snippet to your experiment.yaml file:
@@ -377,15 +379,14 @@ Azure OpenAI Connection:
     name: fields.Str()
     type: AzureOpenAIConnection
     api_key: fields.Str()
-    api_base: fields.Str(required=True)
+    api_base: fields.Str()
     api_type: fields.Str(default="azure")
     api_version: fields.Str()
-
 
 OpenAI Connection:
     name: fields.Str()
     type: OpenAIConnection
-    api_key: fields.Str(required=True)
+    api_key: fields.Str()
     organization: fields.Str()
     base_url: fields.Str()
 
@@ -393,8 +394,8 @@ OpenAI Connection:
 Azure Document Intelligence:
     name: fields.Str()
     type: FormRecognizerConnection
-    api_key: fields.Str(required=True)
-    endpoint: fields.Str(required=True)
+    api_key: fields.Str()
+    endpoint: fields.Str()
     api_version: fields.Str()
     api_type: fields.Str(default="Form Recognizer")
 
@@ -402,7 +403,24 @@ Azure Search AI:
     name: fields.Str()
     type: CognitiveSearchConnection
     api_key: fields.Str()
-    api_base: fields.Str(required=True)
+    api_base: fields.Str()
+    api_version: fields.Str()
+
+Custom Connection:
+    name: fields.Str()
+    type: CustomConnection
+    secrets:
+      api_key: fields.Str()
+    configs:
+      api_base: fields.Str()
+      api_version: fields.Str()
+
+Azure Content Safety Connection:
+    name: fields.Str()
+    type: CustomConnection
+    api_key: fields.Str()
+    api_type: fields.Str()
+    endpoint: fields.Str()
     api_version: fields.Str()
 
 ```

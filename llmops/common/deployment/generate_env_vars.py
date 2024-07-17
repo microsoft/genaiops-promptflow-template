@@ -29,6 +29,8 @@ output_list = []
 
 # Iterate over the top-level elements under 'init'
 for key, value in data.items():
+    key = str(key).strip()
+    value = str(value).strip()
     if value.startswith('${') and value.endswith('}'):
         value = value.replace('${', '').replace('}', '')
         resolved_value = os.environ.get(value.upper(), None)

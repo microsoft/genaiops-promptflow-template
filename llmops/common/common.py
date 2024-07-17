@@ -58,6 +58,9 @@ def resolve_env_vars(base_path: str) -> Dict:
         with open(yaml_file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
         for key, value in yaml_data.items():
+            key = str(key).strip().upper()
+            value = str(value).strip().upper()
+
             temp_val = os.environ.get(key, None)
             if temp_val is not None:
                 env_vars[key] = os.environ.get(key, None)
@@ -67,9 +70,15 @@ def resolve_env_vars(base_path: str) -> Dict:
                     and value.startswith('${')
                     and value.endswith('}')
                 ):
-                    raise ValueError("values in env.yaml not resolved")
+                    value = value.replace('${', '').replace('}', '')
+                    resolved_value = os.environ.get(value, None)
+                    os.environ[key] = str(resolved_value)
+                    env_vars[key] = str(resolved_value)
+                elif value is None or len(value) == 0:
+                    raise ValueError(f"{key} in env.yaml not resolved")
                 else:
                     os.environ[key] = str(value)
+                    env_vars[key] = str(value)
     else:
         env_vars = {}
         print("no values")
