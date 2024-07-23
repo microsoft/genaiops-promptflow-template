@@ -5,7 +5,7 @@ parameters:
  - name: use_case_base_path
    displayName: "type of model to execute"
  - name: deployment_type
-   displayName: "determine type of deployment - aks, aml, docker, webapp"
+   displayName: "determine type of deployment - aks, aml, docker, webapp, none"
  - name: registry_details
    displayName: "determine the variable containing acr details"
  - name: RESOURCE_GROUP_NAME

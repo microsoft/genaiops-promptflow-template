@@ -11,7 +11,7 @@ pipeline {
     parameters {
         string(name: 'use_case_base_path', defaultValue: 'named_entity_recognition', description: 'The flow use-case to execute')
         string(name: 'env_name', defaultValue: 'dev', description: 'Execution Environment')
-        string(name: 'deployment_type', defaultValue: 'webapp', description: 'Determine type of deployment - aml, aks, webapp')
+        string(name: 'deployment_type', defaultValue: 'webapp', description: 'Determine type of deployment - aml, aks, webapp, none')
         string(name: 'rg_name', description: 'Azure Resource Group Name')
         string(name: 'ws_name', description: 'AzureML Workspace Name')
         string(name: 'kv_name', description: 'Azure Key Vault Name')
@@ -173,6 +173,9 @@ load_dotenv('.env')
 
         // Execute Platform CD Pipeline to deploy flow to specified deployment type
         stage('Execute Platform CD Pipeline to deploy flow') {
+            when {
+                expression { params.deployment_type != 'none' }
+            }
             steps {
                 script {
                     build job: 'platform_cd_dev', parameters: [
