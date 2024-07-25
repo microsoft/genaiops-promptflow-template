@@ -15,7 +15,7 @@ on:
         default: "web_classification"
       deployment_type:
         type: string
-        description: "Determine type of deployment - aml, aks, docker, webapp"
+        description: "Determine type of deployment - aml, aks, docker, webapp, none"
         required: true
     secrets:
       azure_credentials:
@@ -165,6 +165,7 @@ jobs:
   # Execute platform_cd_dev_workflow flow for deployment of flows
   #=====================================
   deploy-flow:
+    if: ${{ inputs.deployment_type != 'none' }}
     uses: ./.github/workflows/platform_cd_dev_workflow.yml
     needs: flow-experiment-and_evaluation
     with:
