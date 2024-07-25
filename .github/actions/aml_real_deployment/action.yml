@@ -24,15 +24,28 @@ inputs:
   KEY_VAULT_NAME:
     description: "Key vault name"
     required: true
-
+  ENV_VARS:
+    description: 'The API key for authentication'
+    required: false
 
 runs:
   using: composite
   steps:
-    - name: Provision AML Online Endpoint
+    - name: Create .env file
+      shell: bash
+      run: |
+        echo "${{ inputs.ENV_VARS }}" >> .env
+        for var in $(cat .env); do
+          echo "$var" >> $GITHUB_ENV
+        done
+    - name: load .env file
+      shell: bash
+      run: python -c "from dotenv import load_dotenv; load_dotenv()"
+      
+    - name: Provision Managed Endpoint
       uses: ./.github/actions/execute_script
       with:
-        step_name: "Provision AML Online Endpoint"
+        step_name: "Provision Managed Endpoint"
         script_parameter: |
           python -m llmops.common.deployment.provision_endpoint \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
@@ -71,10 +84,10 @@ runs:
             az keyvault set-policy --name $KEY_VAULT_NAME --resource-group $RESOURCE_GROUP_NAME --object-id $ENDPOINT_PRINCIPAL --secret-permissions get list
         fi
 
-    - name: Provision AML Online Deployment
+    - name: Provision Managed Deployment
       uses: ./.github/actions/execute_script
       with:
-        step_name: "Provision AML Online Deployment"
+        step_name: "Provision Managed Deployment"
         script_parameter: |
           python -m llmops.common.deployment.provision_deployment \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \
@@ -83,10 +96,10 @@ runs:
             --env_name ${{ inputs.DEPLOY_ENVIRONMENT }} \
             --base_path ${{ inputs.use_case_base_path }}
 
-    - name: Test AML Deployment
+    - name: Test Managed Deployment
       uses: ./.github/actions/execute_script
       with:
-        step_name: "Test AML Deployment"
+        step_name: "Test Managed Deployment"
         script_parameter: |
           python -m llmops.common.deployment.test_model_on_aml \
             --subscription_id ${{ inputs.SUBSCRIPTION_ID }} \

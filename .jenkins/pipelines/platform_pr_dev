@@ -12,13 +12,59 @@ pipeline {
     environment {
         RESOURCE_GROUP_NAME = "${rg_name}"
         WORKSPACE_NAME = "${ws_name}"
+        AZURE_CREDENTIALS = credentials('AZURE_CREDENTIALS')
     }
 
     stages {
-        stage('Install Dependencies') {
+
+        //Configure AzureML agent which process necessary requirements
+        stage('Configure Azure ML Agent') {
+            steps {
+                azureLogin()
+                script {
+                    build job: 'jobs/configure_azureml_agent', parameters: [
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}")
+                    ]
+                }
+            }
+        }
+
+        // Create .env file
+        stage('Load .env file') {
             steps {
                 script {
-                    sh 'curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash'
+                    // Ensure the workspace directory is writable
+                    sh 'chmod -R 777 $WORKSPACE'
+
+                    // Use the secret file credentials
+                    withCredentials([file(credentialsId: 'ENV_VARS', variable: 'ENV_FILE')]) {
+                        // Check if the secret file exists and read its content
+                        sh 'ls -l $ENV_FILE'
+                        def envContent = readFile(file: ENV_FILE)
+
+                        // Write the content to .env file in the workspace
+                        writeFile file: '.env', text: envContent
+
+                        // Check if the .env file was created
+                        sh 'ls -l .env'
+
+                        // Echo the contents of the .env file
+                        sh 'cat .env'
+
+                        // Optionally, load the .env file using Python
+                        def loadEnvScript = """
+import os
+from dotenv import load_dotenv
+
+# Load the .env file
+load_dotenv('.env')
+
+                        """
+
+                        // Execute the Python script
+                        writeFile file: 'load_env.py', text: loadEnvScript
+                        sh 'python3 load_env.py'
+                    }
                 }
             }
         }
@@ -48,6 +94,25 @@ pipeline {
                     """
                     }
                 }
+            }
+        }
+
+        // Install requirements for build validation and execute prompt flow bulk run
+        stage('Execute prompt flow bulk run') {
+            steps {
+                installRequirements('build_validation_requirements')
+                withCredentials([azureServicePrincipal('AZURE_CREDENTIALS')]) {
+                    withPythonEnv('/usr/bin/python3.9') {
+                    sh '''
+                    python -m llmops.common.prompt_pipeline \\
+                    --subscription_id $AZURE_SUBSCRIPTION_ID \\
+                    --base_path $use_case_base_path \\
+                    --build_id $BUILD_NUMBER \\
+                    --env_name $env_name \\
+                    --output_file run_id.txt
+                    '''
+                }
+            }
             }
         }
     }

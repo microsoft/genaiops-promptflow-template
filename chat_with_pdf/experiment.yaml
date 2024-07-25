@@ -1,9 +1,17 @@
 name: chat_with_pdf
 flow: flows/standard
 
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_base: https://demoopenaiexamples.openai.azure.com/
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
 datasets:
 - name: chat_with_pdf
-  source: data/bert-paper-qna-3-line.jsonl
+  source: data/bert-paper-qna-1-line.jsonl
   description: "This dataset is for prompt experiments."
   mappings:
     math_question: "${data.question}"

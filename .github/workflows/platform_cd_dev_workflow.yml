@@ -19,11 +19,11 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-      connection_details:
-        description: "prompt flow connection details"
-        required: false
       registry_details:
         description: "prompt flow registry details"
+        required: false
+      ENV_VARS:
+        description: "prompt flow environment variables details"
         required: false
   workflow_dispatch:
     inputs:
@@ -53,12 +53,25 @@ jobs:
     steps:
       - name: Checkout Actions
         uses: actions/checkout@v4
+
       - name: Azure login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.azure_credentials }}
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
+        with:
+          versionSpec: "3.9"
+          base_path: ${{ inputs.use_case_base_path }}
+
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_VARS }}" >> .env
+            for var in $(cat .env); do
+              echo "$var" >> $GITHUB_ENV
+            done
+      - name: load .env file
+        run: python -c "from dotenv import load_dotenv; load_dotenv()"
       - name: load the current Azure subscription details
         id: subscription_details
         shell: bash
@@ -96,10 +109,10 @@ jobs:
           echo "MODEL_VERSION=${model_version}"  >> "$GITHUB_ENV"
 
       #=====================================
-      # Executes Kubernetes deployment when parameter deployment_type == 'aml'
-      # Reads 'kubernetes_endpoint' field values from deployment_config.json
+      # Executes managed deployment when parameter deployment_type == 'aml'
+      # Reads 'azure_managed_endpoint' field values from deployment_config.json
       #=====================================             
-      - name: Deploy to AML real-time online endpoint
+      - name: Deploy to Managed endpoint
         if: ${{ inputs.deployment_type == 'aml'  }}
         uses: ./.github/actions/aml_real_deployment
         with:
@@ -110,10 +123,11 @@ jobs:
           WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
           KEY_VAULT_NAME: ${{ vars.KEY_VAULT_NAME }}
           MODEL_VERSION: $MODEL_VERSION
+          ENV_VARS: "${{ secrets.ENV_VARS }}"
 
       #=====================================
-      # Executes AML Compute deployment when parameter deployment_type == 'aks'
-      # Reads 'azure_managed_endpoint' field values from deployment_config.json
+      # Executes Managed kubernetes deployment when parameter deployment_type == 'aks'
+      # Reads 'kubernetes_endpoint' field values from deployment_config.json
       #=====================================     
       - name: Deploy to kubernetes real-time online endpoint
         if: ${{ inputs.deployment_type == 'aks'  }}  
@@ -140,7 +154,12 @@ jobs:
             python -m llmops.common.prompt_local_connections \
               --env_name ${{ inputs.env_name }} \
               --base_path ${{ inputs.use_case_base_path }} \
-              --connection_details '${{ secrets.CONNECTION_DETAILS }}'
+
+      - name: Read .env file
+        id: env_vars
+        run: |
+          LOCAL_VARS=$(cat .env)
+          echo "local_vars=$LOCAL_VARS" >> $GITHUB_OUTPUT
 
         #=====================================
         # Executes Azure Webapp deployment when parameter 
@@ -153,9 +172,10 @@ jobs:
         with:
           USE_CASE_BASE_PATH: ${{ inputs.use_case_base_path }}
           DEPLOY_ENVIRONMENT: ${{ inputs.env_name }}
+          ENV_VARS: ${{ steps.env_vars.outputs.local_vars }}
         env:
-          CONNECTION_DETAILS: ${{ secrets.connection_details }} 
           REGISTRY_DETAILS: ${{ secrets.registry_details }}
+
         
             
 

@@ -34,3 +34,4 @@ stages:
       WORKSPACE_NAME: $(ws_name)
       exec_environment: ${{ parameters.env_name }}
       use_case_base_path: ${{ parameters.use_case_base_path }}
+      env_vars: $(env_vars)

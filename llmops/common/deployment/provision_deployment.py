@@ -1,7 +1,7 @@
 """
-This module does deployment of flows to AML Managed compute.
+This module does deployment of flows to Managed compute.
 
-The code used AML compute as deployment target.
+The code uses compute as deployment target.
 It configures Managed Online deployments for Prompt Flow 'flows'
 
 Args:
@@ -21,7 +21,7 @@ This argument is required to specify the version of the model for deployment.
 import json
 import argparse
 from typing import Optional
-
+import subprocess
 import os
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import (
@@ -29,17 +29,24 @@ from azure.ai.ml.entities import (
     Environment,
     OnlineRequestSettings,
     BuildContext,
+    DataCollector,
+    DeploymentCollection
 )
-from azure.core.exceptions import ResourceNotFoundError
 from azure.identity import DefaultAzureCredential
 from dotenv import load_dotenv
+from llmops.common.common import REQUEST_TIMEOUT_MS
 
 
 from llmops.common.logger import llmops_logger
 from llmops.common.experiment_cloud_config import ExperimentCloudConfig
 from llmops.common.experiment import load_experiment
+from llmops.common.common import resolve_flow_type, resolve_env_vars
+
 
 logger = llmops_logger("provision_deployment")
+
+_FLOW_DAG_FILENAME = ("flow.dag.yml", "flow.dag.yaml")
+_FLOW_FLEX_FILENAME = ("flow.flex.yml", "flow.flex.yaml")
 
 
 def create_deployment(
@@ -50,22 +57,75 @@ def create_deployment(
     env_name: Optional[str] = None,
     subscription_id: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Create deployment for the model version."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+        )
     experiment = load_experiment(
         filename=exp_filename, base_path=base_path, env=config.environment_name
-    )
+        )
     experiment_name = experiment.name
     model_name = f"{experiment_name}_{env_name}"
+    found_flex = False
+    flow_file_path = ""
+    # flow_type = FlowTypeOption.CLASS_FLOW
+    for root, dirs, files in os.walk(os.path.join(
+        experiment.base_path, experiment.flow)
+    ):
+        for file in files:
+            if file in _FLOW_FLEX_FILENAME:
+                found_flex = True
+                # flow_type = FlowTypeOption.CLASS_FLOW
+                flow_file_path = os.path.abspath(
+                    os.path.join(experiment.base_path, experiment.flow, file)
+                )
+            elif file in _FLOW_DAG_FILENAME:
+                flow_file_path = os.path.abspath(
+                    os.path.join(experiment.base_path, experiment.flow, file)
+                )
+                # flow_type = FlowTypeOption.DAG_FLOW
+
+    flow_type, params_dict = resolve_flow_type(
+        experiment.base_path, experiment.flow
+        )
+
+    params_dict = {}
+    if found_flex:
+        result = subprocess.run(
+            [
+                "python",
+                "llmops/common/deployment/generate_config.py",
+                flow_file_path,
+                "false"
+            ],
+            stdout=subprocess.PIPE
+        )
+        output = result.stdout.decode("utf-8")
+        substrings = output.split()
+
+        # Create an empty dictionary to store the key-value pairs
+
+        # Iterate over each substring
+        for substring in substrings:
+            # Split the substring by the "=" delimiter
+            key_value = substring.split("=")
+
+            # Check if the substring contains the "=" delimiter
+            if len(key_value) == 2:
+                key, value = key_value
+                params_dict[key] = value
+
+    env_vars = resolve_env_vars(experiment.base_path)
 
     real_config = f"{base_path}/configs/deployment_config.json"
 
     logger.info(f"Model name: {model_name}")
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
 
     model = ml_client.models.get(model_name, model_version)
@@ -75,6 +135,20 @@ def create_deployment(
     for elem in endpoint_config["azure_managed_endpoint"]:
         if "ENDPOINT_NAME" in elem and "ENV_NAME" in elem:
             if env_name == elem["ENV_NAME"]:
+                data_collector = None
+
+                data_collector = DataCollector(
+                    collections={
+                        "model_inputs": DeploymentCollection(
+                            enabled="true",
+                        ),
+                        "model_outputs": DeploymentCollection(
+                            enabled="true",
+                        )
+                    },
+                    sampling_rate=1,
+                )
+
                 endpoint_name = elem["ENDPOINT_NAME"]
                 deployment_name = elem["CURRENT_DEPLOYMENT_NAME"]
                 deployment_vm_size = elem["DEPLOYMENT_VM_SIZE"]
@@ -83,12 +157,30 @@ def create_deployment(
                     "CURRENT_DEPLOYMENT_TRAFFIC_ALLOCATION"
                 ]
                 prior_deployment_name = elem["PRIOR_DEPLOYMENT_NAME"]
-                prior_deployment_traffic_allocation = elem[
-                    "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
-                ]
+                # prior_deployment_traffic_allocation = elem[
+                #    "PRIOR_DEPLOYMENT_TRAFFIC_ALLOCATION"
+                # ]
                 deployment_desc = elem["DEPLOYMENT_DESC"]
                 environment_variables = dict(elem["ENVIRONMENT_VARIABLES"])
+
+                if os.environ.get(
+                    "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                    None
+                ):
+                    environment_variables[
+                        "APPLICATIONINSIGHTS_CONNECTION_STRING"
+                    ] = (
+                        os.environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING")
+                    )
+
+                if isinstance(env_vars, dict):
+                    if env_vars:
+                        for key, value in env_vars.items():
+                            environment_variables[key] = value
+                for key, value in params_dict.items():
+                    environment_variables[key] = value
                 environment_variables["PROMPTFLOW_RUN_MODE"] = "serving"
+                environment_variables["PROMPTFLOW_SERVING_ENGINE"] = "fastapi"
                 environment_variables["PRT_CONFIG_OVERRIDE"] = (
                     f"deployment.subscription_id={config.subscription_id},"
                     f"deployment.resource_group={config.resource_group_name},"
@@ -105,7 +197,9 @@ def create_deployment(
                 deploy_count = sum(1 for _ in deployments)
 
                 if deploy_count >= 1:
-                    traffic_allocation[deployment_name] = deployment_traffic_allocation
+                    traffic_allocation[deployment_name] = (
+                        deployment_traffic_allocation
+                    )
                     traffic_allocation[prior_deployment_name] = 100 - int(
                         deployment_traffic_allocation
                     )
@@ -114,7 +208,7 @@ def create_deployment(
 
                 env_docker = Environment(
                     build=BuildContext(
-                        path=experiment.get_flow_detail().flow_path,
+                        path=experiment.get_flow_detail(flow_type).flow_path,
                         dockerfile_path="docker/dockerfile",
                     ),
                     name=deployment_name,
@@ -137,20 +231,26 @@ def create_deployment(
                     environment_variables=dict(environment_variables),
                     tags={"build_id": build_id} if build_id else {},
                     app_insights_enabled=True,
-                    request_settings=OnlineRequestSettings(request_timeout_ms=90000),
+                    request_settings=OnlineRequestSettings(
+                        request_timeout_ms=REQUEST_TIMEOUT_MS
+                    ),
+                    data_collector=data_collector
                 )
 
                 ml_client.online_deployments.begin_create_or_update(
                     blue_deployment
                 ).result()
 
-                endpoint = ml_client.online_endpoints.get(endpoint_name, local=False)
+                endpoint = ml_client.online_endpoints.get(
+                    endpoint_name, local=False
+                )
 
                 endpoint.traffic = traffic_allocation
                 ml_client.begin_create_or_update(endpoint).result()
 
 
 def main():
+    """Entry Main function to provision the deployment."""
     parser = argparse.ArgumentParser("provision_deployment")
     parser.add_argument(
         "--file",
@@ -162,7 +262,7 @@ def main():
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID, overrides the SUBSCRIPTION_ID env var",
         default=None,
     )
     parser.add_argument(
@@ -174,7 +274,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
     parser.add_argument(

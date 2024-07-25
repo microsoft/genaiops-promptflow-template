@@ -5,10 +5,10 @@ pytest-cov==3.0.0
 pytest-azurepipelines==1.0.3
 pytest-mock==3.7.0
 pytest==7.1.2
-azure-ai-ml==1.13.0
-azure-identity==1.11.0
+azure-ai-ml>=1.16.0
+azure-identity>=1.15.0
 mldesigner==0.1.0b4
 pandas==2.2.1
 python-dotenv>=0.10.3
-promptflow==1.6.0
-
+promptflow>=1.11.0
+promptflow-azure>=1.11.0

@@ -1,0 +1,10 @@
+$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Run.schema.json
+flow: .
+data: data.jsonl
+column_mapping:
+  text: ${data.text}
+environment_variables:
+  # environment variables from connection
+  AZURE_OPENAI_API_KEY: AZURE_OPENAI_API_KEY
+  AZURE_OPENAI_ENDPOINT: https://zzzzzzz.openai.azure.com/
+  AZURE_OPENAI_API_TYPE: azure

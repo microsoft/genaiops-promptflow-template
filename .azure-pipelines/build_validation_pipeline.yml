@@ -20,6 +20,10 @@ jobs:
     displayName: 'Run Unit Tests'
     condition: succeededOrFailed()
 
+  - script: |
+      flake8 ./llmops ./tests
+    displayName: "Python Code linting"
+
   - task: PublishTestResults@2
     condition: succeededOrFailed()
     inputs:

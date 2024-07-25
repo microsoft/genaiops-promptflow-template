@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'env_name', defaultValue: 'pr', description: 'Execution Environment: pr, dev or test')
+        string(name: 'use_case_base_path', defaultValue: 'class_flows', description: 'The flow usecase to execute')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+    }
+
+    // Trigger the pipeline on PR opened, reopened or synchronized
+    triggers {
+        GenericTrigger(
+                genericVariables: [
+                    [key: 'action', value: '$.action']
+                ],
+                genericHeaderVariables: [
+                ],
+                causeString: 'Triggered on $action',
+                tokenCredentialId: 'WEBHOOK-TOKEN-SECRET',
+                printContributedVariables: true,
+                printPostContent: false,
+                silentResponse: false,
+                regexpFilterText: '$action',
+                regexpFilterExpression: '^(opened|reopened|synchronize)$'
+        )
+    }
+
+    // Trigger Platform PR Dev Pipeline
+    stages {
+        stage('Trigger Platform PR Dev Pipeline') {
+            steps {
+                script {
+                    build job: 'platform_pr_dev', parameters: [
+                        string(name: 'env_name', value: "${params.env_name}"),
+                        string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'ws_name', value: "${params.ws_name}")
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,14 @@
 name: math_coding
 flow: flows/math_standard_flow
 
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_base: https://demoopenaiexamples.openai.azure.com/
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
 datasets:
 - name: math_coding_training
   source: data/math_data.jsonl

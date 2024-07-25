@@ -22,9 +22,9 @@ on:
       - main
       - development
     paths:
+      - 'named_entity_recognition/**'
       - '.github/**'
       - 'llmops/**'
-      - 'named_entity_recognition/**'
 
 #=====================================
 # Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -38,5 +38,5 @@ jobs:
       deployment_type: ${{ inputs.deployment_type|| 'aml' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
-      connection_details: ${{ secrets.COMMON_DEV_CONNECTIONS }}
       registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
+      ENV_VARS: "${{ secrets.ENV_VARS }}"

@@ -1,8 +1,12 @@
+"""Tests for the register_data_asset module."""
 from pathlib import Path
 from unittest.mock import ANY, Mock, patch
 
 import pytest
-from llmops.common.register_data_asset import register_data_asset, generate_file_hash
+from llmops.common.register_data_asset import (
+    register_data_asset,
+    generate_file_hash
+)
 
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
@@ -10,6 +14,7 @@ RESOURCE_PATH = THIS_PATH / "resources"
 
 @pytest.fixture(scope="module", autouse=True)
 def _set_required_env_vars():
+    """Set required environment variables."""
     monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("SUBSCRIPTION_ID", "TEST_SUBSCRIPTION_ID")
     monkeypatch.setenv("RESOURCE_GROUP_NAME", "TEST_RESOURCE_GROUP_NAME")
@@ -17,9 +22,13 @@ def _set_required_env_vars():
 
 
 def test_register_data_asset():
+    """Test register_data_asset."""
     data_path = str(RESOURCE_PATH / "data/data.jsonl")
+
     data_hash = generate_file_hash(data_path)
-    with patch("llmops.common.register_data_asset.MLClient") as mock_ml_client:
+    with patch(
+        "llmops.common.register_data_asset.MLClient"
+    ) as mock_ml_client:
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance
@@ -39,17 +48,22 @@ def test_register_data_asset():
         # Assert that ml_client.data.create_or_update is called
         ml_client_instance.data.create_or_update.assert_called_with(ANY)
 
-        # Assert that ml_client.data.create_or_update is called with the correct argument
-        created_data = ml_client_instance.data.create_or_update.call_args.args[0]
+        # Assert that data.create_or_update is called with the correct argument
+        created_data = (
+            ml_client_instance.data.create_or_update.call_args.args[0]
+        )
         assert created_data.name == "ds1"
         assert created_data.path == data_path
         assert created_data.tags["data_hash"] == data_hash
 
 
 def test_register_existing_data_asset():
+    """Test register_data_asset with an existing data asset."""
     data_path = str(RESOURCE_PATH / "data/data.jsonl")
     data_hash = generate_file_hash(data_path)
-    with patch("llmops.common.register_data_asset.MLClient") as mock_ml_client:
+    with patch(
+        "llmops.common.register_data_asset.MLClient"
+    ) as mock_ml_client:
         # Mock the MLClient
         ml_client_instance = Mock()
         mock_ml_client.return_value = ml_client_instance

@@ -18,9 +18,9 @@ on:
       - main
       - development
     paths:
+      - 'named_entity_recognition/**'
       - '.github/**'
       - 'llmops/**'
-      - 'named_entity_recognition/**'
 
 #=====================================
 # Execute platform_pr_dev_workflow workflow for experiment, evaluation and deployment of flows
@@ -33,3 +33,4 @@ jobs:
       use_case_base_path: ${{ inputs.use_case_base_path || 'named_entity_recognition' }}
     secrets:
       azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      env_vars: ${{ secrets.ENV_VARS }}

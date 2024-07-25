@@ -1,6 +1,14 @@
 name: named_entity_recognition
 flow: flows/standard
 
+connections:
+- name: aoai
+  connection_type: AzureOpenAIConnection
+  api_base: https://demoopenaiexamples.openai.azure.com/
+  api_version: 2023-07-01-preview
+  api_key: ${api_key}
+  api_type: azure
+
 datasets:
 - name: named_entity_recognition_train
   source: data/data.jsonl
