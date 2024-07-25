@@ -3,7 +3,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "",
+            "ENDPOINT_NAME": "WC_ebndpoint",
             "ENDPOINT_DESC": "An AML compute based endpoint serving a flow for web classification",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
