@@ -1,4 +1,4 @@
 promptflow
-promptflow[azure]
+promptflow-azure>=1.12.0
 promptflow-tools
 bs4

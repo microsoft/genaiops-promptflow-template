@@ -5,6 +5,9 @@ pipeline {
         choice(name: 'env_name', choices: ['dev', 'prod'], description: 'Execution Environment')
         string(name: 'use_case_base_path', description: 'The flow usecase to execute', defaultValue: 'web_classification')
         choice(name: 'deployment_type', choices: ['aml', 'aks', 'webapp'],  description: 'Determine type of deployment')
+        string(name: 'rg_name', description: 'Azure Resource Group Name')
+        string(name: 'ws_name', description: 'AzureML Workspace Name')
+        string(name: 'kv_name', description: 'Azure Key Vault Name')
     }
 
     // Trigger the pipeline on push to development branch
@@ -34,9 +37,9 @@ pipeline {
                         string(name: 'env_name', value: "${params.env_name}"),
                         string(name: 'use_case_base_path', value: "${params.use_case_base_path}"),
                         string(name: 'deployment_type', value: "${params.deployment_type}"),
-                        string(name: 'rg_name', value: "${RESOURCE_GROUP_NAME_dev}"),
-                        string(name: 'ws_name', value: "${WORKSPACE_NAME_dev}"),
-                        string(name: 'kv_name', value: "${KEY_VAULT_NAME_dev}")
+                        string(name: 'rg_name', value: "${params.rg_name}"),
+                        string(name: 'ws_name', value: "${params.ws_name}"),
+                        string(name: 'kv_name', value: "${params.kv_name}")
                     ]
                 }
             }

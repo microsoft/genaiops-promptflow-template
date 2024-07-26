@@ -3,7 +3,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "ENDPOINT_NAME": "Web Classifier endpoint02",
+            "ENDPOINT_NAME": "Web Classifier endpoint",
             "ENDPOINT_DESC": "An AML compute based endpoint serving a flow for web classification",
             "DEPLOYMENT_DESC": "prompt flow deployment",
             "PRIOR_DEPLOYMENT_NAME": "",
@@ -42,7 +42,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai"],
+            "CONNECTION_NAMES": [""],
             "REGISTRY_NAME": "",
             "REGISTRY_RG_NAME": "",
             "APP_PLAN_NAME": "",

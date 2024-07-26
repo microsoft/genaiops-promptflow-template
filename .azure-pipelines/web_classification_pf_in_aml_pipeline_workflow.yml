@@ -15,10 +15,12 @@ stages:
         - template: templates/get_connection_details.yml
 
         - template: templates/configure_azureml_agent.yml
+          parameters:
+            base_path: ${{ parameters.use_case_base_path }}
      
         - template: templates/execute_python_code.yml
           parameters:
-            step_name: "Execute PF IN AML Pipeline"
+            step_name: "Execute PF IN Pipeline"
             script_parameter: |
                   python -m pf_aml_pipeline.promptflow_in_aml_pipeline \
                   --subscription_id "$(SUBSCRIPTION_ID)" \

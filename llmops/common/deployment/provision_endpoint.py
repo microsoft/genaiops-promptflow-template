@@ -1,5 +1,5 @@
 """
-This module creates Managed AML online endpoint as flow deployment process.
+This module creates Managed endpoint if it does not already exist.
 
 Args:
 --base_path: Base path of the use case. Where flows, data,
@@ -37,16 +37,21 @@ def create_endpoint(
     subscription_id: Optional[str] = None,
     output_file: Optional[str] = None,
 ):
-    config = ExperimentCloudConfig(subscription_id=subscription_id, env_name=env_name)
+    """Create endpoint for the model version."""
+    config = ExperimentCloudConfig(
+        subscription_id=subscription_id, env_name=env_name
+    )
 
     real_config = f"{base_path}/configs/deployment_config.json"
 
     ml_client = MLClient(
-        DefaultAzureCredential(),
-        config.subscription_id,
-        config.resource_group_name,
-        config.workspace_name,
+        subscription_id=config.subscription_id,
+        resource_group_name=config.resource_group_name,
+        workspace_name=config.workspace_name,
+        credential=DefaultAzureCredential(),
     )
+
+    existing_endpoints = ml_client.online_endpoints.list(local=False)
 
     config_file = open(real_config)
     endpoint_config = json.load(config_file)
@@ -56,17 +61,34 @@ def create_endpoint(
             if env_name == elem["ENV_NAME"]:
                 endpoint_name = elem["ENDPOINT_NAME"]
                 endpoint_desc = elem["ENDPOINT_DESC"]
-                endpoint = ManagedOnlineEndpoint(
-                    name=endpoint_name,
-                    description=endpoint_desc,
-                    auth_mode="key",
-                    tags={"build_id": build_id} if build_id else {},
-                )
 
-                logger.info(f"Creating endpoint {endpoint.name}")
-                ml_client.online_endpoints.begin_create_or_update(
-                    endpoint=endpoint
-                ).result()
+                # See if endpoint with name endpoint_name already exists
+                endpoint = next(
+                    (
+                        e for e in existing_endpoints
+                        if e.name == endpoint_name
+                        ),
+                    None)
+
+                if endpoint is None:
+                    logger.info(f"Creating endpoint {endpoint_name}")
+                    endpoint = ManagedOnlineEndpoint(
+                        name=endpoint_name,
+                        description=endpoint_desc,
+                        auth_mode="key",
+                        tags={"build_id": build_id} if build_id else {},
+                        properties={
+                            "enforce_access_to_default_secret_stores": True,
+                        })
+
+                    ml_client.online_endpoints.begin_create_or_update(
+                        endpoint=endpoint
+                    ).result()
+                else:
+                    logger.info(
+                        f"Skipping create as endpoint"
+                        f"{endpoint.name} already exists"
+                        )
 
                 logger.info(f"Obtaining endpoint {endpoint.name} identity")
                 principal_id = ml_client.online_endpoints.get(
@@ -78,11 +100,12 @@ def create_endpoint(
 
 
 def main():
+    """Entry main function to create endpoint."""
     parser = argparse.ArgumentParser("provision_endpoints")
     parser.add_argument(
         "--subscription_id",
         type=str,
-        help="Subscription ID, overrides the SUBSCRIPTION_ID environment variable",
+        help="Subscription ID",
         default=None,
     )
     parser.add_argument(
@@ -94,7 +117,7 @@ def main():
     parser.add_argument(
         "--env_name",
         type=str,
-        help="environment name(dev, test, prod) for execution and deployment, overrides the ENV_NAME environment variable",
+        help="environment name(dev, test, prod) for execution and deployment",
         default=None,
     )
     parser.add_argument(

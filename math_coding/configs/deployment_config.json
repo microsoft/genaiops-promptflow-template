@@ -42,7 +42,7 @@
         {
             "ENV_NAME": "dev",
             "TEST_FILE_PATH": "sample-request.json",
-            "CONNECTION_NAMES": ["aoai"],
+            "CONNECTION_NAMES": [""],
             "REGISTRY_NAME": "",
             "REGISTRY_RG_NAME": "",
             "APP_PLAN_NAME": "",

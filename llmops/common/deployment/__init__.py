@@ -1,5 +1,5 @@
 """
 deployment module.
 
-Provisions and tests AML endpoints and deployments.
+Provisions and tests endpoints and deployments.
 """

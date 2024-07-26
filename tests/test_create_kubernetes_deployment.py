@@ -1,8 +1,11 @@
+"""Tests for create_kubernetes_deployment."""
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from llmops.common.deployment.kubernetes_deployment import create_kubernetes_deployment
+from llmops.common.deployment.kubernetes_deployment import (
+    create_kubernetes_deployment
+)
 
 SUBSCRIPTION_ID = "TEST_SUBSCRIPTION_ID"
 RESOURCE_GROUP_NAME = "TEST_RESOURCE_GROUP_NAME"
@@ -11,9 +14,12 @@ WORKSPACE_NAME = "TEST_WORKSPACE_NAME"
 THIS_PATH = Path(__file__).parent
 RESOURCE_PATH = THIS_PATH / "resources"
 
+REQUEST_TIMEOUT_MS = 3 * 60 * 1000
+
 
 @pytest.fixture(scope="module", autouse=True)
 def _set_required_env_vars():
+    """Set required environment variables."""
     monkeypatch = pytest.MonkeyPatch()
     monkeypatch.setenv("SUBSCRIPTION_ID", "TEST_SUBSCRIPTION_ID")
     monkeypatch.setenv("RESOURCE_GROUP_NAME", "TEST_RESOURCE_GROUP_NAME")
@@ -21,6 +27,7 @@ def _set_required_env_vars():
 
 
 def test_create_kubernetes_deployment():
+    """Test create_kubernetes_deployment."""
     model_name = "exp_dev"
     model_version = "1"
     endpoint_name = "k8s-test-endpoint"
@@ -62,25 +69,33 @@ def test_create_kubernetes_deployment():
             model_version, base_path=str(RESOURCE_PATH), env_name="dev"
         )
 
-        # Assert that ml_client.models.get is called with the expected arguments
-        ml_client_instance.models.get.assert_called_with(model_name, model_version)
+        # Assert ml_client.models.get is called with the expected arguments
+        ml_client_instance.models.get.assert_called_with(
+            model_name,
+            model_version
+        )
 
-        # Assert that ml_client.online_deployments.list is called with the expected arguments
+        # Assert that ml_client.online_deployments.list is called
+        # with the expected arguments
         ml_client_instance.online_deployments.list.assert_called_with(
             endpoint_name, local=False
         )
 
-        # Assert that ml_client.online_deployments.begin_create_or_update is called once
+        # Assert that ml_client.online_deployments.begin_create_or_update
+        # is called once
         create_deployment_calls = (
             ml_client_instance.online_deployments.begin_create_or_update
         )
         assert create_deployment_calls.call_count == 1
 
-        # Assert that ml_client.online_endpoints.begin_create_or_update is called with the correct arguments
+        # Assert that ml_client.online_endpoints.begin_create_or_update is
+        # called with the correct arguments
 
         # create_endpoint_calls.call_args_list is triple nested,
-        # first index: select the call of ml_client.online_deployments.begin_create_or_update [0]
-        # second index: select the argument of ml_client.online_deployments.begin_create_or_update [0 (deployment)]
+        # first index: select the call of
+        # ml_client.online_deployments.begin_create_or_update [0]
+        # second index: select the argument of
+        # ml_client.online_deployments.begin_create_or_update [0 (deployment)]
         # third index: select the first element of the tuple [0]
         created_deployment = create_deployment_calls.call_args_list[0][0][0]
         assert created_deployment.name == deployment_name
@@ -94,11 +109,18 @@ def test_create_kubernetes_deployment():
             RESOURCE_PATH / "flows/exp_flow"
         )
         assert (
-            created_deployment.environment.build.dockerfile_path == "docker/dockerfile"
+            created_deployment.environment.build.dockerfile_path == (
+                "docker/dockerfile"
+            )
         )
-        assert created_deployment.environment.inference_config == deployment_config
+        assert created_deployment.environment.inference_config == (
+            deployment_config
+        )
 
-        assert created_deployment.request_settings.request_timeout_ms == 90000
+        assert (
+            created_deployment.request_settings.request_timeout_ms
+            == REQUEST_TIMEOUT_MS
+        )
         assert created_deployment.resources.requests.cpu == deployment_cpu
         assert created_deployment.resources.requests.memory == deployment_mem
 
@@ -115,15 +137,18 @@ def test_create_kubernetes_deployment():
         )
         assert env_vars["PRT_CONFIG_OVERRIDE"] == expected_deployment_config
 
-        # Assert that ml_client.online_endpoints.begin_create_or_update is called twice
+        # Assert online_endpoints.begin_create_or_update is called twice
         update_endpoint_calls = ml_client_instance.begin_create_or_update
         assert update_endpoint_calls.call_count == 1
 
-        # Assert that ml_client.online_endpoints.begin_create_or_update is called with the correct argument
+        # Assert that ml_client.online_endpoints.begin_create_or_update is
+        # called with the correct argument
 
         # update_endpoint_calls.call_args_list is triple nested,
-        # first index: select the call of ml_client.online_endpoints.begin_create_or_update [0]
-        # second index: select the argument of ml_client.online_endpoints.begin_create_or_update [0 (endpoint)]
+        # first index: select the call of
+        # ml_client.online_endpoints.begin_create_or_update [0]
+        # second index: select the argument of
+        # ml_client.online_endpoints.begin_create_or_update [0 (endpoint)]
         # third index: select the first element of the tuple [0]
         updated_endpoint = update_endpoint_calls.call_args_list[0][0][0]
         assert int(updated_endpoint.traffic[deployment_name]) == 70

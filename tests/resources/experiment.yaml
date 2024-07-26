@@ -1,5 +1,5 @@
 name: exp
-flow: exp_flow
+flow: flows/exp_flow
 
 datasets:
 - name: ds1
