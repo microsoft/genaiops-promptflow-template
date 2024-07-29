@@ -1,7 +1,8 @@
 name: web_classification_pr_dev_pipeline
 
 on:
-  workflow_call:
+  # workflow_call:
+  workflow_dispatch:
     inputs:
       env_name:
         type: string
