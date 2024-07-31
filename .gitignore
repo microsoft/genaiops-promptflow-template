@@ -148,3 +148,8 @@ cython_debug/
 .idea/
 
 .vscode
+
+
+# others
+zz_notes.txt
+.env*
