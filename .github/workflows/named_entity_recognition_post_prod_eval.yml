@@ -1,68 +1,68 @@
-name: named_entity_recognition_post_production_evaluation
+# name: named_entity_recognition_post_production_evaluation
 
-on:
-  workflow_dispatch:
-    inputs:
-      flow_type:
-        description: "Flow type to execute"
-        required: true
-        default: "named_entity_recognition"
-      env_name:
-        description: "Environment name"
-        required: true
-        default: "postprodeval"
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       flow_type:
+#         description: "Flow type to execute"
+#         required: true
+#         default: "named_entity_recognition"
+#       env_name:
+#         description: "Environment name"
+#         required: true
+#         default: "postprodeval"
 
-jobs:
-  post_production_evaluation:
-    runs-on: ubuntu-latest
-    env:
-      RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
-      WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
-    steps:
-      - name: Checkout Actions
-        uses: actions/checkout@v4
-      - name: Azure login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.azure_credentials }}
-      - name: Configure Azure ML Agent
-        uses: ./.github/actions/configure_azureml_agent
-        with:
-          versionSpec: "3.9"
-          base_path: ${{ inputs.flow_type }}
-      - name: load the current Azure subscription details
-        id: subscription_details
-        shell: bash
-        run: |
-          export subscriptionId=$(az account show --query id -o tsv)
-          echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
+# jobs:
+#   post_production_evaluation:
+#     runs-on: ubuntu-latest
+#     env:
+#       RESOURCE_GROUP_NAME: ${{ vars.RESOURCE_GROUP_NAME }}
+#       WORKSPACE_NAME: ${{ vars.WORKSPACE_NAME }}
+#     steps:
+#       - name: Checkout Actions
+#         uses: actions/checkout@v4
+#       - name: Azure login
+#         uses: azure/login@v1
+#         with:
+#           creds: ${{ secrets.azure_credentials }}
+#       - name: Configure Azure ML Agent
+#         uses: ./.github/actions/configure_azureml_agent
+#         with:
+#           versionSpec: "3.9"
+#           base_path: ${{ inputs.flow_type }}
+#       - name: load the current Azure subscription details
+#         id: subscription_details
+#         shell: bash
+#         run: |
+#           export subscriptionId=$(az account show --query id -o tsv)
+#           echo "SUBSCRIPTION_ID=$subscriptionId" >> $GITHUB_OUTPUT
 
-      - name: Register experiment data asset
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Register experiment data asset"
-          script_parameter: |
-            python -m llmops.common.register_data_asset \
-            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --file "experiment-postprod.yaml" \
-            --base_path "named_entity_recognition" \
-            --env_name "postprodeval"
+#       - name: Register experiment data asset
+#         uses: ./.github/actions/execute_script
+#         with:
+#           step_name: "Register experiment data asset"
+#           script_parameter: |
+#             python -m llmops.common.register_data_asset \
+#             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+#             --file "experiment-postprod.yaml" \
+#             --base_path "named_entity_recognition" \
+#             --env_name "postprodeval"
 
-      - name: Execute prompt flow bulk evaluation
-        uses: ./.github/actions/execute_script
-        with:
-          step_name: "Execute prompt flow bulk evaluation"
-          script_parameter: |
-            python -m llmops.common.prompt_pipeline \
-            --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
-            --build_id ${{ github.run_id }} \
-            --base_path "named_entity_recognition" \
-            --file "experiment-postprod.yaml" \
-            --env_name "postprodeval" \
-            --output_file run_id.txt
+#       - name: Execute prompt flow bulk evaluation
+#         uses: ./.github/actions/execute_script
+#         with:
+#           step_name: "Execute prompt flow bulk evaluation"
+#           script_parameter: |
+#             python -m llmops.common.prompt_pipeline \
+#             --subscription_id ${{ steps.subscription_details.outputs.SUBSCRIPTION_ID }} \
+#             --build_id ${{ github.run_id }} \
+#             --base_path "named_entity_recognition" \
+#             --file "experiment-postprod.yaml" \
+#             --env_name "postprodeval" \
+#             --output_file run_id.txt
 
-      - name: Archive CSV
-        uses: actions/upload-artifact@v3
-        with:
-          name: evaluation-reports
-          path: ./reports
+#       - name: Archive CSV
+#         uses: actions/upload-artifact@v3
+#         with:
+#           name: evaluation-reports
+#           path: ./reports
