@@ -1,7 +1,0 @@
-{
-    "model_config": {
-        "azure_deployment": "gpt-35-turbo",
-        "connection": "aoai"
-    }
-}
-

@@ -1,3 +1,0 @@
-{"text": "Python Hello World!", "code": "print(\"Hello, world!\")"}
-{"text": "C Hello World!","code": "#include <stdio.h>int main() {printf(\"Hello World!\");return 0;}"}
-{"text": "C# Hello World!","code": "using System;class Program {static void Main(string[] args) {Console.WriteLine(\"Hello, world!\");}}"}

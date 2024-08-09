@@ -1,4 +1,0 @@
-$schema: https://azuremlschemas.azureedge.net/promptflow/latest/Flow.schema.json
-entry: code_quality:CodeEvaluator
-environment:
-  python_requirements_txt: requirements.txt
