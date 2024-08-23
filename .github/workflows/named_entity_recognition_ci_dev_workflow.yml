@@ -2,6 +2,7 @@ name: named_entity_recognition_ci_dev_pipeline
 
 on:
   workflow_call:
+  workflow_dispatch:
     inputs:
       env_name:
         type: string

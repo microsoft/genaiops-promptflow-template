@@ -2,6 +2,7 @@ name: math_coding_ci_dev_workflow
 
 on:
   workflow_call:
+  workflow_dispatch:
     inputs:
       env_name:
         type: string
