@@ -60,7 +60,7 @@ def resolve_env_vars(base_path: str, logger: logging.Logger) -> Dict:
             yaml_data = yaml.safe_load(file)
         for key, value in yaml_data.items():
             key = str(key).strip().upper()
-            value = str(value).strip().upper()
+            value = str(value).strip()
 
             value_existing = os.environ.get(key, None)
             if value_existing is not None:
