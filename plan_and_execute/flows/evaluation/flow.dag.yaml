@@ -1,0 +1,106 @@
+inputs:
+  json_schema_path:
+    type: string
+    default: plan_and_execute_json_schema.json
+  json_string:
+    type: string
+    default: '{"Plan":["Search the Web for the U.S. inflation rate in 2022.","Search
+      the Web for the U.S. inflation rate in 2023.","Use Math to calculate the change
+      rate of the U.S. inflation between 2022 and 2023.","Use LLM to determine if
+      there was an increase or decrease in the inflation based on the change rate."],"Functions":[{"id":"#E1","function":{"arguments":"{\"query\":
+      \"U.S. inflation rate in 2022\"}","name":"web_tool"},"type":"function"},{"id":"#E2","function":{"arguments":"{\"query\":
+      \"U.S. inflation rate in 2023\"}","name":"web_tool"},"type":"function"},{"id":"#E3","function":{"arguments":"{\"problem_description\":
+      \"Calculate the change rate of the U.S. inflation between 2022 and 2023\", \"context\":
+      \"#E1, #E2\"}","name":"math_tool"},"type":"function"},{"id":"#E4","function":{"arguments":"{\"request\":
+      \"Determine if there was an increase or decrease in the U.S. inflation between
+      2022 and 2023\", \"context\": \"#E3\"}","name":"llm_tool"},"type":"function"}]}'
+  plan_steps_count:
+    type: string
+    default: "4"
+  steps:
+    type: string
+    default: >-
+      #E1 = The U.S. inflation rate in 2022 is not provided in the given
+      context. #E2 = The U.S. inflation rate in 2023 was 3.4%.
+
+      #E3 = The change rate of the U.S. inflation between 2022 (assuming an inflation
+      rate of 6.5%) and 2023 (with an inflation rate of 3.4%) is approximately -47.69%.
+
+
+
+      This indicates a decrease of about 47.69% in the inflation rate from 2022 to
+      2023. #E4 = There was a decrease in the U.S. inflation between 2022 and 2023.
+  question:
+    type: string
+    default: What is the change rate of the U.S. inflation between 2022 and 2023?
+      Was there an increase or decrease in the inflation?
+  answer:
+    type: string
+    default: The change rate of U.S. inflation between 2022 and 2023 is approximately
+      -47.69%, indicating a decrease in the inflation rate.
+  ground_truth:
+    type: string
+    default: The change rate of the U.S. inflation between 2022 and 2023 was approximately
+      -48.75%. There was a decrease in the inflation rate.
+outputs:
+  json_evaluator_result:
+    type: string
+    reference: ${json_evaluator.output}
+  executor_evaluator_result:
+    type: string
+    reference: ${executor_evaluator.output}
+  similarity_evaluator_result:
+    type: string
+    reference: ${similarity_evaluator.output}
+  groundedness_evaluator_result:
+    type: string
+    reference: ${groundedness_evaluator.output}
+  relevance_evaluator_result:
+    type: string
+    reference: ${relevance_evaluator.output}
+nodes:
+- name: json_evaluator
+  type: python
+  source:
+    type: code
+    path: json_evaluator.py
+  inputs:
+    json_schema_path: ${inputs.json_schema_path}
+    json_string: ${inputs.json_string}
+- name: executor_evaluator
+  type: python
+  source:
+    type: code
+    path: executor_evaluator.py
+  inputs:
+    plan_steps_count: ${inputs.plan_steps_count}
+    steps: ${inputs.steps}
+- name: similarity_evaluator
+  type: python
+  source:
+    type: code
+    path: similarity_evaluator.py
+  inputs:
+    connection: plan_execute_agent_connection
+    question: ${inputs.question}
+    answer: ${inputs.answer}
+    ground_truth: ${inputs.ground_truth}
+- name: groundedness_evaluator
+  type: python
+  source:
+    type: code
+    path: groundedness_evaluator.py
+  inputs:
+    connection: plan_execute_agent_connection
+    steps: ${inputs.steps}
+    answer: ${inputs.answer}
+- name: relevance_evaluator
+  type: python
+  source:
+    type: code
+    path: relevance_evaluator.py
+  inputs:
+    connection: plan_execute_agent_connection
+    question: ${inputs.question}
+    answer: ${inputs.answer}
+    steps: ${inputs.steps}

@@ -1,0 +1,6 @@
+pyautogen==0.2.27
+bs4==0.0.2
+wikipedia==1.4.0
+numexpr==2.10.0
+jsonschema==4.22.0
+promptflow-evals

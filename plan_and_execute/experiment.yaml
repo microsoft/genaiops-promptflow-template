@@ -1,0 +1,41 @@
+name: plan_and_execute
+flow: flows/standard
+
+connections:
+- name: plan_execute_agent_connection
+  connection_type: CustomConnection
+  secrets:
+    aoai_api_key: ${aoai_api_key}
+    bing_api_key: ${bing_api_key}
+  configs:
+    aoai_base_url: ${aoai_base_url}
+    aoai_api_version: 2023-07-01-preview
+    bing_endpoint: https://api.bing.microsoft.com/v7.0/search
+    aoai_model_gpt4: gpt-4o
+    aoai_model_gpt35: gpt-35-turbo-16k
+
+datasets:
+- name: plan_and_execute_data
+  source: data/plan_and_execute_data.jsonl
+  description: "This dataset is for prompt experiments."
+  mappings:
+    question: "${data.question}"
+
+evaluators:
+- name: plan_and_execute_evaluation_flow
+  flow: flows/evaluation
+  datasets:
+  - name: plan_and_execute_eval_data
+    reference: plan_and_execute_data
+    source: data/plan_and_execute_eval_data.jsonl
+    description: "This dataset is for evaluating flows."
+    mappings:
+      groundtruth: "${data.answer}"
+      prediction: "${run.outputs.answer}"
+      json_schema_path: plan_and_execute_json_schema.json
+      json_string: "${run.outputs.plan}"
+      plan_steps_count: "${run.outputs.number_of_steps}"
+      steps: "${run.outputs.steps}"
+      question: "${data.question}"
+      answer: "${run.outputs.answer}"
+      ground_truth: "${data.answer}"
