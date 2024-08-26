@@ -197,7 +197,7 @@ APPLICATIONINSIGHTS_CONNECTION_STRING=xxxx
 
 ### What values should go into .env file and ENV_VARS ?
 
-If you have configurations in flows (init.json, flow.flex.yaml), experiment.yaml and env.yaml files that uses ${secret_name} style placeholders, then the actual value for secret_name should be stored in ENV_VARS secret in github, library variable in Azure DevOps and within .env file for local execution. These placeholders will be replaced by the actual values during execution either from ENV_VARS secret in github, library variable in Azure DevOps or from .env file for local execution.
+If you have configurations in flows (init.json, flow.flex.yaml), experiment.yaml and env.yaml files that uses ${SECRET_NAME} style placeholders, then the actual value for SECRET_NAME should be stored in ENV_VARS secret in github, library variable in Azure DevOps and within .env file for local execution. These placeholders will be replaced by the actual values during execution either from ENV_VARS secret in github, library variable in Azure DevOps or from .env file for local execution.
 
 - `experiment.yaml` file should contain placeholders for api_key within connections element.
 - `env.yaml` file should contain placeholders for all other configurations. Check use case `function_flows` for an example. It has multiple ${} placeholder within env.yaml.
