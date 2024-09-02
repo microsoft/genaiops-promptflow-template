@@ -9,6 +9,7 @@ connections:
   api_key: ${api_key}
   api_type: azure
 
+- name: math_coding_training
 datasets:
 - name: math_coding_training
   source: data/math_data.jsonl
