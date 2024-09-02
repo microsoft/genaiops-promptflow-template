@@ -11,11 +11,14 @@
 
 [***FAQS HERE***](./docs/faqs.md)
 
+Minor change
+
 Large Language Model Operations, or LLMOps, has become the cornerstone of efficient prompt engineering and LLM induced application development and deployment. As the demand for LLM induced applications continues to soar, organizations find themselves in need of a cohesive and streamlined process to manage their end-to-end lifecycle.
 
 The rise of AI and large language models (LLMs) has transformed various industries, enabling the development of innovative applications with human-like text understanding and generation capabilities. This revolution has opened up new possibilities across fields such as customer service, content creation, and data analysis.
 
 As LLMs rapidly evolve, the importance of Prompt Engineering becomes increasingly evident. Prompt Engineering plays a crucial role in harnessing the full potential of LLMs by creating effective prompts that cater to specific business scenarios. This process enables developers to create tailored AI solutions, making AI more accessible and useful to a broader audience.
+
 
 It is an experimentation and evaluation framework for Prompt Flow. It is just not CI/CD pipelines for Prompt Flow, although it supports it. It has rich set of features for experimentation, evaluation, deployment and monitoring of Prompt Flow. It is a complete end-to-end solution for Prompt Flow operationalization.
 
