@@ -45,7 +45,7 @@ class ClientObjectWrapper:
             raise ValueError("Neither 'pf' nor 'ml_client' is available")
 
 
-def resolve_env_vars(base_path: str) -> Dict:
+def resolve_env_vars(base_path: str, logger: logging.Logger) -> Dict:
     """
     Resolve the environment variables from the config files.
 
@@ -55,33 +55,40 @@ def resolve_env_vars(base_path: str) -> Dict:
     env_vars = {}
     yaml_file_path = os.path.join(base_path,  "environment", "env.yaml")
     if os.path.isfile(os.path.abspath(yaml_file_path)):
+        logger.info(f"Reading envvars from '{yaml_file_path}'")
         with open(yaml_file_path, "r") as file:
             yaml_data = yaml.safe_load(file)
         for key, value in yaml_data.items():
             key = str(key).strip().upper()
-            value = str(value).strip().upper()
+            value = str(value).strip()
 
-            temp_val = os.environ.get(key, None)
-            if temp_val is not None:
-                env_vars[key] = os.environ.get(key, None)
-            else:
-                if (
-                    isinstance(value, str)
-                    and value.startswith('${')
-                    and value.endswith('}')
-                ):
-                    value = value.replace('${', '').replace('}', '')
-                    resolved_value = os.environ.get(value, None)
+            value_existing = os.environ.get(key, None)
+            if value_existing is not None:
+                logger.info(f"Envvar {key} defined in env, using that value.")
+                env_vars[key] = value_existing
+            elif value is None or len(value) == 0:
+                raise ValueError(f"{key} in env.yaml not resolved")
+            elif (
+                isinstance(value, str)
+                and value.startswith('${')
+                and value.endswith('}')
+            ):
+                value_reference = value.replace('${', '').replace('}', '')
+                try:
+                    resolved_value = os.environ[value_reference]
+                    logger.info(f"Reference {value} resolved.")
                     os.environ[key] = str(resolved_value)
                     env_vars[key] = str(resolved_value)
-                elif value is None or len(value) == 0:
-                    raise ValueError(f"{key} in env.yaml not resolved")
-                else:
-                    os.environ[key] = str(value)
-                    env_vars[key] = str(value)
+                except KeyError as e:
+                    raise ValueError(
+                        f"Reference {value} could not be resolved") from e
+            else:
+                os.environ[key] = str(value)
+                env_vars[key] = str(value)
+                logger.info(f"Envvar {key} loaded.")
     else:
         env_vars = {}
-        print("no values")
+        logger.info("No env file found.")
     return env_vars
 
 

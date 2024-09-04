@@ -115,7 +115,7 @@ def create_deployment(
                 key, value = key_value
                 params_dict[key] = value
 
-    env_vars = resolve_env_vars(experiment.base_path)
+    env_vars = resolve_env_vars(experiment.base_path, logger)
 
     real_config = f"{base_path}/configs/deployment_config.json"
 

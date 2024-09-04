@@ -172,6 +172,7 @@ def prepare_and_execute(
     ml_client = None
     wrapper = None
     if EXECUTION_TYPE == "LOCAL":
+        logger.info("Creating promptflow connections for local execution.")
         pf = PFClientLocal()
         create_pf_connections(
             exp_filename,
@@ -207,7 +208,7 @@ def prepare_and_execute(
     all_metrics = []
 
     env_vars = {}
-    env_vars = resolve_env_vars(experiment.base_path)
+    env_vars = resolve_env_vars(experiment.base_path, logger)
 
     logger.info(f"Running experiment {experiment.name}")
     for mapped_dataset in experiment.datasets:
