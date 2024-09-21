@@ -13,7 +13,7 @@
             "DEPLOYMENT_VM_SIZE": "Standard_F4s_v2",
             "DEPLOYMENT_INSTANCE_COUNT": 1,
             "ENVIRONMENT_VARIABLES": {
-                "example-name": "example-value"
+                "example-name": "example-values"
             }
         }
     ],
