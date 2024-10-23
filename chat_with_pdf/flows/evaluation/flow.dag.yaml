@@ -422,7 +422,7 @@ nodes:
     type: code
     path: rag_groundedness_prompt.jinja2
   inputs:
-    deployment_name: aoai
+    deployment_name: gpt-35-turbo
     temperature: 0
     top_p: 1
     max_tokens: 1000
@@ -443,7 +443,7 @@ nodes:
     type: code
     path: rag_retrieval_prompt.jinja2
   inputs:
-    deployment_name: aoai
+    deployment_name: gpt-35-turbo
     temperature: 0
     top_p: 1
     max_tokens: 1000
@@ -463,7 +463,7 @@ nodes:
     type: code
     path: rag_generation_prompt.jinja2
   inputs:
-    deployment_name: aoai
+    deployment_name: gpt-35-turbo
     temperature: 0
     top_p: 1
     max_tokens: 1000
