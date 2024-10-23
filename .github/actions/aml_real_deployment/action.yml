@@ -24,24 +24,10 @@ inputs:
   KEY_VAULT_NAME:
     description: "Key vault name"
     required: true
-  ENV_VARS:
-    description: 'The API key for authentication'
-    required: false
 
 runs:
   using: composite
-  steps:
-    - name: Create .env file
-      shell: bash
-      run: |
-        echo "${{ inputs.ENV_VARS }}" >> .env
-        for var in $(cat .env); do
-          echo "$var" >> $GITHUB_ENV
-        done
-    - name: load .env file
-      shell: bash
-      run: python -c "from dotenv import load_dotenv; load_dotenv()"
-      
+  steps:      
     - name: Provision Managed Endpoint
       uses: ./.github/actions/execute_script
       with:
