@@ -54,8 +54,10 @@ jobs:
 
       - name: Create .env file
         run: |
+          set -e # fail on error        
           echo "${{ secrets.ENV_VARS }}" >> .env
           for var in $(cat .env); do
+            echo "::add-mask::$var"
             echo "$var" >> $GITHUB_ENV
           done
       - name: load .env file
