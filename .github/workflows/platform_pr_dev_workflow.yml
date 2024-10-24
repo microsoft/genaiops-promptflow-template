@@ -43,6 +43,7 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.azure_credentials }}
+          
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
         with:
