@@ -15,7 +15,7 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-      env_vars:
+      ENV_VARS:
         description: "env vars for the flow"
         required: false
 
