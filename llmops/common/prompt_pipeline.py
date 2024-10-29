@@ -382,7 +382,8 @@ def prepare_and_execute(
                 try:
                     run = pf.run(**common_params)
                     if hasattr(run, '_error') and run._error:
-                        logger.error(f"Run completed with errors: {run._error}")
+                        logger.error(
+                            f"Run completed with errors: {run._error}")
                         raise RuntimeError(
                             f"Run completed with errors: {run._error}")
                 except Exception as e:
