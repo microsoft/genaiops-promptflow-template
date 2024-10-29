@@ -268,7 +268,6 @@ def prepare_and_execute(
                             raise e
                     else:
                         raise ValueError("Invalid flow type")
-
                 run._experiment_name = experiment_name
 
                 # Execute the run
