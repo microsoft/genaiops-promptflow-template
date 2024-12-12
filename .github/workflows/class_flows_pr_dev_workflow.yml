@@ -1,4 +1,4 @@
-name: class_flows_ci_dev_workflow
+name: class_flows_pr_dev_workflow
 
 on:
   workflow_call:
