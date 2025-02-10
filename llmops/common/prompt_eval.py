@@ -86,8 +86,6 @@ def prepare_and_execute(
 
     run_ids = resolve_run_ids(run_id)
 
-    eval_flows = experiment.evaluators
-
     flow_type, params_dict = resolve_flow_type(experiment.base_path,
                                                experiment.flow
                                                )
@@ -136,8 +134,8 @@ def prepare_and_execute(
     all_eval_df = []
     all_eval_metrics = []
 
-    for evaluator in eval_flows:
-        logger.info(f"Starting evaluation of '{evaluator.name}'")
+    for evaluator in experiment.evaluators:
+        logger.info(f"Starting evaluation with '{evaluator.name}'")
 
         flow_type, params_dict = resolve_flow_type(evaluator.path, "")
 
@@ -145,8 +143,6 @@ def prepare_and_execute(
 
         dataframes = []
         metrics = []
-
-        flow_name = evaluator.name
 
         evaluator_executed = False
 
@@ -161,7 +157,7 @@ def prepare_and_execute(
             run_data_id = current_standard_run.data
             print(run_data_id)
             if not run_data_id:
-                raise ValueError(f"Run {flow_run}has no data reference.")
+                raise ValueError(f"Run {flow_run} has no data reference.")
 
             # Get evaluation datasets by getting the datasets
             # that reference the standard run
@@ -215,7 +211,7 @@ def prepare_and_execute(
                     )
                 else:
                     logger.info(
-                        f"Using runtime '{experiment.runtime}' for runn"
+                        f"Using runtime '{experiment.runtime}' for run"
                     )
 
                 timestamp = datetime.datetime.now().strftime(
@@ -318,34 +314,28 @@ def prepare_and_execute(
                 logger.info(df_result.head(10))
 
         if evaluator_executed and report_dir:
+            logger.info(f"Generating reports for {evaluator.name}")
             if not os.path.exists(report_dir):
                 os.makedirs(report_dir)
 
             combined_results_df = pd.concat(dataframes, ignore_index=True)
             combined_metrics_df = pd.DataFrame(metrics)
-            combined_results_df["flow_name"] = flow_name
-            combined_metrics_df["flow_name"] = flow_name
+            combined_results_df["flow_name"] = evaluator.name
+            combined_metrics_df["flow_name"] = evaluator.name
             combined_results_df["exp_run"] = flow_run
             combined_metrics_df["exp_run"] = flow_run
 
-            combined_results_df.to_csv(
-                f"{report_dir}/{run_dataset.name}_result.csv"
-                )
-            combined_metrics_df.to_csv(
-                f"{report_dir}/{run_dataset.name}_metrics.csv"
-                )
+            fname_base = f"{report_dir}/{evaluator.name}"
+            combined_results_df.to_csv(f"{fname_base}_result.csv")
+            combined_metrics_df.to_csv(f"{fname_base}_metrics.csv")
 
             styled_df = combined_results_df.to_html(index=False)
 
-            with open(
-                f"{report_dir}/{run_dataset.name}_result.html", "w"
-            ) as c_results:
+            with open(f"{fname_base}_result.html", "w") as c_results:
                 c_results.write(styled_df)
 
             html_table_metrics = combined_metrics_df.to_html(index=False)
-            with open(
-                f"{report_dir}/{run_dataset.name}_metrics.html", "w"
-            ) as c_metrics:
+            with open(f"{fname_base}_metrics.html", "w") as c_metrics:
                 c_metrics.write(html_table_metrics)
 
             all_eval_df.append(combined_results_df)
@@ -437,6 +427,7 @@ def prepare_and_execute(
 
                                 print(result)
 
+    # Final reports
     if len(all_eval_df) > 0:
         final_results_df = pd.concat(all_eval_df, ignore_index=True)
         final_metrics_df = pd.concat(all_eval_metrics, ignore_index=True)
@@ -444,19 +435,16 @@ def prepare_and_execute(
         final_results_df["experiment_name"] = experiment_name
         final_results_df["build"] = build_id
 
-        final_results_df.to_csv(f"{report_dir}/{experiment_name}_result.csv")
-        final_metrics_df.to_csv(f"{report_dir}/{experiment_name}_metrics.csv")
+        fname_base = f"{report_dir}/{experiment_name}"
+        final_results_df.to_csv(f"{fname_base}_result.csv")
+        final_metrics_df.to_csv(f"{fname_base}_metrics.csv")
 
         styled_df = final_results_df.to_html(index=False)
-        with open(
-            f"{report_dir}/{experiment_name}_result.html", "w"
-        ) as f_results:
+        with open(f"{fname_base}_result.html", "w") as f_results:
             f_results.write(styled_df)
 
         html_table_metrics = final_metrics_df.to_html(index=False)
-        with open(
-            f"{report_dir}/{experiment_name}_metrics.html", "w"
-        ) as f_metrics:
+        with open(f"{fname_base}_metrics.html", "w") as f_metrics:
             f_metrics.write(html_table_metrics)
 
 
