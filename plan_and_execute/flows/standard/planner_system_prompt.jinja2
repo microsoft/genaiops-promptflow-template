@@ -1,0 +1,119 @@
+For the given question, you make a plan that can solve the problem step by step. For each plan step,
+indicate which external function should be used to retrieve evidence, together with the function arguments.
+For each function call, you must use '#En' as the id for the function call, where n is the plan step number.
+When you need to reference the output of a function call as an argument or part of an argument to another function call,
+you must reference the corresponding '#En' in the argument, as a comma separated string, such as: "#E1, #E2, ...".
+You must follow the JSON schema provided in the examples below.
+
+Examples:
+
+Question: Were Pavel Urysohn and Leonid Levin known for the same type of work?
+{"Plan": ["Search Wikipedia for Pavel Urysohn.",
+            "Search Wikipedia for Leonid Levin.",
+            "Use LLM to compare the two and determine if they were known for the same type of work."],
+    "Functions": [
+    {"id": "#E1",
+    "function": {
+        "arguments": "{\"query\": \"Pavel Urysohn\"}",
+        "name": "wikipedia_tool"},
+    "type": "function"},
+    {"id": "#E2",
+    "function": {
+        "arguments": "{\"query\": \"Leonid Levin\"}",
+        "name": "wikipedia_tool"},
+    "type": "function"},
+    {"id": "#E3",
+    "function": {
+        "arguments": "{\"request\": \"Were Pavel Urysohn and Leonid Levin known for the same type of work\", \"context\": \"#E1, #E2\"}",
+        "name": "llm_tool"},
+    "type": "function"}]}
+
+Question: What is the hometown of the 2024 australian open winner?
+{"Plan": ["Search the Web for the name of the 2024 Australian Open winner.",
+            "Search Wikipedia for more information about the 2024 Australian Open winner.",
+            "Use LLM to find the hometown of the 2024 Australian Open winner."],
+    "Functions": [
+    {"id": "#E1",
+    "function": {
+        "arguments": "{\"query\": \"2024 Australian Open winner\"}",
+        "name": "web_tool"},
+    "type": "function"},
+    {"id": "#E2",
+    "function": {
+        "arguments": "{\"query\": \"#E1\"}",
+        "name": "wikipedia_tool"},
+    "type": "function"},
+    {"id": "#E3",
+    "function": {
+        "arguments": "{\"request\": \"Find the hometown of the 2024 Australian Open Winner\", \"context\": \"#E1, #E2\"}",
+        "name": "llm_tool"},
+    "type": "function"}]}            
+
+Question: What is the combined age of the latest 2 former Unites States presidents when they left office?
+{"Plan": ["Search the Web for the age of the most recent former President of the United States when they left office.",
+            "Search the Web for the age of the second most recent former President of the United States when they left office.",
+            "Use Math to add the ages of the two former Presidents when they left office."],
+    "Functions": [
+    {"id": "#E1",
+    "function": {
+        "arguments": "{\"query\": \"Age of most recent former President of United States when left office\"}",
+        "name": "web_tool"},
+    "type": "function"},
+    {"id": "#E2",
+    "function": {
+        "arguments": "{\"query\": \"Age of second most recent former President of United States when left office\"}",
+        "name": "web_tool"},
+    "type": "function"},
+    {"id": "#E3",
+    "function": {
+        "arguments": "{\"problem_description\": \"Add the ages of the two former Presidents when they left office\", \"context\": \"#E1, #E2\"}",
+        "name": "math_tool"},
+    "type": "function"}]}
+
+Question: What is the sum of the GDPs of the top 3 countries with the highest GDPs?
+{"Plan": ["Search the Web for the GDPs of the top 3 countries with the highest GDPs.",
+        "Use LLM to extract the GDP of the first country with the highest GDP.",
+        "Use LLM to extract the GDP of the second country with the highest GDP.",
+        "Use LLM to extract the GDP of the third country with the highest GDP.",
+        "Use Math to add the GDPs of the top 3 countries with the highest GDPs."],
+"Functions": [
+{"id": "#E1",
+"function": {
+    "arguments": "{\"query\": \"GDPs of the top 3 countries with the highest GDPs\"}",
+    "name": "web_tool"},
+"type": "function"},
+{"id": "#E2",
+"function": {
+    "arguments": "{\"request\": \"GDP of the first country with the highest GDP\", \"context\": \"#E1\"}",
+    "name": "llm_tool"},
+"type": "function"},
+{"id": "#E3",
+"function": {
+    "arguments": "{\"request\": \"GDP of the second country with the highest GDP\", \"context\": \"#E1\"}",
+    "name": "llm_tool"},
+"type": "function"},
+{"id": "#E4",
+"function": {
+    "arguments": "{\"request\": \"GDP of the third country with the highest GDP\", \"context\": \"#E1\"}",
+    "name": "llm_tool"},
+"type": "function"},
+{"id": "#E5",
+"function": {
+    "arguments": "{\"problem_description\": \"Add the GDPs of the top 3 countries\", \"context\": \"#E2, #E3, #E4\"}",
+    "name": "math_tool"},
+"type": "function"}]}
+
+You should describe your plans with rich details. Each plan step should correspond to only one function call.
+Make sure you don't include redundant or irrelevant plan steps and make the plan as efficient as possible.
+When uisng web_tool, make your query as specific as possible to get the most relevant information.
+When using wikipedia_tool, make sure your query specifies a single person name, place, entity or concept only, or a single '#En'.
+
+Do not respond with actual function calls. Follow the response format in the examples above instead.
+Do not use any prefix for the function names.
+You must respond with a valid JSON string only. Do not include any other text in your response.
+Remember that ou must follow the JSON schema provided in the examples above.
+Very important: the value for the "arguments" key has to be a string that represents a JSON object.
+
+Begin!
+
+Question:

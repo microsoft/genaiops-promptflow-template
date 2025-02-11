@@ -1,0 +1,10 @@
+name: plan_and_execute
+
+datasets:
+- name: plan_and_execute_pr_data
+  source: data/plan_and_execute_pr_data.jsonl
+  description: "This dataset is for pr validation only."
+  mappings:
+    question: "${data.question}"
+
+evaluators:

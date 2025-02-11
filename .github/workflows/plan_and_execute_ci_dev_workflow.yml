@@ -1,0 +1,44 @@
+name: plan_and_execute_ci_dev_workflow
+
+on:
+  workflow_call:
+  workflow_dispatch:
+    inputs:
+      env_name:
+        type: string
+        description: "Execution Environment"
+        required: true
+        default: "dev"
+      use_case_base_path:
+        type: string
+        description: "The flow usecase to execute"
+        required: true
+        default: "plan_and_execute"
+      deployment_type:
+        type: string
+        description: "Determine type of deployment - aml, aks, docker, webapp"
+        required: true
+  push:
+    branches:
+      - main
+      - development
+    paths:
+      - 'plan_and_execute/**'
+      - '.github/**'
+      - 'llmops/**'
+  
+
+#=====================================
+# Execute platform_ci_dev_workflow workflow for experiment, evaluation and deployment of flows
+#=====================================
+jobs:
+  execute-platform-flow-ci:
+    uses: ./.github/workflows/platform_ci_dev_workflow.yml
+    with:
+      env_name: ${{ inputs.env_name || 'dev'}}
+      use_case_base_path: ${{ inputs.use_case_base_path || 'plan_and_execute' }}
+      deployment_type: ${{ inputs.deployment_type|| 'aml' }}
+    secrets:
+      azure_credentials: ${{ secrets.AZURE_CREDENTIALS }}
+      registry_details: ${{ secrets.DOCKER_IMAGE_REGISTRY }}
+      env_vars: ${{ secrets.ENV_VARS }}
