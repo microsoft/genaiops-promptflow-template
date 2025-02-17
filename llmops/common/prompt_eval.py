@@ -231,43 +231,39 @@ def prepare_and_execute(
                     )]
 
                 if files_found:
-                    if flow_type == FlowTypeOption.DAG_FLOW \
-                            or flow_type == FlowTypeOption.FUNCTION_FLOW:
-                        run = pf.run(
-                            flow=evaluator.path,
-                            data=data_id,
-                            run=current_standard_run,
-                            name=run_name,
-                            display_name=run_name,
-                            environment_variables=env_vars,
-                            column_mapping=column_mapping,
-                            tags={} if not build_id else {
-                                "build_id": build_id
-                                },
-                            runtime=experiment.runtime,
-                            resources=runtime_resources,
-                            stream=True,
-                        )
-                    elif flow_type == FlowTypeOption.CLASS_FLOW:
-                        run = pf.run(
-                            flow=evaluator.path,
-                            data=data_id,
-                            run=current_standard_run,
-                            name=run_name,
-                            display_name=run_name,
-                            environment_variables=env_vars,
-                            column_mapping=column_mapping,
-                            tags={} if not build_id else {
-                                "build_id": build_id
-                                },
-                            runtime=experiment.runtime,
-                            resources=runtime_resources,
-                            init=params_dict,
-                            stream=True,
-                        )
+                    common_params = {
+                        "flow": evaluator.path,
+                        "data": data_id,
+                        "run": current_standard_run,
+                        "name": run_name,
+                        "display_name": run_name,
+                        "environment_variables": env_vars,
+                        "column_mapping": column_mapping,
+                        "tags": {} if not build_id else {"build_id": build_id},
+                        "runtime": experiment.runtime,
+                        "resources": runtime_resources,
+                        "stream": True,
+                        "raise_on_error": True,
+                    }
+                    if flow_type == FlowTypeOption.CLASS_FLOW:
+                        common_params["init"] = params_dict
+                    if flow_type in [FlowTypeOption.DAG_FLOW,
+                                     FlowTypeOption.FUNCTION_FLOW,
+                                     FlowTypeOption.CLASS_FLOW]:
+                        try:
+                            run = pf.run(**common_params)
+                            if hasattr(run, '_error') and run._error:
+                                logger.error(
+                                    "Run completed with errors: "
+                                    + f"{run._error}")
+                                raise RuntimeError(
+                                    "Run completed with errors: "
+                                    + f"{run._error}")
+                        except Exception as e:
+                            logger.error(f"Error running the flow: {e}")
+                            raise e
                     else:
                         raise ValueError("Invalid flow type")
-
                 run._experiment_name = experiment_name
 
                 # Execute the run

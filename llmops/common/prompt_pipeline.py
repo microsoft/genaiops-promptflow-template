@@ -274,54 +274,44 @@ def prepare_and_execute(
                             else {"instance_type": "Standard_E4ds_v4"}
                         )
 
-                        if (flow_type == FlowTypeOption.DAG_FLOW or
-                                flow_type == FlowTypeOption.FUNCTION_FLOW):
-                            run = pf.run(
-                                flow=flow_detail.flow_path,
-                                data=(
-                                    dataset.get_local_source(base_path)
-                                    if EXECUTION_TYPE == "LOCAL"
-                                    else dataset.get_remote_source(
-                                        wrapper.get_property_value()
-                                    )
-                                ),
-                                variant=variant_string,
-                                name=run_name,
-                                display_name=run_name,
-                                environment_variables=env_vars,
-                                column_mapping=column_mapping,
-                                tags={} if not build_id else {
-                                    "build_id": build_id
-                                },
-                                resources=runtime_resources,
-                                runtime=experiment.runtime,
-                                stream=True,
-                            )
-                        elif flow_type == FlowTypeOption.CLASS_FLOW:
-                            run = pf.run(
-                                flow=flow_detail.flow_path,
-                                data=(
-                                    dataset.get_local_source(base_path)
-                                    if EXECUTION_TYPE == "LOCAL"
-                                    else dataset.get_remote_source(
-                                        wrapper.get_property_value()
-                                    )
-                                ),
-                                variant=variant_string,
-                                name=run_name,
-                                display_name=run_name,
-                                environment_variables=env_vars,
-                                column_mapping=column_mapping,
-                                tags={} if not build_id else {
-                                    "build_id": build_id
-                                },
-                                resources=runtime_resources,
-                                runtime=experiment.runtime,
-                                init=params_dict,
-                                stream=True,
-                            )
+                        common_params = {
+                            "flow": flow_detail.flow_path,
+                            "data": (dataset.get_local_source(base_path)
+                                     if EXECUTION_TYPE == "LOCAL"
+                                     else dataset.get_remote_source(
+                                         wrapper.get_property_value())),
+                            "variant": variant_string,
+                            "name": run_name,
+                            "display_name": run_name,
+                            "environment_variables": env_vars,
+                            "column_mapping": column_mapping,
+                            "tags": {} if not build_id else {
+                                "build_id": build_id},
+                            "resources": runtime_resources,
+                            "runtime": experiment.runtime,
+                            "stream": True,
+                            "raise_on_error": True,
+                        }
+                        if flow_type == FlowTypeOption.CLASS_FLOW:
+                            common_params["init"] = params_dict
+                        if flow_type in [FlowTypeOption.DAG_FLOW,
+                                         FlowTypeOption.FUNCTION_FLOW,
+                                         FlowTypeOption.CLASS_FLOW]:
+                            try:
+                                run = pf.run(**common_params)
+                                if hasattr(run, '_error') and run._error:
+                                    logger.error(
+                                        "Run completed with errors: "
+                                        + f"{run._error}")
+                                    raise RuntimeError(
+                                        "Run completed with errors: "
+                                        + f"{run._error}")
+                            except Exception as e:
+                                logger.error(f"Error running the flow: {e}")
+                                raise e
                         else:
                             raise ValueError("Invalid flow type")
+
                         run._experiment_name = experiment.name
 
                         # Execute the run
@@ -368,46 +358,39 @@ def prepare_and_execute(
                 }
             )
 
-            if (flow_type == FlowTypeOption.DAG_FLOW or
-                    flow_type == FlowTypeOption.FUNCTION_FLOW):
-                run = pf.run(
-                    flow=flow_detail.flow_path,
-                    data=(
-                        dataset.get_local_source(base_path)
-                        if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(
-                            wrapper.get_property_value()
-                            )
-                    ),
-                    name=run_name,
-                    display_name=run_name,
-                    environment_variables=env_vars,
-                    column_mapping=column_mapping,
-                    tags={} if not build_id else {"build_id": build_id},
-                    resources=runtime_resources,
-                    runtime=experiment.runtime,
-                    stream=True,
-                )
-            elif flow_type == FlowTypeOption.CLASS_FLOW:
-                run = pf.run(
-                    flow=flow_detail.flow_path,
-                    data=(
-                        dataset.get_local_source(base_path)
-                        if EXECUTION_TYPE == "LOCAL"
-                        else dataset.get_remote_source(
-                                wrapper.get_property_value()
-                            )
-                    ),
-                    name=run_name,
-                    display_name=run_name,
-                    environment_variables=env_vars,
-                    column_mapping=column_mapping,
-                    tags={} if not build_id else {"build_id": build_id},
-                    resources=runtime_resources,
-                    runtime=experiment.runtime,
-                    init=params_dict,
-                    stream=True,
-                )
+            common_params = {
+                "flow": flow_detail.flow_path,
+                "data": (dataset.get_local_source(base_path)
+                         if EXECUTION_TYPE == "LOCAL"
+                         else dataset.get_remote_source(
+                              wrapper.get_property_value())),
+                "name": run_name,
+                "display_name": run_name,
+                "environment_variables": env_vars,
+                "column_mapping": column_mapping,
+                "tags": {} if not build_id else {"build_id": build_id},
+                "resources": runtime_resources,
+                "runtime": experiment.runtime,
+                "stream": True,
+                "raise_on_error": True,
+            }
+            if flow_type == FlowTypeOption.CLASS_FLOW:
+                common_params["init"] = params_dict
+            if flow_type in [FlowTypeOption.DAG_FLOW,
+                             FlowTypeOption.FUNCTION_FLOW,
+                             FlowTypeOption.CLASS_FLOW]:
+                try:
+                    run = pf.run(**common_params)
+                    if hasattr(run, '_error') and run._error:
+                        logger.error(
+                            f"Run completed with errors: {run._error}")
+                        raise RuntimeError(
+                            f"Run completed with errors: {run._error}")
+                except Exception as e:
+                    logger.error(f"Error running the flow: {e}")
+                    raise e
+            else:
+                raise ValueError("Invalid flow type")
             run._experiment_name = experiment.name
             print(run)
 
