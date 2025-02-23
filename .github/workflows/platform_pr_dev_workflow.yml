@@ -15,7 +15,7 @@ on:
       azure_credentials:
         description: "service principal auth to Azure"
         required: true
-      env_vars:
+      ENV_VARS:
         description: "env vars for the flow"
         required: false
 
@@ -43,19 +43,24 @@ jobs:
         uses: azure/login@v1
         with:
           creds: ${{ secrets.azure_credentials }}
+          
       - name: Configure Azure ML Agent
         uses: ./.github/actions/configure_azureml_agent
         with:
           versionSpec: "3.9"
           base_path: ${{ inputs.use_case_base_path }}
-      - name: Create .env file
+
+      - name: Load secrets from ENV_VARS
         run: |
-          echo "${{ secrets.env_vars }}" >> .env
-          for var in $(cat .env); do
-            echo "$var" >> $GITHUB_ENV
+          set -e # fail on error
+          IFS=$'\n' # Set internal field separator to new line
+          for var in $(echo "${{ secrets.ENV_VARS }}"); do
+            KEY=$(echo "$var" | cut -d '=' -f 1)
+            VALUE=$(echo "$var" | cut -d '=' -f 2-)
+            echo "::add-mask::$VALUE"
+            echo "$KEY=$VALUE" >> $GITHUB_ENV
           done
-      - name: load .env file
-        run: python -c "from dotenv import load_dotenv; load_dotenv()"
+        shell: bash
 
       - name: load the current Azure subscription details
         id: subscription_details

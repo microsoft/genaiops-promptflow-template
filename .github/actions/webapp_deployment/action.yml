@@ -9,20 +9,10 @@ inputs:
   DEPLOY_ENVIRONMENT:
     description: "env stage e.g. dev, test, prod"
     required: true
-  ENV_VARS:
-    description: "env stage e.g. dev, test, prod"
-    required: true
 
 runs:
   using: composite
   steps:
-    - name: Convert .env to environment variables
-      shell: bash
-      run: |
-        while IFS='=' read -r key value; do
-          echo "$key=$value" >> $GITHUB_ENV
-        done <<< "${{ inputs.env_vars }}"
-
     - name: create docker image
       shell: bash
       run: use_case_base_path=${{ inputs.USE_CASE_BASE_PATH }} deploy_environment=${{ inputs.DEPLOY_ENVIRONMENT }} build_id=${{ github.run_id }} ./llmops/common/scripts/gen_docker_image.sh 
